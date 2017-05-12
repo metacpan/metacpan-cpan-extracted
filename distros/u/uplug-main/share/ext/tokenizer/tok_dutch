@@ -1,0 +1,4 @@
+#!/bin/sh
+
+${ALPINO_HOME}/Tokenization/tokenize.sh
+

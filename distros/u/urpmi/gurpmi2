@@ -1,0 +1,459 @@
+#!/usr/bin/perl
+
+#- Copyright (C) 2005 MandrakeSoft SA
+#- Copyright (C) 2005-2010 Mandriva SA
+
+use strict;
+
+BEGIN { #- set up a safe path and environment
+    $ENV{PATH} = "/sbin:/usr/sbin:/bin:/usr/bin";
+    delete @ENV{qw(ENV BASH_ENV IFS CDPATH)};
+}
+
+use gurpmi;
+use urpm::download;
+use urpm::install;
+use urpm::media;
+use urpm::signature;
+use urpm::get_pkgs;
+use urpm::msg;
+use urpm::util;
+use urpm::select;
+use urpm::main_loop;
+use Gtk2;
+
+#- default options.
+our $allow_medium_change = 0;
+our $auto_select = 0;
+our $force = 0;
+our $test = 0;
+our $use_provides = 1;
+
+my $progressbar_size = 450;
+
+#- GUI globals
+my ($mainw, $mainbox);
+
+#- Replaces the contents of the main window with the specified box
+#- (avoids popup multiplication)
+sub change_mainw {
+    $mainw->remove($mainbox);
+    ($mainbox) = @_;
+    $mainw->add($mainbox);
+    $mainw->show_all;
+}
+
+sub sync () {
+    $mainw->show;
+    Gtk2->main_iteration while Gtk2->events_pending;
+}
+
+#- sets the window to a please-wait message
+sub wait_label {
+    my ($o_text) = @_;
+    my $wait_vbox = Gtk2::VBox->new(0, 5);
+    my $wait_label = Gtk2::Label->new($o_text || N("Please wait..."));
+    $wait_label->set_alignment(0.5, 0.5);
+    $wait_vbox->pack_start($wait_label, 1, 1, 0);
+    change_mainw($wait_vbox);
+    sync();
+}
+
+my @all_rpms = gurpmi::parse_command_line();
+
+$> and fatal(N("Must be root"));
+
+#- Now, the graphical stuff.
+
+Gtk2->init;
+Gtk2->croak_execeptions;
+
+my $title = $::auto_select ? N("Distribution Upgrade") : N("Packages installation");
+
+#- Create main window
+
+$mainw = Gtk2::Window->new('toplevel');
+$::main_window = $mainw;
+$mainw->set_border_width(12);
+$mainw->set_title($title);
+$mainw->signal_connect(destroy => \&quit);
+$mainw->set_position('center');
+$mainw->set_default_size($progressbar_size, 60);
+$mainw->set_type_hint('dialog'); # for matchbox window manager during install
+$mainw->set_modal(1);		 # for matchbox window manager during install
+$mainbox = Gtk2::VBox->new(0, 5);
+$mainw->add($mainbox);
+
+#- Performs installation
+
+my $urpm = configure_urpm();
+my $state = {};
+my %requested = $urpm->register_rpms(@all_rpms);
+if (@gurpmi::names) {
+    urpm::select::search_packages($urpm, \%requested, [ @gurpmi::names ],
+                                  use_provides => $use_provides,
+                              ) || $force or exit 1;
+}
+
+wait_label(N("Preparing packages installation..."));
+
+#- return value is true if program should be restarted (in order to take care of important
+#- packages being upgraded (problably urpmi and perl-URPM, but maybe rpm too, and glibc also ?).
+my $restart_itself = urpm::select::resolve_dependencies($urpm,
+    $state,
+    \%requested,
+    callback_choices => \&ask_choice,
+    auto_select => $::auto_select,
+    priority_upgrade => $urpm->{options}{'priority-upgrade'},
+);
+my @ask_unselect = urpm::select::unselected_packages($state);
+
+# If there are some unselected packages, designate that we are going to return nonzero code.
+if (@ask_unselect) {
+    my $unselect_msg = N("Some requested packages cannot be installed:\n%s",
+        urpm::select::translate_why_unselected($urpm, $state, @ask_unselect));
+    $urpm::postponed_msg .= $unselect_msg . "\n";
+    $urpm::postponed_code = 17;
+}
+
+@ask_unselect
+? ask_continue(N(
+	"Some requested packages cannot be installed:\n%s\nContinue installation anyway?",
+	urpm::select::translate_why_unselected($urpm, $state, @ask_unselect)
+    ), \&do_install)
+: do_install();
+
+$mainw->show_all;
+Gtk2->main;
+
+my ($rpm_lock, $urpmi_lock);
+
+#- Creates and configure an urpm object for this application to use.
+sub configure_urpm() {
+    my $urpm;
+    { 
+        local @ARGV = @ARGV;
+        $urpm = urpm->new_parse_cmdline;
+    }
+
+    $urpm->{fatal} = sub {
+	printf STDERR "%s\n", $_[1];
+	Gtk2::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'error', 'ok', Locale::gettext::iconv($_[1], undef, 'UTF-8'))->run;
+	quit();
+	exit $_[0];
+    };
+    $urpm->{log}   = sub { printf "%s\n", $_[0] };
+    $urpm->{error} = sub {
+	my ($message) = @_;
+	printf STDERR "%s\n", $message;
+
+	if (my $download_errors = delete $urpm->{download_errors}) {
+	    $message = join("\n", @$download_errors, $message);
+	}
+	my $nb_lines = $message =~ tr/\n/\n/;
+	my $w;
+	if ($nb_lines > 30) {
+	    $w  = Gtk2::Dialog->new(N("Warning"), $mainw, [qw(modal destroy-with-parent)], N("Ok"), 'ok');
+	    $w->vbox->add(my $f = Gtk2::Frame->new);
+	    my $sw = create_scrolled_window(my $text = Gtk2::TextView->new);
+	    $sw->set_border_width(2);
+	    $f->add($sw);
+	    $text->get_buffer->set_text($message);
+	    $text->set_editable(0);
+	    $_->show foreach $f, $sw, $text;
+	    $w->set_size_request(400, 400);
+	    $w->set_default_response('ok');
+	} else {
+	    $w  = Gtk2::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'warning', 'ok', $message);
+	}
+	$w->run;
+	$w->destroy;
+    };
+    urpm::select::set_priority_upgrade_option($urpm, $gurpmi::options{previous_priority_upgrade});
+    $rpm_lock = urpm::lock::rpm_db($urpm, 'exclusive');
+    $urpmi_lock = urpm::lock::urpmi_db($urpm);
+    urpm::media::configure($urpm,
+	media	    => $gurpmi::options{media},
+	searchmedia => $gurpmi::options{searchmedia},
+        update      => $::update,
+    );
+    $urpm->{options}{'verify-rpm'} = 0 if $gurpmi::options{'no-verify-rpm'};
+    $urpm;
+}
+
+#- Callback for choices
+sub ask_choice {
+    my (undef, undef, undef, $choices) = @_;
+    return $choices->[0] if $gurpmi::options{auto};
+    my $radio;
+    my @radios = map {
+	$radio = Gtk2::RadioButton->new_with_label(
+	    $radio ? $radio->get_group : undef,
+	    (scalar $_->fullname) . " : " . $_->summary
+	    . ($_->flag_installed ? N(" (to upgrade)") : '')
+	    . ($_->flag_upgrade   ? N(" (to install)") : '')
+	);
+    } @$choices;
+    my $d = Gtk2::Dialog->new(N("Package choice"), $mainw, [], N("_Cancel") => 0, N("_Ok") => 1);
+    my $label = Gtk2::Label->new(N("One of the following packages is needed:"));
+    $label->set_alignment(0.5, 0.5);
+    $d->vbox->pack_start($label, 1, 1, 0);
+    $d->vbox->pack_start($_, 1, 1, 0) foreach @radios;
+    my $n = 0;
+    $d->signal_connect(response => sub {
+	if ($_[1] == 1) { #- "ok"
+	    foreach (@radios) { last if $_->get_active; ++$n }
+	}
+	$d->destroy;
+	exit(1) if $_[1] == 0; #- "cancel"
+    });
+    $radios[0]->set_active(1);
+    $d->set_default_response(1); # defaults to ok
+    $d->show_all;
+    $d->run;
+    $choices->[$n];
+}
+
+sub ask_continue {
+    my ($msg, $nextclosure) = @_;
+    my $vbox = Gtk2::VBox->new(0, 5);
+    $vbox->pack_start(new_label($msg), 1, 1, 0);
+    $urpm->{log}($msg);
+    my $continue_button = Gtk2::Button->new(but(N("_Ok")));
+    my $quit_button = Gtk2::Button->new(but(N("_Abort")));
+    $quit_button->signal_connect(clicked => sub { $urpm->{log}("=> cancel"); &quit(); exit 1 });
+    $continue_button->signal_connect(clicked => sub { $urpm->{log}("=> ok"); goto &$nextclosure });
+    add_button_box($vbox, $quit_button, $continue_button);
+    change_mainw($vbox);
+    # default is to continue, but according to some HIG, warning should reverse the choise and defaults to abort
+    $mainw->set_focus($continue_button); # also set_default should be called but it gives a warning!
+}
+
+sub ask_continue_if_no_auto {
+    my ($msg, $nextclosure) = @_;
+    if ($gurpmi::options{auto}) {
+	$urpm->{log}($msg);
+	$urpm->{log}("=> ok(auto)");
+	goto &$nextclosure;
+    } else {
+	ask_continue($msg, $nextclosure);
+    }
+}
+
+sub ask_continue_blocking {
+    my ($msg) = @_;
+    my $w = Gtk2::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'question', 'yes-no', $msg);
+    my $answer = $w->run;
+    $w->destroy;
+    $urpm->{log}($msg . " => " . $answer);
+    exit(1) if $answer eq 'no';
+    1;
+}
+
+sub do_install {
+    wait_label();
+    my @ask_remove = urpm::select::removed_packages($state);
+    @ask_remove
+	? ask_continue_if_no_auto(N(
+	    "The following packages have to be removed for others to be upgraded:\n%s\nContinue installation anyway?",
+	    urpm::select::translate_why_removed($urpm, $state, @ask_remove)
+	), \&do_install_2)
+	: goto &do_install_2;
+}
+
+sub do_install_2 () {
+    my @to_install;
+    my $sum;
+    foreach my $pkg (sort { $a->name cmp $b->name } @{$urpm->{depslist}}[keys %{$state->{selected}}]) {
+        if ($pkg->arch ne 'src') {
+            push @to_install, scalar $pkg->fullname;
+            $sum += $pkg->size;
+        }
+    }
+    $urpm->{nb_install} = @to_install;
+    @to_install > 1
+	? ask_continue_if_no_auto(
+		(scalar(@to_install) == 1 ?
+		N("To satisfy dependencies, the following package is going to be installed:")
+		: N("To satisfy dependencies, the following packages are going to be installed:"))
+       	. join("\n", '', @to_install, '') 
+	. P("(%d package, %d MB)", "(%d packages, %d MB)", scalar(@to_install), scalar(@to_install), toMb($sum)),
+                    , \&do_install_3)
+	: goto \&do_install_3;
+}
+
+sub do_install_3 () {
+    wait_label($title);
+    my ($local_sources, $blists) = urpm::get_pkgs::selected2local_and_blists($urpm, $state->{selected});
+    $local_sources || $blists or $urpm->{fatal}(3, N("unable to get source packages, aborting"));
+    my $vbox = Gtk2::VBox->new(0, 5);
+
+    my $global_label = gtk_new_Label_Left("<b>$title</b>");
+    $global_label->set_use_markup(1);
+    $vbox->pack_start($global_label, 0, 0, 0);
+
+    my $global_progressbar = Gtk2::ProgressBar->new;
+    $vbox->pack_start($global_progressbar, 0, 0, 0);
+
+    my $progress_label = gtk_new_Label_Left('-');
+    $vbox->pack_start($progress_label, 1, 1, 0);
+
+
+    my $progressbar = Gtk2::ProgressBar->new;
+    $progressbar->set_size_request($progressbar_size, -1);
+    $vbox->pack_start($progressbar, 0, 0, 0);
+
+    change_mainw($vbox);
+    my ($progress_nb, $download_nb);
+    my $set_progressbar = sub {
+	my ($local_ratio) = @_;
+	if ($progress_nb || $download_nb) { # this happens when computing transaction	   
+	    $global_progressbar->set_fraction(($download_nb + $progress_nb - 1 + $local_ratio) / 2 / $urpm->{nb_install});
+	}
+	$progressbar->set_fraction($local_ratio);
+    };
+	    my $callback_inst = sub {
+		my ($urpm, $type, $id, $subtype, $amount, $total) = @_;
+		my $pkg = defined $id ? $urpm->{depslist}[$id] : undef;
+		if ($subtype eq 'start') {
+		    if ($type eq 'trans') {
+			$progress_label->set_label(N("Preparing..."));
+		    } elsif ($pkg) {
+			$progress_nb++;
+			$download_nb = max($download_nb, $progress_nb);
+			$set_progressbar->(0);
+			$progress_label->set_label(
+			    N("Installing package `%s' (%s/%s)...", $pkg->name, $progress_nb, $urpm->{nb_install})
+			);
+		    }
+		} elsif ($subtype eq 'progress') {
+		    $set_progressbar->($amount / $total);
+		}
+		sync();
+	    };
+
+    my $exit_code = urpm::main_loop::run($urpm, $state, scalar(@gurpmi::names),  \@ask_unselect, {
+        bad_signature => sub {
+            my ($msg, $msg2) = @_;
+            $urpm->{log}("$msg\n$msg2");
+            ask_continue_blocking("$msg\n$msg2");
+        },
+        copy_removable => sub {
+            #FIXME: use use hal to wait-for/mount cdroms: 
+            my $w = Gtk2::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'warning', 'ok-cancel',
+                                             N("Please insert the medium named \"%s\"", $_[0])
+                                         );
+            my $response = $w->run;
+            $w->destroy;
+            exit 1 if $response eq 'cancel';
+            1;
+        },
+        trans_log => sub {
+	    my ($mode, $file, $percent, $total, $eta, $speed) = @_;
+
+            urpm::download::sync_logger(@_);
+
+            if (member($mode, 'start', 'progress')) {
+		$file =~ s|/*\s*$||; $file =~ s|.*/||;
+                $progress_label->set_label(N("Downloading package `%s'...", $file) . "\n" .
+                                             &urpm::download::progress_text($mode, $percent, $total, $eta, $speed));
+	    }
+            if ($mode eq 'start') {
+		$download_nb++;
+		$set_progressbar->(0);
+                select(undef, undef, undef, 0.1); #- hackish
+            } elsif ($mode eq 'progress') {
+		$set_progressbar->($percent / 100);
+            } elsif ($mode eq 'end') {
+		$set_progressbar->(1);
+            } elsif ($mode eq 'error') {
+		#- error is 3rd argument, saved in $percent
+		push @{$urpm->{download_errors}}, N("...retrieving failed: %s", $percent);
+            }
+            sync();
+        },
+        ask_yes_or_no => \&ask_yes_or_no,
+
+        completed => sub {
+            $urpmi_lock->unlock;
+            $rpm_lock->unlock;
+            urpm::removable::try_umounting_removables($urpm);
+            $vbox = Gtk2::VBox->new(0, 5);
+            $progress_label = Gtk2::Label->new('-');
+            return 0 if $gurpmi::options{auto};
+            my $sw = create_scrolled_window($progress_label);
+            $sw->set_size_request(500, 200);
+            $vbox->pack_start($sw, 1, 1, 0);
+            my $quit_button = Gtk2::Button->new(but(N("_Done")));
+            $quit_button->signal_connect(clicked => \&quit);
+            add_button_box($vbox, $quit_button);
+            change_mainw($vbox);
+            $mainw->set_focus($quit_button);
+        },
+        need_restart => sub {
+            return if $gurpmi::options{auto};
+            my ($need_restart_formatted) = @_;
+            my $w = Gtk2::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'warning', 'ok',
+                                             join("\n", values %$need_restart_formatted)
+                                         );
+            $w->run;
+            $w->destroy;
+        },
+        missing_files_summary => sub {
+            my ($error_sources) = @_;
+            $progress_label->set_label(N("Installation failed, some files are missing:\n%s",
+                                         join("\n", map { s|([^:]*://[^/:\@]*:)[^/:\@]*(\@.*)|$1xxxx$2|; "    $_" }
+                                                values %$error_sources))
+                                   . "\n" . N("You may want to update your urpmi database."));
+        },
+        trans_error_summary => sub {
+            my ($_nok, $errors) = @_;
+            $progress_label->set_label(N("Installation failed:") . "\n" . join("\n",  map { "\t$_" } @$errors));
+        },
+        # TODO: use urpmi strings:
+        already_installed_or_not_installable => sub {
+            my ($_msg1, $_msg2) = @_;
+            $progress_label->set_label(N("The package(s) are already installed"));
+        },
+        success_summary => sub { $progress_label->set_label(N("Installation finished")) },
+        callback_report_uninst => sub { $progress_label->set_label(N("removing %s", $_[0])) },
+        inst => $callback_inst,
+        trans => $callback_inst,
+    }
+                     );
+
+    # Merge postponed exit code to the result of package installation.
+    $exit_code ||= $urpm::postponed_code;
+
+    #- restart gurpmi if needed, keep command line for that.
+    if ($restart_itself && !$exit_code) {
+        print N("restarting urpmi"), "\n";
+        #- it seems to work correctly with exec instead of system, provided
+        #- added --previous-priority-upgrade to allow checking if yet if
+        #-   priority-upgrade list has changed. and make sure we don't uselessly restart
+        @ARGV = ('--previous-priority-upgrade=' . $urpm->{options}{'priority-upgrade'}, 
+                grep { !/^--no-priority-upgrade$|--previous-priority-upgrade=/ } @ARGV);
+        exec $0, @ARGV;
+    }
+
+    # Show postponed message before exiting
+    $urpm->{error}->($urpm::postponed_msg) if $urpm::postponed_code != 0;
+
+    exit $exit_code;
+}
+
+sub ask_yes_or_no {
+    my ($_title, $msg) = @_;
+    # MessageDialogs have no titles unless using 'secondary-text'
+    my $w = Gtk2::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'warning', 'yes-no', $msg);
+    my $response = $w->run;
+    $w->destroy;
+    $response eq 'yes';
+}
+
+sub gtk_new_Label_Left {
+    my ($text) = @_;
+    my $w = Gtk2::Label->new($text);
+    $w->set_alignment(0, 0);
+    $w;
+}

@@ -1,0 +1,54 @@
+{
+  'input' => {
+    'source text' => {
+      'format' => 'XML',
+      'root' => 's',
+    },
+    'target text' => {
+      'format' => 'XML',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'bitext' => {
+      'format' => 'xces align',
+      'write_mode' => 'overwrite'
+    }
+  },
+  'parameter' => {
+      'hard region' => 'paragraph',
+ #     'hard region' => 'page',
+      'page break' => 'pb',
+      'section' => '(p|head)',
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source text:file',
+       'trg' => 'input:target text:file',
+       'out' => 'output:bitext:file',
+        'pb' => 'parameter:page break',
+        'p' => 'parameter:section',
+    }
+  },
+  'module' => {
+    'program' => 'uplug-sentalign',
+    'location' => '$UplugBin',
+    'name' => 'sentence aligner',
+    'stdout' => 'bitext',
+  },
+  'description' => 'This module calls an external sentence aligner
+  which is basically the length-based GaleChurch approach. More
+  information can be found in the 
+  <a href="http:/citeseer.nj.nec.com/gale91program.html">original
+  publication<a> of this approach.',
+  'widgets' => {
+       'input' => {
+	  'source text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk))'
+	  },
+	  'target text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk))'
+	  },
+       },
+  }
+}

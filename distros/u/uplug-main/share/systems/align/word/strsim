@@ -1,0 +1,76 @@
+{
+  'module' => {
+    'program' => 'uplug-strsim',
+    'location' => '$UplugBin',
+    'name' => 'LCSR - the longest common sub-sequence ratio',
+#    'stdin' => 'bitext',
+  },
+  'description' => 'The longest common sub-sequence ratio is
+  calculated for co-occurring words and chunks.',
+  'input' => {
+    'bitext' => {
+      'stream name' => 'runtime xml',
+    }
+  },
+  'output' => {
+    'string similarities' => {
+      'stream name' => 'string similarities',
+    },
+  },
+  'parameter' => {
+    'token' => {
+      'chunks (source)' => 'c.*',            # use chunks
+      'chunks (target)' => 'c.*',            # use chunks
+#      'minimal length diff' => 0.3,
+#     'matching word class' => 'same',       # don't mix content and stop words
+      'minimal frequency' => 1,
+      'minimal frequency (source)' => 1,
+      'minimal frequency (target)' => 1,
+      'minimal length (source)' => 3,
+      'minimal length (target)' => 3,
+      'maximal ngram length (source)' => 1,  # >1 --> use N-grams
+      'maximal ngram length (target)' => 1,  # >1 --> use N-grams
+#      'use attribute (source)' => 'none',
+#      'use attribute (target)' => 'none',
+#      'grep token (source)' => 'contains alphabetic',
+#      'grep token (target)' => 'contains alphabetic',
+      'lower case (source)' => 1,
+      'lower case (target)' => 1,
+      'exclude stop words (source)' => 1,
+      'exclude stop words (target)' => 1,
+#      'language (source)' => 'english',
+#      'language (target)' => 'swedish',
+      'language (source)' => 'default',
+      'language (target)' => 'default',
+      'delimiter' => '\\s+',
+      'token label' => 'w',
+      'remove linked' => 0,
+    },
+    'similarity measures' => {
+      'minimal score' => 0.4,
+      'use not-matching-weights' => 0,
+      'use N-grams' => 0,
+      'metrics' => 'lcsr',
+#      'precision' => 4,
+      'use weights' => 0,
+    },
+    'runtime' => {
+      'print progress' => 1,
+      'buffer' => 2000000,
+      'source buffer' => 200000,
+      'target buffer' => 200000,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:bitext:file',
+       'informat' => 'input:bitext:format',
+       'out' => 'output:string similarities:file',
+       'outformat' => 'output:string similarities:format',
+       'srclang' => 'parameter:token:language (source)',
+       'trglang' => 'parameter:token:language (target)',
+    }
+  },
+  'widgets' => {
+  }
+}

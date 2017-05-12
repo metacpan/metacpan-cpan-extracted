@@ -1,0 +1,208 @@
+#!/usr/bin/perl
+#
+# -*-perl-*-
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id$
+#----------------------------------------------------------------------------
+# usage: uwa2koma [-o value] align-xml uwa-token-links
+#
+# required:
+#         align-xml: bitext-file in liu-xml
+#         uwa-token-links: uwa token link file
+# optional:
+#         -o value: add <value> to each byte position
+# 
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../..";
+
+use Uplug::Data::Align;
+use Uplug::Data::DOM;
+use Uplug::IO::Any;
+
+my $DefaultOffset=0;
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift;
+    if ($opt eq '-o'){
+	my $val=shift(@ARGV);
+	$DefaultOffset=0-$val;
+    }
+}
+
+my %InputStream=('format' => 'liu xml');
+$InputStream{file}=shift(@ARGV);
+my %OutputStream=('format' => 'liu xml');
+
+my $linkfile=shift(@ARGV);
+
+my $SrcOffset=$DefaultOffset;
+my $TrgOffset=$DefaultOffset;
+my $limit=-20;
+my $TokenLabel='w';
+
+my $data=Uplug::Data::Align->new();
+my $id=0;
+
+#---------------------------------------------------------------------------
+
+my $input=Uplug::IO::Any->new(\%InputStream);
+my $output=Uplug::IO::Any->new(\%OutputStream);
+$input->open('read',\%InputStream);
+$output->addheader($input->header());
+$output->open('write',\%OutputStream);
+
+open F,"<$linkfile";
+
+#---------------------------------------------------------------------------
+
+
+my $count=0;
+
+while (<F>){
+    if (/^\#/){next;}
+    chomp;
+    my @data=split(/\t/,$_);
+    my %link=('align ID' => $data[0],
+	      'src' => $data[1],
+	      'trg' => $data[2],
+	      'step' => $data[3],
+	      'source' => $data[4],
+	      'target' => $data[5]);
+#	      'score' => $data[6]);
+    $SrcOffset=$DefaultOffset;
+    $TrgOffset=$DefaultOffset;
+    &ConvertLink(\%link);
+}
+if ($id and $count){$output->write($data);}
+
+
+sub ConvertLink{
+    my $link=shift;
+
+    @{$$link{srcspans}}=split(/\&/,$$link{source});
+    @{$$link{trgspans}}=split(/\&/,$$link{target});
+
+    @{$$link{srcspansold}}=@{$$link{srcspans}};
+    @{$$link{trgspansold}}=@{$$link{trgspans}};
+
+    &AddOffset($link,$SrcOffset,$TrgOffset);
+
+    while ($id ne $$link{'align ID'}){
+	if ($id and $count){
+	    print STDERR '.';
+	    $output->write($data);$count=0;
+	}
+	if (not $input->read($data)){return 0;}
+	$id=$data->{link}->attribute('id');
+	if (($$link{'align ID'}=~/^[0-9]+$/) and
+	    ($id=~/^([^0-9]+)[0-9]/)){
+	    $$link{'align ID'}="$1$$link{'align ID'}";
+	}
+	if (($$link{'align ID'}=~/^[^0-9]+[0-9]/) and
+	    ($id=~/^([0-9]+)$/)){
+	    $$link{'align ID'}=$1;
+	}
+    }
+
+    my $SrcData=Uplug::Data::DOM->new();
+    my $TrgData=Uplug::Data::DOM->new();
+    $data->subTree($SrcData,'source');
+    $data->subTree($TrgData,'target');
+
+    my @SrcNodes=$SrcData->getNodes($TokenLabel);
+    my @SrcIds=$data->attribute(\@SrcNodes,'id');
+    my @SrcSpans=$data->attribute(\@SrcNodes,'span');
+    my @SrcTokens=$data->content(\@SrcNodes);
+
+    my @TrgNodes=$TrgData->getNodes($TokenLabel);
+    my @TrgIds=$data->attribute(\@TrgNodes,'id');
+    my @TrgSpans=$data->attribute(\@TrgNodes,'span');
+    my @TrgTokens=$data->content(\@TrgNodes);
+
+
+    my @src=();
+    foreach my $s (@{$$link{srcspans}}){
+	my ($idx)=grep($SrcSpans[$_] eq $s,(0..$#SrcSpans));
+	if (defined $idx){
+	    push (@src,$idx);
+	}
+	elsif ($SrcOffset>$limit){
+	    $SrcOffset--;
+	    return &ConvertLink($link);
+	}
+	else{
+	    print STDERR "problems with $id!!\n";
+	    return 0;
+	}
+    }
+    my @trg=();
+    foreach my $t (@{$$link{trgspans}}){
+	my ($idx)=grep($TrgSpans[$_] eq $t,(0..$#TrgSpans));
+	if (defined $idx){
+	    push (@trg,$idx);
+	}
+	elsif ($TrgOffset>$limit){
+	    $TrgOffset--;
+	    return &ConvertLink($link);
+	}
+	else{
+	    print STDERR "problems with $id!!\n";
+	    return 0;
+	}
+    }
+
+    my @srcTok=();
+    my @trgTok=();
+    my @srcId=();
+    my @trgId=();
+    my @srcSpan=();
+    my @trgSpan=();
+
+    foreach (@src){
+	push (@srcTok,$SrcTokens[$_]);
+	push (@srcId,$SrcIds[$_]);
+	push (@srcSpan,$SrcSpans[$_]);
+    }
+    foreach (@trg){
+	push (@trgTok,$TrgTokens[$_]);
+	push (@trgId,$TrgIds[$_]);
+	push (@trgSpan,$TrgSpans[$_]);
+    }
+
+    my %l=();
+    $l{link}=join ' ',@srcTok;
+    $l{link}.=';';
+    $l{link}.=join ' ',@trgTok;
+    $l{source}=join '+',@srcId;
+    $l{target}=join '+',@trgId;
+    $l{src}=join '&',@srcSpan;
+    $l{trg}=join '&',@trgSpan;
+#    $l{score}=$$link{score};
+#    $l{step}=$$link{step};
+    $data->addWordLink(\%l);
+    $count++;
+}
+
+sub AddOffset{
+    my ($link,$SrcOffset,$TrgOffset)=@_;
+    foreach (0..$#{$$link{srcspans}}){
+	if ($$link{srcspansold}[$_]=~/^([0-9]+)[\|\:]/){
+	    my $start=$SrcOffset+$1;
+	    $$link{srcspans}[$_]=~s/^.*[\|\:]/$start\:/;
+	}
+    }
+    foreach (0..$#{$$link{trgspans}}){
+	if ($$link{trgspansold}[$_]=~/^([0-9]+)[\|\:]/){
+	    my $start=$TrgOffset+$1;
+	    $$link{trgspans}[$_]=~s/^.*[\|\:]/$start\:/;
+	}
+    }
+}
+
+
+
+$input->close;
+$output->close;
+

@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: xces2link,v 1.1.1.1 2004/05/03 15:39:55 joerg72 Exp $
+
+
+if ($]>=5.008){binmode(STDIN, ":encoding(utf-8)");}
+
+while (<>){
+    if (/\<link\s.*id\=\"([^\"]+)\"/){
+	$id=$1;
+    }
+    elsif (/\<wordLink\s.*lexPair\=\"([^\"]+)\"/){
+	my ($src,$trg)=split(/\;/,$1);
+	print join "\t",($id,$src,$trg),"\n";
+    }
+}
+

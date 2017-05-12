@@ -1,0 +1,30 @@
+urpmi can automatically find the media repository path using DNS-SD
+(Zeroconf), with the "--zeroconf" option:
+  urpmi.addmedia --distrib --zeroconf
+  urpmi.addmedia --zeroconf main media/main/release
+
+This option can also be used together with the "--mirrorlist" option,
+in which case the repositories are configured using Zeroconf if found,
+and mirrorlist is used as a fallback:
+  urpmi.addmedia --distrib --zeroconf --mirrorlist
+
+When searching for the repository using Zeroconf, the request timeouts
+after a delay of 10 seconds, to avoid hanging urpmi if some hosts are
+unresolvable.
+
+If a repository is found using DNS-SD, urpmi.addmedia will build a
+complete repository path using fields from /etc/product.id, this way:
+<advertised repository path>/lowercase(<branch>)/<version>/<arch>
+
+To advertise an urpmi repository using DNS-SD, a service record with
+the instance "_mdv_urpmi" has to be created, specifying the target
+host and target port where the service is located.
+In addition, two DNS-SD TXT records must be specified, in the form of
+key/value pairs: protocol (http, ftp or rsync) and path (repository root).
+
+The path value should be the full path to the media repository root,
+for example /dis if the distribution repository is reachable on
+http://host:port/dis/official/2010.1/i586
+
+See the urpmi-repository-http.service file for an example of urpmi
+repository advertising using Avahi.

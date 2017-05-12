@@ -1,0 +1,56 @@
+{
+  'module' => {
+    'program' => 'uplug-coocstat-slow',
+    'location' => '$UplugBin',
+    'name' => 'Co-occurence statistics',
+  },
+  'description' => 'This module calculates co-occurrence statistics for
+  bi-lingual token pairs.',
+  'input' => {
+    'cooc freq' => {
+      'stream name' => 'cooc freq',
+    },
+    'source freq' => {
+      'stream name' => 'source freq',
+    },
+    'target freq' => {
+      'stream name' => 'target freq',
+    },
+  },
+  'output' => {
+    'coocstat3' => {
+      'stream name' => 'co-occurrence statistics 3',
+    },
+  },
+  'parameter' => {
+    'token pair' => {
+      'minimal frequency' => 2,
+    },
+    'source token' => {
+      'minimal frequency' => 2,
+    },
+    'target token' => {
+      'minimal frequency' => 2,
+    },
+    'co-occurrence' => {
+      'minimal score' => 0.2,
+      'measure' => 'dice',
+    },
+    'runtime' => {
+      'print progress' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source freq:file',
+       'trg' => 'input:target freq:file',
+       'cooc' => 'input:cooc freq:file',
+       'stat' => 'output:cooc stat:file',
+       's' => 'parameter:co-occurrence:measure',
+       'm' => 'parameter:co-occurrence:minimal score',
+       'min' => 'parameter:co-occurrence:minimal score',
+    }
+  },
+  'widgets' => {
+  }
+}

@@ -1,0 +1,169 @@
+#
+# POD Documentation
+#
+
+=head1 NAME
+
+Text::UberText::Overview - General Documentation
+
+=head1 HOWTO
+
+=over 4
+
+=item How to I create or designate a namespace?
+
+A namespace is two or more words seperated by periods, like "uber.loop", or
+"acme.database.inventory".  All namespaces are in lowercase.
+
+If you do not plan on publishing your code, feel free to use any namespace you
+want, except the "uber.*" namespace.
+
+If you do want to publish your code, you will need to make a name that is
+guaraunteed to be unique.  There is no standard convention for namespaces,
+and I'm not even sure if there ever will be one.  For now, I would recommend
+that all of your namespaces start with your organizational id, or perhaps
+your CPAN id.
+
+=back
+
+=head1 QUESTIONS
+
+=over 4
+
+=item Can you draw out how the UberText objects work?
+
+
+1. At Text::UberText initialization
+
+=over 4
+
+a. Text::UberText::Log is created.
+
+b. Text::UberText::Dispatch is created.
+
+c. Text::UberText::Parser is created.
+
+=back 
+
+2. When a document is read and parsed
+
+=over 4
+
+a. Text::UberText::Parser creates Text::UberText::Tree.
+
+b. Parser reads input and breaks it apart into text and commands.
+
+c. When a command or a full block of text is encountered, Parser 
+creates a Text::UberText::Node::Command or Text::UberText::Node::Text 
+object and passes it on to the Tree.
+
+d. The Node object runs the process() method which does preliminary 
+cleanup of the input.
+
+=back
+
+3. When the tree is run
+
+=over 4
+
+a. The Tree object goes through every Node that has a parent of 0.
+
+b. The Tree object calls the run() method for that node.
+
+c. The Node object refers back to the dispatch table to find which 
+object method to run.
+
+d. The Dispatch object runs the code using the Node data, and passes 
+the output back to the Node object.
+
+=back
+
+4. When the output is displayed
+
+=over 4
+
+a. The tree object goes through ever Node that has a parent of 0.
+
+b. The tree object calls the outout() method for that node.
+
+c. The output is strung together and returned to the caller.
+
+=back
+
+=item Why create this?  Why not just use MASON or Text::Template?
+
+Text::UberText was designed with several goals in mind.  The first goal 
+was to create a template language that was easy to use and yet powerful 
+enough to be useful.
+
+Text::UberText can create an abstract level between documents and program code.
+Someone writing a document using UberText doesn't need to know how to program, 
+which in turn means the programmer doesn't need to write the UberText document.
+However, the programmer and the document writer do need to plan out their 
+namespace and command schema beforehand.
+
+Another benefit of this layer of abstraction is that it opens up the 
+possibilities of using other programming languages.  If someone wants to 
+create a Text::UberText processor in Java or Python, they are more than 
+welcome to.
+
+MASON and Text::Template are excellent template engines.  The downside is that
+they quickly fall back on their ability to embed Perl code.  In some 
+applications it may not be practical to embed raw program code.
+
+=item So why not use XML?
+
+XML documents are XML documents.  UberText documents can be anything.
+UberText can be mixed in with raw PostScript, plain text, HTML (or even XML),
+or LaTex.  If you don't want to create a whole XML document just to generate
+dymanic content in one of these output formats, consider using UberText.
+
+There are other differences, like the ability to have options that don't 
+have values passed to them, there is no need to self-close non-structured 
+tags, but the most important one is probably the ability to put 
+UberText tags within the values of UberText tag options.
+
+=item Why can't I use the uber.* namespace?
+
+I want to keep the "uber.*" namespace in my control so I can add more public 
+routines to UberText down the road.
+
+=item What's the inspiration for the command format?
+
+I tried to get the command language to look very similar to Objective-C.
+
+=item Is there a difference between parenthesis and double quotes for parameter 
+arguments?
+
+No, it's just semantics.  Some people would prefer to use double quotes to 
+represent strings, and use parenthesis to represents expressions.  There is no 
+difference between them when it comes to processing.
+
+=item Any good examples?
+
+Examples are a work in progress.  For now I'd recommend looking over the source 
+code.
+
+=item Do I have to rewrite my entire module just to use UberText?
+
+No.  When the Dispatch module is passed your module or object, it needs to be 
+able to invoke the uberText() method.  That method will return the object the 
+Dispatch module needs, the namespace, and the dispatch table.  So the object 
+returned from uberText() can be different from the one you passed to the 
+Dispatch table.
+
+If you have a complex module named Widgets::Billing, you can create a whole 
+new module (maybe Widgets::Billing::UberText) that handles all the UberText 
+command tags.
+
+=back
+
+=head1 AUTHOR
+
+Chris Josephes E<lt>cpj1@visi.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2002, Chris Josephes.  All rights reserved.
+This module is free software.  It may be used, redistributed,
+and/or modified under the same terms as Perl itself.

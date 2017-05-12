@@ -1,0 +1,237 @@
+#!/usr/bin/env perl
+#
+# markphr.pl - mark given phrases in a corpus
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+# $Id$
+#----------------------------------------------------------------------------
+#
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use strict;
+
+use Uplug::Data;
+use Uplug::Data::Lang;
+use Uplug::IO::Any;
+use Uplug::Config;
+
+
+my $UplugHome="$Bin/../";
+$ENV{UPLUGHOME}=$UplugHome;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='MarkPhrases.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+my $WordDel=' ';
+
+# sort = phrase sorting:
+#       'best first' --> matching phrases with the highest score first
+#        reverse ------> long phrases first (right to left)
+#        otherwise ----> tokens - bigrams - trigrams ... left to right
+
+my ($PhrLabel,$lang,$sort,$verbose);
+if (ref($IniData{parameter}) eq 'HASH'){
+    $PhrLabel=$IniData{parameter}{'phrase label'};
+    $lang=$IniData{parameter}{language};
+    $verbose=$IniData{parameter}{verbose};
+    $sort=$IniData{parameter}{sort};
+}
+
+#---------------------------------------------------------------------------
+
+my $CorpusStream;
+my $PhraseStream;
+foreach (keys %{$IniData{input}}){
+    if (/text/){$CorpusStream=$IniData{input}{$_};}
+    else{$PhraseStream=$IniData{input}{$_};}
+}
+
+if (ref($CorpusStream) ne 'HASH'){die "# MarkPhrases.pl: no corpus defined!\n"}
+if (ref($PhraseStream) ne 'HASH'){die "# MarkPhrases.pl: no phrase stream!\n"}
+
+my ($OutputStreamName,$OutputStream)=             # take only
+    each %{$IniData{'output'}};                   # the first output stream
+
+my $corpus=Uplug::IO::Any->new($CorpusStream);
+my $phrase=Uplug::IO::Any->new($PhraseStream);
+my $output=Uplug::IO::Any->new($OutputStream);
+
+$corpus->open('read',$CorpusStream) || 
+    die "# MarkPhrases.pl: failed to open the corpus!\n";
+$phrase->open('read',$PhraseStream) || 
+    die "# MarkPhrases.pl: failed to open the phrase!\n";
+$output->open('write',$OutputStream) || 
+    die "# MarkPhrases.pl: failed to open the output stream!\n";
+
+
+my $PhraseParam=$phrase->header;
+my %PhraseHash=();
+&LoadPhraseHash($phrase,\%PhraseHash);           # load ALL (!!!) phrases
+$phrase->close();                                # (might blow the memory ...)
+
+my $count=0;
+my $data=Uplug::Data::Lang->new($lang);
+while ($corpus->read($data)){
+
+    $count++;
+    if ($verbose){
+	if (not ($count % 10)){$|=1;print STDERR '.';$|=0;}
+	if (not ($count % 100)){$|=1;print STDERR "$count sentences\n";$|=0;}
+    }
+
+    my @phrases=();                              # now, very simple:
+    my @phraseNodes=();                          # find all possible n-grams
+    my @tokenNodes=();
+    my @phrases=$data->getPhrases($PhraseParam,\@phraseNodes);
+
+    my @matching=&FindMatchingPhrases(\@phrases,\%PhraseHash);
+    &MarkPhrases($data,\@phrases,\@matching,
+		 \@phraseNodes,$PhrLabel,\%PhraseHash,
+		 $sort);
+
+    $output->write($data);
+
+
+#    foreach (0..$#phrases){                      # and mark them if they are
+#	if (defined $PhraseHash{$phrases[$_]}){  # defined
+#	    $data->addParent($phraseNodes[$_],
+#			     $PhrLabel,
+#			     $PhraseHash{$phrases[$_]});
+#	}
+#    }
+#    $output->write($data);
+}
+
+$corpus->close();
+$output->close();
+
+
+#------------------------------------------------------------------------
+
+sub MarkPhrases{
+    my ($data,$phrases,$idx,$nodes,$label,$attr,$sort)=@_;
+    if ($sort=~/best/){
+	foreach (sort { $$attr{$$phrases[$b]}{score} <=>  
+			    $$attr{$$phrases[$a]}{score}} @{$idx}){
+	    $data->addParent($$nodes[$_],$label,$$attr{$$phrases[$_]});
+	}
+    }
+    elsif ($sort=~/reverse/){
+	foreach (@{$idx}){
+	    $data->addParent($$nodes[$_],$label,$$attr{$$phrases[$_]});
+	}
+    }
+    else{
+	foreach (@{$idx}){
+	    $data->addParent($$nodes[$_],$label,$$attr{$$phrases[$_]});
+	}
+    }
+}
+
+#------------------------------------------------------------------------
+# find phrases that match one of the patterns
+# return a list of indeces (phrase position in the array)
+
+sub FindMatchingPhrases{
+    my ($phrases,$pattern)=@_;
+    my @match=();
+    foreach (0..$#{$phrases}){
+	if (defined $$pattern{$$phrases[$_]}){
+	    push (@match,$_);
+	}
+    }
+    return @match;
+}
+
+#------------------------------------------------------------------------
+
+sub LoadPhraseHash{
+    my ($stream,$phrases)=@_;
+    my $data=Uplug::Data->new;
+    while ($stream->read($data)){
+	my $hash=$data->data();
+	if (ref($hash) eq 'HASH'){
+	    foreach (keys %{$hash}){
+		my $phr=undef;
+		if (/gram/ or /phras/ or /tok/ or /field 0/){
+		    $phr=$hash->{$_};
+		    delete $hash->{$_};
+		}
+		if (defined $phr){
+		    %{$phrases->{$phr}}=%{$hash};
+		}
+	    }
+	}
+    }
+}
+
+
+#------------------------------------------------------------------------
+
+
+sub GetDefaultIni{
+
+    my $DefaultIni = {
+  'module' => {
+    'name' => 'phrase marker',
+    'program' => 'markphr.pl',
+    'location' => '$UplugBin',
+    'stin' => 'text',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'XML',
+      'root' => 's',
+    },
+    'phrases' => {
+      'format' => 'uwa tab',
+#      'columns' => ['phrase'],
+    },
+  },
+  'output' => {
+    'text' => {
+      'format' => 'XML',
+      'root' => 's',
+    }
+  },
+  'parameter' => {
+    'language' => 'default',
+    'phrase label' => 'ngram',
+    'sort' => undef,
+    'verbose' => 1,
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'phrformat' => 'input:phrases:format',
+       'phrkey' => 'input:phrases:key',
+       'phrcol' => 'input:phrases:columns',
+       'sort' => 'parameter:sort',         # phrase sorting (e.g. 'best first')
+       'phrase' => 'input:phrases:file',
+       'out' => 'output:text:file',
+       'l' => 'parameter:language',
+       'lang' => 'parameter:language',
+       'label' => 'parameter:phrase label',
+    }
+  },
+};
+    return %{$DefaultIni};
+}

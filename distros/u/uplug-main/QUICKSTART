@@ -1,0 +1,216 @@
+
+Uplug - Quickstart
+------------------
+
+
+1) Install Uplug (see INSTALL)
+
+
+2) Create a project directory (e.g. mkdir myproject)
+   Temporary files will be created in this directory!
+
+
+3) Go to your project directory and run some tests
+
+     cd myproject
+
+   Let's assume that uplug is installed in /cvs/
+   Copy example files to your project directory:
+
+     cp /cvs/uplug/example/1988sv.txt .
+     cp /cvs/uplug/example/1988en.txt .
+   
+
+4a) Basic pre-processing (text --> xml)
+   (a text in Swedish and English, encoded in ISO-8859-1 (latin1))
+
+   /cvs/uplug pre/basic -ci 'iso-8859-1' -in 1988sv.txt > 1988sv.xml
+   /cvs/uplug pre/basic -ci 'iso-8859-1' -in 1988en.txt > 1988en.xml
+
+   Look at 1988sv.xml and 1988en.xml! Both files are (hopefully
+   tokenised and marked with basic XML-tags)
+
+
+4b) Sentence alignment
+
+   source language file: 1988sv.xml
+   target language file: 1988en.xml
+
+   /cvs/uplug align/sent -src 1988sv.xml -trg 1988en.xml > 1988sven.xml
+
+   Sentence alignment pointers are stored in 1988sven.xml.
+   You can read the aligned bitext segments using the following command:
+
+   /cvs/tools/uplug-readalign 1988sven.xml | less
+
+   Since version 0.2.0 there are additional sentence aligners integrated in
+   Uplug (hunalign, GMA). Look at the HOWTO file for details!
+
+
+5a) Word alignment (default)
+
+   /cvs/uplug align/word/default -in 1988sven.xml -out 1988sven.links
+
+   This will take some time! Word alignment is slow even for this
+   little bitext. The word aligner will 
+     * create basic clues (Dice and LCSR)
+     * run GIZA++ with standard settings (trained on plain text)
+     * learn clues from GIZA's Viterbi alignments
+     * "radical stemming" (take only the 3 inital characters of each token)
+       and run GIZA++ again
+     * align words with existing clues
+     * learn clues from previous alignment
+     * align words again with all existing clues
+
+   Word alignment results are stored in 1988sven.links.
+   You may look at word type links using the following script:
+
+   /cvs/tools/xces2dic < 1988sven.links | less
+
+
+5b) Word alignment (tagged)
+
+   Use the following command for aligning tagged corpora (at least POS tags):
+
+   cp /cvs/uplug/example/svenprf* .
+   /cvs/uplug align/word/tagged -in svenprf.xces -out svenprf.links
+
+   This is essentially the same as the default word alignment with additional
+   clues for POS and chunk labels.
+
+
+5c) Word alignment in Moses output format (using default)
+
+    Use the following command if you like to get the word alignments
+    in Moses format (links between word positions like in Moses after
+    word alignment symmetrization)
+
+   /cvs/uplug align/word/default -in 1988sven.xml -out 1988sven.links -of moses
+
+   The Parameter '-of' is used to set the output format. The same
+   parameter is available for other word alignment settings like
+   'basic' and 'advanced'
+
+   Note that you can easily convert your parallel corpus into Moses
+   format as well. There are actually three options:
+
+   cvs/uplug/tools/xces2text 1988sven.xml output.sv output.en
+   cvs/uplug/tools/xces2moses -s sv -t en 1988sven.xml output
+   cvs/uplug/tools/opus2moses.pl -d . -e output.sv -f output.en < 1988sven.xml
+
+   The three tools use different ways of extracting the text from the
+   aligned XML files. Look at the code and the usage information about
+   how they differ. The first option os probably the safest one as
+   this uses the same Uplug modules for extracting the text as they
+   are used for word alignemnt.
+
+
+6a) Tagging (using external taggers)
+
+    There are several taggers that can be called from the Uplug
+    scripts. The following command can be used to tag the English
+    example corpus:
+
+    /cvs/uplug pre/en/tagGrok -in 1988en.xml > 1988en.tag
+
+
+6b) Chunking (using external chunkers)
+
+    There is a chunker for English that can be run on POS-tagged
+    corpus files:
+
+    /cvs/uplug pre/en/chunk -in 1988en.tag > 1988en.chunk
+
+
+7a) Word alignment evaluation
+
+    Word alignment can be evaluated using a gold standard (reference
+    links stored in another file using the same format as for the
+    links produced by Uplug). There is a small gold standard for the
+    example bitext used in 3f). Alignments produced above can be
+    evaluated using the following command:
+
+    /cvs/bin/uplug-evalalign -gold svenprf.gold -in svenprf.links | less
+
+    Several measures will be computed by comparing reference links
+    with links proposed by the system.
+
+
+7b) Word alignment (using existing clues)
+
+    3c) and 3f) explained how to run the aligner with all its
+    sub-processes. However, existing clues do not have to be computed
+    each time. Existing clues can be re-used for further alignent
+    runs. The user can specify the set of clues that should be used
+    for aligning words. The following command runs the word aligner
+    with one clue type (GIZA++ translation probabilities):
+
+    /cvs/uplug align/word/test/link -gw -in svenprf.xces -out links.new
+
+    Weights can be set independently for each clue type. For example,
+    in the example above we can specify a clue weight (e.g. 0.01) for
+    GIZA++ clues using the following runtime parameter: '-gw_w 0.01'.
+    Lots of different clues may be used depending on what has been
+    computed before. The following table gives an overview of some
+    available runtime clue-parameters.
+
+    clue-flag      weight-flag  clue type
+    -------------------------------------------------------------------------
+    -sim	   -sim_w	LCSR (string similarity)
+    -dice	   -dice_w	Dice coefficient
+    -mi		   -mi_w	point-wise Mututal Information
+    -tscore	   -tscore_w	t-scores
+    -gw		   -gw_w	GIZA++ trained on tokenised plain text
+    -gp		   -gp_w	GIZA++ trained on POS tags
+    -gpw	   -gpw_w	GIZA++ trained on words and POS tags
+    -gwp	   -gwp_w	GIZA++ trained on word-prefixes (3 character)
+    -gws	   -gws_w	GIZA++ trained on word-suffixes (3 character)
+    -gwi	   -gwi_w	GIZA++ inverse (same as -gw)
+    -gpi	   -gpi_w	GIZA++ inverse (same as -gp)
+    -gpwi	   -gpwi_w	GIZA++ inverse (same as -gpw)
+    -gwpi	   -gwpi_w	GIZA++ inverse (same as -gwp)
+    -gwsi	   -gwsi_w	GIZA++ inverse (same as -gws)
+    -dl		   -dl_q	dynamic clue (words)
+    -dlp	   -dlp_w	dynamic clue (words+POS)
+    -dp3	   -dp3_w	dynamic clue (POS-trigram)
+    -dcp3	   -dcp3_w	dynamic clue (chunklabel+POS-trigram)
+    -dpx	   -dpx_w	dynamic clue (POS+relative position)
+    -dp3x	   -dp3x_w	dynamic clue (POS trigram+relative position)
+    -dc3	   -dc3_w	dynamic clue (chunk label trigram)
+    -dc3p	   -dc3p_w	dynamic clue (chunk label trigram+POS)
+    -dc3x	   -dc3x_w	dynamic clue (chunk trigram+relative position)
+
+
+
+7c) Word alignment (basic)
+
+   There is another standard setting for word alignment:
+
+   /cvs/uplug align/word/basic -in 1988sven.xml -out basic.links
+
+   The word aligner will 
+     * create basic clues (Dice and LCSR)
+     * run GIZA++ with standard settings (trained on plain text)
+     * align words with existing clues
+
+   Word alignment results are stored in basic.links.
+   You may look at word type links using the following script:
+
+   /cvs/tools/xces2dic < basic.links | less
+
+
+
+7d) Word alignment (advanced)
+
+    This settings is similar to the tagged word alignmen settings (3i) but the
+    last two steps will be repeated 3 times (learning clues from precious
+    alignments). This is the slowest standard setting for word alignment.
+
+   /cvs/uplug align/word/advanced -in svenprf.xces -out advanced.links
+   /cvs/tools/xces2dic < advanced.links | less
+
+
+
+
+More information about other modules will be added later.
+Enjoy!

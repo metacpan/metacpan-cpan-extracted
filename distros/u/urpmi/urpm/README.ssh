@@ -1,0 +1,17 @@
+This extension module allows to use an ssh connection to perform distributed
+copy and installation of rpm packages over a network.
+
+To use this module, edit /etc/urpmi/parallel.cfg and add an alias line as
+follows :
+  <name>:ssh:<node list separated by ':'>
+or
+  <name>:ssh(<default media>):<node list separated by ':'>
+where:
+  <name> is the "alias name" parameter of --parallel options of the
+      urpm* tools,
+  <default media> is the default --media parameter for this alias,
+  <node list separated by ':'> is a list of nodes (network hosts),
+      for example "node1:node2: ...:nodeN".
+
+You can specify 'localhost' as a node name if you want to include
+the server in the list of machines to be upgraded.

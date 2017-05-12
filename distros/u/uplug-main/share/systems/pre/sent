@@ -1,0 +1,68 @@
+{
+  'encoding' => 'iso-8859-1',
+  'module' => {
+    'name' => 'sentence splitter',
+    'program' => 'uplug-sent',
+    'location' => '$UplugBin',
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This is the Europarl sentence boundary detection tool adapted to Uplug.',
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'write_mode' => 'overwrite',
+      'status' => 'sent',
+      'root' => 's'
+    }
+  },
+  'parameter' => {
+    'SentDetect' => {
+       'tag' => 's',
+       'add IDs' => 1,
+       'add parent id' => 1,
+    },
+    'runtime' => {
+       'verbose' => 0,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'infile' => 'input:text:file',
+       'informat' => 'input:text:format',
+       'indoc' => 'input:text:DocRootTag',
+       'inhead' => 'input:text:DocHeaderTag',
+       'inbody' => 'input:text:DocBodyTag',
+       'inroot' => 'input:text:root',
+       'r' => 'input:text:root',
+       'out' => 'output:text:file',
+       'o' => 'output:text:file',
+       'outfile' => 'output:text:file',
+       'outformat' => 'output:text:format',
+       'outenc' => 'output:text:encoding',
+       'outbody' => 'output:text:DocBodyTag',
+       'char' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'l' => 'parameter:SentDetect:language',
+       'id' => 'parameter:SentDetect:add IDs',
+       'space' => 'parameter:SentDetect:keep spaces',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+       'v' => 'parameter:runtime:verbose'
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=markup)'
+	  },
+       },
+  }
+}

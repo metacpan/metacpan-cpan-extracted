@@ -1,0 +1,277 @@
+#######################################################################
+#
+# learnclues - module for learning clues from previously
+#              word-aligned bitexts
+#              (bootstrapping)
+#
+# 2005-02-14 Joerg Tiedemann		
+# tiedeman@let.rug.nl
+#
+#######################################################################
+
+{
+  #######################################################################
+  # module specifications
+  #######################################################################
+
+  'module' => {
+    'location' => '$UplugBin',
+    'program' => 'uplug-linkclue',
+    'name' => 'dynamic alignment clues'
+  },
+  'description' => 'This module learns clues from word aligned
+  bitexts. The following clue patterns are defined:
+  <ul>
+  <li>word forms of the current link (dl)
+  <li>word forms together with their POS tags (dlp)
+  <li>word forms and relative word positions (dlx)
+  <li>initial 3 characters and relative word positions (dl3x)
+  <li>POS tags and relative positions (dlpx)
+  <li>POS tag trigrams (previous, current, next) (dp3)
+  <li>POS tag trigrams and relative word position (dp3x)
+  <li>chunk label trigrams (dc3)
+  <li>chunk label trigrams and POS tags of the current link (dc3p)
+  <li>chunk label trigrams and relative word positions (dc3x)
+  <ul><p>
+  Note: If you add dynamic clues to be learned from the data make sure
+  to enable the same clues in the alignment module (link). Otherwise
+  they will not be used for the word alignment.',
+
+  #######################################################################
+  # input = bitext in XML
+  #######################################################################
+
+  'input' => {
+    'bitext links' => {'stream name' => 'runtime xml',format => 'xces align'}
+  },
+
+  #######################################################################
+  # output = clues in DBM files (defined in $UPLUGini/DataStreams.ini)
+  #######################################################################
+
+  'output' => {
+    'clue dl'		=> {'stream name' => 'clue dl',},
+    'clue dlp'		=> {'stream name' => 'clue dlp'},
+    'clue dlx'		=> {'stream name' => 'clue dlx'},
+    'clue dl3x'		=> {'stream name' => 'clue dl3x'},
+    'clue dpx'	        => {'stream name' => 'clue dpx'},
+    'clue dp3'		=> {'stream name' => 'clue dp3'},
+    'clue dp3 (prefix)' => {'stream name' => 'clue dp3 (prefix)'},
+    'clue dp3x'		=> {'stream name' => 'clue dp3x'},
+    'clue dc3'		=> {'stream name' => 'clue dc3'},
+    'clue dc3p'		=> {'stream name' => 'clue dc3p'},
+    'clue dc3x'		=> {'stream name' => 'clue dc3x'}
+  },
+
+
+  #######################################################################
+  # parameters
+  #######################################################################
+  #
+  # clues ..... enabledisable clue types to be learned (1=enabled)
+  # 
+  #-------------------------------------------------------------------
+
+
+  'parameter' => {
+    'clues' => {
+       'clue dl'	   => 1,
+       'clue dlp'	   => 0,
+       'clue dlx'	   => 1,
+       'clue dl3x'	   => 1,
+       'clue dpx'	   => 0,
+       'clue dp3'	   => 0,
+       'clue dp3 (prefix)' => 0,
+       'clue dp3x'	   => 0,
+       'clue dc3'	   => 0,
+       'clue dc3p'	   => 0,
+       'clue dc3x'	   => 0,
+    },
+
+    #-------------------------------------------------------------------
+    # clue type patterns:
+    #    define features to be used when looking for clues
+    #-------------------------------------------------------------------
+
+    'clue dl' => {
+      'pair frequency' => 2,         # co-occurrence > 1 !
+      'features (source)' => {
+	'#text' => undef
+      },
+      'features (target)' => {
+	'#text' => undef
+      }
+    },
+    'clue dlp' => {
+      'pair frequency' => 2,
+      'features (source)' => {
+        'pos' => undef,
+	'#text' => undef
+      },
+      'features (target)' => {
+        'pos' => undef,
+	'#text' => undef
+      }
+    },
+    'clue dlx' => {
+      'relative position' => 1,
+      'pair frequency' => 2,
+      'features (source)' => {
+	'#text' => undef
+      },
+      'features (target)' => {
+	'#text' => undef
+      }
+    },
+    'clue dl3x' => {
+      'relative position' => 1,
+      'pair frequency' => 2,
+      'features (source)' => {
+	'#text' => '^(...).*$$1'
+      },
+      'features (target)' => {
+	'#text' => '^(...).*$$1'
+      }
+    },
+    'clue dpx' => {
+      'relative position' => 1,
+      'features (source)' => {
+        'pos' => undef,
+      },
+      'features (target)' => {
+        'pos' => undef,
+      }
+    },
+    'clue dp3' => {
+      'features (source)' => {
+        'left(w):pos' => undef,
+        'pos' => undef,
+        'right(w):pos' => undef
+      },
+      'features (target)' => {
+        'left(w):pos' => undef,
+        'pos' => undef,
+        'right(w):pos' => undef
+      },
+     },
+    'clue dp3 (prefix)' => {
+       'features (target)' => {
+	   'left(w):pos'  => '^(..).*$$1',
+           'pos'          => '^(..).*$$1',
+	   'right(w):pos' => '^(..).*$$1',
+       },
+       'features (source)' => {
+	   'left(w):pos'  => '^(..).*$$1',
+           'pos'          => '^(..).*$$1',
+	   'right(w):pos' => '^(..).*$$1',
+       },
+    },
+    'clue dp3x' => {
+      'relative position' => 1,
+      'features (source)' => {
+	'left(w):pos' => undef,
+        'pos' => undef,
+	'right(w):pos' => undef
+      },
+      'features (target)' => {
+	'left(w):pos' => undef,
+        'pos' => undef,
+	'right(w):pos' => undef
+      }
+    },
+    'clue dc3' => {
+      'features (source)' => {
+	'c.*:type' => undef,
+	'c.*:left:type' => undef,
+	'c.*:right:type' => undef
+      },
+      'features (target)' => {
+        'c.*:type' => undef,
+        'c.*:left:type' => undef,
+        'c.*:right:type' => undef
+      }
+    },
+    'clue dc3p' => {
+      'features (source)' => {
+	'c.*:type' => undef,
+	'c.*:left:type' => undef,
+	'c.*:right:type' => undef,
+        'pos' => undef
+      },
+      'features (target)' => {
+        'c.*:type' => undef,
+        'c.*:left:type' => undef,
+        'c.*:right:type' => undef,
+        'pos' => undef
+      }
+    },
+    'clue dc3x' => {
+      'relative position' => 1,
+      'features (source)' => {
+	'c.*:type' => undef,
+	'c.*:left:type' => undef,
+	'c.*:right:type' => undef
+      },
+      'features (target)' => {
+        'c.*:type' => undef,
+        'c.*:left:type' => undef,
+        'c.*:right:type' => undef
+      }
+    },
+    'general' => {
+      'pair frequency' => 4         # co-occurrence > 3
+    }
+  },
+
+
+  #######################################################################
+  # definition of command line arguments
+  #######################################################################
+
+  'arguments' => {
+    'shortcuts' => {
+      'informat' => 'input:bitext:format',
+      'in' => 'input:bitext links:file',
+      'infile' => 'input:bitext:file',
+
+      'dl'	     => 'parameter:clues:clue dl',
+      'dlp'	     => 'parameter:clues:clue dlp',
+      'dlx'	     => 'parameter:clues:clue dlx',
+      'dl3x'	     => 'parameter:clues:clue dl3x',
+      'dpx'	     => 'parameter:clues:clue dpx',   
+      'dp3'	     => 'parameter:clues:clue dp3',
+      'dp3 (prefix)' => 'parameter:clues:clue dp3 (prefix)',
+      'dp3x'	     => 'parameter:clues:clue dp3x',
+      'dc3'	     => 'parameter:clues:clue dc3',
+      'dc3p'	     => 'parameter:clues:clue dc3p',
+      'dc3x'	     => 'parameter:clues:clue dc3x',
+    }
+  },
+
+  #######################################################################
+  # GUI widgets
+  #######################################################################
+
+  'widgets' => {
+#       'input' => {
+#            'bitext links' => {
+#               'stream name' => 'stream (format=xces align,status=sent)',
+#            },
+#        },
+       'parameter' => {
+         'clues' => {
+	   'clue dl'	       => 'checkbox',
+	   'clue dlp'	       => 'checkbox',
+	   'clue dlx'	       => 'checkbox',
+	   'clue dl3x'	       => 'checkbox',
+	   'clue dpx'	       => 'checkbox',
+	   'clue dp3'	       => 'checkbox',
+	   'clue dp3 (prefix)' => 'checkbox',
+	   'clue dp3x'	       => 'checkbox',
+	   'clue dc3'	       => 'checkbox',
+	   'clue dc3p'	       => 'checkbox',
+	   'clue dc3x'	       => 'checkbox'
+	   },
+        }
+  }
+}

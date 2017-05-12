@@ -1,0 +1,347 @@
+#!/usr/bin/perl
+
+# $Id: urpmf 271299 2010-11-21 15:54:30Z peroyvind $
+
+#- Copyright (C) 2002, 2003, 2004, 2005 MandrakeSoft SA
+#- Copyright (C) 2005-2010 Mandriva SA
+#-
+#- This program is free software; you can redistribute it and/or modify
+#- it under the terms of the GNU General Public License as published by
+#- the Free Software Foundation; either version 2, or (at your option)
+#- any later version.
+#-
+#- This program is distributed in the hope that it will be useful,
+#- but WITHOUT ANY WARRANTY; without even the implied warranty of
+#- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#- GNU General Public License for more details.
+#-
+#- You should have received a copy of the GNU General Public License
+#- along with this program; if not, write to the Free Software
+#- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+use strict;
+use urpm;
+use urpm::args;
+use urpm::msg;
+use urpm::media;
+
+sub usage() {
+    print urpm::args::copyright('urpmf', [ '2002-2010', 'Mandriva' ], [ '2011-2012', 'Mageia' ])
+   . N("  --help         - print this help message.
+") . N("  --version      - print this tool's version number.
+") . N("  --env          - use specific environment (typically a bug report).
+") . N("  --excludemedia - do not use the given media, separated by comma.
+") . N("  --literal, -l  - don't match patterns, use argument as a literal string.
+") . N("  --urpmi-root   - use another root for urpmi db & rpm installation.
+") . N("  --media        - use only the given media, separated by comma.
+") . N("  --sortmedia    - sort media according to substrings separated by comma.
+") . N("  --use-distrib  - use the given path to access media
+") . N("  --synthesis    - use the given synthesis instead of urpmi db.
+") . N("  --uniq         - do not print identical lines twice.
+") . N("  --update       - use only update media.
+") . N("  --verbose      - verbose mode.
+") . N("  -i             - ignore case distinctions in patterns.
+") . N("  -I             - honor case distinctions in patterns (default).
+") . N("  -F<str>        - change field separator (defaults to ':').
+") . N("Pattern expressions:
+") . N("  text           - any text is parsed as a regexp, unless -l is used.
+") . N("  -e             - include perl code directly as perl -e.
+") . N("  -a             - binary AND operator.
+") . N("  -o             - binary OR operator.
+") . N("  !              - unary NOT.
+") . N("  ( )            - left and right parentheses.
+") . N("List of tags:
+") . N("  --qf           - specify a printf-like output format
+") . N("                   example: '%%name:%%files'
+") . N("  --arch         - architecture
+") . N("  --buildhost    - build host
+") . N("  --buildtime    - build time
+") . N("  --conffiles    - configuration files
+") . N("  --conflicts    - conflict tags
+") . N("  --description  - package description
+") . N("  --distribution - distribution
+") . N("  --epoch        - epoch
+") . N("  --filename     - filename of the package
+") . N("  --files        - list of files contained in the package
+") . N("  --group        - group
+") . N("  --license      - license
+") . N("  --name         - package name
+") . N("  --obsoletes    - obsoletes tags
+") . N("  --packager     - packager
+") . N("  --provides     - provides tags
+") . N("  --requires     - requires tags
+") . N("  --size         - installed size
+") . N("  --sourcerpm    - source rpm name
+") . N("  --suggests     - suggests tags
+") . N("  --summary      - summary
+") . N("  --url          - url
+") . N("  --vendor       - vendor
+") . N("  -m             - the media in which the package was found
+") . N("  -f             - print version, release and arch with name.
+");
+    exit(1);
+}
+
+my %tags_per_media_info = (
+  everywhere => [ qw(
+    arch
+    epoch
+    filename
+    name
+    release
+    version
+   ) ],
+
+   synthesis => [ qw(
+    conflicts
+    group
+    obsoletes
+    provides
+    requires
+    size
+    suggests
+    summary
+   ) ],
+
+   xml_info__info => [ qw(
+    description
+    license
+    sourcerpm
+    url
+   ) ],
+
+   xml_info__files => [ qw(
+    files
+   ) ],
+
+   hdlist => [ qw(
+    buildhost
+    buildtime
+    conf_files
+    distribution
+    packager
+    vendor
+   ) ],
+);
+
+urpm::args::add_urpmf_cmdline_tags(map { @$_ } values %tags_per_media_info);
+
+#- default options.
+our $env;		# bug report directory
+our $excludemedia = '';
+our $full = '';		# -f : print rpm fullname instead of rpm name
+our $literal = 0;	# should we quotemeta the pattern
+our $media = '';
+our $pattern = '';	# regexp match flags ("i" or "")
+our $qf = '%default';	# format string
+our $separator = ':';	# default field separator
+our $sortmedia = '';
+our $uniq = '';		# --uniq
+our $update = 0;	# --update
+
+#- globals used in callback
+our ($expr, $left_expr); # regexp to match against
+our %uniq;
+
+#- parse arguments list.
+my $urpm = urpm->new_parse_cmdline or exit(1);
+defined $left_expr and $urpm->{fatal}(1, N("unterminated expression (%s)", $left_expr));
+defined $expr or usage();
+
+if ($qf eq '%default') {
+    #- nothing on the command-line : default is to search on file names
+    $qf = '%name' . $separator . '%files';
+} else {
+    #- else default to a leading %name
+    $qf =~ s/%default\b/%name/;
+}
+
+#- replace first %name by %fullname if -f was specified
+if ($full) { $qf =~ s/%name\b/%fullname/ }
+
+#- we really don't want logs on stdout, and remove verbose if not asked.
+$urpm->{info} = sub { print STDERR "$_[0]\n" };
+$urpm->{log} = sub { print STDERR "$_[0]\n" } if $options{verbose} > 0;
+
+my $only_simple_files_search;
+if ($qf eq '%name:%files') {
+    if ($::literal) {
+	$only_simple_files_search = $expr !~ /:/;	
+    } elsif (@::raw_non_literals == 1) {
+	my $s = $::raw_non_literals[0];
+	$s =~ s!/.*!!; # things after "/" won't match pkg name for sure	 
+	$only_simple_files_search = $s !~ m![:.*?\[\]]!;
+    }
+    $only_simple_files_search and $urpm->{log}("using fast algorithm");    
+}
+
+
+my $multitag = '';
+my %multitags = map { $_ => 1 } qw(conffiles conflicts files obsoletes provides requires suggests);
+my %usedtags;
+
+(my $proto = $qf) =~ s/%([-\d]*)(\w+)/%${1}s/g;
+my $sprintfargs = join(', ', map {
+    $usedtags{$_} = 1;
+    if ($_ eq 'media') {
+	'$medium->{name}';
+    } elsif ($_ eq 'fullname') {
+	'scalar($pkg->fullname)';
+    } elsif ($_ eq 'description') {
+	'do { my $d = $pkg->description; $d =~ s/^/\t/mg; "\n$d" }';
+    } elsif ($multitags{$_}) {
+	$multitag and $urpm->{fatal}->(1, N("Incorrect format: you may use only one multi-valued tag"));
+	$multitag = $_;
+	"'%s'";
+    } else {
+	'$pkg->' . $_;
+    }
+} $qf =~ /%[-\d]*(\w+)/g);
+
+my ($proto_cooked, $sprintfargs_cooked);
+if ($multitag) {
+    ($proto_cooked, $sprintfargs_cooked) = ($proto, $sprintfargs);
+    ($proto, $sprintfargs) = ('$proto_cooked', '$mt');    
+}
+
+my $next_st = $multitag ? 'next' : 'return 0';
+my @inner = (
+    'local $_;',
+    "\$_ = sprintf(qq{$proto}, $sprintfargs);",
+    "$expr or $next_st;",
+    $uniq ? ('$uniq{$_} and ' . $next_st . ';', '$uniq{$_} = 1;') : (),
+    'print $_, "\n";',
+);
+
+if ($multitag) {
+    @inner = (
+	"my \$proto_cooked = sprintf(qq{$proto_cooked}, $sprintfargs_cooked);",
+	"foreach my \$mt (\$pkg->$multitag) {", 
+	(map { "    $_" } @inner), 
+	"}",
+    );
+}
+
+#- build the callback matching the expression.
+my $callback = join("\n", 
+    "sub {", 
+    (map { "    $_" } 
+       'my ($urpm, $pkg) = @_;',
+       @inner,
+       '0;'),
+    "}");
+
+$urpm->{debug}("qf:[$qf]\ncallback:\n$callback") if $urpm->{debug} && !$only_simple_files_search;
+our $medium;
+$callback = eval $callback;
+if ($@) {
+    warn "Internal error: $@\n";
+    exit(1);
+}
+
+if ($env) {
+    print N("using specific environment on %s\n", $env);
+    #- setting new environment.
+    $urpm->{config} = "$env/urpmi.cfg";
+    $urpm->{skiplist} = "$env/skip.list";
+    $urpm->{instlist} = "$env/inst.list";
+    $urpm->{statedir} = $env;
+}
+
+my $_lock = urpm::lock::urpmi_db($urpm, '', nofatal => 1, wait => $options{wait_lock});
+
+my %needed_media_info = map { $_ => 1 } grep {
+    my $l = $tags_per_media_info{$_};
+    int(grep { $usedtags{$_} } @$l);
+} keys %tags_per_media_info;
+
+my @needed_xml_info = map { s/xml_info__// ? $_ : @{[]} } keys %needed_media_info;
+if (@needed_xml_info > 1) {
+    # we don't handle parallel parsing of xml files, default to hdlist
+    $needed_media_info{hdlist} = 1;
+}
+
+my %fullname2pkg;
+urpm::media::configure($urpm,
+    no_skiplist => 1,
+    media => $media,
+    excludemedia => $excludemedia,
+    sortmedia => $sortmedia,
+    synthesis => $options{synthesis},
+    usedistrib => $urpm::args::options{usedistrib},
+    update => $update,
+    @needed_xml_info && $needed_media_info{synthesis} && !$needed_media_info{hdlist} ?
+      # in that case, we need to have both synthesis and xml_info
+      (callback => sub {
+	   my ($_urpm, $pkg) = @_;
+	   $fullname2pkg{$pkg->fullname} = $pkg;
+	   1;
+       }) : (nodepslist => 1)
+);
+
+# nb: we don't "my" $medium since it is used for $callback
+if ($needed_media_info{hdlist}) {
+    foreach $medium (urpm::media::non_ignored_media($urpm)) {
+	my $hdlist = urpm::media::any_hdlist($urpm, $medium, $options{verbose} < 0) or 
+	  $urpm->{error}(N("no hdlist available for medium \"%s\"", $medium->{name})), next;
+	$urpm->{log}("getting information from $hdlist");
+	$urpm->parse_hdlist($hdlist, callback => $callback);
+    }
+} elsif (!@needed_xml_info) {
+    foreach $medium (urpm::media::non_ignored_media($urpm)) {
+	my $synthesis = urpm::media::any_synthesis($urpm, $medium) or 
+	  $urpm->{error}(N("no synthesis available for medium \"%s\"", $medium->{name})), next;
+	$urpm->{log}("getting information from $synthesis");
+	$urpm->parse_synthesis($synthesis, callback => $callback);
+    }
+} elsif (my ($xml_info) = @needed_xml_info) {
+    foreach $medium (urpm::media::non_ignored_media($urpm)) {
+	my $xml_info_file = urpm::media::any_xml_info($urpm, $medium, $xml_info, $options{verbose} < 0);
+	if (!$xml_info_file) {
+	    my $hdlist = urpm::media::any_hdlist($urpm, $medium, $options{verbose} < 0) or 
+	      $urpm->{error}(N("no xml-info available for medium \"%s\"", $medium->{name})), next;
+	    $urpm->{log}("getting information from $hdlist");
+	    $urpm->parse_hdlist($hdlist, callback => $callback);
+	    next;
+	}
+	require urpm::xml_info;
+	require urpm::xml_info_pkg;
+
+	my $cooked_callback = $needed_media_info{synthesis} ? 
+	  sub {
+	      my ($node) = @_;
+	      my $pkg = $fullname2pkg{$node->{fn}} or warn "can't find $node->{fn} in synthesis\n";
+	      $pkg and $callback->($urpm, urpm::xml_info_pkg->new($node, $pkg));
+	  } : sub {
+	      my ($node) = @_;
+	      $callback->($urpm, urpm::xml_info_pkg->new($node, undef));
+	  };
+	$urpm->{log}("getting information from $xml_info_file");
+	if ($only_simple_files_search) {
+	    # special version for speed (3x faster), hopefully fully compatible
+	    my $code = sprintf(<<'EOF', $expr, $expr);
+	    my $F = urpm::xml_info::open_lzma($xml_info_file);
+	    my $fn;    
+	    local $_;
+	    while (<$F>) {
+		if (m!^<!) { 
+		    ($fn) = /fn="(.*)"/;
+		} elsif (%s || ($fn =~ %s)) {
+                    $fn or $urpm->{fatal}(1, "fast algorithm is broken, please report a bug");
+                    my $pkg = urpm::xml_info_pkg->new({ fn => $fn });
+		    print $pkg->name, ':', $_;		    
+		}
+	    }
+EOF
+	    $urpm->{debug} and $urpm->{debug}($code);
+	    eval $code;
+	    $@ and $urpm->{fatal}(1, $@);
+	} else {
+	    urpm::xml_info::do_something_with_nodes(
+		$xml_info,
+		$xml_info_file,
+		$cooked_callback,
+	    );
+	}	
+    }
+}

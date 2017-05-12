@@ -1,0 +1,72 @@
+NAME
+    underscore - outlaws global $_
+
+VERSION
+    $Id: README,v 0.1 2007/12/25 08:21:31 dankogai Exp dankogai $
+
+SYNOPSIS
+      no underscore; # outlaws $_
+      while(<>){ # croaks here!
+        print;
+      }
+      use underscore;
+      # back to normal
+
+DESCRIPTION
+    This module detects the use of global $_ and croaks. If you want it to
+    carp or confess, simply
+
+      no underscore 'carp';
+
+    You can also use your custom subroutine like
+
+      no underscore sub { ... }
+
+    You can also customize the error message like
+
+      no undersocore 'croak', 'I said not to use $_'!
+
+EXPORT
+    None
+
+AUTHOR
+    Dan Kogai, "<dankogai at dan.co.jp>"
+
+    Original Idea by Tom Christiansen in Perl Cookbook, p. 543
+
+BUGS
+    Please report any bugs or feature requests to "bug-underscore at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=underscore>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc underscore
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=underscore>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/underscore>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/underscore>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/underscore>
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Dan Kogai, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

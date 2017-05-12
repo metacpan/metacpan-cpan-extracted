@@ -1,0 +1,252 @@
+#!/usr/bin/perl
+#
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id $
+#----------------------------------------------------------------------------
+# usage:
+#
+
+use strict;
+
+my $lang='pl';
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift(@ARGV);
+    if ($opt eq '-l'){
+	$lang=shift(@ARGV);
+    }
+}
+
+while (<>){
+    print &charConvert($_,$lang);
+}
+
+
+
+
+sub charConvert($stringrun, $cmode)
+{
+    my $stringrun = shift(@_);
+    my $lang1=shift;
+
+    if ($lang1 eq "en")
+    {
+	# Have to recognise same chars as original source
+	$stringrun = convSE($stringrun);
+    }
+    elsif ($lang1 eq "se" || $lang1 =~ /sv/)
+    {
+	$stringrun = convSE($stringrun);
+    }
+    elsif ($lang1 eq "es")
+    {
+	$stringrun = convES($stringrun);
+    }
+    elsif ($lang1 =~ /fr/)
+    {
+	$stringrun = convFR($stringrun);
+    }
+    elsif ($lang1 eq "pl")
+    {
+	$stringrun = convPL($stringrun);
+    }
+    elsif ($lang1 eq "scb")
+    {
+	$stringrun = convSBC($stringrun);
+	#$stringrun .= "1 Konverterar serbiska bosniska kroatiska i '$stringrun'";
+    }
+    elsif ($lang1 eq "fi" || $lang1 =~ /fi/ || $lang1 =~ /ro/)
+    {
+	$stringrun = convSF($stringrun);
+    }
+}
+
+
+sub convFR($french)
+{
+    my $french = shift(@_);
+
+    #$french = convSE($french);
+
+    $french =~ s/\340/&agrave;/g;
+    $french =~ s/\300/&Agrave;/g;
+    $french =~ s/\341/&aacute;/g;
+    $french =~ s/\301/&Aacute;/g;
+    $french =~ s/\342/&acirc;/g;
+    $french =~ s/\302/&Acirc;/g;
+    
+    $french =~ s/\347/&ccedil;/g;
+    $french =~ s/\307/&Ccedil;/g;
+    
+    $french =~ s/\350/&egrave;/g;
+    $french =~ s/\310/&Egrave;/g;
+    $french =~ s/\351/&eacute;/g;
+    $french =~ s/\311/&Eacute;/g;
+    $french =~ s/\352/&ecirc;/g;
+    $french =~ s/\312/&Ecirc;/g;
+    
+    $french =~ s/\354/&igrave;/g;
+    $french =~ s/\314/&Igrave;/g;
+    $french =~ s/\355/&iacute;/g;
+    $french =~ s/\315/&Iacute;/g;
+    $french =~ s/\356/&icirc;/g;
+    $french =~ s/\316/&Icirc;/g;
+    $french =~ s/\357/&iuml;/g;
+    $french =~ s/\317/&Iuml;/g;
+
+    $french =~ s/\361/&ntilde;/g;
+    $french =~ s/\321/&Ntilde;/g;
+
+    $french =~ s/\362/&ograve;/g;
+    $french =~ s/\322/&Ograve;/g;
+    $french =~ s/\363/&oacute;/g;
+    $french =~ s/\323/&Oacute;/g;
+    $french =~ s/\364/&ocirc;/g;
+    $french =~ s/\324/&Ocirc;/g;
+    
+    $french =~ s/\371/&ugrave;/g;
+    $french =~ s/\331/&Ugrave;/g;
+    $french =~ s/\372/&uacute;/g;
+    $french =~ s/\332/&Uacute;/g;
+    $french =~ s/\373/&ucirc;/g;
+    $french =~ s/\333/&Ucirc;/g;
+    
+    $french =~ s/\047/&#39;/g;
+    #¼ Doesn't work here but in convSE?
+    $french =~ s/\274/.../g;
+
+    return $french;
+}
+
+sub convPL($polish)
+{
+    my $polish = shift(@_);
+
+    $polish = convSE($polish);
+    #$polish =~ s/\342/&aogon;/g;
+    $polish =~ s/\342/&#261;/g;
+    #$polish =~ s/\302/&Aogon;/g;
+    $polish =~ s/\302/&#260;/g;
+    #$polish =~ s/\376/&cacute;/g;
+    $polish =~ s/\376/&#263;/g;
+    #$polish =~ s/\336/&Cacute;/g;
+    $polish =~ s/\336/&#262;/g;
+    #$polish =~ s/\352/&eogon;/g;
+    $polish =~ s/\352/&#281;/g;
+    #$polish =~ s/\312/&Eogon;/g;
+    $polish =~ s/\312/&#280;/g;
+    #$polish =~ s/\243/&lstrok;/g;
+    $polish =~ s/\243/&#322;/g;
+    #$polish =~ s/\367/&Lstrok;/g;
+    $polish =~ s/\367/&#321;/g;
+    #$polish =~ s/\361/&nacute;/g;
+    $polish =~ s/\361/&#324;/g;
+    #$polish =~ s/\321/&Nacute;/g;
+    $polish =~ s/\321/&#323;/g;
+    #$polish =~ s/\363/&oacute;/g;
+    $polish =~ s/\363/&#243;/g;
+    #$polish =~ s/\323/&Oacute;/g;
+    $polish =~ s/\323/&#211;/g;
+    #$polish =~ s/\242/&sacute;/g;
+    $polish =~ s/\242/&#347;/g;
+    #$polish =~ s/\251/&Sacute;/g;
+    $polish =~ s/\251/&#346;/g;
+    #$polish =~ s/\247/&zacute;/g;
+    $polish =~ s/\247/&#378;/g;
+    #$polish =~ s/\254/&Zacute;/g;
+    $polish =~ s/\254/&#377;/g;
+    #$polish =~ s/\044/&zdot;/g;
+    $polish =~ s/\044/&#380;/g;
+    #$polish =~ s/\256/&Zdot;/g;
+    $polish =~ s/\256/&#379;/g;
+
+    return $polish;
+}
+
+sub convSBC($sbc)
+{
+    my $sbc = shift(@_);
+
+    $sbc = convSE($sbc);
+
+    #$sbc =~ s/\376/&cacute;/g;
+    $sbc =~ s/\376/&#263;/g;
+    #$sbc =~ s/\336/&Cacute;/g;
+    $sbc =~ s/\336/&#262;/g;
+    #$sbc =~ s/\347/&ccaron;/g;
+    $sbc =~ s/\347/&#269;/g;
+    #$sbc =~ s/\307/&Ccaron;/g;
+    $sbc =~ s/\307/&#268;/g;
+    #$sbc =~ s/\360/&dstrok;/g;
+    $sbc =~ s/\360/&#273;/g;
+    #$sbc =~ s/\320/&Dstrok;/g;
+    $sbc =~ s/\320/&#272;/g;
+    #$sbc =~ s/\242/&scaron;/g;
+    $sbc =~ s/\242/&#353;/g;
+    #$sbc =~ s/\251/&Scaron;/g;
+    $sbc =~ s/\251/&#352;/g;
+    #$sbc =~ s/\044/&zcaron;/g;
+    $sbc =~ s/\044/&#382;/g;
+    #$sbc =~ s/\256/&Zcaron;/g;
+    $sbc =~ s/\256/&#381;/g;
+
+    return $sbc;
+}
+
+sub convES($spanish)
+{
+    my $spanish = shift(@_);
+
+    $spanish = convSE($spanish);
+    $spanish =~ s/\341/&aacute;/g;
+    $spanish =~ s/\301/&Aacute;/g;
+    $spanish =~ s/\351/&eacute;/g;
+    $spanish =~ s/\311/&Eacute;/g;
+    $spanish =~ s/\355/&iacute;/g;
+    $spanish =~ s/\315/&Iacute;/g;
+    $spanish =~ s/\361/&ntilde;/g;
+    $spanish =~ s/\321/&Ntilde;/g;
+    $spanish =~ s/\363/&oacute;/g;
+    $spanish =~ s/\323/&Oacute;/g;
+    $spanish =~ s/\372/&uacute;/g;
+    $spanish =~ s/\332/&Uacute;/g;
+    $spanish =~ s/\241/&iexcl;/g;
+    $spanish =~ s/\277/&iquest;/g;
+
+    return $spanish;
+}
+
+sub convSF($finnish)
+{
+    my $finnish = shift(@_);
+
+    $finnish = convSE($finnish);
+
+    return $finnish;
+}
+
+sub convSE($swedish)
+{
+    my $swedish = shift(@_);
+
+    $swedish =~ s/&/&amp;/g;
+    $swedish =~ s/ \242 / &amp; /g;
+    $swedish =~ s/-/&shy;/g;
+    #¼
+    $swedish =~ s/\274/.../g;
+
+    $swedish =~ s/å/&aring;/g;
+    $swedish =~ s/Å/&Aring;/g;
+    $swedish =~ s/ä/&auml;/g;
+    $swedish =~ s/Ä/&Auml;/g;
+    $swedish =~ s/\341/&aacute;/g;
+    $swedish =~ s/\301/&Aacute;/g;
+    $swedish =~ s/\351/&eacute;/g;
+    $swedish =~ s/\311/&Eacute;/g;
+    $swedish =~ s/ö/&ouml;/g;
+    $swedish =~ s/Ö/&Ouml;/g;
+
+    return $swedish;
+}

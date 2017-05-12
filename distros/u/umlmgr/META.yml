@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                umlmgr
+version:             0.10
+abstract:            ~
+license:             ~
+author:              
+    - Olivier Thauvin <nanardon@localdomain>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Config::IniFiles:              
+    IPC::Open3:                    
+    POSIX:                         
+    Sys::Syslog:                   
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

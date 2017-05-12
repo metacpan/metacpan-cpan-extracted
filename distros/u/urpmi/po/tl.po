@@ -1,0 +1,4039 @@
+# translation of urpmi-tl.po to Filipino
+# translation of urpmi.po to Filipino
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) 2005 THE PACKAGE'S COPYRIGHT HOLDER.
+# Arys P. Deloso <arys@deloso.org>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: urpmi-tl\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-01 19:38+0200\n"
+"PO-Revision-Date: 2005-03-08 20:24+0800\n"
+"Last-Translator: Eric Pareja <xenos@upm.edu.ph>\n"
+"Language-Team: Filipino <salinpinoy@comitus.net>\n"
+"Language: fil\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Previous-Translator: Arys P. Deloso <arys@deloso.org>\n"
+
+#: ../gurpmi:32
+#, fuzzy, c-format
+msgid "RPM installation"
+msgstr "Pag-install ng RPM"
+
+#: ../gurpmi:46
+#, c-format
+msgid "Error: unable to find file %s, will cancel operation"
+msgstr ""
+
+#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#, c-format
+msgid "_Ok"
+msgstr "_Ok"
+
+#: ../gurpmi:67
+#, fuzzy, c-format
+msgid ""
+"You have selected a source package:\n"
+"\n"
+"%s\n"
+"\n"
+"You probably didn't want to install it on your computer (installing it would "
+"allow you to make modifications to its sourcecode then compile it).\n"
+"\n"
+"What would you like to do?"
+msgstr ""
+"Pumili kayo ng source package:\n"
+"\n"
+"%s\n"
+"\n"
+"Ito ang source code (gamit ng programmer) na katapat nitong software "
+"package.\n"
+"Hindi mo siguro ginustong i-install ito sa computer mo kung hindi ka\n"
+"programmer (kapag in-install mo ito, maaari mong baguhin ang source code,\n"
+"i-compile ito, at nagbago na ang software).\n"
+"\n"
+"Ano ang gusto mong gawin?"
+
+#: ../gurpmi:75 ../gurpmi:86
+#, fuzzy, c-format
+msgid ""
+"You are about to install the following software packages on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"Proceed?"
+msgstr ""
+"Ikaw ay mag-i-install ng sumusunod na software package sa computer mo:\n"
+"\n"
+"%s\n"
+"\n"
+"Pwede mong naising i-save na lang ito. Ano ang pili mo?"
+
+#: ../gurpmi:81
+#, c-format
+msgid ""
+"You are about to install the following software package on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"You may prefer to just save it. What is your choice?"
+msgstr ""
+"Ikaw ay mag-i-install ng sumusunod na software package sa computer mo:\n"
+"\n"
+"%s\n"
+"\n"
+"Pwede mong naising i-save na lang ito. Ano ang pili mo?"
+
+#: ../gurpmi:99
+#, fuzzy, c-format
+msgid "_Install"
+msgstr "I-install"
+
+#: ../gurpmi:100
+#, fuzzy, c-format
+msgid "_Save"
+msgstr "Save"
+
+#: ../gurpmi:101 ../gurpmi2:197
+#, c-format
+msgid "_Cancel"
+msgstr "_Cancel"
+
+#: ../gurpmi:109
+#, c-format
+msgid "Choose location to save file"
+msgstr "Piliin ang lugar kung saan ise-save ang file"
+
+#: ../gurpmi.pm:41
+#, c-format
+msgid "Options:"
+msgstr ""
+
+#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#, c-format
+msgid "  --help         - print this help message.\n"
+msgstr "  --help         - i-print itong tulong na mensahe.\n"
+
+#: ../gurpmi.pm:43 ../urpmi:74
+#, c-format
+msgid ""
+"  --auto         - non-interactive mode, assume default answers to "
+"questions.\n"
+msgstr ""
+
+#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#, c-format
+msgid ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+msgstr ""
+"  --auto-select  - piliin kaagad ang mga package para i-upgrade ang "
+"sistema.\n"
+
+#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#, c-format
+msgid ""
+"  --force        - force invocation even if some packages do not exist.\n"
+msgstr ""
+"  --force        - pilitin ang imbokasyon kahit na wala ang ilang mga "
+"package.\n"
+
+#: ../gurpmi.pm:46 ../urpmi:129
+#, fuzzy, c-format
+msgid ""
+"  --verify-rpm   - verify rpm signature before installation\n"
+"                   (--no-verify-rpm disables it, default is enabled).\n"
+msgstr ""
+"  --verify-rpm   - patotohanan ang rpm signature bago ang pag-i-install\n"
+"                   (--no-verify-rpm ay idi-disable ito, default ay "
+"gumagana).\n"
+
+#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#, c-format
+msgid "  --media        - use only the given media, separated by comma.\n"
+msgstr ""
+"  --media        - gamitin lang ang binigay na media, hiniwilay ng comma/"
+"kuwit.\n"
+
+#: ../gurpmi.pm:49 ../urpmi:146
+#, c-format
+msgid "  -p             - allow search in provides to find package.\n"
+msgstr ""
+"  -p             - payagang maghanap sa provides para hanapin ang package.\n"
+
+#: ../gurpmi.pm:50 ../urpmi:147
+#, c-format
+msgid "  -P             - do not search in provides to find package.\n"
+msgstr ""
+"  -P             - huwag maghanap sa provides para hanapin ang package.\n"
+
+#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#, c-format
+msgid "  --root         - use another root for rpm installation.\n"
+msgstr ""
+"  --root         - gumamit ng ibang root para sa pag-i-install ng rpm.\n"
+
+#: ../gurpmi.pm:52 ../urpmi:131
+#, fuzzy, c-format
+msgid ""
+"  --test         - only verify if the installation can be achieved "
+"correctly.\n"
+msgstr "  --test         - subukan kung makakamit ng tama ang pag-i-install.\n"
+
+#: ../gurpmi.pm:53 ../urpmi:71
+#, fuzzy, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested packages.\n"
+msgstr ""
+"  --media        - gamitin lang ang binigay na media, hiniwilay ng comma/"
+"kuwit.\n"
+
+#: ../gurpmi.pm:96
+#, fuzzy, c-format
+msgid "No packages specified"
+msgstr "Walang command na nabanggit"
+
+#: ../gurpmi2:55
+#, fuzzy, c-format
+msgid "Please wait..."
+msgstr "Pakihintay."
+
+#: ../gurpmi2:64
+#, fuzzy, c-format
+msgid "Must be root"
+msgstr "Kailangan na kayo ay root"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Distribution Upgrade"
+msgstr "dini-distribute ang %s"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Packages installation"
+msgstr "Pag-i-install ng package..."
+
+#: ../gurpmi2:98
+#, c-format
+msgid "Preparing packages installation..."
+msgstr "Hinahanda ang pag-i-install ng mga package..."
+
+#: ../gurpmi2:113 ../urpmi:505
+#, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s"
+msgstr ""
+"Ilang package na hiniling ay hindi ma-install:\n"
+"%s"
+
+#: ../gurpmi2:121
+#, fuzzy, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Ilang package na hiniling ay hindi ma-install:\n"
+"%s"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Warning"
+msgstr "Babala"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Ok"
+msgstr "Ayos"
+
+#: ../gurpmi2:193
+#, fuzzy, c-format
+msgid " (to upgrade)"
+msgstr " (i-upgrade)"
+
+#: ../gurpmi2:194
+#, fuzzy, c-format
+msgid " (to install)"
+msgstr " (i-install)"
+
+#: ../gurpmi2:197
+#, c-format
+msgid "Package choice"
+msgstr ""
+
+#: ../gurpmi2:198
+#, c-format
+msgid "One of the following packages is needed:"
+msgstr "Isa sa mga sumusunod na package ay kailangan:"
+
+#: ../gurpmi2:223
+#, fuzzy, c-format
+msgid "_Abort"
+msgstr "_Abort"
+
+#: ../gurpmi2:258
+#, fuzzy, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Ang mga sumusunod na package ay dapat alisin para ma-upgrade ang iba:\n"
+"%s\n"
+"Magpatuloy?"
+
+#: ../gurpmi2:277 ../urpmi:605
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following package is going to be installed:"
+msgstr ""
+"Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+"package ay ii-install (%d MB)"
+
+#: ../gurpmi2:278 ../urpmi:606
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following packages are going to be installed:"
+msgstr ""
+"Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+"package ay ii-install (%d MB)"
+
+#: ../gurpmi2:280
+#, c-format
+msgid "(%d package, %d MB)"
+msgid_plural "(%d packages, %d MB)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#, c-format
+msgid "unable to get source packages, aborting"
+msgstr "hindi makuha ang mga source package, hindi tumutuloy"
+
+#: ../gurpmi2:320 ../urpm/install.pm:104
+#, c-format
+msgid "Preparing..."
+msgstr "Naghahanda..."
+
+#: ../gurpmi2:326
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Ini-install ang package na `%s' (%s/%s)..."
+
+#: ../gurpmi2:344 ../urpmi:633
+#, fuzzy, c-format
+msgid "Please insert the medium named \"%s\""
+msgstr "Pakisuksok ang medium na may pangalang \"%s\" sa device na [%s]"
+
+#: ../gurpmi2:358
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Dina-download ang package na `%s'..."
+
+#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
+#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
+#: ../urpm/media.pm:1657
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "...pagkukuha muli nabigo: %s"
+
+#: ../gurpmi2:387
+#, fuzzy, c-format
+msgid "_Done"
+msgstr "Tapos"
+
+#: ../gurpmi2:404 ../urpm/main_loop.pm:82
+#, fuzzy, c-format
+msgid ""
+"Installation failed, some files are missing:\n"
+"%s"
+msgstr "Pag-i-install ay nabigo"
+
+#: ../gurpmi2:407
+#, fuzzy, c-format
+msgid "You may want to update your urpmi database."
+msgstr ""
+"Pag-i-install ay nabigo, ilang mga file ay nawawala:\n"
+"%s\n"
+"Baka gusto mong i-update ang iyong urpmi database"
+
+#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
+#, fuzzy, c-format
+msgid "Installation failed:"
+msgstr "Pag-i-install ay nabigo"
+
+#: ../gurpmi2:416
+#, c-format
+msgid "The package(s) are already installed"
+msgstr "Lahat ay naka-install na"
+
+#: ../gurpmi2:418
+#, c-format
+msgid "Installation finished"
+msgstr "Natapos na ang pag-install"
+
+#: ../gurpmi2:419 ../urpme:165
+#, c-format
+msgid "removing %s"
+msgstr "inaalis ang %s"
+
+#: ../gurpmi2:430 ../urpmi:691
+#, c-format
+msgid "restarting urpmi"
+msgstr "sinisimulan muli ang urpmi"
+
+#: ../rpm-find-leaves:15
+#, c-format
+msgid ""
+"usage: %s [options]\n"
+"where [options] are from\n"
+msgstr ""
+"paggamit: %s [mga_option]\n"
+"kung saan ang [mga_option] ay mula sa\n"
+
+#: ../rpm-find-leaves:17
+#, c-format
+msgid "   -h|--help      - print this help message.\n"
+msgstr "   -h|--help      - i-print itong tulong na mensahe.\n"
+
+#: ../rpm-find-leaves:18
+#, fuzzy, c-format
+msgid "   --root <path>  - use the given root instead of /\n"
+msgstr ""
+"  --synthesis    - gamitin ang binigay na synthesis imbis na urpmi "
+"database.\n"
+
+#: ../rpm-find-leaves:19
+#, c-format
+msgid "   -g [group]     - restrict results to specified group.\n"
+msgstr "   -g [group]     - i-restrict ang mga resulta sa binigay na group.\n"
+
+#: ../rpm-find-leaves:20
+#, c-format
+msgid "                    defaults to %s.\n"
+msgstr "                    defaults ay %s.\n"
+
+#: ../rpm-find-leaves:21
+#, fuzzy, c-format
+msgid "   -f             - output rpm full name (NVRA)\n"
+msgstr "  -g             - i-print ang mga grupo na may pangalan din.\n"
+
+#: ../rurpmi:11 ../urpmi:265
+#, c-format
+msgid "Only superuser is allowed to install packages"
+msgstr "Superuser lamang ang pinapayagang mag-install ng mga package"
+
+#: ../rurpmi:18
+#, c-format
+msgid "Running urpmi in restricted mode..."
+msgstr ""
+
+#: ../urpm.pm:23
+#, c-format
+msgid "While some packages may have been installed, there were failures.\n"
+msgstr ""
+
+#: ../urpm.pm:110
+#, fuzzy, c-format
+msgid "fail to create directory %s"
+msgstr "Hindi magawa ang directory na [%s] para sa ulat ng bug"
+
+#: ../urpm.pm:111
+#, c-format
+msgid "invalid owner for directory %s"
+msgstr ""
+
+#: ../urpm.pm:135
+#, fuzzy, c-format
+msgid "Can not download packages into %s"
+msgstr "Dina-download ang package na `%s'..."
+
+#: ../urpm.pm:150
+#, c-format
+msgid "Environment directory %s does not exist"
+msgstr ""
+
+#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#, c-format
+msgid "using specific environment on %s\n"
+msgstr "ginagamit ang specific environment sa %s\n"
+
+#: ../urpm.pm:313
+#, c-format
+msgid "unable to open rpmdb"
+msgstr "hindi mabuksan ang rpmdb"
+
+#: ../urpm.pm:327
+#, c-format
+msgid "invalid rpm file name [%s]"
+msgstr "inbalidong pangalan ng rpm file [%s]"
+
+#: ../urpm.pm:333
+#, c-format
+msgid "retrieving rpm file [%s] ..."
+msgstr "kinukuha muli ang rpm file [%s] ..."
+
+#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#, c-format
+msgid "...retrieving done"
+msgstr "...pagkukuha muli natapos"
+
+#: ../urpm.pm:343
+#, c-format
+msgid "unable to access rpm file [%s]"
+msgstr "hindi ma-access ang rpm file [%s]"
+
+#: ../urpm.pm:348
+#, fuzzy, c-format
+msgid "unable to parse spec file %s [%s]"
+msgstr "hindi ma-parse ang \"%s\" sa file [%s]"
+
+#: ../urpm.pm:356
+#, c-format
+msgid "unable to register rpm file"
+msgstr "hindi mairehistro ang rpm file"
+
+#: ../urpm.pm:358
+#, c-format
+msgid "Incompatible architecture for rpm [%s]"
+msgstr ""
+
+#: ../urpm.pm:362
+#, c-format
+msgid "error registering local packages"
+msgstr "error sa pagrerehistro ng mga local package"
+
+#: ../urpm.pm:450
+#, c-format
+msgid "This operation is forbidden while running in restricted mode"
+msgstr ""
+
+#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#, c-format
+msgid "bad proxy declaration on command line\n"
+msgstr "masamang pagdeklara ng proxy sa command line\n"
+
+#: ../urpm/args.pm:306
+#, c-format
+msgid "urpmq: cannot read rpm file \"%s\"\n"
+msgstr "urpmq: hindi mabasa ang rpm file na \"%s\"\n"
+
+#: ../urpm/args.pm:384
+#, c-format
+msgid "unexpected expression %s"
+msgstr ""
+
+#: ../urpm/args.pm:385
+#, fuzzy, c-format
+msgid "missing expression before %s"
+msgstr "Nawawalang signature (%s)"
+
+#: ../urpm/args.pm:391
+#, c-format
+msgid "unexpected expression %s (suggestion: use -a or -o ?)"
+msgstr ""
+
+#: ../urpm/args.pm:395
+#, c-format
+msgid "no expression to close"
+msgstr ""
+
+#: ../urpm/args.pm:404
+#, c-format
+msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
+msgstr ""
+
+#: ../urpm/args.pm:478
+#, c-format
+msgid "chroot directory doesn't exist"
+msgstr ""
+
+#: ../urpm/args.pm:501
+#, c-format
+msgid "Can't use %s without %s"
+msgstr ""
+
+#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#, c-format
+msgid "Can't use %s with %s"
+msgstr ""
+
+#: ../urpm/args.pm:515
+#, c-format
+msgid "Too many arguments\n"
+msgstr ""
+
+#: ../urpm/args.pm:523
+#, c-format
+msgid ""
+"%s version %s\n"
+"%s\n"
+"This is free software and may be redistributed under the terms of the GNU "
+"GPL.\n"
+"\n"
+"usage:\n"
+msgstr ""
+"%s version %s\n"
+"%s\n"
+"Ito ay libreng software at maaaring ipamahagi ayon sa mga nasasaad sa GNU "
+"GPL.\n"
+"\n"
+"paggamit:\n"
+
+#: ../urpm/args.pm:529
+#, c-format
+msgid "Copyright (C) %s by %s"
+msgstr ""
+
+#: ../urpm/bug_report.pm:67 ../urpmi:255
+#, c-format
+msgid "Copying failed"
+msgstr "Pagkokopya nabigo"
+
+#: ../urpm/cdrom.pm:80
+#, c-format
+msgid ""
+"You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
+"automatically)"
+msgstr ""
+
+#: ../urpm/cdrom.pm:82
+#, c-format
+msgid "Udisks daemon (udisks-daemon) is not running or not ready"
+msgstr ""
+
+#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
+#, fuzzy, c-format
+msgid "medium \"%s\" is not available"
+msgstr "medium na \"%s\" ay hindi nakapili"
+
+#: ../urpm/cdrom.pm:218
+#, c-format
+msgid "unable to read rpm file [%s] from medium \"%s\""
+msgstr "hindi mabasa ang rpm file na [%s] mula sa medium na \"%s\""
+
+#: ../urpm/cfg.pm:82
+#, fuzzy, c-format
+msgid "syntax error in config file at line %s"
+msgstr "hindi maisulat ang config file [%s]"
+
+#: ../urpm/cfg.pm:115
+#, fuzzy, c-format
+msgid "unable to read config file [%s]"
+msgstr "hindi maisulat ang config file [%s]"
+
+#: ../urpm/cfg.pm:141
+#, c-format
+msgid "medium `%s' is defined twice, aborting"
+msgstr ""
+
+#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#, c-format
+msgid "unable to write config file [%s]"
+msgstr "hindi maisulat ang config file [%s]"
+
+#: ../urpm/download.pm:95
+#, c-format
+msgid "%s is not available, falling back on %s"
+msgstr ""
+
+#: ../urpm/download.pm:178
+#, c-format
+msgid "can not read proxy settings (not enough rights to read %s)"
+msgstr ""
+
+#: ../urpm/download.pm:208
+#, c-format
+msgid "Please enter your credentials for accessing proxy\n"
+msgstr ""
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "User name:"
+msgstr ""
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "Password:"
+msgstr "Password:"
+
+#: ../urpm/download.pm:295
+#, c-format
+msgid "Unknown webfetch `%s' !!!\n"
+msgstr ""
+
+#: ../urpm/download.pm:303
+#, c-format
+msgid "%s failed: exited with signal %d"
+msgstr ""
+
+#: ../urpm/download.pm:304
+#, c-format
+msgid "%s failed: exited with %d"
+msgstr ""
+
+#: ../urpm/download.pm:338
+#, fuzzy, c-format
+msgid "copy failed"
+msgstr "Pagkokopya nabigo"
+
+#: ../urpm/download.pm:344
+#, fuzzy, c-format
+msgid "wget is missing\n"
+msgstr "dahil sa nawawalang %s"
+
+#: ../urpm/download.pm:411
+#, fuzzy, c-format
+msgid "curl is missing\n"
+msgstr "dahil sa nawawalang %s"
+
+#: ../urpm/download.pm:547
+#, c-format
+msgid "curl failed: upload canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:548
+#, c-format
+msgid "curl failed: download canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:583
+#, c-format
+msgid "rsync is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:651
+#, c-format
+msgid "ssh is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:670
+#, c-format
+msgid "prozilla is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:686
+#, c-format
+msgid "Couldn't execute prozilla\n"
+msgstr ""
+
+#: ../urpm/download.pm:696
+#, fuzzy, c-format
+msgid "aria2 is missing\n"
+msgstr "dahil sa nawawalang %s"
+
+#: ../urpm/download.pm:740
+#, c-format
+msgid "Failed to download %s"
+msgstr ""
+
+#: ../urpm/download.pm:835
+#, c-format
+msgid "        %s%% of %s completed, ETA = %s, speed = %s"
+msgstr ""
+
+#: ../urpm/download.pm:836
+#, c-format
+msgid "        %s%% completed, speed = %s"
+msgstr ""
+
+#: ../urpm/download.pm:921
+#, fuzzy, c-format
+msgid "retrieving %s"
+msgstr "inaalis ang %s"
+
+#: ../urpm/download.pm:932
+#, fuzzy, c-format
+msgid "retrieved %s"
+msgstr "...pagkukuha muli nabigo: %s"
+
+#: ../urpm/download.pm:994
+#, c-format
+msgid "unknown protocol defined for %s"
+msgstr "hindi kilalang protocol naka-define para sa %s"
+
+#: ../urpm/download.pm:1008
+#, c-format
+msgid "no webfetch found, supported webfetch are: %s\n"
+msgstr "walang nahanap na webfetch, mga suportadong webfetch ay: %s\n"
+
+#: ../urpm/download.pm:1023
+#, c-format
+msgid "unable to handle protocol: %s"
+msgstr "hindi ma-handle ang protocol: %s"
+
+#: ../urpm/get_pkgs.pm:29
+#, fuzzy, c-format
+msgid "cleaning %s and %s"
+msgstr "ini-install ang %s"
+
+#: ../urpm/get_pkgs.pm:141
+#, c-format
+msgid "package %s is not found."
+msgstr "package na %s ay hindi nahanap."
+
+#: ../urpm/get_pkgs.pm:277
+#, c-format
+msgid "retrieving rpm files from medium \"%s\"..."
+msgstr "kinukuha muli ang mga rpm file mula sa medium na \"%s\"..."
+
+#: ../urpm/install.pm:110
+#, c-format
+msgid "[repackaging]"
+msgstr ""
+
+#: ../urpm/install.pm:201
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+"gumawa ng transaksyon para sa pag-i-install sa %s (alisin=%d, i-install=%d, "
+"i-upgrade=%d)"
+
+#: ../urpm/install.pm:204
+#, c-format
+msgid "unable to create transaction"
+msgstr "hindi magawa ang transaksyon"
+
+#: ../urpm/install.pm:229
+#, fuzzy, c-format
+msgid "unable to extract rpm from delta-rpm package %s"
+msgstr "hindi maalis ang package na %s"
+
+#: ../urpm/install.pm:242
+#, c-format
+msgid "unable to install package %s"
+msgstr "hindi ma-install ang package na %s"
+
+#: ../urpm/install.pm:245
+#, fuzzy, c-format
+msgid "removing bad rpm (%s) from %s"
+msgstr "ini-install ang %s"
+
+#: ../urpm/install.pm:246 ../urpm/install.pm:311
+#, fuzzy, c-format
+msgid "removing %s failed: %s"
+msgstr "...pagkukuha muli nabigo: %s"
+
+#: ../urpm/install.pm:292
+#, fuzzy, c-format
+msgid "Removing package %s"
+msgstr "inaalis ang package na %s"
+
+#: ../urpm/install.pm:293
+#, c-format
+msgid "removing package %s"
+msgstr "inaalis ang package na %s"
+
+#: ../urpm/install.pm:309
+#, fuzzy, c-format
+msgid "removing installed rpms (%s) from %s"
+msgstr "ini-install ang %s"
+
+#: ../urpm/install.pm:318
+#, fuzzy, c-format
+msgid "More information on package %s"
+msgstr "Mas maraming inpormasyon sa package..."
+
+#: ../urpm/ldap.pm:44
+#, c-format
+msgid "Cannot create ldap cache directory"
+msgstr ""
+
+#: ../urpm/ldap.pm:46
+#, c-format
+msgid "Cannot write cache file for ldap\n"
+msgstr ""
+
+#: ../urpm/ldap.pm:181
+#, c-format
+msgid "No server defined, missing uri or host"
+msgstr ""
+
+#: ../urpm/ldap.pm:182
+#, fuzzy, c-format
+msgid "No base defined"
+msgstr "Walang command na nabanggit"
+
+#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#, c-format
+msgid "Cannot connect to ldap uri:"
+msgstr ""
+
+#: ../urpm/lock.pm:99
+#, fuzzy, c-format
+msgid "%s database is locked, process %d is already using it"
+msgstr "urpmi database ay naka-lock"
+
+#: ../urpm/lock.pm:101
+#, c-format
+msgid "%s database is locked (another program is already using it)"
+msgstr ""
+
+#: ../urpm/lock.pm:115
+#, fuzzy, c-format
+msgid "%s database is locked. Waiting..."
+msgstr "urpmi database ay naka-lock"
+
+#: ../urpm/lock.pm:116
+#, fuzzy, c-format
+msgid "aborting"
+msgstr "Babala"
+
+#: ../urpm/main_loop.pm:58
+#, c-format
+msgid "Retry?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:85
+#, fuzzy, c-format
+msgid "You may need to update your urpmi database."
+msgstr ""
+"Pag-i-install ay nabigo, ilang mga file ay nawawala:\n"
+"%s\n"
+"Baka gusto mong i-update ang iyong urpmi database"
+
+#: ../urpm/main_loop.pm:89
+#, fuzzy, c-format
+msgid ""
+"Installation failed, bad rpms:\n"
+"%s"
+msgstr "Pag-i-install ay nabigo"
+
+#: ../urpm/main_loop.pm:108
+#, c-format
+msgid ""
+"There is not enough space on your filesystem to download all packages (%s "
+"needed, %s available).\n"
+"Are you sure you want to continue?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:138
+#, fuzzy, c-format
+msgid "The following package has bad signature"
+msgstr "Ang mga sumusunod na package ay may masamang signature"
+
+#: ../urpm/main_loop.pm:139
+#, c-format
+msgid "The following packages have bad signatures"
+msgstr "Ang mga sumusunod na package ay may masamang signature"
+
+#: ../urpm/main_loop.pm:140
+#, c-format
+msgid "Do you want to continue installation ?"
+msgstr "Gusto mong ituloy ang pag-i-install ?"
+
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
+#: ../urpm/main_loop.pm:296
+#, c-format
+msgid "Installation failed"
+msgstr "Pag-i-install ay nabigo"
+
+#: ../urpm/main_loop.pm:159
+#, fuzzy, c-format
+msgid "removing installed rpms (%s)"
+msgstr "ini-install ang %s"
+
+#: ../urpm/main_loop.pm:185
+#, c-format
+msgid "Try to continue anyway?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:234
+#, fuzzy, c-format
+msgid "installing %s from %s"
+msgstr "ini-install ang %s"
+
+#: ../urpm/main_loop.pm:236
+#, c-format
+msgid "installing %s"
+msgstr "ini-install ang %s"
+
+#: ../urpm/main_loop.pm:243
+#, c-format
+msgid "distributing %s"
+msgstr "dini-distribute ang %s"
+
+#: ../urpm/main_loop.pm:289
+#, fuzzy, c-format
+msgid "Try installation without checking dependencies?"
+msgstr "Subukan ang pag-i-install na hindi sinusuri ang mga dependency? (o/H) "
+
+#: ../urpm/main_loop.pm:297
+#, fuzzy, c-format
+msgid "Try harder to install (--force)?"
+msgstr "Subukan ang pag-i-install nang mas malakas (--force)? (o/H) "
+
+#: ../urpm/main_loop.pm:490
+#, c-format
+msgid "Packages are up to date"
+msgstr ""
+
+#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#, c-format
+msgid "Installation is possible"
+msgstr "Pag-i-install ay maaari"
+
+#: ../urpm/md5sum.pm:55
+#, fuzzy, c-format
+msgid "warning: md5sum for %s unavailable in MD5SUM file"
+msgstr "babala: md5sum para sa %s ay wala sa talaksang MD5SUM"
+
+#: ../urpm/media.pm:270
+#, c-format
+msgid "virtual medium \"%s\" should have a clear url, medium ignored"
+msgstr ""
+"virtual medium na \"%s\" ay dapat may malinaw na url, medium di-pinansin"
+
+#: ../urpm/media.pm:272
+#, c-format
+msgid "unable to access list file of \"%s\", medium ignored"
+msgstr "hindi ma-access ang list file ng \"%s\", medium di-pinansin"
+
+#: ../urpm/media.pm:275
+#, fuzzy, c-format
+msgid "unable to access synthesis file of \"%s\", medium ignored"
+msgstr "hindi ma-access ang hdlist file ng \"%s\", medium di-pinansin"
+
+#: ../urpm/media.pm:301
+#, fuzzy, c-format
+msgid "trying to override existing medium \"%s\", skipping"
+msgstr "sinusubukang i-bypass ang mayroon nang medium na \"%s\", iniiwasan"
+
+#: ../urpm/media.pm:517
+#, c-format
+msgid "failed to migrate removable device, ignoring media"
+msgstr ""
+
+#: ../urpm/media.pm:555
+#, c-format
+msgid "wrote config file [%s]"
+msgstr "isulat ang config file [%s]"
+
+#: ../urpm/media.pm:598
+#, c-format
+msgid "Can't use parallel mode with use-distrib mode"
+msgstr "Hindi magamit ang parallel mode kasama ang use-distrib mode"
+
+#: ../urpm/media.pm:606
+#, c-format
+msgid "using associated media for parallel mode: %s"
+msgstr "ginagamit ang kasamahang media para sa parallel mode: %s"
+
+#: ../urpm/media.pm:622
+#, fuzzy, c-format
+msgid ""
+"--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
+"update, --use-distrib or --parallel"
+msgstr ""
+"--synthesis ay hindi magagamit kasama ang --media, --excludemedia,--"
+"sortmedia, --update o --parallel"
+
+#: ../urpm/media.pm:731
+#, fuzzy, c-format
+msgid "Search start: %s end: %s"
+msgstr "Hanapin ang mga naka-install na font"
+
+#: ../urpm/media.pm:748
+#, c-format
+msgid "skipping package %s"
+msgstr "nilalaktawan ang package na %s"
+
+#: ../urpm/media.pm:764
+#, c-format
+msgid "would install instead of upgrade package %s"
+msgstr "i-install imbis na i-upgrade ang package na %s"
+
+#: ../urpm/media.pm:840
+#, c-format
+msgid "medium \"%s\" already exists"
+msgstr "medium na \"%s\" ay mayroon na"
+
+#: ../urpm/media.pm:882
+#, c-format
+msgid "(ignored by default)"
+msgstr ""
+
+#: ../urpm/media.pm:888
+#, fuzzy, c-format
+msgid "adding medium \"%s\" before remote medium \"%s\""
+msgstr "binabasa ang mga header mula sa medium na \"%s\""
+
+#: ../urpm/media.pm:894
+#, fuzzy, c-format
+msgid "adding medium \"%s\""
+msgstr "inaalis ang medium na \"%s\""
+
+#: ../urpm/media.pm:918
+#, fuzzy, c-format
+msgid "failed to copy media.cfg to %s (%d)"
+msgstr "hindi mabuksan ang rpmdb"
+
+#: ../urpm/media.pm:960
+#, c-format
+msgid "directory %s does not exist"
+msgstr ""
+
+#: ../urpm/media.pm:968
+#, c-format
+msgid "this location doesn't seem to contain any distribution"
+msgstr ""
+
+#: ../urpm/media.pm:992
+#, fuzzy, c-format
+msgid "unable to parse media.cfg"
+msgstr "hindi mabuksan ang rpmdb"
+
+#: ../urpm/media.pm:995
+#, fuzzy, c-format
+msgid "unable to access the distribution medium (no media.cfg file found)"
+msgstr "hindi ma-access ang unang installation medium (walang hdlists na file)"
+
+#: ../urpm/media.pm:1016
+#, c-format
+msgid "skipping non compatible media `%s' (for %s)"
+msgstr ""
+
+#: ../urpm/media.pm:1031
+#, fuzzy, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr "Ini-edit ang medium na \"%s\":"
+
+#: ../urpm/media.pm:1074
+#, fuzzy, c-format
+msgid "retrieving media.cfg file..."
+msgstr "kinukuha muli ang hdlists file..."
+
+#: ../urpm/media.pm:1117
+#, c-format
+msgid "trying to select nonexistent medium \"%s\""
+msgstr "sinusubukang piliin ang di-mayroong medium na \"%s\""
+
+#: ../urpm/media.pm:1120
+#, c-format
+msgid "selecting multiple media: %s"
+msgstr "pumipili ng maramihang media: %s"
+
+#: ../urpm/media.pm:1179
+#, c-format
+msgid "removing medium \"%s\""
+msgstr "inaalis ang medium na \"%s\""
+
+#: ../urpm/media.pm:1262
+#, fuzzy, c-format
+msgid "reconfiguring urpmi for media \"%s\""
+msgstr "kinukuha muli ang mga rpm file mula sa medium na \"%s\"..."
+
+#: ../urpm/media.pm:1296
+#, fuzzy, c-format
+msgid "...reconfiguration failed"
+msgstr "Configuration file"
+
+#: ../urpm/media.pm:1302
+#, fuzzy, c-format
+msgid "reconfiguration done"
+msgstr "Pagsasaayos ng Server"
+
+#: ../urpm/media.pm:1318
+#, c-format
+msgid "Error generating names file: dependency %d not found"
+msgstr ""
+
+#: ../urpm/media.pm:1339
+#, fuzzy, c-format
+msgid "medium \"%s\" is up-to-date"
+msgstr "medium na \"%s\" ay hindi nakapili"
+
+#: ../urpm/media.pm:1350
+#, c-format
+msgid "examining synthesis file [%s]"
+msgstr "sinusuri ang synthesis file [%s]"
+
+#: ../urpm/media.pm:1370
+#, c-format
+msgid "problem reading synthesis file of medium \"%s\""
+msgstr "problema sa pagbabasa ng synthesis file ng medium na \"%s\""
+
+#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
+#, fuzzy, c-format
+msgid "copying [%s] for medium \"%s\"..."
+msgstr "isinusulat ang list file para sa medium na \"%s\""
+
+#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#, c-format
+msgid "...copying failed"
+msgstr "...pagkokopya nabigo"
+
+#: ../urpm/media.pm:1451
+#, c-format
+msgid "copying description file of \"%s\"..."
+msgstr "kinokopya ang paglalarawan na file ng \"%s\"..."
+
+#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#, c-format
+msgid "...copying done"
+msgstr "...pagkokopya natapos"
+
+#: ../urpm/media.pm:1484
+#, c-format
+msgid "copy of [%s] failed (file is suspiciously small)"
+msgstr "pagkopya ng [%s] nabigo (file ay kahina-hinalang maliit)"
+
+#: ../urpm/media.pm:1532
+#, fuzzy, c-format
+msgid "computing md5sum of retrieved source synthesis"
+msgstr "kino-compute ang md5sum ng nakuhang source hdlist (o synthesis)"
+
+#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
+#, fuzzy, c-format
+msgid "retrieval of [%s] failed (md5sum mismatch)"
+msgstr "pagkopya ng [%s] nabigo (md5sum di-tugma)"
+
+#: ../urpm/media.pm:1549
+#, fuzzy, c-format
+msgid "genhdlist2 failed on %s"
+msgstr "sinusuri ang hdlist file [%s]"
+
+#: ../urpm/media.pm:1559
+#, fuzzy, c-format
+msgid "comparing %s and %s"
+msgstr "ini-install ang %s"
+
+#: ../urpm/media.pm:1589
+#, fuzzy, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr "walang nahanap na hdlist file para sa medium na \"%s\""
+
+#: ../urpm/media.pm:1615
+#, fuzzy, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr "kinokopya ang paglalarawan na file ng \"%s\"..."
+
+#: ../urpm/media.pm:1655
+#, fuzzy, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr "inbalidong pangalan ng rpm file [%s]"
+
+#: ../urpm/media.pm:1658
+#, fuzzy, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr "walang nahanap na hdlist file para sa medium na \"%s\""
+
+#: ../urpm/media.pm:1690
+#, fuzzy, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr "kinukuha muli ang source hdlist (o synthesis) ng \"%s\"..."
+
+#: ../urpm/media.pm:1756
+#, c-format
+msgid "examining pubkey file of \"%s\"..."
+msgstr "sinusuri ang pubkey file ng \"%s\"..."
+
+#: ../urpm/media.pm:1768
+#, c-format
+msgid "...imported key %s from pubkey file of \"%s\""
+msgstr "...in-import ang key na %s mula sa pubkey file ng \"%s\""
+
+#: ../urpm/media.pm:1772
+#, c-format
+msgid "unable to import pubkey file of \"%s\""
+msgstr "hindi ma-import ang pubkey file ng \"%s\""
+
+#: ../urpm/media.pm:1813
+#, fuzzy, c-format
+msgid "no synthesis file found for medium \"%s\""
+msgstr "walang nahanap na hdlist file para sa medium na \"%s\""
+
+#: ../urpm/media.pm:1846
+#, fuzzy, c-format
+msgid "updated medium \"%s\""
+msgstr "idinagdag ang medium na %s"
+
+#: ../urpm/media.pm:1968
+#, c-format
+msgid "retrieval of [%s] failed"
+msgstr ""
+
+#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#, c-format
+msgid "trying again with mirror %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:112
+#, c-format
+msgid "Could not find a mirror from mirrorlist %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:260
+#, c-format
+msgid "found geolocalisation %s %.2f %.2f from timezone %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:305
+#, fuzzy, c-format
+msgid "getting mirror list from %s"
+msgstr "binabasa ang mga rpm file mula sa [%s]"
+
+#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#, c-format
+msgid "Nn"
+msgstr "HhNn"
+
+#. -PO: Add here the keys which might be pressed in the "Yes"-case.
+#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#, c-format
+msgid "Yy"
+msgstr "OoYy"
+
+#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#, c-format
+msgid " (y/N) "
+msgstr " (o/H) "
+
+#: ../urpm/msg.pm:139
+#, c-format
+msgid "Sorry, bad choice, try again\n"
+msgstr "Sorry, masamang pili, subukan muli\n"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Package"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Version"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Release"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, fuzzy, c-format
+msgid "Arch"
+msgstr "Maghanap"
+
+#: ../urpm/msg.pm:179
+#, c-format
+msgid "(suggested)"
+msgstr ""
+
+#: ../urpm/msg.pm:194
+#, fuzzy, c-format
+msgid "medium \"%s\""
+msgstr "inaalis ang medium na \"%s\""
+
+#: ../urpm/msg.pm:194
+#, c-format
+msgid "command line"
+msgstr ""
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "B"
+msgstr ""
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "KB"
+msgstr "KB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "MB"
+msgstr "MB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "GB"
+msgstr "GB"
+
+#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#, c-format
+msgid "TB"
+msgstr "TB"
+
+#: ../urpm/orphans.pm:79
+#, c-format
+msgid "Marking %s as manually installed, it won't be auto-orphaned"
+msgstr ""
+
+#: ../urpm/orphans.pm:522
+#, fuzzy, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned."
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned."
+msgstr[0] "Isa sa mga sumusunod na package ay kailangan:"
+msgstr[1] "Isa sa mga sumusunod na package ay kailangan:"
+
+#: ../urpm/orphans.pm:525
+#, fuzzy, c-format
+msgid "You may wish to remove it."
+msgid_plural "You may wish to remove them."
+msgstr[0] "Walang maaalis"
+msgstr[1] "Walang maaalis"
+
+#: ../urpm/orphans.pm:542
+#, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans"
+"\""
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
+"orphans\""
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpm/parallel.pm:15
+#, c-format
+msgid "unable to parse \"%s\" in file [%s]"
+msgstr "hindi ma-parse ang \"%s\" sa file [%s]"
+
+#: ../urpm/parallel.pm:24
+#, c-format
+msgid "examining parallel handler in file [%s]"
+msgstr "sinusuri ang parallel handler sa file [%s]"
+
+#: ../urpm/parallel.pm:35
+#, c-format
+msgid "found parallel handler for nodes: %s"
+msgstr "nakahanap ng parallel handler para sa mga node: %s"
+
+#: ../urpm/parallel.pm:39
+#, c-format
+msgid "unable to use parallel option \"%s\""
+msgstr "hindi magamit ang parallel option na \"%s\""
+
+#: ../urpm/parallel.pm:94
+#, c-format
+msgid "on node %s"
+msgstr ""
+
+#: ../urpm/parallel.pm:294
+#, fuzzy, c-format
+msgid "Installation failed on node %s"
+msgstr "Pag-i-install ay nabigo"
+
+#: ../urpm/parallel_ka_run.pm:58
+#, c-format
+msgid "rshp failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ka_run.pm:80
+#, c-format
+msgid "mput failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:27
+#, c-format
+msgid "scp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:39
+#, c-format
+msgid "cp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:86
+#, c-format
+msgid ""
+"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
+"code: %d)"
+msgstr ""
+
+#: ../urpm/removable.pm:46
+#, fuzzy, c-format
+msgid "unable to access medium \"%s\"."
+msgstr "hindi ma-access ang medium na \"%s\""
+
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#, c-format
+msgid "mounting %s"
+msgstr "mina-mount ang %s"
+
+#: ../urpm/removable.pm:117
+#, c-format
+msgid "unmounting %s"
+msgstr "ina-unmount ang %s"
+
+#: ../urpm/select.pm:45
+#, c-format
+msgid "urpmi was restarted, and the list of priority packages did not change"
+msgstr ""
+
+#: ../urpm/select.pm:47
+#, c-format
+msgid ""
+"urpmi was restarted, and the list of priority packages did change: %s vs %s"
+msgstr ""
+
+#: ../urpm/select.pm:217
+#, c-format
+msgid "No package named %s"
+msgstr "Walang package na may pangalang %s"
+
+#: ../urpm/select.pm:219 ../urpme:113
+#, c-format
+msgid "The following packages contain %s: %s"
+msgstr "Ang mga sumusunod na package ay naglalaman ng %s: %s"
+
+#: ../urpm/select.pm:221
+#, c-format
+msgid "You should use \"-a\" to use all of them"
+msgstr ""
+
+#: ../urpm/select.pm:368
+#, fuzzy, c-format
+msgid "found package(s) %s in urpmi db, but none are installed"
+msgstr "Lahat ay naka-install na"
+
+#: ../urpm/select.pm:600
+#, fuzzy, c-format
+msgid "Package %s is already installed"
+msgstr "Lahat ay naka-install na"
+
+#: ../urpm/select.pm:601
+#, fuzzy, c-format
+msgid "Packages %s are already installed"
+msgstr "Lahat ay naka-install na"
+
+#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#, c-format
+msgid "due to conflicts with %s"
+msgstr "dahil sa pagkakasalungat sa %s"
+
+#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#, c-format
+msgid "due to unsatisfied %s"
+msgstr "dahil sa hindi na-satisfy na %s"
+
+#: ../urpm/select.pm:625
+#, c-format
+msgid "trying to promote %s"
+msgstr "sinusubukang i-promote ang %s"
+
+#: ../urpm/select.pm:626
+#, c-format
+msgid "in order to keep %s"
+msgstr "para maitago ang %s"
+
+#: ../urpm/select.pm:667
+#, fuzzy, c-format
+msgid ""
+"The following package has to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Ang mga sumusunod na package ay dapat alisin para ma-upgrade ang iba:\n"
+"%s"
+
+#: ../urpm/select.pm:668
+#, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Ang mga sumusunod na package ay dapat alisin para ma-upgrade ang iba:\n"
+"%s"
+
+#: ../urpm/select.pm:695
+#, c-format
+msgid "in order to install %s"
+msgstr "para ma-install ang %s"
+
+#: ../urpm/select.pm:701
+#, c-format
+msgid "due to missing %s"
+msgstr "dahil sa nawawalang %s"
+
+#: ../urpm/signature.pm:62
+#, c-format
+msgid "Invalid signature (%s)"
+msgstr "Inbalidong signature (%s)"
+
+#: ../urpm/signature.pm:77
+#, fuzzy, c-format
+msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
+msgstr "Ang mga sumusunod na package ay naglalaman ng %s: %s"
+
+#: ../urpm/signature.pm:83
+#, c-format
+msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
+msgstr ""
+
+#: ../urpm/signature.pm:102
+#, c-format
+msgid "Invalid Key ID (%s)"
+msgstr "Inbalidong Key ID (%s)"
+
+#: ../urpm/signature.pm:104
+#, c-format
+msgid "Missing signature (%s)"
+msgstr "Nawawalang signature (%s)"
+
+#: ../urpm/signature.pm:107
+#, c-format
+msgid "SECURITY: Medium \"%s\" has no key (%s)!"
+msgstr ""
+
+#: ../urpm/signature.pm:109
+#, c-format
+msgid "Medium without key (%s)"
+msgstr ""
+
+#: ../urpm/sys.pm:225
+#, c-format
+msgid "system"
+msgstr ""
+
+#: ../urpm/sys.pm:262
+#, c-format
+msgid "You should restart your computer for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:264
+#, c-format
+msgid "You should restart your session for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:266
+#, c-format
+msgid "You should restart %s for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't write file"
+msgstr "hindi maisulat ang config file [%s]"
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't open file"
+msgstr "Pagkokopya nabigo"
+
+#: ../urpm/sys.pm:417
+#, fuzzy, c-format
+msgid "Can't move file %s to %s"
+msgstr "Pagkokopya nabigo"
+
+#: ../urpme:43
+#, c-format
+msgid "  --auto         - automatically select a package in choices.\n"
+msgstr ""
+"  --auto         - automatic na pumili ng package sa mga pagpipilian.\n"
+
+#: ../urpme:44
+#, c-format
+msgid "  --auto-orphans - remove orphans\n"
+msgstr ""
+
+#: ../urpme:45
+#, fuzzy, c-format
+msgid "  --test         - verify if the removal can be achieved correctly.\n"
+msgstr "  --test         - subukan kung makakamit ng tama ang pag-i-install.\n"
+
+#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#, c-format
+msgid "  --parallel     - distributed urpmi across machines of alias.\n"
+msgstr ""
+"  --parallel     - distributed/nakapamahagi na urpmi sa mga makina ng "
+"alias.\n"
+
+#: ../urpme:48 ../urpmi:138
+#, fuzzy, c-format
+msgid "  --repackage    - Re-package the files before erasing\n"
+msgstr "  --packager     - i-print ang tag packager: taga-package.\n"
+
+#: ../urpme:49
+#, fuzzy, c-format
+msgid "  --root         - use another root for rpm removal.\n"
+msgstr ""
+"  --root         - gumamit ng ibang root para sa pag-i-install ng rpm.\n"
+
+#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
+#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, fuzzy, c-format
+msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
+msgstr ""
+"  --root         - gumamit ng ibang root para sa pag-i-install ng rpm.\n"
+
+#: ../urpme:51 ../urpmi:96
+#, fuzzy, c-format
+msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
+msgstr "  --update       - i-update ang update media lamang.\n"
+
+#: ../urpme:52
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr "  --description  - i-print ang tag description: paglalarawan.\n"
+
+#: ../urpme:53
+#, fuzzy, c-format
+msgid ""
+"  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
+"                   to (un)install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - i-configure ang urpmi \"on the fly\" mula sa isang "
+"distrib\n"
+"                   tree, magagamit para sa mag-(un)install ng chroot na may\n"
+"                   option na --root.\n"
+
+#: ../urpme:55 ../urpmi:149 ../urpmq:87
+#, fuzzy, c-format
+msgid "  --verbose, -v  - verbose mode.\n"
+msgstr "  --verbose      - masalita na paraan.\n"
+
+#: ../urpme:56
+#, c-format
+msgid "  -a             - select all packages matching expression.\n"
+msgstr ""
+"  -a             - piliin lahat ng package na tumutugma sa expression.\n"
+
+#: ../urpme:71
+#, fuzzy, c-format
+msgid "Only superuser is allowed to remove packages"
+msgstr "Superuser lamang ang pinapayagang mag-install ng mga package"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown packages"
+msgstr "hindi kilalang mga package"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown package"
+msgstr "hindi kilalang package"
+
+#: ../urpme:119
+#, fuzzy, c-format
+msgid "Removing the following package will break your system:"
+msgid_plural "Removing the following packages will break your system:"
+msgstr[0] "ang pag-aalis ng package na %s ay sisira ng sistema mo"
+msgstr[1] "ang pag-aalis ng package na %s ay sisira ng sistema mo"
+
+#: ../urpme:124
+#, c-format
+msgid "Nothing to remove"
+msgstr "Walang maaalis"
+
+#: ../urpme:141
+#, fuzzy, c-format
+msgid "No orphans to remove"
+msgstr "Walang maaalis"
+
+#: ../urpme:147
+#, fuzzy, c-format
+msgid "To satisfy dependencies, the following package will be removed"
+msgid_plural ""
+"To satisfy dependencies, the following %d packages will be removed"
+msgstr[0] ""
+"Para ma-satisfy ang dependency, ang sumusunod na package ay aalisin (%d MB)"
+msgstr[1] ""
+"Para ma-satisfy ang dependency, ang sumusunod na package ay aalisin (%d MB)"
+
+#: ../urpme:152
+#, fuzzy, c-format
+msgid "(orphan package)"
+msgid_plural "(orphan packages)"
+msgstr[0] "hindi kilalang package"
+msgstr[1] "hindi kilalang package"
+
+#: ../urpme:159
+#, fuzzy, c-format
+msgid "Remove %d package?"
+msgid_plural "Remove %d packages?"
+msgstr[0] "inaalis ang package na %s"
+msgstr[1] "inaalis ang package na %s"
+
+#: ../urpme:164
+#, fuzzy, c-format
+msgid "testing removal of %s"
+msgstr "kinukuha ang naaalis na device bilang \"%s\""
+
+#: ../urpme:181
+#, c-format
+msgid "Removal failed"
+msgstr "Pag-aalis nabigo"
+
+#: ../urpme:183
+#, fuzzy, c-format
+msgid "Removal is possible"
+msgstr "Pag-aalis nabigo"
+
+#: ../urpmf:31
+#, fuzzy, c-format
+msgid "  --version      - print this tool's version number.\n"
+msgstr "  --help         - i-print itong tulong na mensahe.\n"
+
+#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#, c-format
+msgid "  --env          - use specific environment (typically a bug report).\n"
+msgstr ""
+"  --env          - gumamit ng specific na environment o kapaligiran\n"
+"                   (karaniwan ay isang ulat sa bug).\n"
+
+#: ../urpmf:33 ../urpmi:69 ../urpmq:45
+#, c-format
+msgid "  --excludemedia - do not use the given media, separated by comma.\n"
+msgstr ""
+"  --excludemedia - huwag gamitin ang binigay na media, hiniwalay ng kuwit.\n"
+
+#: ../urpmf:34
+#, c-format
+msgid ""
+"  --literal, -l  - don't match patterns, use argument as a literal string.\n"
+msgstr ""
+
+#: ../urpmf:37 ../urpmi:72 ../urpmq:46
+#, c-format
+msgid ""
+"  --sortmedia    - sort media according to substrings separated by comma.\n"
+msgstr ""
+"  --sortmedia    - iayos ang media ayon sa mga substring na hiniwalay ng "
+"kuwit.\n"
+
+#: ../urpmf:38
+#, fuzzy, c-format
+msgid "  --use-distrib  - use the given path to access media\n"
+msgstr ""
+"  --synthesis    - gamitin ang binigay na synthesis imbis na urpmi "
+"database.\n"
+
+#: ../urpmf:39 ../urpmi:73 ../urpmq:47
+#, c-format
+msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+msgstr ""
+"  --synthesis    - gamitin ang binigay na synthesis imbis na urpmi "
+"database.\n"
+
+#: ../urpmf:40
+#, c-format
+msgid "  --uniq         - do not print identical lines twice.\n"
+msgstr "  --uniq         - huwag i-print ang mga magkatulad na linya.\n"
+
+#: ../urpmf:41 ../urpmi:70 ../urpmq:42
+#, c-format
+msgid "  --update       - use only update media.\n"
+msgstr "  --update       - gamitin lang ang update media.\n"
+
+#: ../urpmf:42
+#, c-format
+msgid "  --verbose      - verbose mode.\n"
+msgstr "  --verbose      - masalita na paraan.\n"
+
+#: ../urpmf:43
+#, c-format
+msgid "  -i             - ignore case distinctions in patterns.\n"
+msgstr ""
+"  -i             - balewalain ang pagkakaiba ng case/laki ng titik sa bawat\n"
+
+#: ../urpmf:44
+#, fuzzy, c-format
+msgid "  -I             - honor case distinctions in patterns (default).\n"
+msgstr ""
+"  -i             - balewalain ang pagkakaiba ng case/laki ng titik sa bawat\n"
+
+#: ../urpmf:45
+#, c-format
+msgid "  -F<str>        - change field separator (defaults to ':').\n"
+msgstr ""
+
+#: ../urpmf:46
+#, c-format
+msgid "Pattern expressions:\n"
+msgstr ""
+
+#: ../urpmf:47
+#, c-format
+msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
+msgstr ""
+
+#: ../urpmf:48
+#, c-format
+msgid "  -e             - include perl code directly as perl -e.\n"
+msgstr "  -e             - isama nang direkta ang perl code bilang perl -e.\n"
+
+#: ../urpmf:49
+#, fuzzy, c-format
+msgid "  -a             - binary AND operator.\n"
+msgstr ""
+"  -a             - binary AND operator, totoo kung parehong expression ay "
+"totoo.\n"
+
+#: ../urpmf:50
+#, fuzzy, c-format
+msgid "  -o             - binary OR operator.\n"
+msgstr ""
+"  -o             - binary OR operator, totoo kung isang expression ay "
+"totoo.\n"
+
+#: ../urpmf:51
+#, fuzzy, c-format
+msgid "  !              - unary NOT.\n"
+msgstr "  -q             - tahimik na paraan.\n"
+
+#: ../urpmf:52
+#, fuzzy, c-format
+msgid "  ( )            - left and right parentheses.\n"
+msgstr ""
+"  )              - kanang parenthesis para isara ang grupo ng expression.\n"
+
+#: ../urpmf:53
+#, fuzzy, c-format
+msgid "List of tags:\n"
+msgstr ""
+"Talaan ng data na ibabalik:\n"
+"\n"
+
+#: ../urpmf:54
+#, fuzzy, c-format
+msgid "  --qf           - specify a printf-like output format\n"
+msgstr "  --X            - gamitin ang X interface.\n"
+
+#: ../urpmf:55
+#, fuzzy, c-format
+msgid "                   example: '%%name:%%files'\n"
+msgstr "                    defaults ay %s.\n"
+
+#: ../urpmf:56
+#, fuzzy, c-format
+msgid "  --arch         - architecture\n"
+msgstr "  --url          - i-print ang tag url: url.\n"
+
+#: ../urpmf:57
+#, fuzzy, c-format
+msgid "  --buildhost    - build host\n"
+msgstr "  --buildhost    - i-print ang tag buildhost: build host.\n"
+
+#: ../urpmf:58
+#, c-format
+msgid "  --buildtime    - build time\n"
+msgstr ""
+
+#: ../urpmf:59
+#, fuzzy, c-format
+msgid "  --conffiles    - configuration files\n"
+msgstr "Module para sa pagco-configure ng Konsole"
+
+#: ../urpmf:60
+#, fuzzy, c-format
+msgid "  --conflicts    - conflict tags\n"
+msgstr ""
+"  --conflicts    - i-print ang tag conflicts: lahat ng pagkakasalungat.\n"
+
+#: ../urpmf:61
+#, fuzzy, c-format
+msgid "  --description  - package description\n"
+msgstr "  --description  - i-print ang tag description: paglalarawan.\n"
+
+#: ../urpmf:62
+#, c-format
+msgid "  --distribution - distribution\n"
+msgstr ""
+
+#: ../urpmf:63
+#, fuzzy, c-format
+msgid "  --epoch        - epoch\n"
+msgstr "  --epoch        - i-print ang tag epoch: epoch.\n"
+
+#: ../urpmf:64
+#, fuzzy, c-format
+msgid "  --filename     - filename of the package\n"
+msgstr "  --all          - i-print lahat ng mga tag.\n"
+
+#: ../urpmf:65
+#, fuzzy, c-format
+msgid "  --files        - list of files contained in the package\n"
+msgstr "  -l             - ilista ang mga file sa package.\n"
+
+#: ../urpmf:66
+#, fuzzy, c-format
+msgid "  --group        - group\n"
+msgstr "  --group        - i-print ang tag group: grupo.\n"
+
+#: ../urpmf:67
+#, fuzzy, c-format
+msgid "  --license      - license\n"
+msgstr "  --all          - i-print lahat ng mga tag.\n"
+
+#: ../urpmf:68
+#, fuzzy, c-format
+msgid "  --name         - package name\n"
+msgstr "  --all          - i-print lahat ng mga tag.\n"
+
+#: ../urpmf:69
+#, fuzzy, c-format
+msgid "  --obsoletes    - obsoletes tags\n"
+msgstr "  --obsoletes    - i-print ang tag obsoletes: lahat ng pinapalaos.\n"
+
+#: ../urpmf:70
+#, fuzzy, c-format
+msgid "  --packager     - packager\n"
+msgstr "  --packager     - i-print ang tag packager: taga-package.\n"
+
+#: ../urpmf:71
+#, fuzzy, c-format
+msgid "  --provides     - provides tags\n"
+msgstr "  --provides     - i-print ang tag provides: lahat ng binibigay.\n"
+
+#: ../urpmf:72
+#, fuzzy, c-format
+msgid "  --requires     - requires tags\n"
+msgstr "  --requires     - i-print ang tag requires: lahat ng kinakailangan.\n"
+
+#: ../urpmf:73
+#, fuzzy, c-format
+msgid "  --size         - installed size\n"
+msgstr "  --size         - i-print ang tag size: laki.\n"
+
+#: ../urpmf:74
+#, fuzzy, c-format
+msgid "  --sourcerpm    - source rpm name\n"
+msgstr "  --sourcerpm    - i-print ang tag sourcerpm: source rpm.\n"
+
+#: ../urpmf:75
+#, fuzzy, c-format
+msgid "  --suggests     - suggests tags\n"
+msgstr "  --obsoletes    - i-print ang tag obsoletes: lahat ng pinapalaos.\n"
+
+#: ../urpmf:76
+#, fuzzy, c-format
+msgid "  --summary      - summary\n"
+msgstr "  --summary      - i-print ang tag summary: kabuuan.\n"
+
+#: ../urpmf:77
+#, fuzzy, c-format
+msgid "  --url          - url\n"
+msgstr "  --url          - i-print ang tag url: url.\n"
+
+#: ../urpmf:78
+#, fuzzy, c-format
+msgid "  --vendor       - vendor\n"
+msgstr "  --verbose      - masalita na paraan.\n"
+
+#: ../urpmf:79
+#, fuzzy, c-format
+msgid "  -m             - the media in which the package was found\n"
+msgstr "  -l             - ilista ang mga file sa package.\n"
+
+#: ../urpmf:80 ../urpmq:97
+#, c-format
+msgid "  -f             - print version, release and arch with name.\n"
+msgstr ""
+"  -f             - i-print ang version, release o labas at arch o "
+"arkitektura\n"
+"                   kasama ang pangalan.\n"
+
+#: ../urpmf:148
+#, c-format
+msgid "unterminated expression (%s)"
+msgstr ""
+
+#: ../urpmf:193
+#, c-format
+msgid "Incorrect format: you may use only one multi-valued tag"
+msgstr ""
+
+#: ../urpmf:286
+#, fuzzy, c-format
+msgid "no hdlist available for medium \"%s\""
+msgstr "walang nahanap na hdlist file para sa medium na \"%s\""
+
+#: ../urpmf:293
+#, fuzzy, c-format
+msgid "no synthesis available for medium \"%s\""
+msgstr "nakabuo ng hdlist synthesis file para sa medium na \"%s\""
+
+#: ../urpmf:302
+#, fuzzy, c-format
+msgid "no xml-info available for medium \"%s\""
+msgstr "isinusulat ang list file para sa medium na \"%s\""
+
+#: ../urpmi:76
+#, fuzzy, c-format
+msgid "  --auto-update  - update media then upgrade the system.\n"
+msgstr ""
+"  --auto-select  - piliin kaagad ang mga package para i-upgrade ang "
+"sistema.\n"
+
+#: ../urpmi:77
+#, fuzzy, c-format
+msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - i-disable ang MD5SUM na pagsusuri ng file.\n"
+
+#: ../urpmi:78
+#, fuzzy, c-format
+msgid "    --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - pilitin ang pag-update ng gpg key.\n"
+
+#: ../urpmi:79
+#, c-format
+msgid "  --auto-orphans - remove orphans without asking\n"
+msgstr ""
+
+#: ../urpmi:80 ../urpmq:52
+#, fuzzy, c-format
+msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
+msgstr "  --obsoletes    - i-print ang tag obsoletes: lahat ng pinapalaos.\n"
+
+#: ../urpmi:81
+#, c-format
+msgid ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+msgstr ""
+"  --no-uninstall - huwag itanong kung alisin ang package, huwag magpatuloy.\n"
+
+#: ../urpmi:82
+#, fuzzy, c-format
+msgid "  --no-install   - don't install packages (only download)\n"
+msgstr ""
+"  --install-src  - i-install ang source package lamang (walang mga binary).\n"
+
+#: ../urpmi:83 ../urpmq:54
+#, c-format
+msgid ""
+"  --keep         - keep existing packages if possible, reject requested\n"
+"                   packages that lead to removals.\n"
+msgstr ""
+"  --keep         - ingatan ang mga package na mayroon na, tanggihan\n"
+"                   ang mga hiniling na package kung magkakaroon ng aalisin.\n"
+
+#: ../urpmi:85
+#, c-format
+msgid ""
+"  --split-level  - split in small transaction if more than given packages\n"
+"                   are going to be installed or upgraded,\n"
+"                   default is %d.\n"
+msgstr ""
+"  --split-level  - hatiin sa maliliit na transaksyon kung mas marami sa "
+"binigay\n"
+"                   na mga package ay ii-install o ia-upgrade,\n"
+"                   default ay %d.\n"
+
+#: ../urpmi:89
+#, c-format
+msgid "  --split-length - small transaction length, default is %d.\n"
+msgstr "  --split-length - haba ng maliit na transaksyon, default ay %d.\n"
+
+#: ../urpmi:91
+#, fuzzy, c-format
+msgid "  --fuzzy, -y    - impose fuzzy search.\n"
+msgstr "  --fuzzy        - igiit ang fuzzy na paghahanap (pareho ng -y).\n"
+
+#: ../urpmi:92
+#, fuzzy, c-format
+msgid "  --buildrequires - install the buildrequires of the packages\n"
+msgstr "  --requires     - i-print ang tag requires: lahat ng kinakailangan.\n"
+
+#: ../urpmi:93
+#, c-format
+msgid "  --install-src  - install only source package (no binaries).\n"
+msgstr ""
+"  --install-src  - i-install ang source package lamang (walang mga binary).\n"
+
+#: ../urpmi:94
+#, c-format
+msgid "  --clean        - remove rpm from cache before anything else.\n"
+msgstr "  --clean        - alisin ang rpm sa cache bago pa ang kung ano.\n"
+
+#: ../urpmi:95
+#, fuzzy, c-format
+msgid "  --noclean      - don't clean rpms from cache.\n"
+msgstr "  --noclean      - ingatan ang rpm na hindi ginagamit sa cache.\n"
+
+#: ../urpmi:97
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr ""
+
+#: ../urpmi:99
+#, c-format
+msgid ""
+"  --allow-nodeps - allow asking user to install packages without\n"
+"                   dependencies checking.\n"
+msgstr ""
+"  --allow-nodeps - payagan ang pagtanong sa user na i-install ang mga "
+"package\n"
+"                   na hindi sinusuri ang mga dependency.\n"
+
+#: ../urpmi:101
+#, c-format
+msgid ""
+"  --allow-force  - allow asking user to install packages without\n"
+"                   dependencies checking and integrity.\n"
+msgstr ""
+"  --allow-force  - payagan ang pagtanong sa user na i-install ang mga "
+"package\n"
+"                   na hindi sinusuri ang mga dependency at integridad.\n"
+
+#: ../urpmi:103
+#, fuzzy, c-format
+msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
+msgstr "  --obsoletes    - i-print ang tag obsoletes: lahat ng pinapalaos.\n"
+
+#: ../urpmi:107
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - i-configure ang urpmi \"on the fly\" mula sa isang "
+"distrib\n"
+"                   tree, magagamit para sa mag-install ng chroot na may\n"
+"                   option na --root.\n"
+
+#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#, c-format
+msgid "  --metalink     - generate and use a local metalink.\n"
+msgstr ""
+
+#: ../urpmi:110
+#, c-format
+msgid ""
+"  --download-all - download all needed packages before trying to install "
+"them\n"
+msgstr ""
+
+#: ../urpmi:111
+#, c-format
+msgid ""
+"  --downloader   - program to use to retrieve distant files. \n"
+"                   known programs: %s\n"
+msgstr ""
+
+#: ../urpmi:114
+#, c-format
+msgid "  --curl-options - additional options to pass to curl\n"
+msgstr ""
+
+#: ../urpmi:115
+#, c-format
+msgid "  --rsync-options- additional options to pass to rsync\n"
+msgstr ""
+
+#: ../urpmi:116
+#, c-format
+msgid "  --wget-options - additional options to pass to wget\n"
+msgstr ""
+
+#: ../urpmi:117
+#, c-format
+msgid "  --prozilla-options - additional options to pass to prozilla\n"
+msgstr ""
+
+#: ../urpmi:118
+#, c-format
+msgid "  --aria2-options - additional options to pass to aria2\n"
+msgstr ""
+
+#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#, c-format
+msgid "  --limit-rate   - limit the download speed.\n"
+msgstr "  --limit-rate   - limitahan ang tulin ng pagda-download.\n"
+
+#: ../urpmi:120
+#, c-format
+msgid ""
+"  --resume       - resume transfer of partially-downloaded files\n"
+"                   (--no-resume disables it, default is disabled).\n"
+msgstr ""
+"  --resume       - ituloy ang paglipat ng mga na-download nang bahagi ng "
+"file\n"
+"                   (--no-resume ay dini-disable ito, default ay naka-"
+"disable).\n"
+
+#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#, c-format
+msgid ""
+"  --proxy        - use specified HTTP proxy, the port number is assumed\n"
+"                   to be 1080 by default (format is <proxyhost[:port]>).\n"
+msgstr ""
+"  --proxy        - gamitin ang binanggit na HTTP proxy, ang bilang ng port "
+"ay\n"
+"                   ipinagpalagay na 1080 bilang default\n"
+"                   (format ay <proxyhost[:port]>).\n"
+
+#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#, c-format
+msgid ""
+"  --proxy-user   - specify user and password to use for proxy\n"
+"                   authentication (format is <user:password>).\n"
+msgstr ""
+"  --proxy-user   - banggitin ang user at password na gagamitin para sa "
+"proxy\n"
+"                   authentication (format ay <user:password>).\n"
+
+#: ../urpmi:126
+#, c-format
+msgid ""
+"  --bug          - output a bug report in directory indicated by\n"
+"                   next arg.\n"
+msgstr ""
+"  --bug          - maglabas ng ulat ng bug sa directory na binanggit ng\n"
+"                   kasunod na argument.\n"
+
+#: ../urpmi:132
+#, c-format
+msgid "  --excludepath  - exclude path separated by comma.\n"
+msgstr "  --excludepath  - huwag isama ang path na hiniwalay ng comma/kuwit.\n"
+
+#: ../urpmi:133
+#, c-format
+msgid "  --excludedocs  - exclude doc files.\n"
+msgstr "  --excludedocs  - huwag isama ang mga docs file.\n"
+
+#: ../urpmi:134
+#, fuzzy, c-format
+msgid "  --ignoresize   - don't verify disk space before installation.\n"
+msgstr ""
+"  --no-uninstall - huwag itanong kung alisin ang package, huwag magpatuloy.\n"
+
+#: ../urpmi:135
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr "  --url          - i-print ang tag url: url.\n"
+
+#: ../urpmi:136
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr "  --description  - i-print ang tag description: paglalarawan.\n"
+
+#: ../urpmi:137
+#, fuzzy, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr ""
+"  --conflicts    - i-print ang tag conflicts: lahat ng pagkakasalungat.\n"
+
+#: ../urpmi:139
+#, fuzzy, c-format
+msgid "  --skip         - packages which installation should be skipped\n"
+msgstr "  --test         - subukan kung makakamit ng tama ang pag-i-install.\n"
+
+#: ../urpmi:140
+#, fuzzy, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr "  --test         - subukan kung makakamit ng tama ang pag-i-install.\n"
+
+#: ../urpmi:141
+#, fuzzy, c-format
+msgid ""
+"  --more-choices - when several packages are found, propose more choices\n"
+"                   than the default.\n"
+msgstr ""
+"  --more-choices - kapag may ilang mga paketeng nahanap, magbigay ng mas-"
+"maraming\n"
+"                        papagpilian kaysa sa default.\n"
+
+#: ../urpmi:143
+#, fuzzy, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr "  --noclean      - ingatan ang rpm na hindi ginagamit sa cache.\n"
+
+#: ../urpmi:144
+#, fuzzy, c-format
+msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
+msgstr ""
+"  --strict-arch  - iapgreyd lamang ang mga paketeng pareho ang arkitektura.\n"
+
+#: ../urpmi:145 ../urpmq:95
+#, c-format
+msgid "  -a             - select all matches on command line.\n"
+msgstr "  -a             - piliin lahat ng katugma sa command line.\n"
+
+#: ../urpmi:148
+#, fuzzy, c-format
+msgid "  --quiet, -q    - quiet mode.\n"
+msgstr "  -q             - tahimik na paraan.\n"
+
+#: ../urpmi:150
+#, fuzzy, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr "  --verbose      - masalita na paraan.\n"
+
+#: ../urpmi:151
+#, c-format
+msgid "  names or rpm files given on command line will be installed.\n"
+msgstr ""
+"  ang mga pangalan o rpm file na binigay sa command line ay ii-install.\n"
+
+#: ../urpmi:179
+#, c-format
+msgid "Error: can't use --auto-select along with package list.\n"
+msgstr ""
+
+#: ../urpmi:186
+#, c-format
+msgid ""
+"Error: To generate a bug report, specify the usual command-line arguments\n"
+"along with --bug.\n"
+msgstr ""
+
+#: ../urpmi:216
+#, fuzzy, c-format
+msgid "You can't install binary rpm files when using --install-src"
+msgstr ""
+"Ano ang magagawa sa mga binary rpm file kung ginagamit ang --install-src"
+
+#: ../urpmi:217
+#, c-format
+msgid "You can't install spec files"
+msgstr ""
+
+#: ../urpmi:224
+#, c-format
+msgid "defaulting to --buildrequires"
+msgstr ""
+
+#: ../urpmi:229
+#, c-format
+msgid ""
+"please use --buildrequires or --install-src, defaulting to --buildrequires"
+msgstr ""
+
+#: ../urpmi:249
+#, c-format
+msgid ""
+"Directory [%s] already exists, please use another directory for bug report "
+"or delete it"
+msgstr ""
+"Directory na [%s] ay meron na, gumamit ng ibang directory para sa ulat ng "
+"bug o alisin ito"
+
+#: ../urpmi:250
+#, c-format
+msgid "Unable to create directory [%s] for bug report"
+msgstr "Hindi magawa ang directory na [%s] para sa ulat ng bug"
+
+#: ../urpmi:271
+#, fuzzy, c-format
+msgid ""
+"Error: %s appears to be mounted read-only.\n"
+"Use --allow-force to force operation."
+msgstr ""
+"Error: mukhang ang %s ay nakalapat na read-only.\n"
+"Gamitin ang --allow-force upang pilitin ang operasyon."
+
+#. -PO: here format is "<package_name>: <summary> (to upgrade)"
+#: ../urpmi:425
+#, fuzzy, c-format
+msgid "%s: %s (to upgrade)"
+msgstr " (i-upgrade)"
+
+#. -PO: here format is "<package_name> (to upgrade)"
+#: ../urpmi:427
+#, fuzzy, c-format
+msgid "%s (to upgrade)"
+msgstr " (i-upgrade)"
+
+#. -PO: here format is "<package_name>: <summary> (to install)"
+#: ../urpmi:431
+#, fuzzy, c-format
+msgid "%s: %s (to install)"
+msgstr " (i-install)"
+
+#. -PO: here format is "<package_name> (to install)"
+#: ../urpmi:433
+#, fuzzy, c-format
+msgid "%s (to install)"
+msgstr " (i-install)"
+
+#: ../urpmi:439
+#, fuzzy, c-format
+msgid ""
+"In order to satisfy the '%s' dependency, one of the following packages is "
+"needed:"
+msgstr ""
+"Para ma-satisfy ang dependency, ang sumusunod na package ay aalisin (%d MB)"
+
+#: ../urpmi:442
+#, c-format
+msgid "What is your choice? (1-%d) "
+msgstr "Ano ang pili mo? (1-%d) "
+
+#: ../urpmi:484
+#, fuzzy, c-format
+msgid ""
+"The following package cannot be installed because it depends on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Ang sumusunod na mga pakete ay hindi maluluklok dahil umaasa sila sa mga\n"
+"pakete na mas-luma sa nakaluklok:\n"
+"%s"
+
+#: ../urpmi:486
+#, fuzzy, c-format
+msgid ""
+"The following packages can't be installed because they depend on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Ang sumusunod na mga pakete ay hindi maluluklok dahil umaasa sila sa mga\n"
+"pakete na mas-luma sa nakaluklok:\n"
+"%s"
+
+#: ../urpmi:492 ../urpmi:510
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Continue installation anyway?"
+msgstr "Magpatuloy kahit paano?"
+
+#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#, c-format
+msgid " (Y/n) "
+msgstr " (O/h) "
+
+#: ../urpmi:504
+#, fuzzy, c-format
+msgid ""
+"A requested package cannot be installed:\n"
+"%s"
+msgstr ""
+"Ilang package na hiniling ay hindi ma-install:\n"
+"%s"
+
+#: ../urpmi:525
+#, c-format
+msgid "removing package %s will break your system"
+msgstr "ang pag-aalis ng package na %s ay sisira ng sistema mo"
+
+#: ../urpmi:533
+#, fuzzy, c-format
+msgid ""
+"The installation cannot continue because the following package\n"
+"has to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Hindi makapagpatuloy ang pag-i-install dahil ang mga sumusunod na\n"
+"package ay dapat alisin para ma-upgrade ang iba:\n"
+"%s\n"
+
+#: ../urpmi:535
+#, c-format
+msgid ""
+"The installation cannot continue because the following packages\n"
+"have to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Hindi makapagpatuloy ang pag-i-install dahil ang mga sumusunod na\n"
+"package ay dapat alisin para ma-upgrade ang iba:\n"
+"%s\n"
+
+#: ../urpmi:543
+#, c-format
+msgid "(test only, removal will not be actually done)"
+msgstr ""
+
+#: ../urpmi:562
+#, fuzzy, c-format
+msgid ""
+"You must first call urpmi with --buildrequires to install the following "
+"dependencies:\n"
+"%s\n"
+msgstr ""
+"Kailangan mong maging root para i-install ang mga sumusunod na dependency:\n"
+"%s\n"
+
+#: ../urpmi:572
+#, fuzzy, c-format
+msgid "The following orphan package will be removed."
+msgid_plural "The following orphan packages will be removed."
+msgstr[0] ""
+"Para ma-satisfy ang dependency, ang sumusunod na package ay aalisin (%d MB)"
+msgstr[1] ""
+"Para ma-satisfy ang dependency, ang sumusunod na package ay aalisin (%d MB)"
+
+#: ../urpmi:596
+#, c-format
+msgid "WARNING: %s option is in use. Some strange problems may happen"
+msgstr ""
+
+#: ../urpmi:608
+#, c-format
+msgid "(test only, installation will not be actually done)"
+msgstr ""
+
+#: ../urpmi:614
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr ""
+
+#: ../urpmi:615
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr ""
+
+#: ../urpmi:616
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr ""
+
+#: ../urpmi:617
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpmi:639
+#, fuzzy, c-format
+msgid "Press Enter when mounted..."
+msgstr "Pindutin ang Enter kung handa na..."
+
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
+#: ../urpmi.addmedia:36
+#, fuzzy, c-format
+msgid ""
+"usage: urpmi.addmedia [options] <name> <url>\n"
+"where <url> is one of\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"usage: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"usage: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"examples:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"and [options] are from\n"
+msgstr ""
+"paggamit: urpmi.addmedia [mga_option] <pangalan> <url> [with "
+"<relative_path>]\n"
+"kung saan ang <url> ay isa sa mga\n"
+"       [file:/]/<path> with <relative filename ng hdlist>\n"
+"       ftp://<login>:<password>@<host>/<path> with <relative filename ng "
+"hdlist>\n"
+"       ftp://<host>/<path> with <relative filename ng hdlist>\n"
+"       http://<host>/<path> with <relative filename ng hdlist>\n"
+"       removable://<path>  with <relative filename of hdlist>\n"
+"\n"
+"at ang [mga_option] ay mula sa\n"
+
+#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#, c-format
+msgid "  --wget         - use wget to retrieve distant files.\n"
+msgstr ""
+"  --wget         - gamitin ang wget para kunin ang mga malayong file.\n"
+
+#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#, c-format
+msgid "  --curl         - use curl to retrieve distant files.\n"
+msgstr ""
+"  --curl         - gamitin ang curl para kunin ang mga malayong file.\n"
+
+#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
+#, fuzzy, c-format
+msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
+msgstr ""
+"  --curl         - gamitin ang curl para kunin ang mga malayong file.\n"
+
+#: ../urpmi.addmedia:59 ../urpmi.update:36
+#, fuzzy, c-format
+msgid "  --aria2        - use aria2 to retrieve distant files.\n"
+msgstr ""
+"  --curl         - gamitin ang curl para kunin ang mga malayong file.\n"
+
+#: ../urpmi.addmedia:66
+#, c-format
+msgid ""
+"  --update       - create an update medium, \n"
+"                   or discard non-update media (when used with --distrib)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:68
+#, c-format
+msgid ""
+"  --xml-info     - use the specific policy for downloading xml info files\n"
+"                   one of: never, on-demand, update-only, always. cf urpmi."
+"cfg(5)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:70
+#, fuzzy, c-format
+msgid "  --probe-synthesis - use synthesis file.\n"
+msgstr ""
+"  --probe-synthesis - subukang hanapin at gamitin ang synthesis file.\n"
+
+#: ../urpmi.addmedia:71
+#, c-format
+msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
+msgstr ""
+
+#: ../urpmi.addmedia:72
+#, fuzzy, c-format
+msgid "  --no-probe     - do not try to find any synthesis file.\n"
+msgstr ""
+"  --no-probe     - huwag subukang maghanap ng synthesis o hdlist file.\n"
+
+#: ../urpmi.addmedia:74
+#, c-format
+msgid ""
+"  --distrib      - automatically create all media from an installation\n"
+"                   medium.\n"
+msgstr ""
+"  --distrib      - automatic na gawin lahat ng media mula sa isang "
+"installation\n"
+"                   medium.\n"
+
+#: ../urpmi.addmedia:76
+#, c-format
+msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
+msgstr ""
+
+#: ../urpmi.addmedia:77
+#, fuzzy, c-format
+msgid "  --all-media    - with --distrib, add every listed media\n"
+msgstr "  --list-media   - ilista ang mga available na media.\n"
+
+#: ../urpmi.addmedia:78
+#, fuzzy, c-format
+msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
+msgstr ""
+"  --virtual      - gumawa ng virtual media na parating naka-update,\n"
+"                   ang file:// protocol lamang ang pinahihintulutan.\n"
+
+#: ../urpmi.addmedia:79 ../urpmi.update:44
+#, c-format
+msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - i-disable ang MD5SUM na pagsusuri ng file.\n"
+
+#: ../urpmi.addmedia:80
+#, c-format
+msgid "  --nopubkey     - don't import pubkey of added media\n"
+msgstr ""
+
+#: ../urpmi.addmedia:81
+#, c-format
+msgid "  --raw          - add the media in config, but don't update it.\n"
+msgstr ""
+
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#, c-format
+msgid "  -q             - quiet mode.\n"
+msgstr "  -q             - tahimik na paraan.\n"
+
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#, c-format
+msgid "  -v             - verbose mode.\n"
+msgstr "  -v             - masalita na paraan.\n"
+
+#: ../urpmi.addmedia:96
+#, c-format
+msgid "known xml-info policies are %s"
+msgstr ""
+
+#: ../urpmi.addmedia:107
+#, c-format
+msgid "no argument needed for --distrib --mirrorlist <url>"
+msgstr ""
+
+#: ../urpmi.addmedia:112
+#, c-format
+msgid "bad <url> (for local directory, the path must be absolute)"
+msgstr ""
+
+#: ../urpmi.addmedia:116
+#, fuzzy, c-format
+msgid "Only superuser is allowed to add media"
+msgstr "Superuser lamang ang pinapayagang mag-install ng mga package"
+
+#: ../urpmi.addmedia:119
+#, fuzzy, c-format
+msgid "creating config file [%s]"
+msgstr "isulat ang config file [%s]"
+
+#: ../urpmi.addmedia:120
+#, fuzzy, c-format
+msgid "Can't create config file [%s]"
+msgstr "isulat ang config file [%s]"
+
+#: ../urpmi.addmedia:128
+#, fuzzy, c-format
+msgid "no need to give <relative path of synthesis> with --distrib"
+msgstr ""
+"hindi kailangang ibigay ang <relative path ng hdlist> kasama ang --distrib"
+
+#: ../urpmi.addmedia:136
+#, c-format
+msgid ""
+"\n"
+"Do you want to add media '%s'?"
+msgstr ""
+
+#: ../urpmi.addmedia:156 ../urpmi.addmedia:181
+#, fuzzy, c-format
+msgid "unable to add medium"
+msgstr "hindi ma-access ang medium na \"%s\""
+
+#: ../urpmi.addmedia:164
+#, fuzzy, c-format
+msgid "<relative path of synthesis> missing\n"
+msgstr "<relative path ng hdlist> ay nawawala\n"
+
+#: ../urpmi.addmedia:167
+#, c-format
+msgid "Can't use %s with remote medium"
+msgstr ""
+
+#: ../urpmi.recover:30
+#, c-format
+msgid "  --checkpoint   - set repackaging start now\n"
+msgstr ""
+
+#: ../urpmi.recover:31
+#, fuzzy, c-format
+msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
+msgstr "  --noclean      - ingatan ang rpm na hindi ginagamit sa cache.\n"
+
+#: ../urpmi.recover:33
+#, fuzzy, c-format
+msgid ""
+"  --list         - list transactions since provided date/duration argument\n"
+msgstr ""
+"  --list-url     - ilista ang mga available na media at kanilang URL.\n"
+
+#: ../urpmi.recover:34
+#, fuzzy, c-format
+msgid "  --list-all     - list all transactions in rpmdb (long)\n"
+msgstr ""
+"  --list-url     - ilista ang mga available na media at kanilang URL.\n"
+
+#: ../urpmi.recover:35
+#, fuzzy, c-format
+msgid "  --list-safe    - list transactions since checkpoint\n"
+msgstr ""
+"  --list-url     - ilista ang mga available na media at kanilang URL.\n"
+
+#: ../urpmi.recover:36
+#, c-format
+msgid ""
+"  --rollback     - rollback until specified date,\n"
+"                   or rollback the specified number of transactions\n"
+msgstr ""
+
+#: ../urpmi.recover:38
+#, fuzzy, c-format
+msgid "  --disable      - turn off repackaging\n"
+msgstr "  --all          - i-print lahat ng mga tag.\n"
+
+#: ../urpmi.recover:53
+#, c-format
+msgid "Invalid date or duration [%s]\n"
+msgstr ""
+
+#: ../urpmi.recover:61
+#, fuzzy, c-format
+msgid "Repackage directory not defined\n"
+msgstr "package na %s ay hindi nahanap."
+
+#: ../urpmi.recover:64
+#, fuzzy, c-format
+msgid "Can't write to repackage directory [%s]\n"
+msgstr "Hindi magawa ang directory na [%s] para sa ulat ng bug"
+
+#: ../urpmi.recover:66
+#, fuzzy, c-format
+msgid "Cleaning up repackage directory [%s]...\n"
+msgstr "Hindi magawa ang directory na [%s] para sa ulat ng bug"
+
+#: ../urpmi.recover:68
+#, c-format
+msgid "%d file removed\n"
+msgid_plural "%d files removed\n"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpmi.recover:78
+#, c-format
+msgid "Spurious command-line arguments [%s]\n"
+msgstr ""
+
+#: ../urpmi.recover:80
+#, c-format
+msgid "You can't specify --checkpoint and --rollback at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:82
+#, c-format
+msgid "You can't specify --checkpoint and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:84
+#, c-format
+msgid "You can't specify --rollback and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:86
+#, c-format
+msgid "You can't specify --disable along with another option"
+msgstr ""
+
+#: ../urpmi.recover:111
+#, c-format
+msgid "No transaction found since %s\n"
+msgstr ""
+
+#: ../urpmi.recover:126
+#, c-format
+msgid "You must be superuser to do this"
+msgstr ""
+
+#: ../urpmi.recover:139 ../urpmi.recover:205
+#, fuzzy, c-format
+msgid "Writing rpm macros file [%s]...\n"
+msgstr "kinukuha muli ang rpm file [%s] ..."
+
+#: ../urpmi.recover:181
+#, fuzzy, c-format
+msgid "No rollback date found\n"
+msgstr "Walang nahanap na filelist\n"
+
+#: ../urpmi.recover:184
+#, c-format
+msgid "Rollback until %s...\n"
+msgstr ""
+
+#: ../urpmi.recover:191
+#, fuzzy, c-format
+msgid "Disabling repackaging\n"
+msgstr "  --all          - i-print lahat ng mga tag.\n"
+
+#: ../urpmi.removemedia:38
+#, c-format
+msgid ""
+"usage: urpmi.removemedia (-a | <name> ...)\n"
+"where <name> is a medium name to remove.\n"
+msgstr ""
+"paggamit: urpmi.removemedia (-a | <pangalan> ...)\n"
+"kung saan ang <pangalan> ay pangalan ng medium na aalisin.\n"
+
+#: ../urpmi.removemedia:41
+#, c-format
+msgid "  -a             - select all media.\n"
+msgstr "  -a             - piliin lahat ng media.\n"
+
+#: ../urpmi.removemedia:42
+#, fuzzy, c-format
+msgid "  -y             - fuzzy match on media names.\n"
+msgstr "  -a             - piliin lahat ng katugma sa command line.\n"
+
+#: ../urpmi.removemedia:59
+#, fuzzy, c-format
+msgid "Only superuser is allowed to remove media"
+msgstr "Superuser lamang ang pinapayagang mag-install ng mga package"
+
+#: ../urpmi.removemedia:71
+#, c-format
+msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
+msgstr "walang aalisin (gamitin ang urpmi.addmedia para magdagdag ng media)\n"
+
+#: ../urpmi.removemedia:77
+#, c-format
+msgid ""
+"the entry to remove is missing\n"
+"(one of %s)\n"
+msgstr ""
+"ang entry na aalisin ay nawawala\n"
+"(isa sa mga %s)\n"
+
+#: ../urpmi.update:30
+#, c-format
+msgid ""
+"usage: urpmi.update [options] <name> ...\n"
+"where <name> is a medium name to update.\n"
+msgstr ""
+"paggamit: urpmi.update [mga_option] <pangalan> ...\n"
+"kung saan ang <pangalan> ay pangalan ng medium na ia-update.\n"
+
+#: ../urpmi.update:43
+#, c-format
+msgid "  --update       - update only update media.\n"
+msgstr "  --update       - i-update ang update media lamang.\n"
+
+#: ../urpmi.update:45
+#, c-format
+msgid "  --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - pilitin ang pag-update ng gpg key.\n"
+
+#: ../urpmi.update:46
+#, fuzzy, c-format
+msgid "  --ignore       - don't update, mark the media as ignored.\n"
+msgstr "  --update       - i-update ang update media lamang.\n"
+
+#: ../urpmi.update:47
+#, fuzzy, c-format
+msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
+msgstr "  --no-ignore    - huwag magsariwa, markahan ang mediya na enabled.\n"
+
+#: ../urpmi.update:49
+#, fuzzy, c-format
+msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
+msgstr ""
+"  --no-probe     - huwag subukang maghanap ng synthesis o hdlist file.\n"
+
+#: ../urpmi.update:50
+#, fuzzy, c-format
+msgid "  -a             - select all enabled non-removable media.\n"
+msgstr ""
+"  -a             - piliin lahat ng non-removable (hindi naaalis) na media.\n"
+
+#: ../urpmi.update:51
+#, fuzzy, c-format
+msgid "  -f             - force updating synthesis\n"
+msgstr "  -f             - pilitin ang paggawa ng mga hdlist file.\n"
+
+#: ../urpmi.update:52
+#, fuzzy, c-format
+msgid "  -ff            - really force updating synthesis\n"
+msgstr "  -f             - pilitin ang paggawa ng mga hdlist file.\n"
+
+#: ../urpmi.update:69
+#, fuzzy, c-format
+msgid "Only superuser is allowed to update media"
+msgstr "Superuser lamang ang pinapayagang mag-install ng mga package"
+
+#: ../urpmi.update:86
+#, c-format
+msgid "nothing to update (use urpmi.addmedia to add a media)\n"
+msgstr ""
+"walang ia-update (gamitin ang urpmi.addmedia para magdagdag ng media)\n"
+
+#: ../urpmi.update:87
+#, c-format
+msgid ""
+"the entry to update is missing\n"
+"(one of %s)\n"
+msgstr ""
+"ang entry na ia-update ay nawawala\n"
+"(isa sa mga %s)\n"
+
+#: ../urpmi.update:98
+#, c-format
+msgid "\"%s\""
+msgstr "\"%s\""
+
+#: ../urpmi.update:99
+#, fuzzy, c-format
+msgid "ignoring media %s"
+msgstr "Ini-edit ang medium na \"%s\":"
+
+#: ../urpmi.update:99
+#, fuzzy, c-format
+msgid "enabling media %s"
+msgstr "inaalis ang medium na \"%s\""
+
+#: ../urpmq:44
+#, fuzzy, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+msgstr ""
+"  --media        - gamitin lang ang binigay na media, hiniwilay ng comma/"
+"kuwit.\n"
+
+#: ../urpmq:49
+#, c-format
+msgid "  --auto-orphans - list orphans\n"
+msgstr ""
+
+#: ../urpmq:50
+#, c-format
+msgid ""
+"  --not-available\n"
+"                 - list installed packages not available on any media.\n"
+msgstr ""
+
+#: ../urpmq:53
+#, c-format
+msgid "  --fuzzy        - impose fuzzy search (same as -y).\n"
+msgstr "  --fuzzy        - igiit ang fuzzy na paghahanap (pareho ng -y).\n"
+
+#: ../urpmq:56
+#, c-format
+msgid "  --list         - list available packages.\n"
+msgstr "  --list         - ilista ang mga available na package.\n"
+
+#: ../urpmq:57
+#, c-format
+msgid "  --list-media   - list available media.\n"
+msgstr "  --list-media   - ilista ang mga available na media.\n"
+
+#: ../urpmq:58
+#, c-format
+msgid "  --list-url     - list available media and their url.\n"
+msgstr ""
+"  --list-url     - ilista ang mga available na media at kanilang URL.\n"
+
+#: ../urpmq:59
+#, c-format
+msgid "  --list-nodes   - list available nodes when using --parallel.\n"
+msgstr ""
+"  --list-nodes   - ilista ang mga available node kung ginagamit ang --"
+"parallel.\n"
+
+#: ../urpmq:60
+#, c-format
+msgid "  --list-aliases - list available parallel aliases.\n"
+msgstr "  --list-aliases - ilista ang mga available na parallel alias.\n"
+
+#: ../urpmq:61
+#, c-format
+msgid ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+msgstr ""
+"  --dump-config  - i-dump ang config sa anyo na argument ng urpmi.addmedia.\n"
+
+#: ../urpmq:62
+#, c-format
+msgid "  --src          - next package is a source package (same as -s).\n"
+msgstr ""
+"  --src          - ang kasunod na package ay source package (pareho ng -s).\n"
+
+#: ../urpmq:63
+#, fuzzy, c-format
+msgid "  --sources      - print source URLs of selected packages\n"
+msgstr ""
+"  --src          - ang kasunod na package ay source package (pareho ng -s).\n"
+
+#: ../urpmq:65
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
+msgstr "  --url          - i-print ang tag url: url.\n"
+
+#: ../urpmq:69
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
+"                   This permit to querying a distro.\n"
+msgstr ""
+"  --use-distrib  - i-configure ang urpmi \"on the fly\" mula sa isang "
+"distrib\n"
+"                   tree. Ito ay magpapahintulot na tanungin ang distro.\n"
+
+#: ../urpmq:79
+#, c-format
+msgid "  --changelog    - print changelog.\n"
+msgstr "  --changelog    - i-print ang changelog.\n"
+
+#: ../urpmq:80
+#, fuzzy, c-format
+msgid "  --conflicts    - print conflicts.\n"
+msgstr ""
+"  --conflicts    - i-print ang tag conflicts: lahat ng pagkakasalungat.\n"
+
+#: ../urpmq:81
+#, fuzzy, c-format
+msgid "  --obsoletes    - print obsoletes.\n"
+msgstr "  --obsoletes    - i-print ang tag obsoletes: lahat ng pinapalaos.\n"
+
+#: ../urpmq:82
+#, fuzzy, c-format
+msgid "  --provides     - print provides.\n"
+msgstr "  --provides     - i-print ang tag provides: lahat ng binibigay.\n"
+
+#: ../urpmq:83
+#, fuzzy, c-format
+msgid "  --requires     - print requires.\n"
+msgstr "  --requires     - i-print ang tag requires: lahat ng kinakailangan.\n"
+
+#: ../urpmq:84
+#, fuzzy, c-format
+msgid "  --suggests     - print suggests.\n"
+msgstr "  --obsoletes    - i-print ang tag obsoletes: lahat ng pinapalaos.\n"
+
+#: ../urpmq:85
+#, fuzzy, c-format
+msgid "  --sourcerpm    - print sourcerpm.\n"
+msgstr "  --sourcerpm    - i-print ang tag sourcerpm: source rpm.\n"
+
+#: ../urpmq:86
+#, fuzzy, c-format
+msgid "  --summary, -S  - print summary.\n"
+msgstr "  --summary      - i-print ang tag summary: kabuuan.\n"
+
+#: ../urpmq:88
+#, fuzzy, c-format
+msgid ""
+"  --requires-recursive, -d\n"
+"                   - query package dependencies.\n"
+msgstr "  -d             - ipaabot ang tanong sa package dependencies.\n"
+
+#: ../urpmq:90
+#, c-format
+msgid "  --whatrequires - reverse search to what requires package.\n"
+msgstr ""
+"  --whatrequires - pabaliktad na paghahanap sa kung ano ang nangangailangan "
+"ng\n"
+"                   package.\n"
+
+#: ../urpmq:91
+#, fuzzy, c-format
+msgid ""
+"  --whatrequires-recursive\n"
+"                   - extended reverse search (includes virtual packages).\n"
+msgstr ""
+"  -R             - pabaliktad na paghahanap sa kung ano ang nangangailangan "
+"ng\n"
+"                   package.\n"
+
+#: ../urpmq:93
+#, fuzzy, c-format
+msgid ""
+"  --whatprovides, -p\n"
+"                   - search in provides to find package.\n"
+msgstr ""
+"  -p             - payagang maghanap sa provides para hanapin ang package.\n"
+
+#: ../urpmq:96
+#, c-format
+msgid "  -c             - complete output with package to be removed.\n"
+msgstr "  -c             - kompletong output kasama ang package na aalisin.\n"
+
+#: ../urpmq:98
+#, c-format
+msgid "  -g             - print groups with name also.\n"
+msgstr "  -g             - i-print ang mga grupo na may pangalan din.\n"
+
+#: ../urpmq:99
+#, c-format
+msgid "  -i             - print useful information in human readable form.\n"
+msgstr ""
+"  -i             - mag-print ng kapakipakinabang na inpormasyon sa anyong\n"
+"                   nababasa ng tao.\n"
+
+#: ../urpmq:100
+#, c-format
+msgid "  -l             - list files in package.\n"
+msgstr "  -l             - ilista ang mga file sa package.\n"
+
+#: ../urpmq:101
+#, fuzzy, c-format
+msgid "  -m             - equivalent to -du\n"
+msgstr "  -q             - tahimik na paraan.\n"
+
+#: ../urpmq:102
+#, c-format
+msgid "  -r             - print version and release with name also.\n"
+msgstr ""
+"  -r             - i-print ang version at release na may pangalan din.\n"
+
+#: ../urpmq:103
+#, c-format
+msgid "  -s             - next package is a source package (same as --src).\n"
+msgstr ""
+"  -s             - ang kasunod na package ay source package (pareho ng --"
+"src).\n"
+
+#: ../urpmq:104
+#, c-format
+msgid ""
+"  -u             - remove package if a more recent version is already "
+"installed.\n"
+msgstr ""
+"  -u             - alisin ang package kung may mas bagong version na\n"
+"                   naka-install.\n"
+
+#: ../urpmq:105
+#, c-format
+msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
+msgstr ""
+"  -y             - igiit ang fuzzy na paghahanap (pareho ng --fuzzy).\n"
+
+#: ../urpmq:106
+#, fuzzy, c-format
+msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
+msgstr "  -a             - piliin lahat ng katugma sa command line.\n"
+
+#: ../urpmq:107
+#, c-format
+msgid "  names or rpm files given on command line are queried.\n"
+msgstr ""
+"  ang mga pangalan o rpm file na binigay sa command line ay tatanungin.\n"
+
+#: ../urpmq:154
+#, c-format
+msgid "usage: \"urpmq --auto-orphans\" with no argument"
+msgstr ""
+
+#: ../urpmq:207
+#, c-format
+msgid "--list-nodes can only be used with --parallel"
+msgstr "--list-nodes ay magagamit lang kasama ang --parallel"
+
+#: ../urpmq:231
+#, fuzzy, c-format
+msgid "use -l to list files"
+msgstr "hindi maisulat ang list file ng \"%s\""
+
+#: ../urpmq:416
+#, fuzzy, c-format
+msgid "no xml info for medium \"%s\", only partial result for package %s"
+msgstr ""
+"Tandaan: dahil wala sa mga hinanapang media ay gumagamit ng mga hdlist, ang "
+"urpmf ay hindi makapagbalik ng kahit anong resulta\n"
+
+#: ../urpmq:417
+#, fuzzy, c-format
+msgid "no xml info for medium \"%s\", only partial result for packages %s"
+msgstr ""
+"Tandaan: dahil wala sa mga hinanapang media ay gumagamit ng mga hdlist, ang "
+"urpmf ay hindi makapagbalik ng kahit anong resulta\n"
+
+#: ../urpmq:420
+#, fuzzy, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for package %s"
+msgstr ""
+"Tandaan: dahil wala sa mga hinanapang media ay gumagamit ng mga hdlist, ang "
+"urpmf ay hindi makapagbalik ng kahit anong resulta\n"
+
+#: ../urpmq:421
+#, fuzzy, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for packages %s"
+msgstr ""
+"Tandaan: dahil wala sa mga hinanapang media ay gumagamit ng mga hdlist, ang "
+"urpmf ay hindi makapagbalik ng kahit anong resulta\n"
+
+#: ../urpmq:488
+#, c-format
+msgid "No changelog found\n"
+msgstr "Walang nahanap na changelog\n"
+
+#: ../gurpmi.desktop.in.h:1
+#, fuzzy
+msgid "Software Installer"
+msgstr "Pang-install ng Software"
+
+#: ../gurpmi.desktop.in.h:2
+msgid "Graphical front end to install RPM files"
+msgstr ""
+"Graphical na front-end para mag-install ng mga RPM file (software package)"
+
+#~ msgid ""
+#~ "urpme version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpme version %s\n"
+#~ "%s\n"
+#~ "Ito ay libreng software at maaaring ipamahagi ayon sa mga nasasaad sa GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "paggamit:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage: urpmf [options] pattern-expression\n"
+#~ msgstr ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "Ito ay libreng software at maaaring ipamahagi ayon sa mga nasasaad sa GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "paggamit:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmi.recover version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmi.recover version %s\n"
+#~ "%s\n"
+#~ "Ito ay libreng software at maaaring ipamahagi ayon sa mga nasasaad sa GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "paggamit:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmq version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmq version %s\n"
+#~ "%s\n"
+#~ "Ito ay libreng software at maaaring ipamahagi ayon sa mga nasasaad sa GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "paggamit:\n"
+
+#~ msgid ""
+#~ "Installation failed, some files are missing:\n"
+#~ "%s\n"
+#~ "You may want to update your urpmi database"
+#~ msgstr ""
+#~ "Pag-i-install ay nabigo, ilang mga file ay nawawala:\n"
+#~ "%s\n"
+#~ "Baka gusto mong i-update ang iyong urpmi database"
+
+#~ msgid "Cancel"
+#~ msgstr "I-cancel"
+
+#, fuzzy
+#~ msgid "Cannot write DUDF file.\n"
+#~ msgstr "hindi maisulat ang config file [%s]"
+
+#~ msgid ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+#~ msgstr ""
+#~ "  --sources      - ibigay lahat ng source package bago i-download (root "
+#~ "lang).\n"
+
+#, fuzzy
+#~ msgid "due to already installed %s"
+#~ msgstr "Lahat ay naka-install na"
+
+#~ msgid ""
+#~ "  --from         - use specified url for list of mirrors, the default is\n"
+#~ "                   %s\n"
+#~ msgstr ""
+#~ "  --from         - gamitin ang binanggit na URL para sa talaan ng mga "
+#~ "mirror,\n"
+#~ "                   default ay %s\n"
+
+#, fuzzy
+#~ msgid "examining %s file"
+#~ msgstr "sinusuri ang MD5SUM file"
+
+#, fuzzy
+#~ msgid "found probed synthesis as %s"
+#~ msgstr "nahanap ang sinuring hdlist (o synthesis) bilang %s"
+
+#~ msgid "  --update       - create an update medium.\n"
+#~ msgstr "  --update       - gumawa ng update medium.\n"
+
+#, fuzzy
+#~ msgid "malformed URL: [%s]"
+#~ msgstr "sirang anyo ng input: [%s]"
+
+#, fuzzy
+#~ msgid "%d installation transaction failed"
+#~ msgid_plural "%d installation transactions failed"
+#~ msgstr[0] "%d transaksyong pag-i-install ay nabigo"
+#~ msgstr[1] "%d transaksyong pag-i-install ay nabigo"
+
+#, fuzzy
+#~ msgid "Package %s can not be installed"
+#~ msgstr "Lahat ay naka-install na"
+
+#~ msgid "Checking to remove the following packages"
+#~ msgstr "Nagsusuri para alisin ang mga sumusunod na package"
+
+#, fuzzy
+#~ msgid "%s database locked"
+#~ msgstr "urpmi database ay naka-lock"
+
+#, fuzzy
+#~ msgid "Unknown option %s"
+#~ msgstr ""
+#~ "\n"
+#~ "mga hindi kilalang option '%s'\n"
+
+#~ msgid "too many mount points for removable medium \"%s\""
+#~ msgstr "sobrang daming mount point para sa naaalis na medium na \"%s\""
+
+#, fuzzy
+#~ msgid "Medium \"%s\" is an ISO image, will be mounted on-the-fly"
+#~ msgstr "Ang \"%s\" ay ISO image at isasalang ng kusa"
+
+#~ msgid "using different removable device [%s] for \"%s\""
+#~ msgstr "gumagamit ng iba't-ibang naaalis na device [%s] para sa \"%s\""
+
+#~ msgid "unable to retrieve pathname for removable medium \"%s\""
+#~ msgstr "hindi makuha muli ang pathname para sa naaalis na medium \"%s\""
+
+#, fuzzy
+#~ msgid "unable to mount the distribution medium"
+#~ msgstr "hindi ma-access ang unang installation medium"
+
+#~ msgid ""
+#~ "unable to access medium \"%s\",\n"
+#~ "this could happen if you mounted manually the directory when creating the "
+#~ "medium."
+#~ msgstr ""
+#~ "hindi ma-access ang medium na \"%s\",\n"
+#~ "ito ay mangyayari kung mano-mano mong in-mount ang directory noong "
+#~ "ginagawa ang medium."
+
+#~ msgid "inconsistent medium \"%s\" marked removable but not really"
+#~ msgstr "incoherent na medium na \"%s\" may markang naaalis pero hindi naman"
+
+#~ msgid "  -c             - clean headers cache directory.\n"
+#~ msgstr "  -c             - linisin ang headers cache directory.\n"
+
+#~ msgid "virtual medium needs to be local"
+#~ msgstr "virtual medium ay kailangang local"
+
+#, fuzzy
+#~ msgid "unable to parse synthesis file of \"%s\""
+#~ msgstr "hindi ma-parse ang hdlist file ng \"%s\""
+
+#, fuzzy
+#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
+#~ msgstr "kino-compute ang md5sum ng mayroong source hdlist (o synthesis)"
+
+#~ msgid ""
+#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
+#~ "ignored"
+#~ msgstr ""
+#~ "virtual medium na \"%s\" ay dapat nag-define ng hdlist o list file, "
+#~ "medium di-pinansin"
+
+#, fuzzy
+#~ msgid "invalid hdlist name"
+#~ msgstr "inbalidong pangalan ng rpm file [%s]"
+
+#~ msgid "unable to find list file for \"%s\", medium ignored"
+#~ msgstr "hindi mahanap ang list file para sa \"%s\", medium di-pinansin"
+
+#, fuzzy
+#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
+#~ msgstr "sinusubukang piliin ang di-mayroong medium na \"%s\""
+
+#, fuzzy
+#~ msgid "\"synthesis\" should be set (medium \"%s\")"
+#~ msgstr "nakabuo ng hdlist synthesis file para sa medium na \"%s\""
+
+#, fuzzy
+#~ msgid "unable to access list file of \"%s\""
+#~ msgstr "hindi ma-parse ang hdlist file ng \"%s\""
+
+#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
+#~ msgstr ""
+#~ "medium \"%s\" ay sumusubok gumamit ng gamit na na hdlist, medium di-"
+#~ "pinansin"
+
+#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
+#~ msgstr ""
+#~ "medium \"%s\" ay sumusubok gumamit ng gamit na na list, medium di-pinansin"
+
+#, fuzzy
+#~ msgid ""
+#~ "Note: no hdlist for medium \"%s\", unable to return any result for it"
+#~ msgstr ""
+#~ "Tandaan: dahil wala sa mga hinanapang media ay gumagamit ng mga hdlist, "
+#~ "ang urpmf ay hindi makapagbalik ng kahit anong resulta\n"
+
+#~ msgid "performing second pass to compute dependencies\n"
+#~ msgstr ""
+#~ "nagsasagawa ng pangalawang pagdaan para i-compute ang mga dependency\n"
+
+#~ msgid "building hdlist [%s]"
+#~ msgstr "binubuo ang hdlist [%s]"
+
+#, fuzzy
+#~ msgid ""
+#~ "Unable to build synthesis file for medium \"%s\". Your hdlist file may be "
+#~ "corrupted."
+#~ msgstr ""
+#~ "Hindi makabuo ng talaksang synthesis para sa medium na \"%s\". Maaaring "
+#~ "sira ang inyong talaksang hdlist."
+
+#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
+#~ msgstr ""
+#~ "problema sa pagbabasa ng hdlist o synthesis file ng medium na \"%s\""
+
+#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
+#~ msgstr "kino-compute ang md5sum ng nakopyang source hdlist (o synthesis)"
+
+#~ msgid "...retrieving failed: md5sum mismatch"
+#~ msgstr "...pagkukuha muli nabigo: md5sum di-tugma"
+
+#~ msgid "no rpm files found from [%s]"
+#~ msgstr "walang nahanap na rpm file mula sa [%s]"
+
+#~ msgid "unable to read rpm files from [%s]: %s"
+#~ msgstr "hindi mabasa ang mga rpm file mula sa [%s]: %s"
+
+#, fuzzy
+#~ msgid "no rpms read"
+#~ msgstr "walang nabasang rpm"
+
+#~ msgid "reading headers from medium \"%s\""
+#~ msgstr "binabasa ang mga header mula sa medium na \"%s\""
+
+#, fuzzy
+#~ msgid "    --probe-synthesis - use synthesis file.\n"
+#~ msgstr ""
+#~ "  --probe-synthesis - subukang hanapin at gamitin ang synthesis file.\n"
+
+#, fuzzy
+#~ msgid "    --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - subukang hanapin at gamitin ang hdlist file.\n"
+
+#~ msgid ""
+#~ "Note: since no media searched uses hdlists, urpmf was unable to return "
+#~ "any result\n"
+#~ msgstr ""
+#~ "Tandaan: dahil wala sa mga hinanapang media ay gumagamit ng mga hdlist, "
+#~ "ang urpmf ay hindi makapagbalik ng kahit anong resulta\n"
+
+#, fuzzy
+#~ msgid "You may want to use --name to search for package names.\n"
+#~ msgstr ""
+#~ "Maaari niyong gamitin ang --name upang maghanap ng pangalan ng mga "
+#~ "pakete.\n"
+
+#, fuzzy
+#~ msgid "  --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - subukang hanapin at gamitin ang hdlist file.\n"
+
+#~ msgid "unable to update medium \"%s\"\n"
+#~ msgstr "hindi ma-update ang medium na \"%s\"\n"
+
+#~ msgid "unable to create medium \"%s\"\n"
+#~ msgstr "hindi magawa ang medium na \"%s\"\n"
+
+#~ msgid "there are multiple packages with the same rpm filename \"%s\""
+#~ msgstr "may maramihang package na may parehong pangalan ng rpm file \"%s\""
+
+#~ msgid "unable to correctly parse [%s] on value \"%s\""
+#~ msgstr "hindi ma-parse ng tama ang [%s] sa halaga na \"%s\""
+
+#~ msgid ""
+#~ "medium \"%s\" uses an invalid list file:\n"
+#~ "  mirror is probably not up-to-date, trying to use alternate method"
+#~ msgstr ""
+#~ "medium na \"%s\" ay gumagamit ng inbalidong list file:\n"
+#~ "  siguro hindi na-update ang mirror, sinusubukang gamitin ang "
+#~ "alternatibong paraan"
+
+#~ msgid "medium \"%s\" does not define any location for rpm files"
+#~ msgstr ""
+#~ "medium na \"%s\" ay hindi nagde-define ng lokasyon para sa mga rpm file"
+
+#~ msgid "unrequested"
+#~ msgstr "hindi hiniling"
+
+#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
+#~ msgstr "idinadagdag ang package na %s (id=%d, eid=%d, update=%d, file=%s)"
+
+#, fuzzy
+#~ msgid ""
+#~ "The following packages have bad signatures:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "Do you want to continue installation ?"
+#~ msgstr ""
+#~ "Ang mga sumusunod na package ay may masamang signature:\n"
+#~ "\n"
+#~ "%s\n"
+#~ "\n"
+#~ "Gusto mong ituloy ang pag-i-install?"
+
+#, fuzzy
+#~ msgid "You need to be root to use --use-distrib"
+#~ msgstr "Kailangan mong maging root para magamit itong command ! \n"
+
+#~ msgid "unable to remove package %s"
+#~ msgstr "hindi maalis ang package na %s"
+
+#~ msgid "No filelist found\n"
+#~ msgstr "Walang nahanap na filelist\n"
+
+#~ msgid "medium \"%s\" is not selected"
+#~ msgstr "medium na \"%s\" ay hindi nakapili"
+
+#, fuzzy
+#~ msgid "Remove %d packages?"
+#~ msgstr "inaalis ang package na %s"
+
+#~ msgid "  -f             - force generation of hdlist files.\n"
+#~ msgstr "  -f             - pilitin ang paggawa ng mga hdlist file.\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "  -P             - do not search in provides to find package (default).\n"
+#~ msgstr ""
+#~ "  -P             - huwag maghanap sa provides para hanapin ang package.\n"
+
+#~ msgid "  -R             - reverse search to what requires package.\n"
+#~ msgstr ""
+#~ "  -R             - pabaliktad na paghahanap sa kung ano ang "
+#~ "nangangailangan ng\n"
+#~ "                   package.\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "  -RR            - extended reverse search (includes virtual packages).\n"
+#~ msgstr ""
+#~ "  -R             - pabaliktad na paghahanap sa kung ano ang "
+#~ "nangangailangan ng\n"
+#~ "                   package.\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "To satisfy dependencies, the following package is going to be installed"
+#~ msgid_plural ""
+#~ "To satisfy dependencies, the following packages are going to be installed"
+#~ msgstr[0] ""
+#~ "Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+#~ "package ay ii-install (%d MB)"
+#~ msgstr[1] ""
+#~ "Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+#~ "package ay ii-install (%d MB)"
+
+#, fuzzy
+#~ msgid ""
+#~ "To satisfy dependencies, the following %d packages are going to be "
+#~ "installed:\n"
+#~ "%s\n"
+#~ msgstr ""
+#~ "Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+#~ "package ay ii-install (%d MB)"
+
+#, fuzzy
+#~ msgid ""
+#~ "To satisfy dependencies, the following packages are going to be installed"
+#~ msgid_plural ""
+#~ "To satisfy dependencies, the following package is going to be installed"
+#~ msgstr[0] ""
+#~ "Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+#~ "package ay ii-install (%d MB)"
+#~ msgstr[1] ""
+#~ "Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+#~ "package ay ii-install (%d MB)"
+
+#, fuzzy
+#~ msgid "skipping media %s: no hdlist"
+#~ msgstr "nilalaktawan ang media na %s: walang hdlist\n"
+
+#, fuzzy
+#~ msgid "Installing packages on nodes..."
+#~ msgstr "Ini-install ang package na `%s' (%s/%s)..."
+
+#, fuzzy
+#~ msgid "Propagating synthesis to %s..."
+#~ msgstr "sinusuri ang synthesis file [%s]"
+
+#, fuzzy
+#~ msgid "Distributing files to %s..."
+#~ msgstr "dini-distribute ang %s"
+
+#, fuzzy
+#~ msgid "Performing install on %s..."
+#~ msgstr "Pag-i-install ng package..."
+
+#, fuzzy
+#~ msgid "Preparing install on %s..."
+#~ msgstr "Pag-i-install ng package..."
+
+#~ msgid "  --probe-synthesis - try to find and use synthesis file.\n"
+#~ msgstr ""
+#~ "  --probe-synthesis - subukang hanapin at gamitin ang synthesis file.\n"
+
+#~ msgid "  --probe-hdlist - try to find and use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - subukang hanapin at gamitin ang hdlist file.\n"
+
+#~ msgid "`with' missing for network media\n"
+#~ msgstr "`with' nawawala para sa network media\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "unknown options '%s'\n"
+#~ msgstr ""
+#~ "\n"
+#~ "mga hindi kilalang option '%s'\n"
+
+#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
+#~ msgstr "hindi mahanap ang hdlist file para sa \"%s\", medium di-pinansin"
+
+#~ msgid "inconsistent list file for \"%s\", medium ignored"
+#~ msgstr "incoherent na list file para sa \"%s\", medium di-pinansin"
+
+#~ msgid "unable to inspect list file for \"%s\", medium ignored"
+#~ msgstr "hindi masiyasat ang list file para sa \"%s\", medium di-pinansin"
+
+#~ msgid "virtual medium \"%s\" is not local, medium ignored"
+#~ msgstr "virtual medium na \"%s\" ay hindi local, medium di-pinansin"
+
+#~ msgid ""
+#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
+#~ "medium ignored"
+#~ msgstr ""
+#~ "virtual medium na \"%s\" ay dapat may balidong source hdlist o synthesis, "
+#~ "medium di-pinansin"
+
+#~ msgid "copying source hdlist (or synthesis) of \"%s\"..."
+#~ msgstr "kinokopya ang source hdlist (o synthesis) ng \"%s\"..."
+
+#~ msgid "retrieval of source hdlist (or synthesis) failed"
+#~ msgstr "pagkuha muli ng source hdlist (o synthesis) nabigo"
+
+#~ msgid "file [%s] already used in the same medium \"%s\""
+#~ msgstr "file na [%s] ay ginagamit na sa parehong medium na \"%s\""
+
+#~ msgid "nothing written in list file for \"%s\""
+#~ msgstr "walang naisulat sa list file para sa \"%s\""
+
+#~ msgid "found %d headers in cache"
+#~ msgstr "nahanap %d header sa cache"
+
+#~ msgid "removing %d obsolete headers in cache"
+#~ msgstr "inaalis ang %d obsolete na header sa cache"
+
+#~ msgid "using process %d for executing transaction"
+#~ msgstr "ginagamit ang proseso na %d para sa pagpapatupad ng transaksyon"
+
+#, fuzzy
+#~ msgid "  --norebuild    - don't try to rebuild hdlist if not readable.\n"
+#~ msgstr "  --buildhost    - i-print ang tag buildhost: build host.\n"
+
+#, fuzzy
+#~ msgid "The following package names were assumed: %s"
+#~ msgstr "Ang mga sumusunod na package ay naglalaman ng %s: %s"
+
+#~ msgid "copying hdlists file..."
+#~ msgstr "kinokopya ang hdlists file..."
+
+#~ msgid "invalid hdlist description \"%s\" in hdlists file"
+#~ msgstr "hindi balidong paglalarawan ng hdlist na \"%s\" sa hdlists file"
+
+#~ msgid "Is this OK?"
+#~ msgstr "Ayos ba ito?"
+
+#~ msgid ""
+#~ "  --version      - use specified distribution version, the default is "
+#~ "taken\n"
+#~ "                   from the version of the distribution told by the\n"
+#~ "                   installed mandriva-release package.\n"
+#~ msgstr ""
+#~ "  --version      - gamitin ang binanggit na version ng distribusyon, ang\n"
+#~ "                   default ay kukunin sa version ng distribusyon na "
+#~ "sinabi ng\n"
+#~ "                   naka-install na mandriva-release package.\n"
+
+#~ msgid ""
+#~ "  --arch         - use specified architecture, the default is arch of\n"
+#~ "                   mandriva-release package installed.\n"
+#~ msgstr ""
+#~ "  --arch         - gamitin ang binanggit na arkitektura, ang default ay "
+#~ "arch ng\n"
+#~ "                   mandriva-release package na naka-install.\n"
+
+#~ msgid ""
+#~ "  --headers      - extract headers for package listed from urpmi db to\n"
+#~ "                   stdout (root only).\n"
+#~ msgstr ""
+#~ "  --headers      - kunin ang mga header para sa package na nakalista mula "
+#~ "sa\n"
+#~ "                   urpmi database papuntang stdout (root lang).\n"
+
+#~ msgid ""
+#~ "To satisfy dependencies, the following %d packages are going to be "
+#~ "installed (%d MB)"
+#~ msgstr ""
+#~ "Para ma-satisfy ang dependency/pagkaka-asa-asa, ang mga sumusunod na %d "
+#~ "package ay ii-install (%d MB)"
+
+#~ msgid "installing %s\n"
+#~ msgstr "ini-install ang %s\n"
+
+#~ msgid ""
+#~ "Automatic installation of packages...\n"
+#~ "You requested installation of package %s\n"
+#~ msgstr ""
+#~ "Automatic na pag-i-install ng mga package...\n"
+#~ "Hiniling mo na i-install ang package na %s\n"
+
+#~ msgid "%s: command not found\n"
+#~ msgstr "%s: command hindi nahanap\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "Some package requested cannot be installed:\n"
+#~ "%s\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "Ilang package na hiniling ay hindi ma-install:\n"
+#~ "%s\n"
+#~ "Magpatuloy?"
+
+#~ msgid "md5sum mismatch"
+#~ msgstr "md5sum di-tugma"
+
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "Ito ay libreng software at maaaring ipamahagi ayon sa mga nasasaad sa GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "paggamit:\n"
+
+#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
+#~ msgstr ""
+#~ "  --synthesis    - gamitin ang binigay na synthesis imbis na urpmi "
+#~ "database.\n"
+
+#~ msgid ""
+#~ "  --quiet        - do not print tag name (default if no tag given on "
+#~ "command\n"
+#~ "                   line, incompatible with interactive mode).\n"
+#~ msgstr ""
+#~ "  --quiet        - huwag i-print ang pangalan ng tag (default kung "
+#~ "walang\n"
+#~ "                   binigay na tag sa command line, hindi kasundo ang\n"
+#~ "                   interactive na mode o paraan).\n"
+
+#~ msgid "  --uniq         - do not print identical lines.\n"
+#~ msgstr "  --uniq         - huwag i-print ang mga magkatulad na linya.\n"
+
+#~ msgid "  --all          - print all tags.\n"
+#~ msgstr "  --all          - i-print lahat ng mga tag.\n"
+
+#~ msgid "  --summary      - print tag summary: summary.\n"
+#~ msgstr "  --summary      - i-print ang tag summary: kabuuan.\n"
+
+#~ msgid "  --description  - print tag description: description.\n"
+#~ msgstr "  --description  - i-print ang tag description: paglalarawan.\n"
+
+#~ msgid "  --buildhost    - print tag buildhost: build host.\n"
+#~ msgstr "  --buildhost    - i-print ang tag buildhost: build host.\n"
+
+#~ msgid "  --provides     - print tag provides: all provides.\n"
+#~ msgstr "  --provides     - i-print ang tag provides: lahat ng binibigay.\n"
+
+#~ msgid "  --requires     - print tag requires: all requires.\n"
+#~ msgstr ""
+#~ "  --requires     - i-print ang tag requires: lahat ng kinakailangan.\n"
+
+#~ msgid "  --files        - print tag files: all files.\n"
+#~ msgstr "  --files        - i-print ang tag files: lahat ng file.\n"
+
+#~ msgid "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+#~ msgstr ""
+#~ "  --obsoletes    - i-print ang tag obsoletes: lahat ng pinapalaos.\n"
+
+#~ msgid ""
+#~ "  --env          - use specific environment (typically a bug\n"
+#~ "                   report).\n"
+#~ msgstr ""
+#~ "  --env          - gumamit ng specific na environment o kapaligiran "
+#~ "(karaniwan\n"
+#~ "                   ay isang ulat sa bug).\n"
+
+#~ msgid "  -i             - ignore case distinctions in every pattern.\n"
+#~ msgstr ""
+#~ "  -i             - balewalain ang pagkakaiba ng case/laki ng titik sa "
+#~ "bawat\n"
+#~ "                   pattern o parisan.\n"
+
+#~ msgid ""
+#~ "  -a             - binary AND operator, true if both expression are "
+#~ "true.\n"
+#~ msgstr ""
+#~ "  -a             - binary AND operator, totoo kung parehong expression ay "
+#~ "totoo.\n"
+
+#~ msgid "  !              - unary NOT, true if expression is false.\n"
+#~ msgstr ""
+#~ "  !              - unary NOT, totoo kung expression ay hindi totoo.\n"
+
+#~ msgid "  (              - left parenthesis to open group expression.\n"
+#~ msgstr ""
+#~ "  (              - kaliwang parenthesis para buksan ang grupo ng "
+#~ "expression.\n"
+
+#~ msgid "  )              - right parenthesis to close group expression.\n"
+#~ msgstr ""
+#~ "  )              - kanang parenthesis para isara ang grupo ng "
+#~ "expression.\n"
+
+#~ msgid ""
+#~ "callback is:\n"
+#~ "%s\n"
+#~ msgstr ""
+#~ "ang callback ay :\n"
+#~ "%s\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "\n"
+#~ "Continue?"
+#~ msgstr "Magpatuloy"
+
+#~ msgid ""
+#~ "Some package requested cannot be installed:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Ilang package na hiniling ay hindi ma-install:\n"
+#~ "%s"
+
+#, fuzzy
+#~ msgid ""
+#~ "  --keep         - keep existing packages if possible, reject requested\n"
+#~ "                   packages that leads to remove.\n"
+#~ msgstr ""
+#~ "  --keep         - ingatan ang mga package na mayroon na, tanggihan\n"
+#~ "                   ang mga hiniling na package kung magkakaroon ng "
+#~ "aalisin.\n"
+
+#~ msgid ""
+#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
+#~ "                   distribution, XXX may be main, contrib, updates or\n"
+#~ "                   anything else that has been configured ;-)\n"
+#~ msgstr ""
+#~ "  --distrib-XXX  - automatic na gumawa ng medium para sa XXX na bahagi "
+#~ "ng\n"
+#~ "                   distribusyon, ang XXX ay maaaring main, contrib, "
+#~ "updates o\n"
+#~ "                   kahit ano na na-configure ;-)\n"
+
+#, fuzzy
+#~ msgid "found version %s and arch %s ..."
+#~ msgstr "nahanap ang bersyon %s at arch %s ..."
+
+#~ msgid "cannot add updates of a cooker distribution\n"
+#~ msgstr "hindi maidagdag ang mga update ng distribusyon ng cooker\n"
+
+#~ msgid "retrieving mirrors at %s ..."
+#~ msgstr "kinukuha ang mga mirror sa %s ..."

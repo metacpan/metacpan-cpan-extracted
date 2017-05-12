@@ -1,0 +1,47 @@
+
+Scripts and tools for various tasks (some are outdated)
+-------------------------------------------------------
+
+* Reading and converting (parallel) corpus files
+
+uplug-readalign		read sentence alignments from XCES files
+uplug-recode		a perlish character encoding conversion (handles malformed data?)
+opus2moses.pl		converts OPUS/Uplug corpora into Moses format (including factors!)
+tab2tmx			simplistic conversion of TAB-separated parallel corpora to TMX
+xces2moses		simplistic converter from XCES format to Moses format
+xces2text		convert parallel corpora in XCES format to text format
+xces2tmx		convert parallel corpora in XCES format to TMX
+xces2plain		yet another XCES to text converter (based on XML::DT and XML::XCES)
+
+* Process Uplug word alignment files
+
+xces2dic		extract all word alignments from Uplug format and sort
+xces2link		extract all word alignments from Uplug format
+xces2poslink		extract features from aligned words (default=pos)
+
+* wordalign/ -- Scripts related to the Uplug clue aligner (word alignment)
+
+declclue		convert text-files to clue-DBMs
+dumpdbm			dump content of DBM-files
+dump2dbm		convert DBM-dump back to a DBM
+giza2clue		convert lexical prob's from GIZA++ to clue DBMs
+giza2links		convert GIZA++ Viterbi alignments to token links
+giza2uplug		convert GIZA++ Viterbi alignments to Uplug XML
+giza_inv2clue		same as giza2clue for GIZA++ in inverse align direction
+giza_inv2uplug		same as giza2uplug for GIZA++ in inverse align direction
+invlinks		swap alignment direction (in XCES align files)
+readdump		read a DB dump file and create a DBM file
+searchkey		search a specific key in a DBM file
+swap-lang		swap languages in clue-DBMs
+
+* Other scripts
+
+uplug-sentence-align    standalone sentence alignment script (extended Gale&Church)
+phrase2dice		compute dice scores out of Moses phrase tables
+
+* projects/ -- Project-related scripts (not maintained anymore)
+
+ETAP		http://stp.ling.uu.se/etap/
+KOMA		http://www.ida.liu.se/~nlplab/koma/
+SCANIA
+align		experiments with parameter optimization

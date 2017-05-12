@@ -1,0 +1,38 @@
+=head1 NAME
+
+rurpmi - restricted urpmi
+
+=head1 SYNOPSIS
+
+    rurpmi [options] [package_name...]
+
+=head1 DESCRIPTION
+
+rurpmi is similar to urpmi, but has a stripped-down set of features. It's
+intended to be used by users without root privileges but with sudo rights
+on it, preventing any abuse of this tool to compromise the system.
+
+With rurpmi, you can't install arbitrary rpm files; moreoever the
+B<--keep> and B<--verify-rpm> options are forced, and
+several dangerous options are forbidden (B<--root>, B<--use-distrib>,
+B<--env>, B<--allow-nodeps>, B<--allow-force>, B<--force>, B<--noscripts>,
+B<--auto-update>). Also, you won't be able to install rpms with bad
+signatures.
+
+=head1 CAVEAT
+
+This software is still experimental. While some operations are forbidden,
+there is no guarantee it is actually secure.
+
+=head1 OPTIONS
+
+The options are the same than urpmi ones.
+
+=head1 AUTHOR
+
+Maintained by Rafael Garcia-Suarez,
+
+
+=head1 SEE ALSO
+
+urpmi(8).

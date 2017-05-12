@@ -1,0 +1,16 @@
+----------------------------------------------------------------------
+make it so that the <PRED> field in the LMR lexicon is optional, and
+inherits the <STEM> value if empty.
+
+----------------------------------------------------------------------
+convert to ant instead of make for building Grok.
+
+http://jakarta.apache.org/ant/index.html
+
+----------------------------------------------------------------------
+see if there is a new version of gnu.regexp or any new regular
+expression packages available
+
+----------------------------------------------------------------------
+get rid of Metamata stuff and find an open source replacement
+

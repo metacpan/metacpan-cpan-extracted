@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+#
+#--------------------------------------------------------------------------
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id: readdump,v 1.1 2004/12/21 23:21:49 joerg72 Exp $
+#--------------------------------------------------------------------------
+
+BEGIN {@AnyDBM_File::ISA=qw(DB_File GDBM_File SDBM_File NDBM_File ODBM_File) }
+#BEGIN { @AnyDBM_File::ISA=qw(GDBM_File SDBM_File NDBM_File ODBM_File) }
+use AnyDBM_File;
+use POSIX;
+
+
+my $dumpfile=shift @ARGV;
+my $dbmfile=shift @ARGV;
+
+if (not defined $dbmfile){$dbmfile=$dumpfile.'.dbm';}
+if (not -e $dumpfile){
+    die "USAGE: readdump dump-file [dbmfile]\n";
+}
+
+
+tie %dbm, 'AnyDBM_File',$dbmfile,O_RDWR|O_CREAT,0640;
+
+open F,"<$dumpfile" || die "cannot open $dumpfile!\n";
+
+while (<F>){
+    chomp;
+    my ($key,$value)=split(' => ');
+    $dbm{$key}=$value;
+}
+close F;
+untie %dbm;
+
+

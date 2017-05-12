@@ -1,0 +1,6133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<text>
+<p id="1">
+<s id="s1.1">
+ <chunk type="NP" id="c1.1-1">
+  <w pos="NNP" id="w1.1.1">Statement</w>
+ </chunk>
+ <chunk type="PP" id="c1.1-2">
+  <w pos="IN" id="w1.1.2">of</w>
+ </chunk>
+ <chunk type="NP" id="c1.1-3">
+  <w pos="NNP" id="w1.1.3">Government</w>
+  <w pos="NN" id="w1.1.4">Policy</w>
+ </chunk>
+ <chunk type="PP" id="c1.1-4">
+  <w pos="IN" id="w1.1.5">by</w>
+ </chunk>
+ <chunk type="NP" id="c1.1-5">
+  <w pos="DT" id="w1.1.6">the</w>
+  <w pos="NNP" id="w1.1.7">Prime</w>
+  <w pos="NNP" id="w1.1.8">Minister</w>
+  <w pos="NNP" id="w1.1.9">,</w>
+  <w pos="NNP" id="w1.1.10">Mr</w>
+  <w pos="NNP" id="w1.1.11">Ingvar</w>
+  <w pos="NNP" id="w1.1.12">Carlsson</w>
+ </chunk>
+ <w pos="," id="w1.1.13">,</w>
+ <chunk type="PP" id="c1.1-7">
+  <w pos="IN" id="w1.1.14">at</w>
+ </chunk>
+ <chunk type="NP" id="c1.1-8">
+  <w pos="DT" id="w1.1.15">the</w>
+  <w pos="NN" id="w1.1.16">Opening</w>
+ </chunk>
+ <chunk type="PP" id="c1.1-9">
+  <w pos="IN" id="w1.1.17">of</w>
+ </chunk>
+ <chunk type="NP" id="c1.1-10">
+  <w pos="DT" id="w1.1.18">the</w>
+  <w pos="NNP" id="w1.1.19">Swedish</w>
+  <w pos="NNP" id="w1.1.20">Parliament</w>
+ </chunk>
+ <chunk type="PP" id="c1.1-11">
+  <w pos="IN" id="w1.1.21">on</w>
+ </chunk>
+ <chunk type="NP" id="c1.1-12">
+  <w pos="NNP" id="w1.1.22">Tuesday</w>
+ </chunk>
+ <w pos="," id="w1.1.23">,</w>
+ <chunk type="NP" id="c1.1-14">
+  <w pos="CD" id="w1.1.24">4</w>
+  <w pos="NNP" id="w1.1.25">October</w>
+  <w pos="," id="w1.1.26">,</w>
+  <w pos="CD" id="w1.1.27">1988</w>
+ </chunk>
+ <w pos="." id="w1.1.28">.</w>
+</s></p>
+
+<p id="2">
+<s id="s2.1">
+ <chunk type="NP" id="c2.1-1">
+  <w pos="PRP$" id="w2.1.1">Your</w>
+  <w pos="NNPS" id="w2.1.2">Majesties</w>
+ </chunk>
+ <w pos="," id="w2.1.3">,</w>
+ <chunk type="NP" id="c2.1-3">
+  <w pos="NNP" id="w2.1.4">Your</w>
+  <w pos="NNP" id="w2.1.5">Royal</w>
+  <w pos="NNP" id="w2.1.6">Highnesses</w>
+ </chunk>
+ <w pos="," id="w2.1.7">,</w>
+ <chunk type="NP" id="c2.1-5">
+  <w pos="NNP" id="w2.1.8">Mr</w>
+  <w pos="NNP" id="w2.1.9">Speaker</w>
+ </chunk>
+ <w pos="," id="w2.1.10">,</w>
+ <chunk type="NP" id="c2.1-7">
+  <w pos="NNP" id="w2.1.11">Members</w>
+ </chunk>
+ <chunk type="PP" id="c2.1-8">
+  <w pos="IN" id="w2.1.12">of</w>
+ </chunk>
+ <chunk type="NP" id="c2.1-9">
+  <w pos="DT" id="w2.1.13">the</w>
+  <w pos="NNP" id="w2.1.14">Swedish</w>
+  <w pos="NNP" id="w2.1.15">Parliament</w>
+ </chunk>
+ <w pos="." id="w2.1.16">.</w>
+</s></p>
+
+<p id="3">
+<s id="s3.1">
+ <chunk type="NP" id="c3.1-1">
+  <w pos="NNP" id="w3.1.1">Sweden</w>
+ </chunk>
+ <chunk type="NP" id="c3.1-2">
+  <w pos="POS" id="w3.1.2">'s</w>
+  <w pos="NN" id="w3.1.3">policy</w>
+ </chunk>
+ <chunk type="PP" id="c3.1-3">
+  <w pos="IN" id="w3.1.4">of</w>
+ </chunk>
+ <chunk type="NP" id="c3.1-4">
+  <w pos="NN" id="w3.1.5">neutrality</w>
+ </chunk>
+ <chunk type="VP" id="c3.1-5">
+  <w pos="VBZ" id="w3.1.6">is</w>
+ </chunk>
+ <chunk type="PP" id="c3.1-6">
+  <w pos="IN" id="w3.1.7">of</w>
+ </chunk>
+ <chunk type="NP" id="c3.1-7">
+  <w pos="JJ" id="w3.1.8">decisive</w>
+  <w pos="NN" id="w3.1.9">importance</w>
+ </chunk>
+ <chunk type="PP" id="c3.1-8">
+  <w pos="IN" id="w3.1.10">for</w>
+ </chunk>
+ <chunk type="NP" id="c3.1-9">
+  <w pos="PRP$" id="w3.1.11">our</w>
+  <w pos="NN" id="w3.1.12">peace</w>
+  <w pos="CC" id="w3.1.13">and</w>
+  <w pos="NN" id="w3.1.14">independence</w>
+ </chunk>
+ <w pos="." id="w3.1.15">.</w>
+</s> 
+ 
+
+
+<s id="s3.2">
+ <chunk type="NP" id="c3.2-1">
+  <w pos="PRP" id="w3.2.1">It</w>
+ </chunk>
+ <chunk type="ADVP" id="c3.2-2">
+  <w pos="RB" id="w3.2.2">also</w>
+ </chunk>
+ <chunk type="VP" id="c3.2-3">
+  <w pos="VBZ" id="w3.2.3">contributes</w>
+ </chunk>
+ <chunk type="PP" id="c3.2-4">
+  <w pos="VBN" id="w3.2.4">to</w>
+ </chunk>
+ <chunk type="NP" id="c3.2-5">
+  <w pos="NN" id="w3.2.5">stability</w>
+  <w pos="CC" id="w3.2.6">and</w>
+  <w pos="NN" id="w3.2.7">détente</w>
+ </chunk>
+ <chunk type="PP" id="c3.2-6">
+  <w pos="IN" id="w3.2.8">in</w>
+ </chunk>
+ <chunk type="NP" id="c3.2-7">
+  <w pos="PRP$" id="w3.2.9">our</w>
+  <w pos="NN" id="w3.2.10">part</w>
+ </chunk>
+ <chunk type="PP" id="c3.2-8">
+  <w pos="IN" id="w3.2.11">of</w>
+ </chunk>
+ <chunk type="NP" id="c3.2-9">
+  <w pos="DT" id="w3.2.12">the</w>
+  <w pos="NN" id="w3.2.13">world</w>
+ </chunk>
+ <w pos="." id="w3.2.14">.</w>
+</s> 
+ 
+
+
+<s id="s3.3">
+ <chunk type="NP" id="c3.3-1">
+  <w pos="EX" id="w3.3.1">There</w>
+ </chunk>
+ <chunk type="VP" id="c3.3-2">
+  <w pos="VBZ" id="w3.3.2">is</w>
+ </chunk>
+ <chunk type="NP" id="c3.3-3">
+  <w pos="RB" id="w3.3.3">wide</w>
+  <w pos="JJ" id="w3.3.4">popular</w>
+  <w pos="NN" id="w3.3.5">support</w>
+ </chunk>
+ <chunk type="PP" id="c3.3-4">
+  <w pos="IN" id="w3.3.6">for</w>
+ </chunk>
+ <chunk type="NP" id="c3.3-5">
+  <w pos="DT" id="w3.3.7">this</w>
+  <w pos="NN" id="w3.3.8">policy</w>
+ </chunk>
+ <w pos="." id="w3.3.9">.</w>
+</s> 
+ 
+
+
+<s id="s3.4">
+ <chunk type="NP" id="c3.4-1">
+  <w pos="PRP" id="w3.4.1">It</w>
+ </chunk>
+ <chunk type="VP" id="c3.4-2">
+  <w pos="MD" id="w3.4.2">will</w>
+  <w pos="VB" id="w3.4.3">be</w>
+  <w pos="VBN" id="w3.4.4">pursued</w>
+ </chunk>
+ <chunk type="PP" id="c3.4-3">
+  <w pos="IN" id="w3.4.5">with</w>
+ </chunk>
+ <chunk type="NP" id="c3.4-4">
+  <w pos="NN" id="w3.4.6">firmness</w>
+  <w pos="CC" id="w3.4.7">and</w>
+  <w pos="NN" id="w3.4.8">consistency</w>
+ </chunk>
+ <w pos="." id="w3.4.9">.</w>
+</s></p>
+
+<p id="4">
+<s id="s4.1">
+ <chunk type="NP" id="c4.1-1">
+  <w pos="PRP$" id="w4.1.1">Our</w>
+  <w pos="NN" id="w4.1.2">policy</w>
+ </chunk>
+ <chunk type="PP" id="c4.1-2">
+  <w pos="IN" id="w4.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c4.1-3">
+  <w pos="NN" id="w4.1.4">neutrality</w>
+ </chunk>
+ <chunk type="VP" id="c4.1-4">
+  <w pos="VBZ" id="w4.1.5">is</w>
+  <w pos="VBN" id="w4.1.6">underpinned</w>
+ </chunk>
+ <chunk type="PP" id="c4.1-5">
+  <w pos="IN" id="w4.1.7">by</w>
+ </chunk>
+ <chunk type="NP" id="c4.1-6">
+  <w pos="DT" id="w4.1.8">a</w>
+  <w pos="JJ" id="w4.1.9">strong</w>
+  <w pos="NN" id="w4.1.10">defence</w>
+ </chunk>
+ <w pos="." id="w4.1.11">.</w>
+</s> 
+ 
+
+
+<s id="s4.2">
+ <chunk type="NP" id="c4.2-1">
+  <w pos="DT" id="w4.2.1">That</w>
+ </chunk>
+ <chunk type="VP" id="c4.2-2">
+  <w pos="VBZ" id="w4.2.2">safeguards</w>
+ </chunk>
+ <chunk type="NP" id="c4.2-3">
+  <w pos="PRP$" id="w4.2.3">our</w>
+  <w pos="NN" id="w4.2.4">independence</w>
+ </chunk>
+ <w pos="." id="w4.2.5">.</w>
+</s> 
+ 
+
+
+<s id="s4.3">
+ <chunk type="NP" id="c4.3-1">
+  <w pos="NNS" id="w4.3.1">Violations</w>
+ </chunk>
+ <chunk type="PP" id="c4.3-2">
+  <w pos="IN" id="w4.3.2">of</w>
+ </chunk>
+ <chunk type="NP" id="c4.3-3">
+  <w pos="NNP" id="w4.3.3">Swedish</w>
+  <w pos="NN" id="w4.3.4">territory</w>
+ </chunk>
+ <chunk type="VP" id="c4.3-4">
+  <w pos="MD" id="w4.3.5">will</w>
+  <w pos="RB" id="w4.3.6">never</w>
+  <w pos="VB" id="w4.3.7">be</w>
+  <w pos="VBN" id="w4.3.8">accepted</w>
+ </chunk>
+ <w pos="." id="w4.3.9">.</w>
+</s> 
+ 
+
+
+<s id="s4.4">
+ <chunk type="NP" id="c4.4-1">
+  <w pos="DT" id="w4.4.1">The</w>
+  <w pos="NN" id="w4.4.2">army</w>
+ </chunk>
+ <chunk type="VP" id="c4.4-2">
+  <w pos="MD" id="w4.4.3">will</w>
+  <w pos="VB" id="w4.4.4">be</w>
+  <w pos="VBN" id="w4.4.5">reorganized</w>
+ </chunk>
+ <chunk type="PP" id="c4.4-3">
+  <w pos="IN" id="w4.4.6">with</w>
+ </chunk>
+ <chunk type="NP" id="c4.4-4">
+  <w pos="DT" id="w4.4.7">the</w>
+  <w pos="NN" id="w4.4.8">aim</w>
+ </chunk>
+ <chunk type="PP" id="c4.4-5">
+  <w pos="IN" id="w4.4.9">of</w>
+ </chunk>
+ <chunk type="VP" id="c4.4-6">
+  <w pos="VBG" id="w4.4.10">making</w>
+ </chunk>
+ <chunk type="NP" id="c4.4-7">
+  <w pos="PRP" id="w4.4.11">it</w>
+ </chunk>
+ <chunk type="NP" id="c4.4-8">
+  <w pos="JJR" id="w4.4.12">more</w>
+  <w pos="NN" id="w4.4.13">effective</w>
+ </chunk>
+ <w pos="." id="w4.4.14">.</w>
+</s> 
+ 
+
+
+<s id="s4.5">
+ <chunk type="NP" id="c4.5-1">
+  <w pos="PRP" id="w4.5.1">It</w>
+ </chunk>
+ <chunk type="VP" id="c4.5-2">
+  <w pos="VBZ" id="w4.5.2">is</w>
+ </chunk>
+ <chunk type="NP" id="c4.5-3">
+  <w pos="DT" id="w4.5.3">the</w>
+  <w pos="NNP" id="w4.5.4">Government</w>
+ </chunk>
+ <chunk type="NP" id="c4.5-4">
+  <w pos="POS" id="w4.5.5">'s</w>
+  <w pos="NN" id="w4.5.6">intention</w>
+ </chunk>
+ <chunk type="VP" id="c4.5-5">
+  <w pos="TO" id="w4.5.7">to</w>
+  <w pos="VB" id="w4.5.8">seek</w>
+ </chunk>
+ <chunk type="NP" id="c4.5-6">
+  <w pos="JJ" id="w4.5.9">broad</w>
+  <w pos="NNS" id="w4.5.10">solutions</w>
+ </chunk>
+ <chunk type="PP" id="c4.5-7">
+  <w pos="IN" id="w4.5.11">in</w>
+ </chunk>
+ <chunk type="NP" id="c4.5-8">
+  <w pos="NNS" id="w4.5.12">issues</w>
+ </chunk>
+ <chunk type="NP" id="c4.5-9">
+  <w pos="WDT" id="w4.5.13">that</w>
+ </chunk>
+ <chunk type="VP" id="c4.5-10">
+  <w pos="VBP" id="w4.5.14">are</w>
+  <w pos="JJ" id="w4.5.15">of</w>
+ </chunk>
+ <chunk type="NP" id="c4.5-11">
+  <w pos="NN" id="w4.5.16">importance</w>
+ </chunk>
+ <chunk type="PP" id="c4.5-12">
+  <w pos="IN" id="w4.5.17">for</w>
+ </chunk>
+ <chunk type="NP" id="c4.5-13">
+  <w pos="PRP$" id="w4.5.18">our</w>
+  <w pos="JJ" id="w4.5.19">national</w>
+  <w pos="NN" id="w4.5.20">security</w>
+ </chunk>
+ <w pos="." id="w4.5.21">.</w>
+</s></p>
+
+<p id="5">
+<s id="s5.1">
+ <chunk type="NP" id="c5.1-1">
+  <w pos="DT" id="w5.1.1">The</w>
+  <w pos="NNP" id="w5.1.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c5.1-2">
+  <w pos="VBD" id="w5.1.3">welcomed</w>
+ </chunk>
+ <chunk type="NP" id="c5.1-3">
+  <w pos="DT" id="w5.1.4">the</w>
+  <w pos="NN" id="w5.1.5">agreement</w>
+ </chunk>
+ <chunk type="PP" id="c5.1-4">
+  <w pos="IN" id="w5.1.6">between</w>
+ </chunk>
+ <chunk type="NP" id="c5.1-5">
+  <w pos="DT" id="w5.1.7">the</w>
+  <w pos="NNP" id="w5.1.8">United</w>
+  <w pos="NNPS" id="w5.1.9">States</w>
+ </chunk>
+ <w pos="CC" id="w5.1.10">and</w>
+ <chunk type="NP" id="c5.1-7">
+  <w pos="DT" id="w5.1.11">the</w>
+  <w pos="NNP" id="w5.1.12">Soviet</w>
+  <w pos="NNP" id="w5.1.13">Union</w>
+ </chunk>
+ <chunk type="PP" id="c5.1-8">
+  <w pos="IN" id="w5.1.14">on</w>
+ </chunk>
+ <chunk type="NP" id="c5.1-9">
+  <w pos="DT" id="w5.1.15">the</w>
+  <w pos="NN" id="w5.1.16">elimination</w>
+ </chunk>
+ <chunk type="PP" id="c5.1-10">
+  <w pos="IN" id="w5.1.17">of</w>
+ </chunk>
+ <chunk type="NP" id="c5.1-11">
+  <w pos="JJ" id="w5.1.18">land-based</w>
+  <w pos="JJ" id="w5.1.19">intermediate-range</w>
+  <w pos="JJ" id="w5.1.20">nuclear</w>
+  <w pos="NNS" id="w5.1.21">weapons</w>
+ </chunk>
+ <w pos="." id="w5.1.22">.</w>
+</s> 
+ 
+
+
+<s id="s5.2">
+ <chunk type="NP" id="c5.2-1">
+  <w pos="NNS" id="w5.2.1">Efforts</w>
+ </chunk>
+ <chunk type="VP" id="c5.2-2">
+  <w pos="MD" id="w5.2.2">must</w>
+ </chunk>
+ <chunk type="ADVP" id="c5.2-3">
+  <w pos="RB" id="w5.2.3">now</w>
+ </chunk>
+ <w pos="," id="w5.2.4">,</w>
+ <chunk type="PP" id="c5.2-5">
+  <w pos="IN" id="w5.2.5">among</w>
+ </chunk>
+ <chunk type="NP" id="c5.2-6">
+  <w pos="JJ" id="w5.2.6">other</w>
+  <w pos="NNS" id="w5.2.7">things</w>
+ </chunk>
+ <w pos="," id="w5.2.8">,</w>
+ <chunk type="VP" id="c5.2-8">
+  <w pos="VBN" id="w5.2.9">aim</w>
+ </chunk>
+ <chunk type="PP" id="c5.2-9">
+  <w pos="IN" id="w5.2.10">at</w>
+ </chunk>
+ <chunk type="VP" id="c5.2-10">
+  <w pos="VBG" id="w5.2.11">reducing</w>
+ </chunk>
+ <chunk type="NP" id="c5.2-11">
+  <w pos="JJ" id="w5.2.12">strategic</w>
+  <w pos="NNS" id="w5.2.13">arms</w>
+ </chunk>
+ <w pos="CC" id="w5.2.14">and</w>
+ <chunk type="NP" id="c5.2-13">
+  <w pos="NN" id="w5.2.15">bringing</w>
+ </chunk>
+ <chunk type="PP" id="c5.2-14">
+  <w pos="IN" id="w5.2.16">about</w>
+ </chunk>
+ <chunk type="NP" id="c5.2-15">
+  <w pos="DT" id="w5.2.17">a</w>
+  <w pos="JJ" id="w5.2.18">comprehensive</w>
+  <w pos="NN" id="w5.2.19">test</w>
+  <w pos="NN" id="w5.2.20">ban</w>
+  <w pos="NN" id="w5.2.21">treaty</w>
+ </chunk>
+ <w pos="." id="w5.2.22">.</w>
+</s> 
+ 
+
+
+<s id="s5.3">
+ <chunk type="NP" id="c5.3-1">
+  <w pos="NNP" id="w5.3.1">Sweden</w>
+ </chunk>
+ <chunk type="VP" id="c5.3-2">
+  <w pos="VBZ" id="w5.3.2">is</w>
+  <w pos="VBG" id="w5.3.3">acting</w>
+ </chunk>
+ <chunk type="PP" id="c5.3-3">
+  <w pos="IN" id="w5.3.4">in</w>
+ </chunk>
+ <chunk type="NP" id="c5.3-4">
+  <w pos="NN" id="w5.3.5">support</w>
+ </chunk>
+ <chunk type="PP" id="c5.3-5">
+  <w pos="IN" id="w5.3.6">of</w>
+ </chunk>
+ <chunk type="NP" id="c5.3-6">
+  <w pos="DT" id="w5.3.7">this</w>
+  <w pos="JJ" id="w5.3.8">inter</w>
+  <w pos="NN" id="w5.3.9">alia</w>
+ </chunk>
+ <chunk type="PP" id="c5.3-7">
+  <w pos="IN" id="w5.3.10">within</w>
+ </chunk>
+ <chunk type="NP" id="c5.3-8">
+  <w pos="DT" id="w5.3.11">the</w>
+  <w pos="NN" id="w5.3.12">framework</w>
+ </chunk>
+ <chunk type="PP" id="c5.3-9">
+  <w pos="IN" id="w5.3.13">of</w>
+ </chunk>
+ <chunk type="NP" id="c5.3-10">
+  <w pos="DT" id="w5.3.14">the</w>
+  <w pos="NNP" id="w5.3.15">Six</w>
+  <w pos="NNP" id="w5.3.16">Nation</w>
+  <w pos="NNP" id="w5.3.17">Initiative</w>
+ </chunk>
+ <w pos="." id="w5.3.18">.</w>
+</s></p>
+
+<p id="6">
+<s id="s6.1">
+ <chunk type="NP" id="c6.1-1">
+  <w pos="DT" id="w6.1.1">The</w>
+  <w pos="NNP" id="w6.1.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c6.1-2">
+  <w pos="MD" id="w6.1.3">will</w>
+  <w pos="VB" id="w6.1.4">continue</w>
+ </chunk>
+ <chunk type="NP" id="c6.1-3">
+  <w pos="PRP$" id="w6.1.5">its</w>
+  <w pos="JJ" id="w6.1.6">active</w>
+  <w pos="NNS" id="w6.1.7">efforts</w>
+ </chunk>
+ <chunk type="PP" id="c6.1-4">
+  <w pos="IN" id="w6.1.8">on</w>
+ </chunk>
+ <chunk type="NP" id="c6.1-5">
+  <w pos="NN" id="w6.1.9">behalf</w>
+ </chunk>
+ <chunk type="PP" id="c6.1-6">
+  <w pos="IN" id="w6.1.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c6.1-7">
+  <w pos="DT" id="w6.1.11">a</w>
+  <w pos="JJ" id="w6.1.12">nuclear-weapon-free</w>
+  <w pos="NN" id="w6.1.13">zone</w>
+ </chunk>
+ <chunk type="PP" id="c6.1-8">
+  <w pos="IN" id="w6.1.14">in</w>
+ </chunk>
+ <chunk type="NP" id="c6.1-9">
+  <w pos="DT" id="w6.1.15">the</w>
+  <w pos="JJ" id="w6.1.16">Nordic</w>
+  <w pos="NN" id="w6.1.17">area</w>
+ </chunk>
+ <w pos="CC" id="w6.1.18">and</w>
+ <chunk type="PP" id="c6.1-11">
+  <w pos="IN" id="w6.1.19">of</w>
+ </chunk>
+ <chunk type="NP" id="c6.1-12">
+  <w pos="DT" id="w6.1.20">a</w>
+  <w pos="NN" id="w6.1.21">corridor</w>
+ </chunk>
+ <chunk type="PP" id="c6.1-13">
+  <w pos="IN" id="w6.1.22">in</w>
+ </chunk>
+ <chunk type="NP" id="c6.1-14">
+  <w pos="NNP" id="w6.1.23">Central</w>
+  <w pos="NNP" id="w6.1.24">Europe</w>
+  <w pos="NN" id="w6.1.25">free</w>
+ </chunk>
+ <chunk type="PP" id="c6.1-15">
+  <w pos="IN" id="w6.1.26">of</w>
+ </chunk>
+ <chunk type="NP" id="c6.1-16">
+  <w pos="JJ" id="w6.1.27">battlefield</w>
+  <w pos="JJ" id="w6.1.28">nuclear</w>
+  <w pos="NNS" id="w6.1.29">weapons</w>
+ </chunk>
+ <w pos="." id="w6.1.30">.</w>
+</s></p>
+
+<p id="7">
+<s id="s7.1">
+ <chunk type="PP" id="c7.1-1">
+  <w pos="IN" id="w7.1.1">By</w>
+ </chunk>
+ <chunk type="NP" id="c7.1-2">
+  <w pos="JJ" id="w7.1.2">supporting</w>
+  <w pos="JJ" id="w7.1.3">economic</w>
+  <w pos="CC" id="w7.1.4">and</w>
+  <w pos="JJ" id="w7.1.5">social</w>
+  <w pos="NN" id="w7.1.6">progress</w>
+ </chunk>
+ <chunk type="PP" id="c7.1-3">
+  <w pos="IN" id="w7.1.7">in</w>
+ </chunk>
+ <chunk type="NP" id="c7.1-4">
+  <w pos="VBG" id="w7.1.8">developing</w>
+  <w pos="NNS" id="w7.1.9">countries</w>
+ </chunk>
+ <chunk type="NP" id="c7.1-5">
+  <w pos="DT" id="w7.1.10">the</w>
+  <w pos="NNP" id="w7.1.11">Government</w>
+ </chunk>
+ <chunk type="VP" id="c7.1-6">
+  <w pos="VBZ" id="w7.1.12">wishes</w>
+ </chunk>
+ <chunk type="VP" id="c7.1-7">
+  <w pos="TO" id="w7.1.13">to</w>
+  <w pos="VB" id="w7.1.14">contribute</w>
+  <w pos="TO" id="w7.1.15">to</w>
+  <w pos="VB" id="w7.1.16">reversing</w>
+ </chunk>
+ <chunk type="NP" id="c7.1-8">
+  <w pos="DT" id="w7.1.17">the</w>
+  <w pos="JJ" id="w7.1.18">economic</w>
+  <w pos="NN" id="w7.1.19">decline</w>
+ </chunk>
+ <chunk type="PP" id="c7.1-9">
+  <w pos="IN" id="w7.1.20">in</w>
+ </chunk>
+ <chunk type="NP" id="c7.1-10">
+  <w pos="DT" id="w7.1.21">the</w>
+  <w pos="JJ" id="w7.1.22">poor</w>
+  <w pos="NNS" id="w7.1.23">countries</w>
+ </chunk>
+ <w pos="CC" id="w7.1.24">and</w>
+ <chunk type="VP" id="c7.1-12">
+  <w pos="TO" id="w7.1.25">to</w>
+  <w pos="VB" id="w7.1.26">alleviating</w>
+ </chunk>
+ <chunk type="NP" id="c7.1-13">
+  <w pos="DT" id="w7.1.27">the</w>
+  <w pos="NN" id="w7.1.28">debt</w>
+  <w pos="NN" id="w7.1.29">crisis</w>
+ </chunk>
+ <w pos="." id="w7.1.30">.</w>
+</s> 
+ 
+
+
+<s id="s7.2">
+ <chunk type="NP" id="c7.2-1">
+  <w pos="JJ" id="w7.2.1">Development</w>
+  <w pos="NN" id="w7.2.2">assistance</w>
+ </chunk>
+ <chunk type="VP" id="c7.2-2">
+  <w pos="VBP" id="w7.2.3">shall</w>
+  <w pos="VBN" id="w7.2.4">furthermore</w>
+  <w pos="VB" id="w7.2.5">promote</w>
+ </chunk>
+ <chunk type="NP" id="c7.2-3">
+  <w pos="DT" id="w7.2.6">a</w>
+  <w pos="JJ" id="w7.2.7">sustainable</w>
+  <w pos="NN" id="w7.2.8">use</w>
+ </chunk>
+ <chunk type="PP" id="c7.2-4">
+  <w pos="IN" id="w7.2.9">of</w>
+ </chunk>
+ <chunk type="NP" id="c7.2-5">
+  <w pos="JJ" id="w7.2.10">natural</w>
+  <w pos="NNS" id="w7.2.11">resources</w>
+  <w pos="CC" id="w7.2.12">and</w>
+  <w pos="NN" id="w7.2.13">protection</w>
+ </chunk>
+ <chunk type="PP" id="c7.2-6">
+  <w pos="IN" id="w7.2.14">of</w>
+ </chunk>
+ <chunk type="NP" id="c7.2-7">
+  <w pos="DT" id="w7.2.15">the</w>
+  <w pos="NN" id="w7.2.16">environment</w>
+ </chunk>
+ <w pos="." id="w7.2.17">.</w>
+</s></p>
+
+<p id="8">
+<s id="s8.1">
+ <chunk type="NP" id="c8.1-1">
+  <w pos="DT" id="w8.1.1">The</w>
+  <w pos="NNP" id="w8.1.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c8.1-2">
+  <w pos="RB" id="w8.1.3">will</w>
+  <w pos="RB" id="w8.1.4">actively</w>
+  <w pos="VBP" id="w8.1.5">promote</w>
+ </chunk>
+ <chunk type="NP" id="c8.1-3">
+  <w pos="DT" id="w8.1.6">the</w>
+  <w pos="NN" id="w8.1.7">convening</w>
+ </chunk>
+ <chunk type="PP" id="c8.1-4">
+  <w pos="IN" id="w8.1.8">in</w>
+ </chunk>
+ <chunk type="NP" id="c8.1-5">
+  <w pos="CD" id="w8.1.9">1992</w>
+ </chunk>
+ <chunk type="PP" id="c8.1-6">
+  <w pos="IN" id="w8.1.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c8.1-7">
+  <w pos="DT" id="w8.1.11">a</w>
+  <w pos="JJ" id="w8.1.12">global</w>
+  <w pos="NNP" id="w8.1.13">United</w>
+  <w pos="NNP" id="w8.1.14">Nations</w>
+  <w pos="NN" id="w8.1.15">conference</w>
+ </chunk>
+ <chunk type="PP" id="c8.1-8">
+  <w pos="IN" id="w8.1.16">on</w>
+ </chunk>
+ <chunk type="NP" id="c8.1-9">
+  <w pos="DT" id="w8.1.17">the</w>
+  <w pos="NN" id="w8.1.18">environment</w>
+ </chunk>
+ <w pos="CC" id="w8.1.19">and</w>
+ <chunk type="NP" id="c8.1-11">
+  <w pos="NN" id="w8.1.20">development</w>
+ </chunk>
+ <w pos="." id="w8.1.21">.</w>
+</s></p>
+
+<p id="9">
+<s id="s9.1">
+ <chunk type="PP" id="c9.1-1">
+  <w pos="IN" id="w9.1.1">In</w>
+ </chunk>
+ <chunk type="NP" id="c9.1-2">
+  <w pos="NNP" id="w9.1.2">Central</w>
+  <w pos="NNP" id="w9.1.3">America</w>
+ </chunk>
+ <chunk type="NP" id="c9.1-3">
+  <w pos="DT" id="w9.1.4">the</w>
+  <w pos="NN" id="w9.1.5">five</w>
+  <w pos="NNS" id="w9.1.6">Presidents</w>
+ </chunk>
+ <chunk type="VP" id="c9.1-4">
+  <w pos="VBP" id="w9.1.7">have</w>
+  <w pos="VBN" id="w9.1.8">signed</w>
+ </chunk>
+ <chunk type="NP" id="c9.1-5">
+  <w pos="DT" id="w9.1.9">a</w>
+  <w pos="NN" id="w9.1.10">peace</w>
+  <w pos="NN" id="w9.1.11">plan</w>
+ </chunk>
+ <chunk type="NP" id="c9.1-6">
+  <w pos="WDT" id="w9.1.12">which</w>
+ </chunk>
+ <chunk type="NP" id="c9.1-7">
+  <w pos="NNP" id="w9.1.13">Sweden</w>
+ </chunk>
+ <chunk type="VP" id="c9.1-8">
+  <w pos="VBZ" id="w9.1.14">has</w>
+  <w pos="VBN" id="w9.1.15">given</w>
+ </chunk>
+ <chunk type="NP" id="c9.1-9">
+  <w pos="PRP$" id="w9.1.16">its</w>
+  <w pos="JJ" id="w9.1.17">wholehearted</w>
+  <w pos="NN" id="w9.1.18">support</w>
+ </chunk>
+ <w pos="." id="w9.1.19">.</w>
+</s> 
+ 
+
+
+<s id="s9.2">
+ <chunk type="NP" id="c9.2-1">
+  <w pos="NNS" id="w9.2.1">Negotiations</w>
+ </chunk>
+ <chunk type="VP" id="c9.2-2">
+  <w pos="VBP" id="w9.2.2">are</w>
+ </chunk>
+ <chunk type="PP" id="c9.2-3">
+  <w pos="IN" id="w9.2.3">in</w>
+ </chunk>
+ <chunk type="NP" id="c9.2-4">
+  <w pos="NN" id="w9.2.4">progress</w>
+ </chunk>
+ <chunk type="PP" id="c9.2-5">
+  <w pos="IN" id="w9.2.5">on</w>
+ </chunk>
+ <chunk type="NP" id="c9.2-6">
+  <w pos="NN" id="w9.2.6">peace</w>
+ </chunk>
+ <chunk type="PP" id="c9.2-7">
+  <w pos="IN" id="w9.2.7">between</w>
+ </chunk>
+ <chunk type="NP" id="c9.2-8">
+  <w pos="NNP" id="w9.2.8">Iran</w>
+  <w pos="CC" id="w9.2.9">and</w>
+  <w pos="NNP" id="w9.2.10">Iraq</w>
+ </chunk>
+ <w pos="." id="w9.2.11">.</w>
+</s> 
+ 
+
+
+<s id="s9.3">
+ <chunk type="NP" id="c9.3-1">
+  <w pos="DT" id="w9.3.1">The</w>
+  <w pos="JJ" id="w9.3.2">Soviet</w>
+  <w pos="NNS" id="w9.3.3">troops</w>
+ </chunk>
+ <chunk type="VP" id="c9.3-2">
+  <w pos="VBP" id="w9.3.4">are</w>
+ </chunk>
+ <chunk type="PP" id="c9.3-3">
+  <w pos="IN" id="w9.3.5">in</w>
+ </chunk>
+ <chunk type="NP" id="c9.3-4">
+  <w pos="DT" id="w9.3.6">the</w>
+  <w pos="NN" id="w9.3.7">process</w>
+ </chunk>
+ <chunk type="PP" id="c9.3-5">
+  <w pos="IN" id="w9.3.8">of</w>
+ </chunk>
+ <chunk type="NP" id="c9.3-6">
+  <w pos="NN" id="w9.3.9">withdrawing</w>
+ </chunk>
+ <chunk type="PP" id="c9.3-7">
+  <w pos="IN" id="w9.3.10">from</w>
+ </chunk>
+ <chunk type="NP" id="c9.3-8">
+  <w pos="NNP" id="w9.3.11">Afghanistan</w>
+ </chunk>
+ <w pos="." id="w9.3.12">.</w>
+</s></p>
+
+<p id="10">
+<s id="s10.1">
+ <chunk type="PP" id="c10.1-1">
+  <w pos="IN" id="w10.1.1">In</w>
+ </chunk>
+ <chunk type="NP" id="c10.1-2">
+  <w pos="DT" id="w10.1.2">the</w>
+  <w pos="NN" id="w10.1.3">majority</w>
+ </chunk>
+ <chunk type="PP" id="c10.1-3">
+  <w pos="IN" id="w10.1.4">of</w>
+ </chunk>
+ <chunk type="NP" id="c10.1-4">
+  <w pos="DT" id="w10.1.5">the</w>
+  <w pos="JJ" id="w10.1.6">regional</w>
+  <w pos="NNS" id="w10.1.7">conflicts</w>
+ </chunk>
+ <chunk type="NP" id="c10.1-5">
+  <w pos="DT" id="w10.1.8">the</w>
+  <w pos="NNP" id="w10.1.9">United</w>
+  <w pos="NNP" id="w10.1.10">Nations</w>
+ </chunk>
+ <chunk type="VP" id="c10.1-6">
+  <w pos="VBZ" id="w10.1.11">has</w>
+  <w pos="VBN" id="w10.1.12">been</w>
+ </chunk>
+ <chunk type="ADJP" id="c10.1-7">
+  <w pos="JJ" id="w10.1.13">able</w>
+ </chunk>
+ <chunk type="VP" id="c10.1-8">
+  <w pos="TO" id="w10.1.14">to</w>
+  <w pos="VB" id="w10.1.15">make</w>
+ </chunk>
+ <chunk type="NP" id="c10.1-9">
+  <w pos="JJ" id="w10.1.16">important</w>
+  <w pos="NNS" id="w10.1.17">contributions</w>
+ </chunk>
+ <w pos="." id="w10.1.18">.</w>
+</s> 
+ 
+
+
+<s id="s10.2">
+ <chunk type="NP" id="c10.2-1">
+  <w pos="NNP" id="w10.2.1">Sweden</w>
+ </chunk>
+ <chunk type="VP" id="c10.2-2">
+  <w pos="VBZ" id="w10.2.2">is</w>
+  <w pos="VBG" id="w10.2.3">participating</w>
+ </chunk>
+ <chunk type="PP" id="c10.2-3">
+  <w pos="IN" id="w10.2.4">in</w>
+ </chunk>
+ <chunk type="NP" id="c10.2-4">
+  <w pos="NN" id="w10.2.5">,</w>
+ </chunk>
+ <chunk type="PP" id="c10.2-5">
+  <w pos="IN" id="w10.2.6">among</w>
+ </chunk>
+ <chunk type="NP" id="c10.2-6">
+  <w pos="JJ" id="w10.2.7">other</w>
+  <w pos="NNS" id="w10.2.8">things</w>
+ </chunk>
+ <w pos="," id="w10.2.9">,</w>
+ <chunk type="NP" id="c10.2-8">
+  <w pos="DT" id="w10.2.10">the</w>
+  <w pos="NNP" id="w10.2.11">United</w>
+  <w pos="NNP" id="w10.2.12">Nations</w>
+  <w pos="NNP" id="w10.2.13">Military</w>
+  <w pos="NNP" id="w10.2.14">Observer</w>
+  <w pos="NNP" id="w10.2.15">Groups</w>
+ </chunk>
+ <chunk type="PP" id="c10.2-9">
+  <w pos="IN" id="w10.2.16">in</w>
+ </chunk>
+ <chunk type="NP" id="c10.2-10">
+  <w pos="NNP" id="w10.2.17">Afghanistan</w>
+ </chunk>
+ <w pos="CC" id="w10.2.18">and</w>
+ <chunk type="PP" id="c10.2-12">
+  <w pos="IN" id="w10.2.19">in</w>
+ </chunk>
+ <chunk type="NP" id="c10.2-13">
+  <w pos="NNP" id="w10.2.20">Iran</w>
+  <w pos="NNP" id="w10.2.21">/</w>
+  <w pos="NNP" id="w10.2.22">Iraq</w>
+ </chunk>
+ <w pos="." id="w10.2.23">.</w>
+</s></p>
+
+<p id="11">
+<s id="s11.1">
+ <chunk type="NP" id="c11.1-1">
+  <w pos="PRP" id="w11.1.1">We</w>
+ </chunk>
+ <chunk type="VP" id="c11.1-2">
+  <w pos="VBD" id="w11.1.2">were</w>
+ </chunk>
+ <chunk type="ADJP" id="c11.1-3">
+  <w pos="VBN" id="w11.1.3">pleased</w>
+ </chunk>
+ <chunk type="VP" id="c11.1-4">
+  <w pos="TO" id="w11.1.4">to</w>
+  <w pos="VB" id="w11.1.5">learn</w>
+ </chunk>
+ <chunk type="SBAR" id="c11.1-5">
+  <w pos="IN" id="w11.1.6">that</w>
+ </chunk>
+ <chunk type="NP" id="c11.1-6">
+  <w pos="DT" id="w11.1.7">the</w>
+  <w pos="NNP" id="w11.1.8">Nobel</w>
+  <w pos="NNP" id="w11.1.9">Peace</w>
+  <w pos="NNP" id="w11.1.10">Prize</w>
+ </chunk>
+ <chunk type="VP" id="c11.1-7">
+  <w pos="VBZ" id="w11.1.11">is</w>
+  <w pos="VBG" id="w11.1.12">being</w>
+  <w pos="VBN" id="w11.1.13">awarded</w>
+ </chunk>
+ <chunk type="NP" id="c11.1-8">
+  <w pos="DT" id="w11.1.14">this</w>
+  <w pos="NN" id="w11.1.15">year</w>
+ </chunk>
+ <chunk type="PP" id="c11.1-9">
+  <w pos="TO" id="w11.1.16">to</w>
+ </chunk>
+ <chunk type="NP" id="c11.1-10">
+  <w pos="DT" id="w11.1.17">the</w>
+  <w pos="NNP" id="w11.1.18">United</w>
+  <w pos="NNP" id="w11.1.19">Nations</w>
+  <w pos="NN" id="w11.1.20">peace-keeping</w>
+  <w pos="NNS" id="w11.1.21">forces</w>
+ </chunk>
+ <w pos="." id="w11.1.22">.</w>
+</s> 
+ 
+
+
+<s id="s11.2">
+ <chunk type="NP" id="c11.2-1">
+  <w pos="NNP" id="w11.2.1">Sweden</w>
+ </chunk>
+ <chunk type="VP" id="c11.2-2">
+  <w pos="VBZ" id="w11.2.2">has</w>
+  <w pos="VBN" id="w11.2.3">participated</w>
+ </chunk>
+ <chunk type="PP" id="c11.2-3">
+  <w pos="IN" id="w11.2.4">in</w>
+ </chunk>
+ <chunk type="ADVP" id="c11.2-4">
+  <w pos="RB" id="w11.2.5">practically</w>
+ </chunk>
+ <chunk type="PP" id="c11.2-5">
+  <w pos="RB" id="w11.2.6">all</w>
+ </chunk>
+ <chunk type="NP" id="c11.2-6">
+  <w pos="DT" id="w11.2.7">the</w>
+  <w pos="NNP" id="w11.2.8">United</w>
+  <w pos="NNP" id="w11.2.9">Nations</w>
+  <w pos="NNS" id="w11.2.10">operations</w>
+ </chunk>
+ <chunk type="PP" id="c11.2-7">
+  <w pos="IN" id="w11.2.11">of</w>
+ </chunk>
+ <chunk type="NP" id="c11.2-8">
+  <w pos="DT" id="w11.2.12">this</w>
+  <w pos="NN" id="w11.2.13">kind</w>
+ </chunk>
+ <w pos="." id="w11.2.14">.</w>
+</s> 
+ 
+
+
+<s id="s11.3">
+ <chunk type="NP" id="c11.3-1">
+  <w pos="PRP" id="w11.3.1">It</w>
+ </chunk>
+ <chunk type="VP" id="c11.3-2">
+  <w pos="VBZ" id="w11.3.2">is</w>
+ </chunk>
+ <chunk type="ADVP" id="c11.3-3">
+  <w pos="RB" id="w11.3.3">also</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-4">
+  <w pos="DT" id="w11.3.4">an</w>
+  <w pos="NN" id="w11.3.5">honour</w>
+ </chunk>
+ <chunk type="PP" id="c11.3-5">
+  <w pos="IN" id="w11.3.6">for</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-6">
+  <w pos="NNP" id="w11.3.7">Sweden</w>
+ </chunk>
+ <chunk type="SBAR" id="c11.3-7">
+  <w pos="IN" id="w11.3.8">that</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-8">
+  <w pos="DT" id="w11.3.9">the</w>
+  <w pos="NNP" id="w11.3.10">Secretary-General</w>
+ </chunk>
+ <w pos="," id="w11.3.11">,</w>
+ <chunk type="PP" id="c11.3-10">
+  <w pos="IN" id="w11.3.12">in</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-11">
+  <w pos="NN" id="w11.3.13">consultation</w>
+ </chunk>
+ <chunk type="PP" id="c11.3-12">
+  <w pos="IN" id="w11.3.14">with</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-13">
+  <w pos="DT" id="w11.3.15">the</w>
+  <w pos="NNS" id="w11.3.16">parties</w>
+ </chunk>
+ <w pos="," id="w11.3.17">,</w>
+ <chunk type="VP" id="c11.3-15">
+  <w pos="VBZ" id="w11.3.18">has</w>
+  <w pos="VBN" id="w11.3.19">appointed</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-16">
+  <w pos="PRP$" id="w11.3.20">our</w>
+  <w pos="NNP" id="w11.3.21">United</w>
+  <w pos="NNP" id="w11.3.22">Nations</w>
+  <w pos="NN" id="w11.3.23">Ambassador</w>
+ </chunk>
+ <chunk type="VP" id="c11.3-17">
+  <w pos="TO" id="w11.3.24">to</w>
+  <w pos="VB" id="w11.3.25">be</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-18">
+  <w pos="PRP$" id="w11.3.26">his</w>
+  <w pos="JJ" id="w11.3.27">personal</w>
+  <w pos="NN" id="w11.3.28">representative</w>
+ </chunk>
+ <chunk type="PP" id="c11.3-19">
+  <w pos="IN" id="w11.3.29">at</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-20">
+  <w pos="DT" id="w11.3.30">the</w>
+  <w pos="NN" id="w11.3.31">peace</w>
+  <w pos="NNS" id="w11.3.32">negotiations</w>
+ </chunk>
+ <chunk type="PP" id="c11.3-21">
+  <w pos="IN" id="w11.3.33">between</w>
+ </chunk>
+ <chunk type="NP" id="c11.3-22">
+  <w pos="NNP" id="w11.3.34">Iran</w>
+  <w pos="CC" id="w11.3.35">and</w>
+  <w pos="NNP" id="w11.3.36">Iraq</w>
+ </chunk>
+ <w pos="." id="w11.3.37">.</w>
+</s></p>
+
+<p id="12">
+<s id="s12.1">
+ <chunk type="NP" id="c12.1-1">
+  <w pos="DT" id="w12.1.1">The</w>
+  <w pos="JJ" id="w12.1.2">degrading</w>
+  <w pos="NN" id="w12.1.3">apartheid</w>
+  <w pos="NN" id="w12.1.4">system</w>
+ </chunk>
+ <chunk type="PP" id="c12.1-2">
+  <w pos="IN" id="w12.1.5">in</w>
+ </chunk>
+ <chunk type="NP" id="c12.1-3">
+  <w pos="NNP" id="w12.1.6">South</w>
+  <w pos="NNP" id="w12.1.7">Africa</w>
+ </chunk>
+ <chunk type="VP" id="c12.1-4">
+  <w pos="MD" id="w12.1.8">must</w>
+  <w pos="VB" id="w12.1.9">be</w>
+  <w pos="VBN" id="w12.1.10">abolished</w>
+ </chunk>
+ <w pos="." id="w12.1.11">.</w>
+</s> 
+ 
+
+
+<s id="s12.2">
+ <chunk type="NP" id="c12.2-1">
+  <w pos="DT" id="w12.2.1">A</w>
+  <w pos="NN" id="w12.2.2">decision</w>
+ </chunk>
+ <chunk type="PP" id="c12.2-2">
+  <w pos="IN" id="w12.2.3">by</w>
+ </chunk>
+ <chunk type="NP" id="c12.2-3">
+  <w pos="DT" id="w12.2.4">the</w>
+  <w pos="NNP" id="w12.2.5">United</w>
+  <w pos="NNP" id="w12.2.6">Nations</w>
+  <w pos="NNP" id="w12.2.7">Security</w>
+  <w pos="NNP" id="w12.2.8">Council</w>
+ </chunk>
+ <chunk type="PP" id="c12.2-4">
+  <w pos="IN" id="w12.2.9">on</w>
+ </chunk>
+ <chunk type="NP" id="c12.2-5">
+  <w pos="JJ" id="w12.2.10">mandatory</w>
+  <w pos="NNS" id="w12.2.11">sanctions</w>
+ </chunk>
+ <chunk type="PP" id="c12.2-6">
+  <w pos="IN" id="w12.2.12">against</w>
+ </chunk>
+ <chunk type="NP" id="c12.2-7">
+  <w pos="NNP" id="w12.2.13">South</w>
+  <w pos="NNP" id="w12.2.14">Africa</w>
+ </chunk>
+ <chunk type="VP" id="c12.2-8">
+  <w pos="MD" id="w12.2.15">would</w>
+  <w pos="VB" id="w12.2.16">be</w>
+ </chunk>
+ <chunk type="NP" id="c12.2-9">
+  <w pos="DT" id="w12.2.17">the</w>
+  <w pos="RBS" id="w12.2.18">most</w>
+  <w pos="JJ" id="w12.2.19">effective</w>
+  <w pos="NN" id="w12.2.20">measure</w>
+ </chunk>
+ <chunk type="PP" id="c12.2-10">
+  <w pos="TO" id="w12.2.21">to</w>
+ </chunk>
+ <chunk type="NP" id="c12.2-11">
+  <w pos="DT" id="w12.2.22">this</w>
+  <w pos="NN" id="w12.2.23">end</w>
+ </chunk>
+ <w pos="." id="w12.2.24">.</w>
+</s></p>
+
+<p id="13">
+<s id="s13.1">
+ <chunk type="NP" id="c13.1-1">
+  <w pos="DT" id="w13.1.1">The</w>
+  <w pos="NN" id="w13.1.2">conflict</w>
+ </chunk>
+ <chunk type="PP" id="c13.1-2">
+  <w pos="IN" id="w13.1.3">in</w>
+ </chunk>
+ <chunk type="NP" id="c13.1-3">
+  <w pos="DT" id="w13.1.4">the</w>
+  <w pos="NNP" id="w13.1.5">Middle</w>
+  <w pos="NNP" id="w13.1.6">East</w>
+ </chunk>
+ <chunk type="VP" id="c13.1-4">
+  <w pos="VBZ" id="w13.1.7">is</w>
+ </chunk>
+ <chunk type="PP" id="c13.1-5">
+  <w pos="IN" id="w13.1.8">among</w>
+ </chunk>
+ <chunk type="NP" id="c13.1-6">
+  <w pos="DT" id="w13.1.9">the</w>
+  <w pos="RBS" id="w13.1.10">most</w>
+  <w pos="JJ" id="w13.1.11">difficult</w>
+ </chunk>
+ <chunk type="VP" id="c13.1-7">
+  <w pos="TO" id="w13.1.12">to</w>
+  <w pos="VB" id="w13.1.13">solve</w>
+ </chunk>
+ <w pos="." id="w13.1.14">.</w>
+</s> 
+ 
+
+
+<s id="s13.2">
+ <chunk type="NP" id="c13.2-1">
+  <w pos="DT" id="w13.2.1">The</w>
+  <w pos="NNP" id="w13.2.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c13.2-2">
+  <w pos="RB" id="w13.2.3">actively</w>
+  <w pos="VBZ" id="w13.2.4">supports</w>
+ </chunk>
+ <chunk type="NP" id="c13.2-3">
+  <w pos="DT" id="w13.2.5">the</w>
+  <w pos="NNS" id="w13.2.6">endeavours</w>
+ </chunk>
+ <chunk type="VP" id="c13.2-4">
+  <w pos="TO" id="w13.2.7">to</w>
+  <w pos="VB" id="w13.2.8">convene</w>
+ </chunk>
+ <chunk type="NP" id="c13.2-5">
+  <w pos="DT" id="w13.2.9">an</w>
+  <w pos="JJ" id="w13.2.10">international</w>
+  <w pos="NN" id="w13.2.11">peace</w>
+  <w pos="NN" id="w13.2.12">conference</w>
+ </chunk>
+ <chunk type="PP" id="c13.2-6">
+  <w pos="IN" id="w13.2.13">under</w>
+ </chunk>
+ <chunk type="NP" id="c13.2-7">
+  <w pos="DT" id="w13.2.14">the</w>
+  <w pos="NNS" id="w13.2.15">auspices</w>
+ </chunk>
+ <chunk type="PP" id="c13.2-8">
+  <w pos="IN" id="w13.2.16">of</w>
+ </chunk>
+ <chunk type="NP" id="c13.2-9">
+  <w pos="DT" id="w13.2.17">the</w>
+  <w pos="NNP" id="w13.2.18">United</w>
+  <w pos="NNPS" id="w13.2.19">Nations</w>
+ </chunk>
+ <w pos="." id="w13.2.20">.</w>
+</s></p>
+
+<p id="14">
+<s id="s14.1">
+ <chunk type="NP" id="c14.1-1">
+  <w pos="NNP" id="w14.1.1">Sweden</w>
+ </chunk>
+ <chunk type="VP" id="c14.1-2">
+  <w pos="VBZ" id="w14.1.2">is</w>
+ </chunk>
+ <chunk type="ADJP" id="c14.1-3">
+  <w pos="VBN" id="w14.1.3">dependent</w>
+ </chunk>
+ <chunk type="PP" id="c14.1-4">
+  <w pos="IN" id="w14.1.4">on</w>
+ </chunk>
+ <chunk type="NP" id="c14.1-5">
+  <w pos="JJ" id="w14.1.5">free</w>
+  <w pos="NNS" id="w14.1.6">exchanges</w>
+ </chunk>
+ <chunk type="PP" id="c14.1-6">
+  <w pos="IN" id="w14.1.7">of</w>
+ </chunk>
+ <chunk type="NP" id="c14.1-7">
+  <w pos="NNS" id="w14.1.8">goods</w>
+  <w pos="CC" id="w14.1.9">and</w>
+  <w pos="NNS" id="w14.1.10">services</w>
+ </chunk>
+ <chunk type="PP" id="c14.1-8">
+  <w pos="IN" id="w14.1.11">across</w>
+ </chunk>
+ <chunk type="NP" id="c14.1-9">
+  <w pos="JJ" id="w14.1.12">national</w>
+  <w pos="NNS" id="w14.1.13">boundaries</w>
+ </chunk>
+ <w pos="." id="w14.1.14">.</w>
+</s> 
+ 
+
+
+<s id="s14.2">
+ <chunk type="NP" id="c14.2-1">
+  <w pos="PRP" id="w14.2.1">We</w>
+ </chunk>
+ <chunk type="VP" id="c14.2-2">
+  <w pos="VBP" id="w14.2.2">are</w>
+  <w pos="VBG" id="w14.2.3">setting</w>
+ </chunk>
+ <chunk type="NP" id="c14.2-3">
+  <w pos="DT" id="w14.2.4">the</w>
+  <w pos="NN" id="w14.2.5">pace</w>
+ </chunk>
+ <chunk type="PP" id="c14.2-4">
+  <w pos="IN" id="w14.2.6">in</w>
+ </chunk>
+ <chunk type="NP" id="c14.2-5">
+  <w pos="DT" id="w14.2.7">the</w>
+  <w pos="JJ" id="w14.2.8">current</w>
+  <w pos="NNS" id="w14.2.9">negotiations</w>
+ </chunk>
+ <chunk type="VP" id="c14.2-6">
+  <w pos="TO" id="w14.2.10">to</w>
+  <w pos="VB" id="w14.2.11">strengthen</w>
+ </chunk>
+ <chunk type="NP" id="c14.2-7">
+  <w pos="JJ" id="w14.2.12">free</w>
+  <w pos="NN" id="w14.2.13">trade</w>
+ </chunk>
+ <w pos="." id="w14.2.14">.</w>
+</s></p>
+
+<p id="15">
+<s id="s15.1">
+ <chunk type="PP" id="c15.1-1">
+  <w pos="IN" id="w15.1.1">Within</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-2">
+  <w pos="DT" id="w15.1.2">the</w>
+  <w pos="NN" id="w15.1.3">framework</w>
+ </chunk>
+ <chunk type="PP" id="c15.1-3">
+  <w pos="IN" id="w15.1.4">of</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-4">
+  <w pos="NNP" id="w15.1.5">EFTA</w>
+ </chunk>
+ <w pos="CC" id="w15.1.6">and</w>
+ <chunk type="PP" id="c15.1-6">
+  <w pos="IN" id="w15.1.7">in</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-7">
+  <w pos="NN" id="w15.1.8">collaboration</w>
+ </chunk>
+ <chunk type="PP" id="c15.1-8">
+  <w pos="IN" id="w15.1.9">with</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-9">
+  <w pos="DT" id="w15.1.10">the</w>
+  <w pos="JJ" id="w15.1.11">other</w>
+  <w pos="JJ" id="w15.1.12">EFTA</w>
+  <w pos="NNS" id="w15.1.13">countries</w>
+ </chunk>
+ <w pos="," id="w15.1.14">,</w>
+ <chunk type="NP" id="c15.1-11">
+  <w pos="DT" id="w15.1.15">the</w>
+  <w pos="NNP" id="w15.1.16">Government</w>
+ </chunk>
+ <chunk type="VP" id="c15.1-12">
+  <w pos="MD" id="w15.1.17">will</w>
+  <w pos="VB" id="w15.1.18">intensify</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-13">
+  <w pos="NN" id="w15.1.19">co-operation</w>
+ </chunk>
+ <chunk type="VP" id="c15.1-14">
+  <w pos="VBD" id="w15.1.20">wit</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-15">
+  <w pos="DT" id="w15.1.21">the</w>
+  <w pos="NNP" id="w15.1.22">EC</w>
+ </chunk>
+ <chunk type="PP" id="c15.1-16">
+  <w pos="IN" id="w15.1.23">in</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-17">
+  <w pos="DT" id="w15.1.24">all</w>
+  <w pos="NNS" id="w15.1.25">fields</w>
+ </chunk>
+ <chunk type="PP" id="c15.1-18">
+  <w pos="TO" id="w15.1.26">to</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-19">
+  <w pos="DT" id="w15.1.27">the</w>
+  <w pos="NN" id="w15.1.28">extent</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-20">
+  <w pos="PRP" id="w15.1.29">it</w>
+ </chunk>
+ <chunk type="VP" id="c15.1-21">
+  <w pos="VBZ" id="w15.1.30">is</w>
+  <w pos="VBN" id="w15.1.31">compatible</w>
+ </chunk>
+ <chunk type="PP" id="c15.1-22">
+  <w pos="IN" id="w15.1.32">with</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-23">
+  <w pos="PRP$" id="w15.1.33">our</w>
+  <w pos="NN" id="w15.1.34">policy</w>
+ </chunk>
+ <chunk type="PP" id="c15.1-24">
+  <w pos="IN" id="w15.1.35">of</w>
+ </chunk>
+ <chunk type="NP" id="c15.1-25">
+  <w pos="NN" id="w15.1.36">neutrality</w>
+ </chunk>
+ <w pos="." id="w15.1.37">.</w>
+</s> 
+ 
+
+
+<s id="s15.2">
+ <chunk type="NP" id="c15.2-1">
+  <w pos="JJ" id="w15.2.1">Nordic</w>
+  <w pos="NN" id="w15.2.2">co-operation</w>
+ </chunk>
+ <chunk type="VP" id="c15.2-2">
+  <w pos="MD" id="w15.2.3">will</w>
+  <w pos="RB" id="w15.2.4">also</w>
+  <w pos="VB" id="w15.2.5">be</w>
+  <w pos="VBN" id="w15.2.6">developed</w>
+ </chunk>
+ <w pos="." id="w15.2.7">.</w>
+</s> 
+ 
+
+
+<s id="s15.3">
+ <chunk type="PP" id="c15.3-1">
+  <w pos="IN" id="w15.3.1">In</w>
+ </chunk>
+ <chunk type="NP" id="c15.3-2">
+  <w pos="DT" id="w15.3.2">this</w>
+  <w pos="NN" id="w15.3.3">context</w>
+ </chunk>
+ <w pos="," id="w15.3.4">,</w>
+ <chunk type="NP" id="c15.3-4">
+  <w pos="DT" id="w15.3.5">the</w>
+  <w pos="NNS" id="w15.3.6">requirements</w>
+ </chunk>
+ <chunk type="PP" id="c15.3-5">
+  <w pos="IN" id="w15.3.7">of</w>
+ </chunk>
+ <chunk type="NP" id="c15.3-6">
+  <w pos="JJ" id="w15.3.8">full</w>
+  <w pos="NN" id="w15.3.9">employment</w>
+  <w pos="," id="w15.3.10">,</w>
+  <w pos="NN" id="w15.3.11">welfare</w>
+ </chunk>
+ <w pos="," id="w15.3.12">,</w>
+ <chunk type="NP" id="c15.3-8">
+  <w pos="DT" id="w15.3.13">a</w>
+  <w pos="JJ" id="w15.3.14">good</w>
+  <w pos="NN" id="w15.3.15">working</w>
+  <w pos="NN" id="w15.3.16">environment</w>
+ </chunk>
+ <w pos="CC" id="w15.3.17">and</w>
+ <chunk type="NP" id="c15.3-10">
+  <w pos="NN" id="w15.3.18">trade</w>
+  <w pos="NN" id="w15.3.19">union</w>
+  <w pos="NN" id="w15.3.20">participation</w>
+ </chunk>
+ <chunk type="VP" id="c15.3-11">
+  <w pos="MD" id="w15.3.21">will</w>
+  <w pos="VB" id="w15.3.22">be</w>
+ </chunk>
+ <chunk type="NP" id="c15.3-12">
+  <w pos="JJ" id="w15.3.23">key</w>
+  <w pos="NNS" id="w15.3.24">issues</w>
+ </chunk>
+ <w pos="." id="w15.3.25">.</w>
+</s> 
+ 
+
+
+<s id="s15.4">
+ <chunk type="NP" id="c15.4-1">
+  <w pos="NNS" id="w15.4.1">Opportunities</w>
+ </chunk>
+ <chunk type="PP" id="c15.4-2">
+  <w pos="IN" id="w15.4.2">for</w>
+ </chunk>
+ <chunk type="NP" id="c15.4-3">
+  <w pos="NN" id="w15.4.3">study</w>
+ </chunk>
+ <w pos="," id="w15.4.4">,</w>
+ <chunk type="NP" id="c15.4-5">
+  <w pos="NN" id="w15.4.5">work</w>
+  <w pos="CC" id="w15.4.6">and</w>
+  <w pos="JJ" id="w15.4.7">cultural</w>
+  <w pos="NNS" id="w15.4.8">exchanges</w>
+ </chunk>
+ <chunk type="PP" id="c15.4-6">
+  <w pos="IN" id="w15.4.9">across</w>
+ </chunk>
+ <chunk type="NP" id="c15.4-7">
+  <w pos="JJ" id="w15.4.10">national</w>
+  <w pos="NNS" id="w15.4.11">boundaries</w>
+ </chunk>
+ <chunk type="VP" id="c15.4-8">
+  <w pos="MD" id="w15.4.12">will</w>
+  <w pos="VB" id="w15.4.13">be</w>
+  <w pos="VBN" id="w15.4.14">extended</w>
+ </chunk>
+ <w pos="." id="w15.4.15">.</w>
+</s></p>
+
+<p id="16">
+<s id="s16.1">
+ <chunk type="NP" id="c16.1-1">
+  <w pos="DT" id="w16.1.1">The</w>
+  <w pos="NNP" id="w16.1.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c16.1-2">
+  <w pos="VBZ" id="w16.1.3">intends</w>
+  <w pos="TO" id="w16.1.4">to</w>
+  <w pos="VB" id="w16.1.5">uphold</w>
+  <w pos="CC" id="w16.1.6">and</w>
+  <w pos="VB" id="w16.1.7">strengthen</w>
+ </chunk>
+ <chunk type="NP" id="c16.1-3">
+  <w pos="DT" id="w16.1.8">the</w>
+  <w pos="NN" id="w16.1.9">rule</w>
+ </chunk>
+ <chunk type="PP" id="c16.1-4">
+  <w pos="IN" id="w16.1.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c16.1-5">
+  <w pos="NN" id="w16.1.11">law</w>
+ </chunk>
+ <chunk type="PP" id="c16.1-6">
+  <w pos="IN" id="w16.1.12">in</w>
+ </chunk>
+ <chunk type="NP" id="c16.1-7">
+  <w pos="JJ" id="w16.1.13">several</w>
+  <w pos="NNS" id="w16.1.14">ways</w>
+ </chunk>
+ <w pos="." id="w16.1.15">.</w>
+</s></p>
+
+<p id="17">
+<s id="s17.1">
+ <chunk type="NP" id="c17.1-1">
+  <w pos="DT" id="w17.1.1">The</w>
+  <w pos="NNS" id="w17.1.2">possibilities</w>
+ </chunk>
+ <chunk type="PP" id="c17.1-2">
+  <w pos="IN" id="w17.1.3">for</w>
+ </chunk>
+ <chunk type="NP" id="c17.1-3">
+  <w pos="NNS" id="w17.1.4">courts</w>
+  <w pos="CC" id="w17.1.5">and</w>
+  <w pos="JJ" id="w17.1.6">public</w>
+  <w pos="NN" id="w17.1.7">prosecution</w>
+  <w pos="NNS" id="w17.1.8">authorities</w>
+ </chunk>
+ <chunk type="VP" id="c17.1-4">
+  <w pos="TO" id="w17.1.9">to</w>
+  <w pos="VB" id="w17.1.10">carry</w>
+ </chunk>
+ <chunk type="PRT" id="c17.1-5">
+  <w pos="IN" id="w17.1.11">out</w>
+ </chunk>
+ <chunk type="NP" id="c17.1-6">
+  <w pos="PRP$" id="w17.1.12">their</w>
+  <w pos="JJ" id="w17.1.13">important</w>
+  <w pos="NN" id="w17.1.14">work</w>
+ </chunk>
+ <chunk type="VP" id="c17.1-7">
+  <w pos="MD" id="w17.1.15">will</w>
+  <w pos="VB" id="w17.1.16">be</w>
+  <w pos="VBN" id="w17.1.17">improved</w>
+ </chunk>
+ <w pos="." id="w17.1.18">.</w>
+</s></p>
+
+<p id="18">
+<s id="s18.1">
+ <chunk type="NP" id="c18.1-1">
+  <w pos="DT" id="w18.1.1">The</w>
+  <w pos="NNP" id="w18.1.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c18.1-2">
+  <w pos="MD" id="w18.1.3">will</w>
+  <w pos="VB" id="w18.1.4">put</w>
+ </chunk>
+ <chunk type="NP" id="c18.1-3">
+  <w pos="RB" id="w18.1.5">forward</w>
+  <w pos="NNS" id="w18.1.6">proposals</w>
+ </chunk>
+ <chunk type="PP" id="c18.1-4">
+  <w pos="IN" id="w18.1.7">for</w>
+ </chunk>
+ <chunk type="NP" id="c18.1-5">
+  <w pos="VBG" id="w18.1.8">developing</w>
+  <w pos="NN" id="w18.1.9">police</w>
+  <w pos="NN" id="w18.1.10">work</w>
+ </chunk>
+ <w pos="CC" id="w18.1.11">and</w>
+ <chunk type="VP" id="c18.1-7">
+  <w pos="VBG" id="w18.1.12">making</w>
+ </chunk>
+ <chunk type="NP" id="c18.1-8">
+  <w pos="PRP" id="w18.1.13">it</w>
+ </chunk>
+ <chunk type="NP" id="c18.1-9">
+  <w pos="JJR" id="w18.1.14">more</w>
+  <w pos="NN" id="w18.1.15">effective</w>
+ </chunk>
+ <w pos="." id="w18.1.16">.</w>
+</s></p>
+
+<p id="19">
+<s id="s19.1">
+ <chunk type="NP" id="c19.1-1">
+  <w pos="DT" id="w19.1.1">A</w>
+  <w pos="NN" id="w19.1.2">proposal</w>
+ </chunk>
+ <chunk type="PP" id="c19.1-2">
+  <w pos="IN" id="w19.1.3">for</w>
+ </chunk>
+ <chunk type="NP" id="c19.1-3">
+  <w pos="DT" id="w19.1.4">a</w>
+  <w pos="JJ" id="w19.1.5">lower</w>
+  <w pos="JJ" id="w19.1.6">legal</w>
+  <w pos="NN" id="w19.1.7">limit</w>
+ </chunk>
+ <chunk type="PP" id="c19.1-4">
+  <w pos="IN" id="w19.1.8">for</w>
+ </chunk>
+ <chunk type="NP" id="c19.1-5">
+  <w pos="DT" id="w19.1.9">the</w>
+  <w pos="NN" id="w19.1.10">offence</w>
+ </chunk>
+ <chunk type="PP" id="c19.1-6">
+  <w pos="IN" id="w19.1.11">of</w>
+ </chunk>
+ <chunk type="NP" id="c19.1-7">
+  <w pos="JJ" id="w19.1.12">driving</w>
+ </chunk>
+ <chunk type="PP" id="c19.1-8">
+  <w pos="IN" id="w19.1.13">with</w>
+ </chunk>
+ <chunk type="NP" id="c19.1-9">
+  <w pos="NN" id="w19.1.14">ability</w>
+ </chunk>
+ <chunk type="VP" id="c19.1-10">
+  <w pos="VBN" id="w19.1.15">impaired</w>
+ </chunk>
+ <chunk type="PP" id="c19.1-11">
+  <w pos="IN" id="w19.1.16">by</w>
+ </chunk>
+ <chunk type="NP" id="c19.1-12">
+  <w pos="NN" id="w19.1.17">alcohol</w>
+ </chunk>
+ <chunk type="VP" id="c19.1-13">
+  <w pos="MD" id="w19.1.18">will</w>
+  <w pos="VB" id="w19.1.19">be</w>
+  <w pos="VBN" id="w19.1.20">submitted</w>
+ </chunk>
+ <chunk type="PP" id="c19.1-14">
+  <w pos="TO" id="w19.1.21">to</w>
+ </chunk>
+ <chunk type="NP" id="c19.1-15">
+  <w pos="NNP" id="w19.1.22">Parliament</w>
+ </chunk>
+ <w pos="." id="w19.1.23">.</w>
+</s></p>
+
+<p id="20">
+<s id="s20.1">
+ <chunk type="NP" id="c20.1-1">
+  <w pos="NNP" id="w20.1.1">Crime</w>
+  <w pos="NN" id="w20.1.2">prevention</w>
+  <w pos="NN" id="w20.1.3">work</w>
+ </chunk>
+ <chunk type="PP" id="c20.1-2">
+  <w pos="IN" id="w20.1.4">at</w>
+ </chunk>
+ <chunk type="NP" id="c20.1-3">
+  <w pos="DT" id="w20.1.5">the</w>
+  <w pos="JJ" id="w20.1.6">local</w>
+  <w pos="NN" id="w20.1.7">level</w>
+ </chunk>
+ <chunk type="VP" id="c20.1-4">
+  <w pos="VBZ" id="w20.1.8">is</w>
+  <w pos="TO" id="w20.1.9">to</w>
+  <w pos="VB" id="w20.1.10">be</w>
+  <w pos="VBN" id="w20.1.11">encouraged</w>
+ </chunk>
+ <w pos="." id="w20.1.12">.</w>
+</s> 
+ 
+
+
+<s id="s20.2">
+ <chunk type="NP" id="c20.2-1">
+  <w pos="DT" id="w20.2.1">The</w>
+  <w pos="NN" id="w20.2.2">fight</w>
+ </chunk>
+ <chunk type="PP" id="c20.2-2">
+  <w pos="IN" id="w20.2.3">against</w>
+ </chunk>
+ <chunk type="NP" id="c20.2-3">
+  <w pos="NN" id="w20.2.4">violence</w>
+  <w pos="CC" id="w20.2.5">and</w>
+  <w pos="JJ" id="w20.2.6">economic</w>
+  <w pos="NN" id="w20.2.7">crime</w>
+ </chunk>
+ <chunk type="VP" id="c20.2-4">
+  <w pos="MD" id="w20.2.8">will</w>
+  <w pos="VB" id="w20.2.9">be</w>
+  <w pos="VBN" id="w20.2.10">given</w>
+ </chunk>
+ <chunk type="NP" id="c20.2-5">
+  <w pos="NN" id="w20.2.11">priority</w>
+ </chunk>
+ <w pos="." id="w20.2.12">.</w>
+</s></p>
+
+<p id="21">
+<s id="s21.1">
+ <chunk type="NP" id="c21.1-1">
+  <w pos="DT" id="w21.1.1">The</w>
+  <w pos="NN" id="w21.1.2">treatment</w>
+ </chunk>
+ <chunk type="PP" id="c21.1-2">
+  <w pos="IN" id="w21.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c21.1-3">
+  <w pos="NNS" id="w21.1.4">offenders</w>
+ </chunk>
+ <chunk type="VP" id="c21.1-4">
+  <w pos="MD" id="w21.1.5">must</w>
+  <w pos="VB" id="w21.1.6">be</w>
+  <w pos="VBN" id="w21.1.7">administered</w>
+ </chunk>
+ <chunk type="PP" id="c21.1-5">
+  <w pos="IN" id="w21.1.8">in</w>
+ </chunk>
+ <chunk type="NP" id="c21.1-6">
+  <w pos="PDT" id="w21.1.9">such</w>
+  <w pos="DT" id="w21.1.10">a</w>
+  <w pos="NN" id="w21.1.11">way</w>
+ </chunk>
+ <chunk type="SBAR" id="c21.1-7">
+  <w pos="IN" id="w21.1.12">that</w>
+ </chunk>
+ <chunk type="NP" id="c21.1-8">
+  <w pos="NN" id="w21.1.13">prison</w>
+  <w pos="NNS" id="w21.1.14">escapes</w>
+ </chunk>
+ <chunk type="VP" id="c21.1-9">
+  <w pos="VBP" id="w21.1.15">are</w>
+  <w pos="VBN" id="w21.1.16">prevented</w>
+ </chunk>
+ <w pos="." id="w21.1.17">.</w>
+</s> 
+ 
+
+
+<s id="s21.2">
+ <chunk type="PP" id="c21.2-1">
+  <w pos="IN" id="w21.2.1">At</w>
+ </chunk>
+ <chunk type="NP" id="c21.2-2">
+  <w pos="DT" id="w21.2.2">the</w>
+  <w pos="JJ" id="w21.2.3">same</w>
+  <w pos="NN" id="w21.2.4">time</w>
+ </chunk>
+ <chunk type="NP" id="c21.2-3">
+  <w pos="DT" id="w21.2.5">the</w>
+  <w pos="NN" id="w21.2.6">term</w>
+ </chunk>
+ <chunk type="PP" id="c21.2-4">
+  <w pos="IN" id="w21.2.7">in</w>
+ </chunk>
+ <chunk type="NP" id="c21.2-5">
+  <w pos="NN" id="w21.2.8">prison</w>
+ </chunk>
+ <w pos="CC" id="w21.2.9">and</w>
+ <chunk type="NP" id="c21.2-7">
+  <w pos="JJ" id="w21.2.10">non-institutional</w>
+  <w pos="NN" id="w21.2.11">care</w>
+ </chunk>
+ <chunk type="VP" id="c21.2-8">
+  <w pos="MD" id="w21.2.12">must</w>
+  <w pos="VB" id="w21.2.13">facilitate</w>
+ </chunk>
+ <chunk type="NP" id="c21.2-9">
+  <w pos="NN" id="w21.2.14">rehabilitation</w>
+ </chunk>
+ <chunk type="PP" id="c21.2-10">
+  <w pos="IN" id="w21.2.15">after</w>
+ </chunk>
+ <chunk type="NP" id="c21.2-11">
+  <w pos="NN" id="w21.2.16">discharge</w>
+ </chunk>
+ <w pos="." id="w21.2.17">.</w>
+</s></p>
+
+<p id="22">
+<s id="s22.1">
+ <chunk type="NP" id="c22.1-1">
+  <w pos="DT" id="w22.1.1">The</w>
+  <w pos="NN" id="w22.1.2">goal</w>
+ </chunk>
+ <chunk type="PP" id="c22.1-2">
+  <w pos="IN" id="w22.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c22.1-3">
+  <w pos="PRP$" id="w22.1.4">our</w>
+  <w pos="JJ" id="w22.1.5">economic</w>
+  <w pos="NN" id="w22.1.6">policy</w>
+ </chunk>
+ <chunk type="VP" id="c22.1-4">
+  <w pos="VBZ" id="w22.1.7">is</w>
+ </chunk>
+ <chunk type="NP" id="c22.1-5">
+  <w pos="JJ" id="w22.1.8">full</w>
+  <w pos="NN" id="w22.1.9">employment</w>
+ </chunk>
+ <w pos="CC" id="w22.1.10">and</w>
+ <chunk type="NP" id="c22.1-7">
+  <w pos="NN" id="w22.1.11">greater</w>
+  <w pos="NN" id="w22.1.12">prosperity</w>
+ </chunk>
+ <chunk type="PP" id="c22.1-8">
+  <w pos="IN" id="w22.1.13">for</w>
+ </chunk>
+ <chunk type="NP" id="c22.1-9">
+  <w pos="DT" id="w22.1.14">the</w>
+  <w pos="JJ" id="w22.1.15">whole</w>
+  <w pos="NN" id="w22.1.16">nation</w>
+ </chunk>
+ <w pos="." id="w22.1.17">.</w>
+</s></p>
+
+<p id="23">
+<s id="s23.1">
+ <chunk type="NP" id="c23.1-1">
+  <w pos="DT" id="w23.1.1">The</w>
+  <w pos="NN" id="w23.1.2">rate</w>
+ </chunk>
+ <chunk type="PP" id="c23.1-2">
+  <w pos="IN" id="w23.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c23.1-3">
+  <w pos="NN" id="w23.1.4">inflation</w>
+ </chunk>
+ <chunk type="VP" id="c23.1-4">
+  <w pos="VBZ" id="w23.1.5">is</w>
+ </chunk>
+ <chunk type="ADJP" id="c23.1-5">
+  <w pos="RB" id="w23.1.6">too</w>
+  <w pos="JJ" id="w23.1.7">high</w>
+ </chunk>
+ <w pos="CC" id="w23.1.8">and</w>
+ <chunk type="VP" id="c23.1-7">
+  <w pos="MD" id="w23.1.9">must</w>
+  <w pos="VB" id="w23.1.10">be</w>
+  <w pos="VBN" id="w23.1.11">reduced</w>
+ </chunk>
+ <w pos="." id="w23.1.12">.</w>
+</s> 
+ 
+
+
+<s id="s23.2">
+ <chunk type="NP" id="c23.2-1">
+  <w pos="PRP$" id="w23.2.1">Our</w>
+  <w pos="NN" id="w23.2.2">budget</w>
+  <w pos="NN" id="w23.2.3">policy</w>
+ </chunk>
+ <chunk type="VP" id="c23.2-2">
+  <w pos="MD" id="w23.2.4">must</w>
+  <w pos="RB" id="w23.2.5">therefore</w>
+  <w pos="VB" id="w23.2.6">continue</w>
+  <w pos="TO" id="w23.2.7">to</w>
+  <w pos="VB" id="w23.2.8">be</w>
+ </chunk>
+ <chunk type="NP" id="c23.2-3">
+  <w pos="JJ" id="w23.2.9">tight</w>
+  <w pos="CC" id="w23.2.10">and</w>
+  <w pos="JJ" id="w23.2.11">strong</w>
+  <w pos="NN" id="w23.2.12">government</w>
+  <w pos="NNS" id="w23.2.13">finances</w>
+ </chunk>
+ <chunk type="VP" id="c23.2-4">
+  <w pos="VBD" id="w23.2.14">maintained</w>
+ </chunk>
+ <w pos="." id="w23.2.15">.</w>
+</s> 
+ 
+
+
+<s id="s23.3">
+ <chunk type="NP" id="c23.3-1">
+  <w pos="JJ" id="w23.3.1">Costly</w>
+  <w pos="NNS" id="w23.3.2">reforms</w>
+ </chunk>
+ <chunk type="VP" id="c23.3-2">
+  <w pos="MD" id="w23.3.3">will</w>
+  <w pos="RB" id="w23.3.4">only</w>
+  <w pos="VB" id="w23.3.5">be</w>
+  <w pos="VBN" id="w23.3.6">carried</w>
+ </chunk>
+ <chunk type="PP" id="c23.3-3">
+  <w pos="IN" id="w23.3.7">through</w>
+ </chunk>
+ <chunk type="PP" id="c23.3-4">
+  <w pos="TO" id="w23.3.8">to</w>
+ </chunk>
+ <chunk type="NP" id="c23.3-5">
+  <w pos="DT" id="w23.3.9">the</w>
+  <w pos="NN" id="w23.3.10">extent</w>
+ </chunk>
+ <chunk type="VP" id="c23.3-6">
+  <w pos="VBN" id="w23.3.11">allowed</w>
+ </chunk>
+ <chunk type="PP" id="c23.3-7">
+  <w pos="IN" id="w23.3.12">by</w>
+ </chunk>
+ <chunk type="NP" id="c23.3-8">
+  <w pos="JJ" id="w23.3.13">economic</w>
+  <w pos="NN" id="w23.3.14">growth</w>
+ </chunk>
+ <w pos="," id="w23.3.15">,</w>
+ <chunk type="NP" id="c23.3-10">
+  <w pos="NN" id="w23.3.16">reappraisal</w>
+ </chunk>
+ <chunk type="PP" id="c23.3-11">
+  <w pos="IN" id="w23.3.17">of</w>
+ </chunk>
+ <chunk type="NP" id="c23.3-12">
+  <w pos="NN" id="w23.3.18">expenditure</w>
+ </chunk>
+ <w pos="CC" id="w23.3.19">and</w>
+ <chunk type="PP" id="c23.3-14">
+  <w pos="IN" id="w23.3.20">by</w>
+ </chunk>
+ <chunk type="NP" id="c23.3-15">
+  <w pos="NNS" id="w23.3.21">rationalizations</w>
+ </chunk>
+ <chunk type="PP" id="c23.3-16">
+  <w pos="IN" id="w23.3.22">in</w>
+ </chunk>
+ <chunk type="NP" id="c23.3-17">
+  <w pos="DT" id="w23.3.23">the</w>
+  <w pos="JJ" id="w23.3.24">public</w>
+  <w pos="NN" id="w23.3.25">sector</w>
+ </chunk>
+ <w pos="." id="w23.3.26">.</w>
+</s></p>
+
+<p id="24">
+<s id="s24.1">
+ <chunk type="NP" id="c24.1-1">
+  <w pos="DT" id="w24.1.1">A</w>
+  <w pos="NN" id="w24.1.2">shortage</w>
+ </chunk>
+ <chunk type="PP" id="c24.1-2">
+  <w pos="IN" id="w24.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c24.1-3">
+  <w pos="NN" id="w24.1.4">labour</w>
+  <w pos="CC" id="w24.1.5">and</w>
+  <w pos="JJ" id="w24.1.6">low</w>
+  <w pos="NNS" id="w24.1.7">savings</w>
+  <w pos="NN" id="w24.1.8">restrict</w>
+  <w pos="NN" id="w24.1.9">growth</w>
+ </chunk>
+ <w pos="CC" id="w24.1.10">and</w>
+ <chunk type="VP" id="c24.1-5">
+  <w pos="VB" id="w24.1.11">push</w>
+ </chunk>
+ <chunk type="ADVP" id="c24.1-6">
+  <w pos="IN" id="w24.1.12">up</w>
+ </chunk>
+ <chunk type="NP" id="c24.1-7">
+  <w pos="NNS" id="w24.1.13">prices</w>
+ </chunk>
+ <w pos="CC" id="w24.1.14">and</w>
+ <chunk type="NP" id="c24.1-9">
+  <w pos="NNS" id="w24.1.15">costs</w>
+ </chunk>
+ <w pos="." id="w24.1.16">.</w>
+</s> 
+ 
+
+
+<s id="s24.2">
+ <chunk type="NP" id="c24.2-1">
+  <w pos="JJ" id="w24.2.1">Special</w>
+  <w pos="NNS" id="w24.2.2">measures</w>
+ </chunk>
+ <chunk type="VP" id="c24.2-2">
+  <w pos="MD" id="w24.2.3">will</w>
+  <w pos="RB" id="w24.2.4">therefore</w>
+  <w pos="VB" id="w24.2.5">be</w>
+  <w pos="VBN" id="w24.2.6">taken</w>
+ </chunk>
+ <chunk type="SBAR" id="c24.2-3">
+  <w pos="IN" id="w24.2.7">in</w>
+ </chunk>
+ <w pos="NN" id="w24.2.8">order</w>
+ <chunk type="VP" id="c24.2-5">
+  <w pos="TO" id="w24.2.9">to</w>
+  <w pos="VB" id="w24.2.10">encourage</w>
+ </chunk>
+ <chunk type="NP" id="c24.2-6">
+  <w pos="NN" id="w24.2.11">saving</w>
+ </chunk>
+ <w pos="CC" id="w24.2.12">and</w>
+ <chunk type="VP" id="c24.2-8">
+  <w pos="VB" id="w24.2.13">make</w>
+ </chunk>
+ <chunk type="NP" id="c24.2-9">
+  <w pos="JJR" id="w24.2.14">better</w>
+  <w pos="NN" id="w24.2.15">use</w>
+ </chunk>
+ <chunk type="PP" id="c24.2-10">
+  <w pos="IN" id="w24.2.16">of</w>
+ </chunk>
+ <chunk type="NP" id="c24.2-11">
+  <w pos="NNS" id="w24.2.17">people</w>
+ </chunk>
+ <chunk type="NP" id="c24.2-12">
+  <w pos="POS" id="w24.2.18">'s</w>
+  <w pos="NN" id="w24.2.19">desire</w>
+ </chunk>
+ <chunk type="PP" id="c24.2-13">
+  <w pos="TO" id="w24.2.20">to</w>
+ </chunk>
+ <chunk type="NP" id="c24.2-14">
+  <w pos="NN" id="w24.2.21">work</w>
+ </chunk>
+ <w pos="." id="w24.2.22">.</w>
+</s> 
+ 
+
+
+<s id="s24.3">
+ <chunk type="NP" id="c24.3-1">
+  <w pos="NNS" id="w24.3.1">Proposals</w>
+ </chunk>
+ <chunk type="VP" id="c24.3-2">
+  <w pos="MD" id="w24.3.2">will</w>
+  <w pos="VB" id="w24.3.3">be</w>
+  <w pos="VBN" id="w24.3.4">put</w>
+ </chunk>
+ <chunk type="ADVP" id="c24.3-3">
+  <w pos="RB" id="w24.3.5">forward</w>
+ </chunk>
+ <chunk type="PP" id="c24.3-4">
+  <w pos="IN" id="w24.3.6">for</w>
+ </chunk>
+ <chunk type="NP" id="c24.3-5">
+  <w pos="JJ" id="w24.3.7">increasing</w>
+  <w pos="NN" id="w24.3.8">competition</w>
+ </chunk>
+ <w pos="CC" id="w24.3.9">and</w>
+ <chunk type="VP" id="c24.3-7">
+  <w pos="VBG" id="w24.3.10">keeping</w>
+ </chunk>
+ <chunk type="PP" id="c24.3-8">
+  <w pos="IN" id="w24.3.11">down</w>
+ </chunk>
+ <chunk type="NP" id="c24.3-9">
+  <w pos="NNS" id="w24.3.12">costs</w>
+ </chunk>
+ <chunk type="PP" id="c24.3-10">
+  <w pos="IN" id="w24.3.13">in</w>
+ </chunk>
+ <chunk type="NP" id="c24.3-11">
+  <w pos="NNS" id="w24.3.14">areas</w>
+ </chunk>
+ <chunk type="ADVP" id="c24.3-12">
+  <w pos="WRB" id="w24.3.15">where</w>
+ </chunk>
+ <chunk type="NP" id="c24.3-13">
+  <w pos="NN" id="w24.3.16">price</w>
+  <w pos="NNS" id="w24.3.17">trends</w>
+ </chunk>
+ <chunk type="VP" id="c24.3-14">
+  <w pos="VBP" id="w24.3.18">are</w>
+  <w pos="JJ" id="w24.3.19">boosting</w>
+ </chunk>
+ <chunk type="NP" id="c24.3-15">
+  <w pos="NN" id="w24.3.20">inflation</w>
+ </chunk>
+ <w pos="." id="w24.3.21">.</w>
+</s></p>
+
+<p id="25">
+<s id="s25.1">
+ <chunk type="NP" id="c25.1-1">
+  <w pos="DT" id="w25.1.1">A</w>
+  <w pos="NN" id="w25.1.2">reduction</w>
+ </chunk>
+ <chunk type="PP" id="c25.1-2">
+  <w pos="IN" id="w25.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c25.1-3">
+  <w pos="DT" id="w25.1.4">the</w>
+  <w pos="JJ" id="w25.1.5">marginal</w>
+  <w pos="JJ" id="w25.1.6">income-tax</w>
+  <w pos="NN" id="w25.1.7">rate</w>
+ </chunk>
+ <chunk type="PP" id="c25.1-4">
+  <w pos="IN" id="w25.1.8">in</w>
+ </chunk>
+ <chunk type="NP" id="c25.1-5">
+  <w pos="CD" id="w25.1.9">1989</w>
+ </chunk>
+ <chunk type="PP" id="c25.1-6">
+  <w pos="IN" id="w25.1.10">by</w>
+ </chunk>
+ <chunk type="NP" id="c25.1-7">
+  <w pos="CD" id="w25.1.11">3</w>
+  <w pos="NN" id="w25.1.12">percentage</w>
+  <w pos="NNS" id="w25.1.13">points</w>
+ </chunk>
+ <chunk type="VP" id="c25.1-8">
+  <w pos="MD" id="w25.1.14">will</w>
+  <w pos="VB" id="w25.1.15">be</w>
+  <w pos="VBN" id="w25.1.16">proposed</w>
+ </chunk>
+ <chunk type="PP" id="c25.1-9">
+  <w pos="IN" id="w25.1.17">in</w>
+ </chunk>
+ <chunk type="NP" id="c25.1-10">
+  <w pos="DT" id="w25.1.18">the</w>
+  <w pos="JJ" id="w25.1.19">first</w>
+  <w pos="NN" id="w25.1.20">place</w>
+ </chunk>
+ <chunk type="PP" id="c25.1-11">
+  <w pos="IN" id="w25.1.21">for</w>
+ </chunk>
+ <chunk type="NP" id="c25.1-12">
+  <w pos="JJ" id="w25.1.22">full-time</w>
+  <w pos="NNS" id="w25.1.23">employees</w>
+ </chunk>
+ <w pos="." id="w25.1.24">.</w>
+</s></p>
+
+<p id="26">
+<s id="s26.1">
+ <chunk type="ADVP" id="c26.1-1">
+  <w pos="RB" id="w26.1.1">Later</w>
+ </chunk>
+ <chunk type="PP" id="c26.1-2">
+  <w pos="IN" id="w26.1.2">in</w>
+ </chunk>
+ <chunk type="NP" id="c26.1-3">
+  <w pos="DT" id="w26.1.3">the</w>
+  <w pos="JJ" id="w26.1.4">electoral</w>
+  <w pos="NN" id="w26.1.5">period</w>
+ </chunk>
+ <w pos="," id="w26.1.6">,</w>
+ <chunk type="NP" id="c26.1-5">
+  <w pos="NNS" id="w26.1.7">proposals</w>
+ </chunk>
+ <chunk type="VP" id="c26.1-6">
+  <w pos="MD" id="w26.1.8">will</w>
+  <w pos="VB" id="w26.1.9">be</w>
+  <w pos="VBN" id="w26.1.10">put</w>
+ </chunk>
+ <chunk type="ADVP" id="c26.1-7">
+  <w pos="RB" id="w26.1.11">forward</w>
+ </chunk>
+ <chunk type="PP" id="c26.1-8">
+  <w pos="IN" id="w26.1.12">for</w>
+ </chunk>
+ <chunk type="NP" id="c26.1-9">
+  <w pos="DT" id="w26.1.13">an</w>
+  <w pos="JJ" id="w26.1.14">extensive</w>
+  <w pos="NN" id="w26.1.15">reform</w>
+ </chunk>
+ <chunk type="PP" id="c26.1-10">
+  <w pos="IN" id="w26.1.16">of</w>
+ </chunk>
+ <chunk type="NP" id="c26.1-11">
+  <w pos="DT" id="w26.1.17">the</w>
+  <w pos="NN" id="w26.1.18">tax</w>
+  <w pos="NN" id="w26.1.19">system</w>
+ </chunk>
+ <w pos="." id="w26.1.20">.</w>
+</s> 
+ 
+
+
+<s id="s26.2">
+ <chunk type="NP" id="c26.2-1">
+  <w pos="DT" id="w26.2.1">The</w>
+  <w pos="NN" id="w26.2.2">aim</w>
+ </chunk>
+ <chunk type="VP" id="c26.2-2">
+  <w pos="VBZ" id="w26.2.3">is</w>
+ </chunk>
+ <chunk type="PP" id="c26.2-3">
+  <w pos="RB" id="w26.2.4">to</w>
+ </chunk>
+ <chunk type="NP" id="c26.2-4">
+  <w pos="JJ" id="w26.2.5">stimulate</w>
+  <w pos="NN" id="w26.2.6">work</w>
+  <w pos="CC" id="w26.2.7">and</w>
+  <w pos="NN" id="w26.2.8">saving</w>
+ </chunk>
+ <w pos="." id="w26.2.9">.</w>
+</s> 
+ 
+
+
+<s id="s26.3">
+ <chunk type="NP" id="c26.3-1">
+  <w pos="NNP" id="w26.3.1">State</w>
+  <w pos="NN" id="w26.3.2">income-tax</w>
+ </chunk>
+ <chunk type="VP" id="c26.3-2">
+  <w pos="MD" id="w26.3.3">will</w>
+  <w pos="VB" id="w26.3.4">be</w>
+  <w pos="VBN" id="w26.3.5">reduced</w>
+ </chunk>
+ <w pos="CC" id="w26.3.6">and</w>
+ <chunk type="NP" id="c26.3-4">
+  <w pos="NN" id="w26.3.7">capital</w>
+  <w pos="NNS" id="w26.3.8">taxes</w>
+ </chunk>
+ <chunk type="VP" id="c26.3-5">
+  <w pos="VBD" id="w26.3.9">increased</w>
+ </chunk>
+ <w pos="." id="w26.3.10">.</w>
+</s> 
+ 
+
+
+<s id="s26.4">
+ <chunk type="NP" id="c26.4-1">
+  <w pos="DT" id="w26.4.1">The</w>
+  <w pos="NN" id="w26.4.2">tax</w>
+  <w pos="NN" id="w26.4.3">system</w>
+ </chunk>
+ <chunk type="VP" id="c26.4-2">
+  <w pos="MD" id="w26.4.4">will</w>
+  <w pos="VB" id="w26.4.5">be</w>
+ </chunk>
+ <chunk type="NP" id="c26.4-3">
+  <w pos="JJ" id="w26.4.6">simplified</w>
+  <w pos="CC" id="w26.4.7">and</w>
+  <w pos="NN" id="w26.4.8">tax</w>
+  <w pos="NN" id="w26.4.9">avoidance</w>
+ </chunk>
+ <chunk type="VP" id="c26.4-4">
+  <w pos="VBD" id="w26.4.10">counteracted</w>
+ </chunk>
+ <w pos="." id="w26.4.11">.</w>
+</s> 
+ 
+
+
+<s id="s26.5">
+ <chunk type="NP" id="c26.5-1">
+  <w pos="NN" id="w26.5.1">Company</w>
+  <w pos="NN" id="w26.5.2">taxation</w>
+ </chunk>
+ <chunk type="VP" id="c26.5-2">
+  <w pos="MD" id="w26.5.3">will</w>
+  <w pos="VB" id="w26.5.4">be</w>
+  <w pos="VBN" id="w26.5.5">reformed</w>
+ </chunk>
+ <chunk type="PP" id="c26.5-3">
+  <w pos="IN" id="w26.5.6">in</w>
+ </chunk>
+ <chunk type="NP" id="c26.5-4">
+  <w pos="DT" id="w26.5.7">the</w>
+  <w pos="NN" id="w26.5.8">direction</w>
+ </chunk>
+ <chunk type="PP" id="c26.5-5">
+  <w pos="IN" id="w26.5.9">of</w>
+ </chunk>
+ <chunk type="NP" id="c26.5-6">
+  <w pos="JJ" id="w26.5.10">lower</w>
+  <w pos="NNS" id="w26.5.11">rates</w>
+ </chunk>
+ <chunk type="PP" id="c26.5-7">
+  <w pos="IN" id="w26.5.12">of</w>
+ </chunk>
+ <chunk type="NP" id="c26.5-8">
+  <w pos="NN" id="w26.5.13">tax</w>
+  <w pos="CC" id="w26.5.14">and</w>
+  <w pos="JJR" id="w26.5.15">broader</w>
+  <w pos="NN" id="w26.5.16">tax</w>
+  <w pos="NNS" id="w26.5.17">bases</w>
+ </chunk>
+ <w pos="." id="w26.5.18">.</w>
+</s> 
+ 
+
+
+<s id="s26.6">
+ <chunk type="NP" id="c26.6-1">
+  <w pos="NNP" id="w26.6.1">Indirect</w>
+  <w pos="NN" id="w26.6.2">taxation</w>
+ </chunk>
+ <chunk type="VP" id="c26.6-2">
+  <w pos="VBZ" id="w26.6.3">is</w>
+  <w pos="TO" id="w26.6.4">to</w>
+  <w pos="VB" id="w26.6.5">be</w>
+  <w pos="VBN" id="w26.6.6">reformed</w>
+ </chunk>
+ <chunk type="ADVP" id="c26.6-3">
+  <w pos="RB" id="w26.6.7">too</w>
+ </chunk>
+ <w pos="." id="w26.6.8">.</w>
+</s></p>
+
+<p id="27">
+<s id="s27.1">
+ <chunk type="SBAR" id="c27.1-1">
+  <w pos="IN" id="w27.1.1">In</w>
+ </chunk>
+ <w pos="NN" id="w27.1.2">order</w>
+ <chunk type="NP" id="c27.1-3">
+  <w pos="JJ" id="w27.1.3">further</w>
+ </chunk>
+ <chunk type="VP" id="c27.1-4">
+  <w pos="TO" id="w27.1.4">to</w>
+  <w pos="VB" id="w27.1.5">increase</w>
+ </chunk>
+ <chunk type="NP" id="c27.1-5">
+  <w pos="NN" id="w27.1.6">employment</w>
+ </chunk>
+ <w pos="CC" id="w27.1.7">and</w>
+ <chunk type="VP" id="c27.1-7">
+  <w pos="VB" id="w27.1.8">meet</w>
+ </chunk>
+ <chunk type="NP" id="c27.1-8">
+  <w pos="DT" id="w27.1.9">the</w>
+  <w pos="NN" id="w27.1.10">shortage</w>
+ </chunk>
+ <chunk type="PP" id="c27.1-9">
+  <w pos="IN" id="w27.1.11">of</w>
+ </chunk>
+ <chunk type="NP" id="c27.1-10">
+  <w pos="RB" id="w27.1.12">labour</w>
+ </chunk>
+ <chunk type="NP" id="c27.1-11">
+  <w pos="DT" id="w27.1.13">the</w>
+  <w pos="NNP" id="w27.1.14">Government</w>
+ </chunk>
+ <chunk type="VP" id="c27.1-12">
+  <w pos="MD" id="w27.1.15">will</w>
+  <w pos="VB" id="w27.1.16">develop</w>
+ </chunk>
+ <chunk type="NP" id="c27.1-13">
+  <w pos="PRP$" id="w27.1.17">its</w>
+  <w pos="JJ" id="w27.1.18">active</w>
+  <w pos="NN" id="w27.1.19">labour</w>
+  <w pos="NN" id="w27.1.20">market</w>
+  <w pos="NN" id="w27.1.21">policy</w>
+ </chunk>
+ <w pos="." id="w27.1.22">.</w>
+</s> 
+ 
+
+
+<s id="s27.2">
+ <chunk type="NP" id="c27.2-1">
+  <w pos="JJ" id="w27.2.1">Recurrent</w>
+  <w pos="NN" id="w27.2.2">training</w>
+ </chunk>
+ <chunk type="PP" id="c27.2-2">
+  <w pos="IN" id="w27.2.3">in</w>
+ </chunk>
+ <chunk type="NP" id="c27.2-3">
+  <w pos="JJ" id="w27.2.4">working</w>
+  <w pos="NN" id="w27.2.5">life</w>
+  <w pos="CC" id="w27.2.6">and</w>
+  <w pos="JJ" id="w27.2.7">qualified</w>
+  <w pos="JJ" id="w27.2.8">further</w>
+  <w pos="NN" id="w27.2.9">education</w>
+ </chunk>
+ <chunk type="VP" id="c27.2-4">
+  <w pos="MD" id="w27.2.10">will</w>
+  <w pos="VB" id="w27.2.11">play</w>
+ </chunk>
+ <chunk type="NP" id="c27.2-5">
+  <w pos="DT" id="w27.2.12">an</w>
+  <w pos="JJ" id="w27.2.13">important</w>
+  <w pos="NN" id="w27.2.14">role</w>
+ </chunk>
+ <chunk type="PP" id="c27.2-6">
+  <w pos="IN" id="w27.2.15">in</w>
+ </chunk>
+ <chunk type="NP" id="c27.2-7">
+  <w pos="DT" id="w27.2.16">this</w>
+  <w pos="NN" id="w27.2.17">context</w>
+ </chunk>
+ <w pos="." id="w27.2.18">.</w>
+</s> 
+ 
+
+
+<s id="s27.3">
+ <chunk type="NP" id="c27.3-1">
+  <w pos="NNS" id="w27.3.1">Opportunities</w>
+ </chunk>
+ <chunk type="PP" id="c27.3-2">
+  <w pos="IN" id="w27.3.2">for</w>
+ </chunk>
+ <chunk type="NP" id="c27.3-3">
+  <w pos="DT" id="w27.3.3">the</w>
+  <w pos="VBN" id="w27.3.4">disabled</w>
+ </chunk>
+ <chunk type="VP" id="c27.3-4">
+  <w pos="TO" id="w27.3.5">to</w>
+  <w pos="VB" id="w27.3.6">participate</w>
+ </chunk>
+ <chunk type="PP" id="c27.3-5">
+  <w pos="IN" id="w27.3.7">in</w>
+ </chunk>
+ <chunk type="NP" id="c27.3-6">
+  <w pos="JJ" id="w27.3.8">working</w>
+  <w pos="NN" id="w27.3.9">life</w>
+ </chunk>
+ <chunk type="VP" id="c27.3-7">
+  <w pos="MD" id="w27.3.10">must</w>
+  <w pos="VB" id="w27.3.11">be</w>
+  <w pos="RB" id="w27.3.12">further</w>
+  <w pos="VBN" id="w27.3.13">improved</w>
+ </chunk>
+ <w pos="." id="w27.3.14">.</w>
+</s> 
+ 
+
+
+<s id="s27.4">
+ <chunk type="NP" id="c27.4-1">
+  <w pos="NNP" id="w27.4.1">Immigrants</w>
+ </chunk>
+ <chunk type="NP" id="c27.4-2">
+  <w pos="POS" id="w27.4.2">'</w>
+  <w pos="NN" id="w27.4.3">entry</w>
+ </chunk>
+ <chunk type="PP" id="c27.4-3">
+  <w pos="IN" id="w27.4.4">into</w>
+ </chunk>
+ <chunk type="NP" id="c27.4-4">
+  <w pos="DT" id="w27.4.5">the</w>
+  <w pos="JJ" id="w27.4.6">labour</w>
+  <w pos="NN" id="w27.4.7">market</w>
+ </chunk>
+ <chunk type="VP" id="c27.4-5">
+  <w pos="MD" id="w27.4.8">should</w>
+  <w pos="VB" id="w27.4.9">be</w>
+  <w pos="VBN" id="w27.4.10">facilitated</w>
+ </chunk>
+ <w pos="." id="w27.4.11">.</w>
+</s></p>
+
+<p id="28">
+<s id="s28.1">
+ <chunk type="NP" id="c28.1-1">
+  <w pos="JJ" id="w28.1.1">Working</w>
+  <w pos="NN" id="w28.1.2">life</w>
+ </chunk>
+ <chunk type="VP" id="c28.1-2">
+  <w pos="VBZ" id="w28.1.3">is</w>
+  <w pos="TO" id="w28.1.4">to</w>
+  <w pos="VB" id="w28.1.5">be</w>
+  <w pos="VBN" id="w28.1.6">made</w>
+ </chunk>
+ <chunk type="ADJP" id="c28.1-3">
+  <w pos="RBR" id="w28.1.7">more</w>
+  <w pos="JJ" id="w28.1.8">secure</w>
+ </chunk>
+ <w pos="CC" id="w28.1.9">and</w>
+ <chunk type="NP" id="c28.1-5">
+  <w pos="NN" id="w28.1.10">just</w>
+ </chunk>
+ <w pos="." id="w28.1.11">.</w>
+</s></p>
+
+<p id="29">
+<s id="s29.1">
+ <chunk type="NP" id="c29.1-1">
+  <w pos="DT" id="w29.1.1">The</w>
+  <w pos="NNP" id="w29.1.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c29.1-2">
+  <w pos="MD" id="w29.1.3">will</w>
+  <w pos="VB" id="w29.1.4">invite</w>
+ </chunk>
+ <chunk type="NP" id="c29.1-3">
+  <w pos="DT" id="w29.1.5">the</w>
+  <w pos="NNS" id="w29.1.6">organizations</w>
+ </chunk>
+ <chunk type="PP" id="c29.1-4">
+  <w pos="IN" id="w29.1.7">in</w>
+ </chunk>
+ <chunk type="NP" id="c29.1-5">
+  <w pos="DT" id="w29.1.8">the</w>
+  <w pos="NN" id="w29.1.9">labour</w>
+  <w pos="NN" id="w29.1.10">market</w>
+ </chunk>
+ <w pos="CC" id="w29.1.11">and</w>
+ <chunk type="NP" id="c29.1-7">
+  <w pos="DT" id="w29.1.12">the</w>
+  <w pos="JJ" id="w29.1.13">relevant</w>
+  <w pos="NNS" id="w29.1.14">authorities</w>
+ </chunk>
+ <chunk type="VP" id="c29.1-8">
+  <w pos="TO" id="w29.1.15">to</w>
+  <w pos="VB" id="w29.1.16">participate</w>
+ </chunk>
+ <chunk type="PP" id="c29.1-9">
+  <w pos="IN" id="w29.1.17">in</w>
+ </chunk>
+ <chunk type="NP" id="c29.1-10">
+  <w pos="DT" id="w29.1.18">a</w>
+  <w pos="NN" id="w29.1.19">commission</w>
+ </chunk>
+ <chunk type="PP" id="c29.1-11">
+  <w pos="IN" id="w29.1.20">on</w>
+ </chunk>
+ <chunk type="NP" id="c29.1-12">
+  <w pos="DT" id="w29.1.21">the</w>
+  <w pos="JJ" id="w29.1.22">working</w>
+  <w pos="NN" id="w29.1.23">environment</w>
+ </chunk>
+ <chunk type="VP" id="c29.1-13">
+  <w pos="TO" id="w29.1.24">to</w>
+  <w pos="VB" id="w29.1.25">make</w>
+ </chunk>
+ <chunk type="NP" id="c29.1-14">
+  <w pos="JJ" id="w29.1.26">special</w>
+  <w pos="NNS" id="w29.1.27">efforts</w>
+ </chunk>
+ <chunk type="PP" id="c29.1-15">
+  <w pos="IN" id="w29.1.28">for</w>
+ </chunk>
+ <chunk type="NP" id="c29.1-16">
+  <w pos="DT" id="w29.1.29">the</w>
+  <w pos="CD" id="w29.1.30">400,000</w>
+ </chunk>
+ <chunk type="VP" id="c29.1-17">
+  <w pos="VBZ" id="w29.1.31">workplaces</w>
+ </chunk>
+ <chunk type="ADJP" id="c29.1-18">
+  <w pos="RB" id="w29.1.32">most</w>
+  <w pos="VBN" id="w29.1.33">exposed</w>
+ </chunk>
+ <chunk type="PP" id="c29.1-19">
+  <w pos="TO" id="w29.1.34">to</w>
+ </chunk>
+ <chunk type="NP" id="c29.1-20">
+  <w pos="NNS" id="w29.1.35">hazards</w>
+ </chunk>
+ <w pos="." id="w29.1.36">.</w>
+</s> 
+ 
+
+
+<s id="s29.2">
+ <chunk type="NP" id="c29.2-1">
+  <w pos="DT" id="w29.2.1">The</w>
+  <w pos="NN" id="w29.2.2">commission</w>
+ </chunk>
+ <chunk type="VP" id="c29.2-2">
+  <w pos="VBZ" id="w29.2.3">is</w>
+  <w pos="TO" id="w29.2.4">to</w>
+  <w pos="VB" id="w29.2.5">submit</w>
+ </chunk>
+ <chunk type="NP" id="c29.2-3">
+  <w pos="NNS" id="w29.2.6">proposals</w>
+ </chunk>
+ <chunk type="PP" id="c29.2-4">
+  <w pos="IN" id="w29.2.7">for</w>
+ </chunk>
+ <chunk type="NP" id="c29.2-5">
+  <w pos="NNS" id="w29.2.8">measures</w>
+ </chunk>
+ <chunk type="NP" id="c29.2-6">
+  <w pos="WDT" id="w29.2.9">that</w>
+ </chunk>
+ <chunk type="VP" id="c29.2-7">
+  <w pos="MD" id="w29.2.10">will</w>
+  <w pos="VB" id="w29.2.11">result</w>
+ </chunk>
+ <chunk type="PP" id="c29.2-8">
+  <w pos="IN" id="w29.2.12">in</w>
+ </chunk>
+ <chunk type="NP" id="c29.2-9">
+  <w pos="JJ" id="w29.2.13">healthier</w>
+  <w pos="NN" id="w29.2.14">working</w>
+  <w pos="NNS" id="w29.2.15">environments</w>
+ </chunk>
+ <w pos="," id="w29.2.16">,</w>
+ <w pos="CC" id="w29.2.17">and</w>
+ <chunk type="NP" id="c29.2-12">
+  <w pos="NN" id="w29.2.18">which</w>
+ </chunk>
+ <chunk type="VP" id="c29.2-13">
+  <w pos="MD" id="w29.2.19">will</w>
+  <w pos="VB" id="w29.2.20">reduce</w>
+ </chunk>
+ <chunk type="NP" id="c29.2-14">
+  <w pos="DT" id="w29.2.21">the</w>
+  <w pos="JJ" id="w29.2.22">many</w>
+  <w pos="NN" id="w29.2.23">work</w>
+  <w pos="NNS" id="w29.2.24">injuries</w>
+ </chunk>
+ <w pos="." id="w29.2.25">.</w>
+</s></p>
+
+<p id="30">
+<s id="s30.1">
+ <chunk type="PP" id="c30.1-1">
+  <w pos="IN" id="w30.1.1">During</w>
+ </chunk>
+ <chunk type="NP" id="c30.1-2">
+  <w pos="DT" id="w30.1.2">this</w>
+  <w pos="JJ" id="w30.1.3">electoral</w>
+  <w pos="NN" id="w30.1.4">period</w>
+ </chunk>
+ <w pos="," id="w30.1.5">,</w>
+ <chunk type="NP" id="c30.1-4">
+  <w pos="NN" id="w30.1.6">legislation</w>
+ </chunk>
+ <chunk type="PP" id="c30.1-5">
+  <w pos="IN" id="w30.1.7">on</w>
+ </chunk>
+ <chunk type="NP" id="c30.1-6">
+  <w pos="DT" id="w30.1.8">a</w>
+  <w pos="JJ" id="w30.1.9">sixth</w>
+  <w pos="NN" id="w30.1.10">week</w>
+ </chunk>
+ <chunk type="PP" id="c30.1-7">
+  <w pos="IN" id="w30.1.11">of</w>
+ </chunk>
+ <chunk type="NP" id="c30.1-8">
+  <w pos="JJ" id="w30.1.12">annual</w>
+  <w pos="NN" id="w30.1.13">holiday</w>
+ </chunk>
+ <chunk type="PP" id="c30.1-9">
+  <w pos="IN" id="w30.1.14">with</w>
+ </chunk>
+ <chunk type="NP" id="c30.1-10">
+  <w pos="NN" id="w30.1.15">pay</w>
+ </chunk>
+ <chunk type="VP" id="c30.1-11">
+  <w pos="MD" id="w30.1.16">will</w>
+  <w pos="VB" id="w30.1.17">be</w>
+  <w pos="VBN" id="w30.1.18">enacted</w>
+ </chunk>
+ <w pos="." id="w30.1.19">.</w>
+</s> 
+ 
+
+
+<s id="s30.2">
+ <chunk type="NP" id="c30.2-1">
+  <w pos="DT" id="w30.2.1">This</w>
+  <w pos="NN" id="w30.2.2">reform</w>
+ </chunk>
+ <chunk type="VP" id="c30.2-2">
+  <w pos="MD" id="w30.2.3">will</w>
+  <w pos="VB" id="w30.2.4">be</w>
+  <w pos="VBN" id="w30.2.5">carried</w>
+ </chunk>
+ <chunk type="PP" id="c30.2-3">
+  <w pos="IN" id="w30.2.6">through</w>
+ </chunk>
+ <chunk type="PP" id="c30.2-4">
+  <w pos="IN" id="w30.2.7">in</w>
+ </chunk>
+ <chunk type="NP" id="c30.2-5">
+  <w pos="NNS" id="w30.2.8">stages</w>
+ </chunk>
+ <w pos="." id="w30.2.9">.</w>
+</s></p>
+
+<p id="31">
+<s id="s31.1">
+ <chunk type="NP" id="c31.1-1">
+  <w pos="PRP" id="w31.1.1">It</w>
+ </chunk>
+ <chunk type="VP" id="c31.1-2">
+  <w pos="VBZ" id="w31.1.2">is</w>
+ </chunk>
+ <chunk type="ADJP" id="c31.1-3">
+  <w pos="JJ" id="w31.1.3">essential</w>
+ </chunk>
+ <chunk type="SBAR" id="c31.1-4">
+  <w pos="IN" id="w31.1.4">that</w>
+ </chunk>
+ <chunk type="NP" id="c31.1-5">
+  <w pos="DT" id="w31.1.5">the</w>
+  <w pos="NN" id="w31.1.6">work</w>
+ </chunk>
+ <chunk type="PP" id="c31.1-6">
+  <w pos="IN" id="w31.1.7">of</w>
+ </chunk>
+ <chunk type="NP" id="c31.1-7">
+  <w pos="NN" id="w31.1.8">breaking</w>
+ </chunk>
+ <chunk type="PP" id="c31.1-8">
+  <w pos="IN" id="w31.1.9">down</w>
+ </chunk>
+ <chunk type="NP" id="c31.1-9">
+  <w pos="DT" id="w31.1.10">the</w>
+  <w pos="NNS" id="w31.1.11">barriers</w>
+ </chunk>
+ <chunk type="PP" id="c31.1-10">
+  <w pos="IN" id="w31.1.12">on</w>
+ </chunk>
+ <chunk type="NP" id="c31.1-11">
+  <w pos="DT" id="w31.1.13">the</w>
+  <w pos="NN" id="w31.1.14">labour</w>
+  <w pos="NN" id="w31.1.15">market</w>
+ </chunk>
+ <chunk type="PP" id="c31.1-12">
+  <w pos="IN" id="w31.1.16">for</w>
+ </chunk>
+ <chunk type="NP" id="c31.1-13">
+  <w pos="JJR" id="w31.1.17">more</w>
+  <w pos="JJ" id="w31.1.18">flexible</w>
+  <w pos="NNS" id="w31.1.19">choices</w>
+ </chunk>
+ <chunk type="PP" id="c31.1-14">
+  <w pos="IN" id="w31.1.20">by</w>
+ </chunk>
+ <chunk type="NP" id="c31.1-15">
+  <w pos="DT" id="w31.1.21">both</w>
+  <w pos="NNS" id="w31.1.22">sexes</w>
+ </chunk>
+ <chunk type="VP" id="c31.1-16">
+  <w pos="VBP" id="w31.1.23">be</w>
+  <w pos="VBN" id="w31.1.24">continued</w>
+ </chunk>
+ <w pos="." id="w31.1.25">.</w>
+</s> 
+ 
+
+
+<s id="s31.2">
+ <chunk type="NP" id="c31.2-1">
+  <w pos="PRP" id="w31.2.1">It</w>
+ </chunk>
+ <chunk type="VP" id="c31.2-2">
+  <w pos="MD" id="w31.2.2">must</w>
+  <w pos="VB" id="w31.2.3">be</w>
+  <w pos="VBN" id="w31.2.4">made</w>
+ </chunk>
+ <chunk type="NP" id="c31.2-3">
+  <w pos="NN" id="w31.2.5">easier</w>
+ </chunk>
+ <chunk type="PP" id="c31.2-4">
+  <w pos="IN" id="w31.2.6">for</w>
+ </chunk>
+ <chunk type="NP" id="c31.2-5">
+  <w pos="NNS" id="w31.2.7">men</w>
+  <w pos="CC" id="w31.2.8">and</w>
+  <w pos="NNS" id="w31.2.9">women</w>
+ </chunk>
+ <chunk type="VP" id="c31.2-6">
+  <w pos="TO" id="w31.2.10">to</w>
+  <w pos="VB" id="w31.2.11">combine</w>
+ </chunk>
+ <chunk type="NP" id="c31.2-7">
+  <w pos="JJ" id="w31.2.12">gainful</w>
+  <w pos="NN" id="w31.2.13">employment</w>
+  <w pos="CC" id="w31.2.14">and</w>
+  <w pos="JJ" id="w31.2.15">parental</w>
+  <w pos="NN" id="w31.2.16">responsibility</w>
+ </chunk>
+ <w pos="." id="w31.2.17">.</w>
+</s> 
+ 
+
+
+<s id="s31.3">
+ <chunk type="NP" id="c31.3-1">
+  <w pos="JJ" id="w31.3.1">Further</w>
+  <w pos="NNS" id="w31.3.2">measures</w>
+ </chunk>
+ <chunk type="VP" id="c31.3-2">
+  <w pos="MD" id="w31.3.3">will</w>
+  <w pos="VB" id="w31.3.4">be</w>
+  <w pos="VBN" id="w31.3.5">taken</w>
+ </chunk>
+ <chunk type="VP" id="c31.3-3">
+  <w pos="TO" id="w31.3.6">to</w>
+  <w pos="VB" id="w31.3.7">increase</w>
+ </chunk>
+ <chunk type="NP" id="c31.3-4">
+  <w pos="DT" id="w31.3.8">the</w>
+  <w pos="NN" id="w31.3.9">number</w>
+ </chunk>
+ <chunk type="PP" id="c31.3-5">
+  <w pos="IN" id="w31.3.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c31.3-6">
+  <w pos="NNS" id="w31.3.11">women</w>
+ </chunk>
+ <chunk type="PP" id="c31.3-7">
+  <w pos="IN" id="w31.3.12">in</w>
+ </chunk>
+ <chunk type="NP" id="c31.3-8">
+  <w pos="JJ" id="w31.3.13">various</w>
+  <w pos="JJ" id="w31.3.14">decision-making</w>
+  <w pos="NNS" id="w31.3.15">assemblies</w>
+ </chunk>
+ <w pos="." id="w31.3.16">.</w>
+</s></p>
+
+<p id="32">
+<s id="s32.1">
+ <chunk type="NP" id="c32.1-1">
+  <w pos="DT" id="w32.1.1">The</w>
+  <w pos="NN" id="w32.1.2">broadening</w>
+ </chunk>
+ <chunk type="PP" id="c32.1-2">
+  <w pos="IN" id="w32.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c32.1-3">
+  <w pos="JJ" id="w32.1.4">regional</w>
+  <w pos="NN" id="w32.1.5">policy</w>
+ </chunk>
+ <chunk type="NP" id="c32.1-4">
+  <w pos="WDT" id="w32.1.6">that</w>
+ </chunk>
+ <chunk type="VP" id="c32.1-5">
+  <w pos="VBZ" id="w32.1.7">has</w>
+  <w pos="VBN" id="w32.1.8">taken</w>
+ </chunk>
+ <chunk type="NP" id="c32.1-6">
+  <w pos="NN" id="w32.1.9">place</w>
+ </chunk>
+ <chunk type="PP" id="c32.1-7">
+  <w pos="IN" id="w32.1.10">in</w>
+ </chunk>
+ <chunk type="NP" id="c32.1-8">
+  <w pos="JJ" id="w32.1.11">recent</w>
+  <w pos="NNS" id="w32.1.12">years</w>
+ </chunk>
+ <chunk type="PP" id="c32.1-9">
+  <w pos="IN" id="w32.1.13">in</w>
+ </chunk>
+ <chunk type="NP" id="c32.1-10">
+  <w pos="DT" id="w32.1.14">the</w>
+  <w pos="NN" id="w32.1.15">direction</w>
+ </chunk>
+ <chunk type="PP" id="c32.1-11">
+  <w pos="IN" id="w32.1.16">of</w>
+ </chunk>
+ <chunk type="NP" id="c32.1-12">
+  <w pos="JJ" id="w32.1.17">higher</w>
+  <w pos="NN" id="w32.1.18">competence</w>
+ </chunk>
+ <w pos="," id="w32.1.19">,</w>
+ <chunk type="NP" id="c32.1-14">
+  <w pos="NN" id="w32.1.20">education</w>
+ </chunk>
+ <w pos="CC" id="w32.1.21">and</w>
+ <chunk type="NP" id="c32.1-16">
+  <w pos="DT" id="w32.1.22">an</w>
+  <w pos="JJ" id="w32.1.23">enhanced</w>
+  <w pos="NN" id="w32.1.24">infrastructure</w>
+ </chunk>
+ <w pos="," id="w32.1.25">,</w>
+ <chunk type="VP" id="c32.1-18">
+  <w pos="MD" id="w32.1.26">will</w>
+  <w pos="VB" id="w32.1.27">continue</w>
+ </chunk>
+ <w pos="." id="w32.1.28">.</w>
+</s></p>
+
+<p id="33">
+<s id="s33.1">
+ <chunk type="NP" id="c33.1-1">
+  <w pos="JJ" id="w33.1.1">Small</w>
+  <w pos="NNS" id="w33.1.2">companies</w>
+ </chunk>
+ <chunk type="VP" id="c33.1-2">
+  <w pos="VBP" id="w33.1.3">are</w>
+ </chunk>
+ <chunk type="ADJP" id="c33.1-3">
+  <w pos="JJ" id="w33.1.4">responsible</w>
+ </chunk>
+ <chunk type="PP" id="c33.1-4">
+  <w pos="IN" id="w33.1.5">for</w>
+ </chunk>
+ <chunk type="NP" id="c33.1-5">
+  <w pos="NN" id="w33.1.6">much</w>
+ </chunk>
+ <chunk type="PP" id="c33.1-6">
+  <w pos="IN" id="w33.1.7">of</w>
+ </chunk>
+ <chunk type="NP" id="c33.1-7">
+  <w pos="DT" id="w33.1.8">the</w>
+  <w pos="NNS" id="w33.1.9">dynamics</w>
+  <w pos="CC" id="w33.1.10">and</w>
+  <w pos="NN" id="w33.1.11">renewal</w>
+ </chunk>
+ <chunk type="PP" id="c33.1-8">
+  <w pos="IN" id="w33.1.12">in</w>
+ </chunk>
+ <chunk type="NP" id="c33.1-9">
+  <w pos="JJ" id="w33.1.13">Swedish</w>
+  <w pos="NN" id="w33.1.14">industry</w>
+  <w pos="CC" id="w33.1.15">and</w>
+  <w pos="NN" id="w33.1.16">commerce</w>
+ </chunk>
+ <w pos="." id="w33.1.17">.</w>
+</s> 
+ 
+
+
+<s id="s33.2">
+ <chunk type="NP" id="c33.2-1">
+  <w pos="PRP" id="w33.2.1">We</w>
+ </chunk>
+ <chunk type="VP" id="c33.2-2">
+  <w pos="MD" id="w33.2.2">will</w>
+  <w pos="RB" id="w33.2.3">therefore</w>
+  <w pos="VB" id="w33.2.4">continue</w>
+ </chunk>
+ <chunk type="NP" id="c33.2-3">
+  <w pos="PRP$" id="w33.2.5">our</w>
+  <w pos="NNS" id="w33.2.6">efforts</w>
+ </chunk>
+ <chunk type="VP" id="c33.2-4">
+  <w pos="TO" id="w33.2.7">to</w>
+  <w pos="VB" id="w33.2.8">create</w>
+ </chunk>
+ <chunk type="NP" id="c33.2-5">
+  <w pos="JJ" id="w33.2.9">favourable</w>
+  <w pos="NN" id="w33.2.10">development</w>
+  <w pos="NNS" id="w33.2.11">opportunities</w>
+ </chunk>
+ <chunk type="PP" id="c33.2-6">
+  <w pos="IN" id="w33.2.12">for</w>
+ </chunk>
+ <chunk type="NP" id="c33.2-7">
+  <w pos="JJ" id="w33.2.13">small</w>
+  <w pos="NNS" id="w33.2.14">companies</w>
+ </chunk>
+ <w pos="." id="w33.2.15">.</w>
+</s></p>
+
+<p id="34">
+<s id="s34.1">
+ <chunk type="NP" id="c34.1-1">
+  <w pos="PRP$" id="w34.1.1">Our</w>
+  <w pos="JJ" id="w34.1.2">generous</w>
+  <w pos="NN" id="w34.1.3">policy</w>
+ </chunk>
+ <chunk type="PP" id="c34.1-2">
+  <w pos="IN" id="w34.1.4">in</w>
+ </chunk>
+ <chunk type="NP" id="c34.1-3">
+  <w pos="NN" id="w34.1.5">solidarity</w>
+ </chunk>
+ <chunk type="PP" id="c34.1-4">
+  <w pos="IN" id="w34.1.6">with</w>
+ </chunk>
+ <chunk type="NP" id="c34.1-5">
+  <w pos="NN" id="w34.1.7">refugees</w>
+  <w pos="NNS" id="w34.1.8">stands</w>
+  <w pos="NN" id="w34.1.9">firm</w>
+ </chunk>
+ <w pos="." id="w34.1.10">.</w>
+</s> 
+ 
+
+
+<s id="s34.2">
+ <chunk type="NP" id="c34.2-1">
+  <w pos="DT" id="w34.2.1">The</w>
+  <w pos="NNP" id="w34.2.2">United</w>
+  <w pos="NNP" id="w34.2.3">Nations</w>
+  <w pos="NNS" id="w34.2.4">efforts</w>
+ </chunk>
+ <chunk type="PP" id="c34.2-2">
+  <w pos="IN" id="w34.2.5">for</w>
+ </chunk>
+ <chunk type="NP" id="c34.2-3">
+  <w pos="DT" id="w34.2.6">the</w>
+  <w pos="NNS" id="w34.2.7">worlds</w>
+ </chunk>
+ <chunk type="NP" id="c34.2-4">
+  <w pos="POS" id="w34.2.8">'</w>
+  <w pos="NNS" id="w34.2.9">refugees</w>
+ </chunk>
+ <chunk type="VP" id="c34.2-5">
+  <w pos="MD" id="w34.2.10">will</w>
+  <w pos="VB" id="w34.2.11">be</w>
+  <w pos="VBN" id="w34.2.12">given</w>
+ </chunk>
+ <chunk type="NP" id="c34.2-6">
+  <w pos="VBD" id="w34.2.13">continued</w>
+  <w pos="JJ" id="w34.2.14">strong</w>
+  <w pos="NN" id="w34.2.15">support</w>
+ </chunk>
+ <w pos="." id="w34.2.16">.</w>
+</s> 
+ 
+
+
+<s id="s34.3">
+ <chunk type="NP" id="c34.3-1">
+  <w pos="NNP" id="w34.3.1">Racism</w>
+  <w pos="CC" id="w34.3.2">and</w>
+  <w pos="NN" id="w34.3.3">xenophobia</w>
+ </chunk>
+ <chunk type="VP" id="c34.3-2">
+  <w pos="MD" id="w34.3.4">will</w>
+  <w pos="VB" id="w34.3.5">be</w>
+  <w pos="RB" id="w34.3.6">forcefully</w>
+  <w pos="VBN" id="w34.3.7">combated</w>
+ </chunk>
+ <w pos="." id="w34.3.8">.</w>
+</s></p>
+
+<p id="35">
+<s id="s35.1">
+ <chunk type="NP" id="c35.1-1">
+  <w pos="NNS" id="w35.1.1">Proposals</w>
+ </chunk>
+ <chunk type="VP" id="c35.1-2">
+  <w pos="MD" id="w35.1.2">will</w>
+  <w pos="VB" id="w35.1.3">be</w>
+  <w pos="VBN" id="w35.1.4">submitted</w>
+ </chunk>
+ <chunk type="PP" id="c35.1-3">
+  <w pos="TO" id="w35.1.5">to</w>
+ </chunk>
+ <chunk type="NP" id="c35.1-4">
+  <w pos="NNP" id="w35.1.6">Parliament</w>
+ </chunk>
+ <chunk type="PP" id="c35.1-5">
+  <w pos="IN" id="w35.1.7">for</w>
+ </chunk>
+ <chunk type="NP" id="c35.1-6">
+  <w pos="DT" id="w35.1.8">a</w>
+  <w pos="JJ" id="w35.1.9">new</w>
+  <w pos="NNP" id="w35.1.10">Aliens</w>
+  <w pos="NNP" id="w35.1.11">Act</w>
+ </chunk>
+ <w pos="." id="w35.1.12">.</w>
+</s> 
+ 
+
+
+<s id="s35.2">
+ <chunk type="NP" id="c35.2-1">
+  <w pos="DT" id="w35.2.1">The</w>
+  <w pos="NN" id="w35.2.2">administration</w>
+ </chunk>
+ <chunk type="PP" id="c35.2-2">
+  <w pos="IN" id="w35.2.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c35.2-3">
+  <w pos="NNS" id="w35.2.4">matters</w>
+  <w pos="JJ" id="w35.2.5">relating</w>
+ </chunk>
+ <chunk type="PP" id="c35.2-4">
+  <w pos="NN" id="w35.2.6">to</w>
+ </chunk>
+ <chunk type="NP" id="c35.2-5">
+  <w pos="NNS" id="w35.2.7">aliens</w>
+ </chunk>
+ <chunk type="VP" id="c35.2-6">
+  <w pos="MD" id="w35.2.8">will</w>
+  <w pos="VB" id="w35.2.9">be</w>
+  <w pos="VBN" id="w35.2.10">speeded</w>
+ </chunk>
+ <chunk type="PRT" id="c35.2-7">
+  <w pos="RP" id="w35.2.11">up</w>
+ </chunk>
+ <chunk type="ADVP" id="c35.2-8">
+  <w pos="RB" id="w35.2.12">considerably</w>
+ </chunk>
+ <w pos="." id="w35.2.13">.</w>
+</s></p>
+
+<p id="36">
+<s id="s36.1">
+ <chunk type="NP" id="c36.1-1">
+  <w pos="NN" id="w36.1.1">Consideration</w>
+ </chunk>
+ <chunk type="PP" id="c36.1-2">
+  <w pos="IN" id="w36.1.2">for</w>
+ </chunk>
+ <chunk type="NP" id="c36.1-3">
+  <w pos="DT" id="w36.1.3">the</w>
+  <w pos="NN" id="w36.1.4">environment</w>
+ </chunk>
+ <w pos="CC" id="w36.1.5">and</w>
+ <chunk type="NP" id="c36.1-5">
+  <w pos="DT" id="w36.1.6">the</w>
+  <w pos="NN" id="w36.1.7">countryside</w>
+ </chunk>
+ <chunk type="VP" id="c36.1-6">
+  <w pos="MD" id="w36.1.8">must</w>
+  <w pos="VB" id="w36.1.9">characterize</w>
+ </chunk>
+ <chunk type="NP" id="c36.1-7">
+  <w pos="NNS" id="w36.1.10">developments</w>
+ </chunk>
+ <chunk type="PP" id="c36.1-8">
+  <w pos="IN" id="w36.1.11">in</w>
+ </chunk>
+ <chunk type="NP" id="c36.1-9">
+  <w pos="DT" id="w36.1.12">all</w>
+  <w pos="NNS" id="w36.1.13">fields</w>
+ </chunk>
+ <w pos="." id="w36.1.14">.</w>
+</s> 
+ 
+
+
+<s id="s36.2">
+ <chunk type="NP" id="c36.2-1">
+  <w pos="NNP" id="w36.2.1">Parliament</w>
+ </chunk>
+ <chunk type="NP" id="c36.2-2">
+  <w pos="POS" id="w36.2.2">'s</w>
+  <w pos="NN" id="w36.2.3">decision</w>
+ </chunk>
+ <chunk type="PP" id="c36.2-3">
+  <w pos="IN" id="w36.2.4">on</w>
+ </chunk>
+ <chunk type="NP" id="c36.2-4">
+  <w pos="NN" id="w36.2.5">traffic</w>
+  <w pos="NN" id="w36.2.6">policy</w>
+ </chunk>
+ <chunk type="VP" id="c36.2-5">
+  <w pos="VBZ" id="w36.2.7">is</w>
+ </chunk>
+ <chunk type="PP" id="c36.2-6">
+  <w pos="IN" id="w36.2.8">of</w>
+ </chunk>
+ <chunk type="NP" id="c36.2-7">
+  <w pos="JJ" id="w36.2.9">great</w>
+  <w pos="NN" id="w36.2.10">importance</w>
+ </chunk>
+ <chunk type="PP" id="c36.2-8">
+  <w pos="IN" id="w36.2.11">in</w>
+ </chunk>
+ <chunk type="NP" id="c36.2-9">
+  <w pos="DT" id="w36.2.12">this</w>
+  <w pos="NN" id="w36.2.13">context</w>
+ </chunk>
+ <w pos="." id="w36.2.14">.</w>
+</s></p>
+
+<p id="37">
+<s id="s37.1">
+ <chunk type="NP" id="c37.1-1">
+  <w pos="DT" id="w37.1.1">A</w>
+  <w pos="JJ" id="w37.1.2">radical</w>
+  <w pos="JJ" id="w37.1.3">environmental</w>
+  <w pos="NN" id="w37.1.4">policy</w>
+ </chunk>
+ <chunk type="VP" id="c37.1-2">
+  <w pos="VBZ" id="w37.1.5">presupposes</w>
+ </chunk>
+ <chunk type="NP" id="c37.1-3">
+  <w pos="DT" id="w37.1.6">a</w>
+  <w pos="JJ" id="w37.1.7">strong</w>
+  <w pos="NN" id="w37.1.8">economy</w>
+ </chunk>
+ <w pos="." id="w37.1.9">.</w>
+</s> 
+ 
+
+
+<s id="s37.2">
+ <chunk type="NP" id="c37.2-1">
+  <w pos="NNS" id="w37.2.1">Efforts</w>
+ </chunk>
+ <chunk type="VP" id="c37.2-2">
+  <w pos="VBP" id="w37.2.2">are</w>
+  <w pos="VBG" id="w37.2.3">being</w>
+  <w pos="RB" id="w37.2.4">further</w>
+  <w pos="VBD" id="w37.2.5">pursued</w>
+ </chunk>
+ <chunk type="PP" id="c37.2-3">
+  <w pos="TO" id="w37.2.6">to</w>
+ </chunk>
+ <chunk type="NP" id="c37.2-4">
+  <w pos="JJ" id="w37.2.7">reach</w>
+  <w pos="NNS" id="w37.2.8">agreements</w>
+ </chunk>
+ <chunk type="PP" id="c37.2-5">
+  <w pos="IN" id="w37.2.9">across</w>
+ </chunk>
+ <chunk type="NP" id="c37.2-6">
+  <w pos="NNS" id="w37.2.10">boundaries</w>
+ </chunk>
+ <chunk type="PP" id="c37.2-7">
+  <w pos="IN" id="w37.2.11">on</w>
+ </chunk>
+ <chunk type="NP" id="c37.2-8">
+  <w pos="JJ" id="w37.2.12">reduced</w>
+  <w pos="NN" id="w37.2.13">air</w>
+  <w pos="CC" id="w37.2.14">and</w>
+  <w pos="NN" id="w37.2.15">water</w>
+  <w pos="NN" id="w37.2.16">pollution</w>
+ </chunk>
+ <w pos="CC" id="w37.2.17">and</w>
+ <chunk type="PP" id="c37.2-10">
+  <w pos="IN" id="w37.2.18">on</w>
+ </chunk>
+ <chunk type="NP" id="c37.2-11">
+  <w pos="NN" id="w37.2.19">protection</w>
+ </chunk>
+ <chunk type="PP" id="c37.2-12">
+  <w pos="IN" id="w37.2.20">of</w>
+ </chunk>
+ <chunk type="NP" id="c37.2-13">
+  <w pos="DT" id="w37.2.21">the</w>
+  <w pos="NN" id="w37.2.22">earth</w>
+ </chunk>
+ <chunk type="NP" id="c37.2-14">
+  <w pos="POS" id="w37.2.23">'s</w>
+  <w pos="NN" id="w37.2.24">climate</w>
+ </chunk>
+ <w pos="." id="w37.2.25">.</w>
+</s> 
+ 
+
+
+<s id="s37.3">
+ <chunk type="NP" id="c37.3-1">
+  <w pos="DT" id="w37.3.1">The</w>
+  <w pos="NN" id="w37.3.2">plan</w>
+ </chunk>
+ <chunk type="PP" id="c37.3-2">
+  <w pos="IN" id="w37.3.3">for</w>
+ </chunk>
+ <chunk type="NP" id="c37.3-3">
+  <w pos="NN" id="w37.3.4">phasing</w>
+ </chunk>
+ <chunk type="PP" id="c37.3-4">
+  <w pos="IN" id="w37.3.5">out</w>
+ </chunk>
+ <chunk type="NP" id="c37.3-5">
+  <w pos="NNP" id="w37.3.6">CFCs</w>
+ </chunk>
+ <chunk type="VP" id="c37.3-6">
+  <w pos="VBZ" id="w37.3.7">is</w>
+  <w pos="VBG" id="w37.3.8">being</w>
+  <w pos="VBN" id="w37.3.9">fulfilled</w>
+ </chunk>
+ <w pos="." id="w37.3.10">.</w>
+</s></p>
+
+<p id="38">
+<s id="s38.1">
+ <chunk type="NP" id="c38.1-1">
+  <w pos="JJ" id="w38.1.1">Industrial</w>
+  <w pos="NNS" id="w38.1.2">products</w>
+  <w pos="CC" id="w38.1.3">and</w>
+  <w pos="NNS" id="w38.1.4">processes</w>
+ </chunk>
+ <chunk type="VP" id="c38.1-2">
+  <w pos="VBP" id="w38.1.5">are</w>
+  <w pos="TO" id="w38.1.6">to</w>
+  <w pos="VB" id="w38.1.7">be</w>
+  <w pos="VBN" id="w38.1.8">cleaner</w>
+ </chunk>
+ <chunk type="PP" id="c38.1-3">
+  <w pos="IN" id="w38.1.9">through</w>
+ </chunk>
+ <chunk type="NP" id="c38.1-4">
+  <w pos="NN" id="w38.1.10">stringent</w>
+  <w pos="NNS" id="w38.1.11">requirements</w>
+ </chunk>
+ <w pos="CC" id="w38.1.12">and</w>
+ <chunk type="NP" id="c38.1-6">
+  <w pos="JJ" id="w38.1.13">rapid</w>
+  <w pos="NN" id="w38.1.14">adaptation</w>
+ </chunk>
+ <chunk type="PP" id="c38.1-7">
+  <w pos="TO" id="w38.1.15">to</w>
+ </chunk>
+ <chunk type="NP" id="c38.1-8">
+  <w pos="JJ" id="w38.1.16">new</w>
+  <w pos="NN" id="w38.1.17">technology</w>
+ </chunk>
+ <w pos="." id="w38.1.18">.</w>
+</s> 
+ 
+
+
+<s id="s38.2">
+ <chunk type="SBAR" id="c38.2-1">
+  <w pos="NNS" id="w38.2.1">Permits</w>
+ </chunk>
+ <chunk type="VP" id="c38.2-2">
+  <w pos="VBN" id="w38.2.2">granted</w>
+ </chunk>
+ <chunk type="VP" id="c38.2-3">
+  <w pos="MD" id="w38.2.3">will</w>
+  <w pos="VB" id="w38.2.4">be</w>
+ </chunk>
+ <chunk type="ADJP" id="c38.2-4">
+  <w pos="JJ" id="w38.2.5">re-examined</w>
+ </chunk>
+ <w pos="." id="w38.2.6">.</w>
+</s> 
+ 
+
+
+<s id="s38.3">
+ <chunk type="NP" id="c38.3-1">
+  <w pos="NNS" id="w38.3.1">Requirements</w>
+ </chunk>
+ <chunk type="VP" id="c38.3-2">
+  <w pos="VBN" id="w38.3.2">imposed</w>
+ </chunk>
+ <chunk type="PP" id="c38.3-3">
+  <w pos="IN" id="w38.3.3">on</w>
+ </chunk>
+ <chunk type="NP" id="c38.3-4">
+  <w pos="JJ" id="w38.3.4">environmentally</w>
+  <w pos="JJ" id="w38.3.5">hazardous</w>
+  <w pos="NNS" id="w38.3.6">products</w>
+ </chunk>
+ <w pos="," id="w38.3.7">,</w>
+ <chunk type="NP" id="c38.3-6">
+  <w pos="NNS" id="w38.3.8">chemicals</w>
+  <w pos="VBN" id="w38.3.9">and</w>
+ </chunk>
+ <chunk type="PP" id="c38.3-7">
+  <w pos="IN" id="w38.3.10">on</w>
+ </chunk>
+ <chunk type="NP" id="c38.3-8">
+  <w pos="NN" id="w38.3.11">waste</w>
+  <w pos="NN" id="w38.3.12">disposal</w>
+  <w pos="NN" id="w38.3.13">management</w>
+ </chunk>
+ <chunk type="VP" id="c38.3-9">
+  <w pos="MD" id="w38.3.14">will</w>
+  <w pos="VB" id="w38.3.15">be</w>
+  <w pos="VBN" id="w38.3.16">tightened</w>
+ </chunk>
+ <w pos="." id="w38.3.17">.</w>
+</s> 
+ 
+
+
+<s id="s38.4">
+ <chunk type="NP" id="c38.4-1">
+  <w pos="NNP" id="w38.4.1">Preliminary</w>
+  <w pos="NN" id="w38.4.2">inspection</w>
+ </chunk>
+ <chunk type="PP" id="c38.4-2">
+  <w pos="IN" id="w38.4.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c38.4-3">
+  <w pos="JJ" id="w38.4.4">new</w>
+  <w pos="NN" id="w38.4.5">chemical</w>
+  <w pos="NNS" id="w38.4.6">substances</w>
+ </chunk>
+ <chunk type="VP" id="c38.4-4">
+  <w pos="MD" id="w38.4.7">will</w>
+  <w pos="VB" id="w38.4.8">be</w>
+  <w pos="VBN" id="w38.4.9">introduced</w>
+ </chunk>
+ <w pos="." id="w38.4.10">.</w>
+</s></p>
+
+<p id="39">
+<s id="s39.1">
+ <chunk type="NP" id="c39.1-1">
+  <w pos="JJ" id="w39.1.1">Pollution</w>
+  <w pos="NNS" id="w39.1.2">charges</w>
+ </chunk>
+ <chunk type="PP" id="c39.1-2">
+  <w pos="IN" id="w39.1.3">for</w>
+ </chunk>
+ <chunk type="NP" id="c39.1-3">
+  <w pos="NN" id="w39.1.4">chlorine</w>
+  <w pos="NNS" id="w39.1.5">organics</w>
+  <w pos="CC" id="w39.1.6">and</w>
+  <w pos="NN" id="w39.1.7">sulphur</w>
+ </chunk>
+ <chunk type="VP" id="c39.1-4">
+  <w pos="MD" id="w39.1.8">will</w>
+  <w pos="VB" id="w39.1.9">be</w>
+  <w pos="VBN" id="w39.1.10">introduced</w>
+ </chunk>
+ <chunk type="ADVP" id="c39.1-5">
+  <w pos="RB" id="w39.1.11">as</w>
+  <w pos="RB" id="w39.1.12">early</w>
+ </chunk>
+ <chunk type="PP" id="c39.1-6">
+  <w pos="IN" id="w39.1.13">as</w>
+ </chunk>
+ <chunk type="NP" id="c39.1-7">
+  <w pos="CD" id="w39.1.14">1989</w>
+ </chunk>
+ <w pos="." id="w39.1.15">.</w>
+</s> 
+ 
+
+
+<s id="s39.2">
+ <chunk type="NP" id="c39.2-1">
+  <w pos="NNS" id="w39.2.1">Proposals</w>
+ </chunk>
+ <chunk type="PP" id="c39.2-2">
+  <w pos="IN" id="w39.2.2">for</w>
+ </chunk>
+ <chunk type="NP" id="c39.2-3">
+  <w pos="NN" id="w39.2.3">pollution</w>
+  <w pos="NNS" id="w39.2.4">charges</w>
+ </chunk>
+ <chunk type="PP" id="c39.2-4">
+  <w pos="IN" id="w39.2.5">for</w>
+ </chunk>
+ <chunk type="NP" id="c39.2-5">
+  <w pos="JJ" id="w39.2.6">other</w>
+  <w pos="NNS" id="w39.2.7">substances</w>
+ </chunk>
+ <w pos="," id="w39.2.8">,</w>
+ <chunk type="PP" id="c39.2-7">
+  <w pos="IN" id="w39.2.9">among</w>
+ </chunk>
+ <chunk type="NP" id="c39.2-8">
+  <w pos="PRP" id="w39.2.10">them</w>
+ </chunk>
+ <chunk type="NP" id="c39.2-9">
+  <w pos="JJ" id="w39.2.11">carbon</w>
+  <w pos="NN" id="w39.2.12">dioxide</w>
+ </chunk>
+ <w pos="," id="w39.2.13">,</w>
+ <chunk type="VP" id="c39.2-11">
+  <w pos="MD" id="w39.2.14">will</w>
+  <w pos="VB" id="w39.2.15">be</w>
+  <w pos="VBN" id="w39.2.16">presented</w>
+ </chunk>
+ <chunk type="PP" id="c39.2-12">
+  <w pos="IN" id="w39.2.17">during</w>
+ </chunk>
+ <chunk type="NP" id="c39.2-13">
+  <w pos="DT" id="w39.2.18">this</w>
+  <w pos="NN" id="w39.2.19">term</w>
+ </chunk>
+ <chunk type="PP" id="c39.2-14">
+  <w pos="IN" id="w39.2.20">of</w>
+ </chunk>
+ <chunk type="NP" id="c39.2-15">
+  <w pos="NN" id="w39.2.21">office</w>
+ </chunk>
+ <w pos="." id="w39.2.22">.</w>
+</s></p>
+
+<p id="40">
+<s id="s40.1">
+ <chunk type="NP" id="c40.1-1">
+  <w pos="DT" id="w40.1.1">All</w>
+  <w pos="NN" id="w40.1.2">legislation</w>
+ </chunk>
+ <chunk type="VP" id="c40.1-2">
+  <w pos="VBD" id="w40.1.3">pertaining</w>
+ </chunk>
+ <chunk type="PP" id="c40.1-3">
+  <w pos="TO" id="w40.1.4">to</w>
+ </chunk>
+ <chunk type="NP" id="c40.1-4">
+  <w pos="DT" id="w40.1.5">the</w>
+  <w pos="NN" id="w40.1.6">environment</w>
+ </chunk>
+ <chunk type="VP" id="c40.1-5">
+  <w pos="MD" id="w40.1.7">will</w>
+  <w pos="VB" id="w40.1.8">be</w>
+  <w pos="VBN" id="w40.1.9">reviewed</w>
+ </chunk>
+ <w pos="CC" id="w40.1.10">and</w>
+ <chunk type="ADJP" id="c40.1-7">
+  <w pos="JJ" id="w40.1.11">co-ordinated</w>
+ </chunk>
+ <w pos="." id="w40.1.12">.</w>
+</s> 
+ 
+
+
+<s id="s40.2">
+ <chunk type="NP" id="c40.2-1">
+  <w pos="NNS" id="w40.2.1">Proposals</w>
+ </chunk>
+ <chunk type="PP" id="c40.2-2">
+  <w pos="IN" id="w40.2.2">for</w>
+ </chunk>
+ <chunk type="NP" id="c40.2-3">
+  <w pos="DT" id="w40.2.3">a</w>
+  <w pos="JJ" id="w40.2.4">new</w>
+  <w pos="NNP" id="w40.2.5">Nature</w>
+  <w pos="NNP" id="w40.2.6">Conservation</w>
+  <w pos="NNP" id="w40.2.7">Act</w>
+ </chunk>
+ <chunk type="CONJP" id="c40.2-4">
+  <w pos="VBZ" id="w40.2.8">as</w>
+  <w pos="RB" id="w40.2.9">also</w>
+ </chunk>
+ <chunk type="NP" id="c40.2-5">
+  <w pos="JJ" id="w40.2.10">further</w>
+  <w pos="NN" id="w40.2.11">tightening</w>
+ </chunk>
+ <chunk type="PP" id="c40.2-6">
+  <w pos="IN" id="w40.2.12">of</w>
+ </chunk>
+ <chunk type="NP" id="c40.2-7">
+  <w pos="DT" id="w40.2.13">the</w>
+  <w pos="NNP" id="w40.2.14">Environment</w>
+  <w pos="NNP" id="w40.2.15">Protection</w>
+  <w pos="NNP" id="w40.2.16">Act</w>
+ </chunk>
+ <chunk type="VP" id="c40.2-8">
+  <w pos="MD" id="w40.2.17">will</w>
+  <w pos="VB" id="w40.2.18">be</w>
+  <w pos="VBN" id="w40.2.19">presented</w>
+ </chunk>
+ <chunk type="PP" id="c40.2-9">
+  <w pos="IN" id="w40.2.20">during</w>
+ </chunk>
+ <chunk type="NP" id="c40.2-10">
+  <w pos="DT" id="w40.2.21">the</w>
+  <w pos="NN" id="w40.2.22">life</w>
+ </chunk>
+ <chunk type="PP" id="c40.2-11">
+  <w pos="IN" id="w40.2.23">of</w>
+ </chunk>
+ <chunk type="NP" id="c40.2-12">
+  <w pos="DT" id="w40.2.24">this</w>
+  <w pos="NNP" id="w40.2.25">Parliament</w>
+ </chunk>
+ <w pos="." id="w40.2.26">.</w>
+</s></p>
+
+<p id="41">
+<s id="s41.1">
+ <chunk type="NP" id="c41.1-1">
+  <w pos="DT" id="w41.1.1">The</w>
+  <w pos="NN" id="w41.1.2">organization</w>
+ </chunk>
+ <chunk type="PP" id="c41.1-2">
+  <w pos="IN" id="w41.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c41.1-3">
+  <w pos="JJ" id="w41.1.4">environmental</w>
+  <w pos="NN" id="w41.1.5">protection</w>
+ </chunk>
+ <chunk type="VP" id="c41.1-4">
+  <w pos="MD" id="w41.1.6">will</w>
+  <w pos="VB" id="w41.1.7">be</w>
+  <w pos="VBN" id="w41.1.8">given</w>
+ </chunk>
+ <chunk type="NP" id="c41.1-5">
+  <w pos="RB" id="w41.1.9">substantially</w>
+  <w pos="VBN" id="w41.1.10">increased</w>
+  <w pos="NNS" id="w41.1.11">resources</w>
+ </chunk>
+ <w pos="." id="w41.1.12">.</w>
+</s> 
+ 
+
+
+<s id="s41.2">
+ <chunk type="NP" id="c41.2-1">
+  <w pos="JJ" id="w41.2.1">Special</w>
+  <w pos="NNS" id="w41.2.2">measures</w>
+ </chunk>
+ <chunk type="VP" id="c41.2-2">
+  <w pos="MD" id="w41.2.3">will</w>
+  <w pos="VB" id="w41.2.4">be</w>
+  <w pos="VBN" id="w41.2.5">applied</w>
+ </chunk>
+ <chunk type="PP" id="c41.2-3">
+  <w pos="IN" id="w41.2.6">in</w>
+ </chunk>
+ <chunk type="NP" id="c41.2-4">
+  <w pos="NNS" id="w41.2.7">regions</w>
+  <w pos="RB" id="w41.2.8">particularly</w>
+  <w pos="VBN" id="w41.2.9">exposed</w>
+ </chunk>
+ <w pos="," id="w41.2.10">,</w>
+ <chunk type="PP" id="c41.2-6">
+  <w pos="IN" id="w41.2.11">for</w>
+ </chunk>
+ <chunk type="NP" id="c41.2-7">
+  <w pos="NN" id="w41.2.12">example</w>
+  <w pos="NN" id="w41.2.13">west</w>
+  <w pos="NNP" id="w41.2.14">Skåne</w>
+ </chunk>
+ <w pos="CC" id="w41.2.15">and</w>
+ <chunk type="NP" id="c41.2-9">
+  <w pos="DT" id="w41.2.16">the</w>
+  <w pos="NNP" id="w41.2.17">Sundsvall</w>
+  <w pos="NNP" id="w41.2.18">/</w>
+  <w pos="NNP" id="w41.2.19">Timrå</w>
+  <w pos="NN" id="w41.2.20">area</w>
+ </chunk>
+ <w pos="." id="w41.2.21">.</w>
+</s></p>
+
+<p id="42">
+<s id="s42.1">
+ <chunk type="PP" id="c42.1-1">
+  <w pos="IN" id="w42.1.1">In</w>
+ </chunk>
+ <chunk type="NP" id="c42.1-2">
+  <w pos="DT" id="w42.1.2">the</w>
+  <w pos="JJ" id="w42.1.3">near</w>
+  <w pos="NN" id="w42.1.4">future</w>
+  <w pos="DT" id="w42.1.5">the</w>
+  <w pos="NNP" id="w42.1.6">Government</w>
+ </chunk>
+ <chunk type="VP" id="c42.1-3">
+  <w pos="MD" id="w42.1.7">will</w>
+  <w pos="VB" id="w42.1.8">invite</w>
+ </chunk>
+ <chunk type="NP" id="c42.1-4">
+  <w pos="NNS" id="w42.1.9">representatives</w>
+ </chunk>
+ <chunk type="PP" id="c42.1-5">
+  <w pos="IN" id="w42.1.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c42.1-6">
+  <w pos="DT" id="w42.1.11">the</w>
+  <w pos="CD" id="w42.1.12">three</w>
+  <w pos="JJ" id="w42.1.13">big</w>
+  <w pos="NNS" id="w42.1.14">cities</w>
+ </chunk>
+ <chunk type="VP" id="c42.1-7">
+  <w pos="TO" id="w42.1.15">to</w>
+  <w pos="VB" id="w42.1.16">take</w>
+ </chunk>
+ <chunk type="NP" id="c42.1-8">
+  <w pos="NN" id="w42.1.17">part</w>
+ </chunk>
+ <chunk type="PP" id="c42.1-9">
+  <w pos="IN" id="w42.1.18">in</w>
+ </chunk>
+ <chunk type="NP" id="c42.1-10">
+  <w pos="NNS" id="w42.1.19">discussions</w>
+ </chunk>
+ <chunk type="PP" id="c42.1-11">
+  <w pos="IN" id="w42.1.20">on</w>
+ </chunk>
+ <chunk type="ADVP" id="c42.1-12">
+  <w pos="WRB" id="w42.1.21">how</w>
+ </chunk>
+ <chunk type="NP" id="c42.1-13">
+  <w pos="DT" id="w42.1.22">the</w>
+  <w pos="NN" id="w42.1.23">environment</w>
+ </chunk>
+ <chunk type="PP" id="c42.1-14">
+  <w pos="IN" id="w42.1.24">of</w>
+ </chunk>
+ <chunk type="NP" id="c42.1-15">
+  <w pos="DT" id="w42.1.25">these</w>
+  <w pos="NNS" id="w42.1.26">cities</w>
+ </chunk>
+ <chunk type="VP" id="c42.1-16">
+  <w pos="VBZ" id="w42.1.27">is</w>
+  <w pos="TO" id="w42.1.28">to</w>
+  <w pos="VB" id="w42.1.29">be</w>
+  <w pos="VBN" id="w42.1.30">improved</w>
+ </chunk>
+ <w pos="." id="w42.1.31">.</w>
+</s></p>
+
+<p id="43">
+<s id="s43.1">
+ <chunk type="PP" id="c43.1-1">
+  <w pos="IN" id="w43.1.1">In</w>
+ </chunk>
+ <chunk type="NP" id="c43.1-2">
+  <w pos="CD" id="w43.1.2">1990</w>
+  <w pos="DT" id="w43.1.3">a</w>
+  <w pos="NN" id="w43.1.4">proposal</w>
+ </chunk>
+ <chunk type="VP" id="c43.1-3">
+  <w pos="MD" id="w43.1.5">will</w>
+  <w pos="VB" id="w43.1.6">be</w>
+  <w pos="VBN" id="w43.1.7">submitted</w>
+ </chunk>
+ <chunk type="PP" id="c43.1-4">
+  <w pos="TO" id="w43.1.8">to</w>
+ </chunk>
+ <chunk type="NP" id="c43.1-5">
+  <w pos="NNP" id="w43.1.9">Parliament</w>
+ </chunk>
+ <chunk type="PP" id="c43.1-6">
+  <w pos="IN" id="w43.1.10">on</w>
+ </chunk>
+ <chunk type="NP" id="c43.1-7">
+  <w pos="DT" id="w43.1.11">the</w>
+  <w pos="CD" id="w43.1.12">two</w>
+  <w pos="NNS" id="w43.1.13">reactors</w>
+ </chunk>
+ <chunk type="PP" id="c43.1-8">
+  <w pos="IN" id="w43.1.14">at</w>
+ </chunk>
+ <chunk type="NP" id="c43.1-9">
+  <w pos="DT" id="w43.1.15">the</w>
+  <w pos="NNP" id="w43.1.16">Barsebäck</w>
+  <w pos="CC" id="w43.1.17">and</w>
+  <w pos="NNP" id="w43.1.18">Ringhals</w>
+  <w pos="JJ" id="w43.1.19">nuclear</w>
+  <w pos="NN" id="w43.1.20">power</w>
+  <w pos="NNS" id="w43.1.21">stations</w>
+ </chunk>
+ <chunk type="NP" id="c43.1-10">
+  <w pos="WDT" id="w43.1.22">that</w>
+ </chunk>
+ <chunk type="VP" id="c43.1-11">
+  <w pos="VBP" id="w43.1.23">are</w>
+  <w pos="TO" id="w43.1.24">to</w>
+  <w pos="VB" id="w43.1.25">be</w>
+  <w pos="VBN" id="w43.1.26">taken</w>
+ </chunk>
+ <chunk type="PP" id="c43.1-12">
+  <w pos="IN" id="w43.1.27">out</w>
+ </chunk>
+ <chunk type="PP" id="c43.1-13">
+  <w pos="IN" id="w43.1.28">of</w>
+ </chunk>
+ <chunk type="NP" id="c43.1-14">
+  <w pos="NN" id="w43.1.29">service</w>
+ </chunk>
+ <chunk type="PP" id="c43.1-15">
+  <w pos="IN" id="w43.1.30">in</w>
+ </chunk>
+ <chunk type="NP" id="c43.1-16">
+  <w pos="CD" id="w43.1.31">1995</w>
+  <w pos="CC" id="w43.1.32">and</w>
+  <w pos="CD" id="w43.1.33">1996</w>
+ </chunk>
+ <w pos="." id="w43.1.34">.</w>
+</s> 
+ 
+
+
+<s id="s43.2">
+ <chunk type="NP" id="c43.2-1">
+  <w pos="DT" id="w43.2.1">The</w>
+  <w pos="NN" id="w43.2.2">energy</w>
+  <w pos="NN" id="w43.2.3">system</w>
+ </chunk>
+ <chunk type="VP" id="c43.2-2">
+  <w pos="MD" id="w43.2.4">will</w>
+  <w pos="VB" id="w43.2.5">be</w>
+  <w pos="VBN" id="w43.2.6">modified</w>
+ </chunk>
+ <chunk type="PP" id="c43.2-3">
+  <w pos="JJ" id="w43.2.7">such</w>
+  <w pos="IN" id="w43.2.8">that</w>
+ </chunk>
+ <chunk type="NP" id="c43.2-4">
+  <w pos="NN" id="w43.2.9">acidification</w>
+ </chunk>
+ <chunk type="VP" id="c43.2-5">
+  <w pos="VBZ" id="w43.2.10">is</w>
+  <w pos="VBN" id="w43.2.11">reduced</w>
+ </chunk>
+ <w pos="CC" id="w43.2.12">and</w>
+ <chunk type="NP" id="c43.2-7">
+  <w pos="JJ" id="w43.2.13">climatic</w>
+  <w pos="NNS" id="w43.2.14">effects</w>
+ </chunk>
+ <chunk type="VP" id="c43.2-8">
+  <w pos="VBD" id="w43.2.15">counteracted</w>
+ </chunk>
+ <w pos="." id="w43.2.16">.</w>
+</s></p>
+
+<p id="44">
+<s id="s44.1">
+ <chunk type="NP" id="c44.1-1">
+  <w pos="DT" id="w44.1.1">The</w>
+  <w pos="NNP" id="w44.1.2">Government</w>
+ </chunk>
+ <chunk type="NP" id="c44.1-2">
+  <w pos="POS" id="w44.1.3">'s</w>
+  <w pos="JJ" id="w44.1.4">agricultural</w>
+  <w pos="NN" id="w44.1.5">policy</w>
+  <w pos="NNS" id="w44.1.6">aims</w>
+ </chunk>
+ <chunk type="VP" id="c44.1-3">
+  <w pos="TO" id="w44.1.7">to</w>
+  <w pos="VB" id="w44.1.8">promote</w>
+ </chunk>
+ <chunk type="NP" id="c44.1-4">
+  <w pos="NN" id="w44.1.9">farming</w>
+ </chunk>
+ <chunk type="SBAR" id="c44.1-5">
+  <w pos="IN" id="w44.1.10">that</w>
+ </chunk>
+ <chunk type="NP" id="c44.1-6">
+  <w pos="NNS" id="w44.1.11">thrives</w>
+ </chunk>
+ <chunk type="PP" id="c44.1-7">
+  <w pos="IN" id="w44.1.12">without</w>
+ </chunk>
+ <chunk type="VP" id="c44.1-8">
+  <w pos="VBG" id="w44.1.13">having</w>
+ </chunk>
+ <chunk type="NP" id="c44.1-9">
+  <w pos="JJ" id="w44.1.14">damaging</w>
+  <w pos="NNS" id="w44.1.15">effects</w>
+ </chunk>
+ <chunk type="PP" id="c44.1-10">
+  <w pos="IN" id="w44.1.16">on</w>
+ </chunk>
+ <chunk type="NP" id="c44.1-11">
+  <w pos="DT" id="w44.1.17">the</w>
+  <w pos="NN" id="w44.1.18">environment</w>
+ </chunk>
+ <w pos="." id="w44.1.19">.</w>
+</s> 
+ 
+
+
+<s id="s44.2">
+ <chunk type="NP" id="c44.2-1">
+  <w pos="EX" id="w44.2.1">There</w>
+ </chunk>
+ <chunk type="VP" id="c44.2-2">
+  <w pos="MD" id="w44.2.2">must</w>
+  <w pos="VB" id="w44.2.3">be</w>
+ </chunk>
+ <chunk type="NP" id="c44.2-3">
+  <w pos="DT" id="w44.2.4">a</w>
+  <w pos="NN" id="w44.2.5">move</w>
+ </chunk>
+ <chunk type="PP" id="c44.2-4">
+  <w pos="IN" id="w44.2.6">from</w>
+ </chunk>
+ <chunk type="NP" id="c44.2-5">
+  <w pos="NN" id="w44.2.7">today</w>
+ </chunk>
+ <chunk type="NP" id="c44.2-6">
+  <w pos="POS" id="w44.2.8">'s</w>
+  <w pos="JJ" id="w44.2.9">intensive</w>
+  <w pos="NN" id="w44.2.10">production</w>
+ </chunk>
+ <chunk type="VP" id="c44.2-7">
+  <w pos="TO" id="w44.2.11">to</w>
+  <w pos="VB" id="w44.2.12">farming</w>
+ </chunk>
+ <chunk type="NP" id="c44.2-8">
+  <w pos="DT" id="w44.2.13">that</w>
+  <w pos="NN" id="w44.2.14">better</w>
+ </chunk>
+ <chunk type="VP" id="c44.2-9">
+  <w pos="VBZ" id="w44.2.15">meets</w>
+ </chunk>
+ <chunk type="NP" id="c44.2-10">
+  <w pos="DT" id="w44.2.16">the</w>
+  <w pos="NNS" id="w44.2.17">requirements</w>
+ </chunk>
+ <chunk type="PP" id="c44.2-11">
+  <w pos="IN" id="w44.2.18">in</w>
+ </chunk>
+ <chunk type="NP" id="c44.2-12">
+  <w pos="NN" id="w44.2.19">respect</w>
+ </chunk>
+ <chunk type="PP" id="c44.2-13">
+  <w pos="IN" id="w44.2.20">of</w>
+ </chunk>
+ <chunk type="NP" id="c44.2-14">
+  <w pos="DT" id="w44.2.21">the</w>
+  <w pos="NN" id="w44.2.22">environment</w>
+ </chunk>
+ <w pos="CC" id="w44.2.23">and</w>
+ <chunk type="NP" id="c44.2-16">
+  <w pos="JJ" id="w44.2.24">regional</w>
+  <w pos="NN" id="w44.2.25">distribution</w>
+ </chunk>
+ <w pos="." id="w44.2.26">.</w>
+</s> 
+ 
+
+
+<s id="s44.3">
+ <chunk type="NP" id="c44.3-1">
+  <w pos="JJ" id="w44.3.1">Alternative</w>
+  <w pos="NNS" id="w44.3.2">methods</w>
+ </chunk>
+ <chunk type="PP" id="c44.3-2">
+  <w pos="IN" id="w44.3.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c44.3-3">
+  <w pos="NN" id="w44.3.4">farming</w>
+ </chunk>
+ <chunk type="VP" id="c44.3-4">
+  <w pos="MD" id="w44.3.5">will</w>
+  <w pos="VB" id="w44.3.6">be</w>
+  <w pos="VBN" id="w44.3.7">stimulated</w>
+ </chunk>
+ <w pos="." id="w44.3.8">.</w>
+</s> 
+ 
+
+
+<s id="s44.4">
+ <chunk type="NP" id="c44.4-1">
+  <w pos="NNS" id="w44.4.1">Measures</w>
+ </chunk>
+ <chunk type="VP" id="c44.4-2">
+  <w pos="MD" id="w44.4.2">will</w>
+  <w pos="VB" id="w44.4.3">be</w>
+  <w pos="VBN" id="w44.4.4">taken</w>
+ </chunk>
+ <chunk type="VP" id="c44.4-3">
+  <w pos="TO" id="w44.4.5">to</w>
+  <w pos="VB" id="w44.4.6">protect</w>
+ </chunk>
+ <chunk type="NP" id="c44.4-4">
+  <w pos="DT" id="w44.4.7">the</w>
+  <w pos="JJ" id="w44.4.8">visual</w>
+  <w pos="NN" id="w44.4.9">amenity</w>
+ </chunk>
+ <chunk type="PP" id="c44.4-5">
+  <w pos="IN" id="w44.4.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c44.4-6">
+  <w pos="DT" id="w44.4.11">the</w>
+  <w pos="JJ" id="w44.4.12">open</w>
+  <w pos="NN" id="w44.4.13">landscape</w>
+ </chunk>
+ <w pos="." id="w44.4.14">.</w>
+</s></p>
+
+<p id="45">
+<s id="s45.1">
+ <chunk type="NP" id="c45.1-1">
+  <w pos="JJ" id="w45.1.1">International</w>
+  <w pos="NNS" id="w45.1.2">developments</w>
+ </chunk>
+ <chunk type="VP" id="c45.1-2">
+  <w pos="MD" id="w45.1.3">will</w>
+  <w pos="VB" id="w45.1.4">require</w>
+ </chunk>
+ <chunk type="NP" id="c45.1-3">
+  <w pos="NNS" id="w45.1.5">changes</w>
+ </chunk>
+ <chunk type="PP" id="c45.1-4">
+  <w pos="IN" id="w45.1.6">in</w>
+ </chunk>
+ <chunk type="NP" id="c45.1-5">
+  <w pos="JJ" id="w45.1.7">agricultural</w>
+  <w pos="NNS" id="w45.1.8">subsidies</w>
+ </chunk>
+ <chunk type="PP" id="c45.1-6">
+  <w pos="TO" id="w45.1.9">to</w>
+ </chunk>
+ <chunk type="NP" id="c45.1-7">
+  <w pos="NNS" id="w45.1.10">forms</w>
+  <w pos="RB" id="w45.1.11">implying</w>
+  <w pos="JJ" id="w45.1.12">less</w>
+  <w pos="NN" id="w45.1.13">protectionism</w>
+ </chunk>
+ <w pos="." id="w45.1.14">.</w>
+</s> 
+ 
+
+
+<s id="s45.2">
+ <chunk type="NP" id="c45.2-1">
+  <w pos="DT" id="w45.2.1">The</w>
+  <w pos="NNP" id="w45.2.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c45.2-2">
+  <w pos="VBZ" id="w45.2.3">intends</w>
+  <w pos="TO" id="w45.2.4">to</w>
+  <w pos="VB" id="w45.2.5">pursue</w>
+ </chunk>
+ <chunk type="NP" id="c45.2-3">
+  <w pos="DT" id="w45.2.6">a</w>
+  <w pos="NN" id="w45.2.7">food</w>
+  <w pos="NN" id="w45.2.8">policy</w>
+ </chunk>
+ <chunk type="PP" id="c45.2-4">
+  <w pos="NN" id="w45.2.9">such</w>
+  <w pos="IN" id="w45.2.10">that</w>
+ </chunk>
+ <chunk type="NP" id="c45.2-5">
+  <w pos="DT" id="w45.2.11">the</w>
+  <w pos="NN" id="w45.2.12">price</w>
+  <w pos="NN" id="w45.2.13">trend</w>
+ </chunk>
+ <chunk type="VP" id="c45.2-6">
+  <w pos="VBZ" id="w45.2.14">is</w>
+  <w pos="VBN" id="w45.2.15">checked</w>
+ </chunk>
+ <w pos="CC" id="w45.2.16">and</w>
+ <chunk type="NP" id="c45.2-8">
+  <w pos="DT" id="w45.2.17">the</w>
+  <w pos="NNS" id="w45.2.18">consumers</w>
+ </chunk>
+ <chunk type="VP" id="c45.2-9">
+  <w pos="VBN" id="w45.2.19">offered</w>
+ </chunk>
+ <chunk type="NP" id="c45.2-10">
+  <w pos="NN" id="w45.2.20">food</w>
+ </chunk>
+ <chunk type="PP" id="c45.2-11">
+  <w pos="IN" id="w45.2.21">at</w>
+ </chunk>
+ <chunk type="NP" id="c45.2-12">
+  <w pos="JJ" id="w45.2.22">reasonable</w>
+  <w pos="NNS" id="w45.2.23">prices</w>
+ </chunk>
+ <w pos="." id="w45.2.24">.</w>
+</s> 
+ 
+
+
+<s id="s45.3">
+ <chunk type="NP" id="c45.3-1">
+  <w pos="NN" id="w45.3.1">Food</w>
+  <w pos="NNS" id="w45.3.2">controls</w>
+ </chunk>
+ <chunk type="VP" id="c45.3-2">
+  <w pos="MD" id="w45.3.3">will</w>
+  <w pos="VB" id="w45.3.4">be</w>
+  <w pos="VBN" id="w45.3.5">tightened</w>
+ </chunk>
+ <w pos="." id="w45.3.6">.</w>
+</s></p>
+
+<p id="46">
+<s id="s46.1">
+ <chunk type="NP" id="c46.1-1">
+  <w pos="DT" id="w46.1.1">The</w>
+  <w pos="JJ" id="w46.1.2">public</w>
+  <w pos="NN" id="w46.1.3">sector</w>
+ </chunk>
+ <chunk type="VP" id="c46.1-2">
+  <w pos="MD" id="w46.1.4">will</w>
+  <w pos="VB" id="w46.1.5">be</w>
+  <w pos="VBN" id="w46.1.6">renewed</w>
+ </chunk>
+ <chunk type="SBAR" id="c46.1-3">
+  <w pos="IN" id="w46.1.7">in</w>
+ </chunk>
+ <w pos="NN" id="w46.1.8">order</w>
+ <chunk type="VP" id="c46.1-5">
+  <w pos="TO" id="w46.1.9">to</w>
+  <w pos="VB" id="w46.1.10">provide</w>
+ </chunk>
+ <chunk type="NP" id="c46.1-6">
+  <w pos="JJR" id="w46.1.11">better</w>
+  <w pos="NN" id="w46.1.12">service</w>
+ </chunk>
+ <chunk type="PP" id="c46.1-7">
+  <w pos="TO" id="w46.1.13">to</w>
+ </chunk>
+ <chunk type="NP" id="c46.1-8">
+  <w pos="NNS" id="w46.1.14">people</w>
+ </chunk>
+ <chunk type="PP" id="c46.1-9">
+  <w pos="VBG" id="w46.1.15">according</w>
+ </chunk>
+ <chunk type="PP" id="c46.1-10">
+  <w pos="TO" id="w46.1.16">to</w>
+ </chunk>
+ <chunk type="NP" id="c46.1-11">
+  <w pos="PRP$" id="w46.1.17">their</w>
+  <w pos="NNS" id="w46.1.18">needs</w>
+ </chunk>
+ <w pos="CC" id="w46.1.19">and</w>
+ <chunk type="NP" id="c46.1-13">
+  <w pos="NNS" id="w46.1.20">wishes</w>
+ </chunk>
+ <w pos="." id="w46.1.21">.</w>
+</s> 
+ 
+
+
+<s id="s46.2">
+ <chunk type="NP" id="c46.2-1">
+  <w pos="NNP" id="w46.2.1">Service</w>
+ </chunk>
+ <w pos="CC" id="w46.2.2">and</w>
+ <chunk type="NP" id="c46.2-3">
+  <w pos="NN" id="w46.2.3">freedom</w>
+ </chunk>
+ <chunk type="PP" id="c46.2-4">
+  <w pos="IN" id="w46.2.4">of</w>
+ </chunk>
+ <chunk type="NP" id="c46.2-5">
+  <w pos="NN" id="w46.2.5">choice</w>
+ </chunk>
+ <chunk type="VP" id="c46.2-6">
+  <w pos="MD" id="w46.2.6">will</w>
+  <w pos="VB" id="w46.2.7">be</w>
+  <w pos="VBN" id="w46.2.8">augmented</w>
+ </chunk>
+ <w pos="." id="w46.2.9">.</w>
+</s> 
+ 
+
+
+<s id="s46.3">
+ <chunk type="NP" id="c46.3-1">
+  <w pos="NNP" id="w46.3.1">Efficiency</w>
+ </chunk>
+ <chunk type="VP" id="c46.3-2">
+  <w pos="VBZ" id="w46.3.2">is</w>
+  <w pos="TO" id="w46.3.3">to</w>
+  <w pos="VB" id="w46.3.4">be</w>
+  <w pos="VBN" id="w46.3.5">promoted</w>
+ </chunk>
+ <w pos="," id="w46.3.6">,</w>
+ <chunk type="PP" id="c46.3-4">
+  <w pos="IN" id="w46.3.7">by</w>
+ </chunk>
+ <chunk type="NP" id="c46.3-5">
+  <w pos="NN" id="w46.3.8">,</w>
+ </chunk>
+ <chunk type="PP" id="c46.3-6">
+  <w pos="IN" id="w46.3.9">among</w>
+ </chunk>
+ <chunk type="NP" id="c46.3-7">
+  <w pos="JJ" id="w46.3.10">other</w>
+  <w pos="NNS" id="w46.3.11">things</w>
+ </chunk>
+ <w pos="," id="w46.3.12">,</w>
+ <chunk type="VP" id="c46.3-9">
+  <w pos="VBG" id="w46.3.13">allowing</w>
+ </chunk>
+ <chunk type="NP" id="c46.3-10">
+  <w pos="JJR" id="w46.3.14">greater</w>
+  <w pos="NN" id="w46.3.15">scope</w>
+ </chunk>
+ <chunk type="PP" id="c46.3-11">
+  <w pos="IN" id="w46.3.16">for</w>
+ </chunk>
+ <chunk type="NP" id="c46.3-12">
+  <w pos="NNS" id="w46.3.17">employees</w>
+ </chunk>
+ <chunk type="NP" id="c46.3-13">
+  <w pos="POS" id="w46.3.18">'</w>
+  <w pos="NN" id="w46.3.19">power</w>
+ </chunk>
+ <chunk type="PP" id="c46.3-14">
+  <w pos="IN" id="w46.3.20">of</w>
+ </chunk>
+ <chunk type="NP" id="c46.3-15">
+  <w pos="NN" id="w46.3.21">initiative</w>
+ </chunk>
+ <w pos="." id="w46.3.22">.</w>
+</s></p>
+
+<p id="47">
+<s id="s47.1">
+ <chunk type="NP" id="c47.1-1">
+  <w pos="JJ" id="w47.1.1">Parental</w>
+  <w pos="NN" id="w47.1.2">insurance</w>
+ </chunk>
+ <chunk type="VP" id="c47.1-2">
+  <w pos="MD" id="w47.1.3">will</w>
+  <w pos="VB" id="w47.1.4">be</w>
+  <w pos="VBN" id="w47.1.5">extended</w>
+ </chunk>
+ <chunk type="PP" id="c47.1-3">
+  <w pos="IN" id="w47.1.6">from</w>
+ </chunk>
+ <chunk type="NP" id="c47.1-4">
+  <w pos="CD" id="w47.1.7">nine</w>
+ </chunk>
+ <chunk type="PP" id="c47.1-5">
+  <w pos="TO" id="w47.1.8">to</w>
+ </chunk>
+ <chunk type="NP" id="c47.1-6">
+  <w pos="CD" id="w47.1.9">eighteen</w>
+  <w pos="NNS" id="w47.1.10">months</w>
+ </chunk>
+ <chunk type="PP" id="c47.1-7">
+  <w pos="IN" id="w47.1.11">with</w>
+ </chunk>
+ <chunk type="NP" id="c47.1-8">
+  <w pos="NN" id="w47.1.12">payment</w>
+ </chunk>
+ <chunk type="PP" id="c47.1-9">
+  <w pos="VBG" id="w47.1.13">according</w>
+ </chunk>
+ <chunk type="PP" id="c47.1-10">
+  <w pos="TO" id="w47.1.14">to</w>
+ </chunk>
+ <chunk type="NP" id="c47.1-11">
+  <w pos="DT" id="w47.1.15">the</w>
+  <w pos="JJ" id="w47.1.16">"</w>
+  <w pos="NN" id="w47.1.17">loss</w>
+ </chunk>
+ <chunk type="PP" id="c47.1-12">
+  <w pos="IN" id="w47.1.18">of</w>
+ </chunk>
+ <chunk type="NP" id="c47.1-13">
+  <w pos="NNS" id="w47.1.19">earnings</w>
+  <w pos="JJ" id="w47.1.20">"</w>
+  <w pos="NN" id="w47.1.21">principle</w>
+ </chunk>
+ <w pos="." id="w47.1.22">.</w>
+</s> 
+ 
+
+
+<s id="s47.2">
+ <chunk type="NP" id="c47.2-1">
+  <w pos="DT" id="w47.2.1">The</w>
+  <w pos="NN" id="w47.2.2">extension</w>
+ </chunk>
+ <chunk type="VP" id="c47.2-2">
+  <w pos="MD" id="w47.2.3">will</w>
+  <w pos="VB" id="w47.2.4">be</w>
+  <w pos="VBN" id="w47.2.5">completed</w>
+ </chunk>
+ <chunk type="PP" id="c47.2-3">
+  <w pos="IN" id="w47.2.6">by</w>
+ </chunk>
+ <chunk type="NP" id="c47.2-4">
+  <w pos="CD" id="w47.2.7">1991</w>
+ </chunk>
+ <w pos="." id="w47.2.8">.</w>
+</s> 
+ 
+
+
+<s id="s47.3">
+ <chunk type="NP" id="c47.3-1">
+  <w pos="DT" id="w47.3.1">The</w>
+  <w pos="JJ" id="w47.3.2">first</w>
+  <w pos="NN" id="w47.3.3">stage</w>
+ </chunk>
+ <w pos="," id="w47.3.4">,</w>
+ <chunk type="NP" id="c47.3-3">
+  <w pos="WDT" id="w47.3.5">which</w>
+ </chunk>
+ <chunk type="VP" id="c47.3-4">
+  <w pos="VBZ" id="w47.3.6">enters</w>
+ </chunk>
+ <chunk type="PP" id="c47.3-5">
+  <w pos="IN" id="w47.3.7">into</w>
+ </chunk>
+ <chunk type="NP" id="c47.3-6">
+  <w pos="NN" id="w47.3.8">force</w>
+ </chunk>
+ <chunk type="PP" id="c47.3-7">
+  <w pos="IN" id="w47.3.9">on</w>
+ </chunk>
+ <chunk type="NP" id="c47.3-8">
+  <w pos="CD" id="w47.3.10">1</w>
+  <w pos="NNP" id="w47.3.11">July</w>
+  <w pos="CD" id="w47.3.12">1989</w>
+ </chunk>
+ <w pos="," id="w47.3.13">,</w>
+ <chunk type="NP" id="c47.3-10">
+  <w pos="JJ" id="w47.3.14">means</w>
+  <w pos="NN" id="w47.3.15">payment</w>
+ </chunk>
+ <chunk type="PP" id="c47.3-11">
+  <w pos="IN" id="w47.3.16">for</w>
+ </chunk>
+ <chunk type="NP" id="c47.3-12">
+  <w pos="DT" id="w47.3.17">a</w>
+  <w pos="JJ" id="w47.3.18">further</w>
+  <w pos="CD" id="w47.3.19">three</w>
+  <w pos="NNS" id="w47.3.20">months</w>
+ </chunk>
+ <w pos="." id="w47.3.21">.</w>
+</s></p>
+
+<p id="48">
+<s id="s48.1">
+ <chunk type="NP" id="c48.1-1">
+  <w pos="DT" id="w48.1.1">The</w>
+  <w pos="NN" id="w48.1.2">extension</w>
+ </chunk>
+ <chunk type="PP" id="c48.1-2">
+  <w pos="IN" id="w48.1.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c48.1-3">
+  <w pos="NN" id="w48.1.4">child</w>
+  <w pos="NN" id="w48.1.5">care</w>
+  <w pos="NNS" id="w48.1.6">services</w>
+ </chunk>
+ <chunk type="VP" id="c48.1-4">
+  <w pos="MD" id="w48.1.7">will</w>
+  <w pos="VB" id="w48.1.8">continue</w>
+ </chunk>
+ <chunk type="PP" id="c48.1-5">
+  <w pos="IN" id="w48.1.9">in</w>
+ </chunk>
+ <chunk type="NP" id="c48.1-6">
+  <w pos="NN" id="w48.1.10">accordance</w>
+ </chunk>
+ <chunk type="PP" id="c48.1-7">
+  <w pos="IN" id="w48.1.11">with</w>
+ </chunk>
+ <chunk type="NP" id="c48.1-8">
+  <w pos="NNP" id="w48.1.12">Parliament</w>
+ </chunk>
+ <chunk type="NP" id="c48.1-9">
+  <w pos="POS" id="w48.1.13">'s</w>
+  <w pos="NN" id="w48.1.14">decision</w>
+ </chunk>
+ <w pos="." id="w48.1.15">.</w>
+</s></p>
+
+<p id="49">
+<s id="s49.1">
+ <chunk type="PP" id="c49.1-1">
+  <w pos="IN" id="w49.1.1">Through</w>
+ </chunk>
+ <chunk type="NP" id="c49.1-2">
+  <w pos="DT" id="w49.1.2">the</w>
+  <w pos="JJ" id="w49.1.3">extra</w>
+  <w pos="NN" id="w49.1.4">increase</w>
+ </chunk>
+ <chunk type="PP" id="c49.1-3">
+  <w pos="IN" id="w49.1.5">of</w>
+ </chunk>
+ <chunk type="NP" id="c49.1-4">
+  <w pos="DT" id="w49.1.6">the</w>
+  <w pos="NN" id="w49.1.7">base</w>
+  <w pos="NN" id="w49.1.8">amount</w>
+ </chunk>
+ <chunk type="PP" id="c49.1-5">
+  <w pos="IN" id="w49.1.9">as</w>
+ </chunk>
+ <chunk type="PP" id="c49.1-6">
+  <w pos="IN" id="w49.1.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c49.1-7">
+  <w pos="CD" id="w49.1.11">1</w>
+  <w pos="NNP" id="w49.1.12">January</w>
+  <w pos="CD" id="w49.1.13">1989</w>
+ </chunk>
+ <w pos="," id="w49.1.14">,</w>
+ <chunk type="NP" id="c49.1-9">
+  <w pos="NNS" id="w49.1.15">pensioners</w>
+ </chunk>
+ <chunk type="VP" id="c49.1-10">
+  <w pos="MD" id="w49.1.16">will</w>
+  <w pos="VB" id="w49.1.17">receive</w>
+ </chunk>
+ <chunk type="NP" id="c49.1-11">
+  <w pos="JJ" id="w49.1.18">full</w>
+  <w pos="NN" id="w49.1.19">compensation</w>
+ </chunk>
+ <chunk type="PP" id="c49.1-12">
+  <w pos="IN" id="w49.1.20">for</w>
+ </chunk>
+ <chunk type="NP" id="c49.1-13">
+  <w pos="DT" id="w49.1.21">the</w>
+  <w pos="CD" id="w49.1.22">1982</w>
+  <w pos="NN" id="w49.1.23">devaluation</w>
+ </chunk>
+ <w pos="." id="w49.1.24">.</w>
+</s></p>
+
+<p id="50">
+<s id="s50.1">
+ <chunk type="NP" id="c50.1-1">
+  <w pos="DT" id="w50.1.1">The</w>
+  <w pos="NNP" id="w50.1.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c50.1-2">
+  <w pos="VBZ" id="w50.1.3">intends</w>
+ </chunk>
+ <chunk type="PP" id="c50.1-3">
+  <w pos="IN" id="w50.1.4">through</w>
+ </chunk>
+ <chunk type="NP" id="c50.1-4">
+  <w pos="NN" id="w50.1.5">,</w>
+ </chunk>
+ <chunk type="PP" id="c50.1-5">
+  <w pos="IN" id="w50.1.6">among</w>
+ </chunk>
+ <chunk type="NP" id="c50.1-6">
+  <w pos="JJ" id="w50.1.7">other</w>
+  <w pos="NNS" id="w50.1.8">things</w>
+ </chunk>
+ <w pos="," id="w50.1.9">,</w>
+ <chunk type="NP" id="c50.1-8">
+  <w pos="DT" id="w50.1.10">the</w>
+  <w pos="NN" id="w50.1.11">work</w>
+ </chunk>
+ <chunk type="PP" id="c50.1-9">
+  <w pos="IN" id="w50.1.12">of</w>
+ </chunk>
+ <chunk type="NP" id="c50.1-10">
+  <w pos="DT" id="w50.1.13">the</w>
+  <w pos="NNP" id="w50.1.14">National</w>
+  <w pos="NNP" id="w50.1.15">Health</w>
+  <w pos="NNP" id="w50.1.16">Policy</w>
+  <w pos="NNP" id="w50.1.17">Commission</w>
+ </chunk>
+ <chunk type="VP" id="c50.1-11">
+  <w pos="TO" id="w50.1.18">to</w>
+  <w pos="VB" id="w50.1.19">devote</w>
+ </chunk>
+ <chunk type="NP" id="c50.1-12">
+  <w pos="JJ" id="w50.1.20">considerable</w>
+  <w pos="NN" id="w50.1.21">attention</w>
+ </chunk>
+ <chunk type="PP" id="c50.1-13">
+  <w pos="TO" id="w50.1.22">to</w>
+ </chunk>
+ <chunk type="NP" id="c50.1-14">
+  <w pos="DT" id="w50.1.23">the</w>
+  <w pos="NN" id="w50.1.24">provision</w>
+ </chunk>
+ <chunk type="PP" id="c50.1-15">
+  <w pos="IN" id="w50.1.25">of</w>
+ </chunk>
+ <chunk type="NP" id="c50.1-16">
+  <w pos="DT" id="w50.1.26">a</w>
+  <w pos="JJ" id="w50.1.27">universal</w>
+  <w pos="NN" id="w50.1.28">right</w>
+ </chunk>
+ <chunk type="VP" id="c50.1-17">
+  <w pos="TO" id="w50.1.29">to</w>
+ </chunk>
+ <chunk type="NP" id="c50.1-18">
+  <w pos="VB" id="w50.1.30">high</w>
+  <w pos="JJ" id="w50.1.31">quality</w>
+  <w pos="NN" id="w50.1.32">health</w>
+  <w pos="CC" id="w50.1.33">and</w>
+  <w pos="JJ" id="w50.1.34">medical</w>
+  <w pos="NN" id="w50.1.35">service</w>
+ </chunk>
+ <w pos="." id="w50.1.36">.</w>
+</s> 
+ 
+
+
+<s id="s50.2">
+ <chunk type="NP" id="c50.2-1">
+  <w pos="NNP" id="w50.2.1">Staff</w>
+  <w pos="NN" id="w50.2.2">recruitment</w>
+ </chunk>
+ <chunk type="PP" id="c50.2-2">
+  <w pos="IN" id="w50.2.3">within</w>
+ </chunk>
+ <chunk type="NP" id="c50.2-3">
+  <w pos="DT" id="w50.2.4">the</w>
+  <w pos="NN" id="w50.2.5">caring</w>
+  <w pos="NNS" id="w50.2.6">services</w>
+ </chunk>
+ <chunk type="VP" id="c50.2-4">
+  <w pos="MD" id="w50.2.7">must</w>
+  <w pos="VB" id="w50.2.8">be</w>
+  <w pos="VBN" id="w50.2.9">improved</w>
+ </chunk>
+ <w pos="." id="w50.2.10">.</w>
+</s></p>
+
+<p id="51">
+<s id="s51.1">
+ <chunk type="NP" id="c51.1-1">
+  <w pos="DT" id="w51.1.1">The</w>
+  <w pos="NN" id="w51.1.2">situation</w>
+ </chunk>
+ <chunk type="PP" id="c51.1-2">
+  <w pos="IN" id="w51.1.3">for</w>
+ </chunk>
+ <chunk type="NP" id="c51.1-3">
+  <w pos="RB" id="w51.1.4">severely</w>
+  <w pos="JJ" id="w51.1.5">disabled</w>
+  <w pos="NNS" id="w51.1.6">persons</w>
+ </chunk>
+ <w pos="CC" id="w51.1.7">and</w>
+ <chunk type="PP" id="c51.1-5">
+  <w pos="IN" id="w51.1.8">for</w>
+ </chunk>
+ <chunk type="NP" id="c51.1-6">
+  <w pos="JJ" id="w51.1.9">disabled</w>
+  <w pos="NNS" id="w51.1.10">children</w>
+ </chunk>
+ <w pos="CC" id="w51.1.11">and</w>
+ <chunk type="NP" id="c51.1-8">
+  <w pos="PRP$" id="w51.1.12">their</w>
+  <w pos="NNS" id="w51.1.13">families</w>
+ </chunk>
+ <chunk type="VP" id="c51.1-9">
+  <w pos="MD" id="w51.1.14">will</w>
+  <w pos="VB" id="w51.1.15">be</w>
+  <w pos="VBN" id="w51.1.16">given</w>
+ </chunk>
+ <chunk type="NP" id="c51.1-10">
+  <w pos="JJ" id="w51.1.17">special</w>
+  <w pos="NN" id="w51.1.18">attention</w>
+ </chunk>
+ <w pos="." id="w51.1.19">.</w>
+</s></p>
+
+<p id="52">
+<s id="s52.1">
+ <chunk type="NP" id="c52.1-1">
+  <w pos="NN" id="w52.1.1">Care</w>
+ </chunk>
+ <chunk type="PP" id="c52.1-2">
+  <w pos="IN" id="w52.1.2">of</w>
+ </chunk>
+ <chunk type="NP" id="c52.1-3">
+  <w pos="DT" id="w52.1.3">the</w>
+  <w pos="NN" id="w52.1.4">elderly</w>
+ </chunk>
+ <chunk type="VP" id="c52.1-4">
+  <w pos="MD" id="w52.1.5">will</w>
+  <w pos="VB" id="w52.1.6">be</w>
+  <w pos="VBN" id="w52.1.7">extended</w>
+ </chunk>
+ <chunk type="PP" id="c52.1-5">
+  <w pos="IN" id="w52.1.8">with</w>
+ </chunk>
+ <chunk type="NP" id="c52.1-6">
+  <w pos="DT" id="w52.1.9">the</w>
+  <w pos="NN" id="w52.1.10">aim</w>
+ </chunk>
+ <chunk type="PP" id="c52.1-7">
+  <w pos="IN" id="w52.1.11">of</w>
+ </chunk>
+ <chunk type="NP" id="c52.1-8">
+  <w pos="JJ" id="w52.1.12">creating</w>
+  <w pos="NN" id="w52.1.13">security</w>
+ </chunk>
+ <w pos="," id="w52.1.14">,</w>
+ <chunk type="NP" id="c52.1-10">
+  <w pos="NN" id="w52.1.15">independence</w>
+ </chunk>
+ <w pos="CC" id="w52.1.16">and</w>
+ <chunk type="NP" id="c52.1-12">
+  <w pos="NN" id="w52.1.17">freedom</w>
+ </chunk>
+ <chunk type="PP" id="c52.1-13">
+  <w pos="IN" id="w52.1.18">of</w>
+ </chunk>
+ <chunk type="NP" id="c52.1-14">
+  <w pos="NN" id="w52.1.19">choice</w>
+ </chunk>
+ <w pos="." id="w52.1.20">.</w>
+</s></p>
+
+<p id="53">
+<s id="s53.1">
+ <chunk type="NP" id="c53.1-1">
+  <w pos="DT" id="w53.1.1">The</w>
+  <w pos="NN" id="w53.1.2">fight</w>
+ </chunk>
+ <chunk type="PP" id="c53.1-2">
+  <w pos="IN" id="w53.1.3">against</w>
+ </chunk>
+ <chunk type="NP" id="c53.1-3">
+  <w pos="NNP" id="w53.1.4">HIV</w>
+ </chunk>
+ <w pos="CC" id="w53.1.5">and</w>
+ <chunk type="NP" id="c53.1-5">
+  <w pos="NNP" id="w53.1.6">AIDS</w>
+ </chunk>
+ <chunk type="VP" id="c53.1-6">
+  <w pos="MD" id="w53.1.7">will</w>
+  <w pos="VB" id="w53.1.8">continue</w>
+ </chunk>
+ <chunk type="PP" id="c53.1-7">
+  <w pos="IN" id="w53.1.9">as</w>
+ </chunk>
+ <chunk type="ADVP" id="c53.1-8">
+  <w pos="RB" id="w53.1.10">also</w>
+ </chunk>
+ <chunk type="NP" id="c53.1-9">
+  <w pos="DT" id="w53.1.11">the</w>
+  <w pos="NN" id="w53.1.12">fight</w>
+ </chunk>
+ <chunk type="PP" id="c53.1-10">
+  <w pos="IN" id="w53.1.13">against</w>
+ </chunk>
+ <chunk type="NP" id="c53.1-11">
+  <w pos="NNS" id="w53.1.14">drugs</w>
+ </chunk>
+ <w pos="." id="w53.1.15">.</w>
+</s></p>
+
+<p id="54">
+<s id="s54.1">
+ <chunk type="NP" id="c54.1-1">
+  <w pos="DT" id="w54.1.1">The</w>
+  <w pos="NNP" id="w54.1.2">Government</w>
+  <w pos="NN" id="w54.1.3">bill</w>
+ </chunk>
+ <chunk type="PP" id="c54.1-2">
+  <w pos="IN" id="w54.1.4">on</w>
+ </chunk>
+ <chunk type="NP" id="c54.1-3">
+  <w pos="DT" id="w54.1.5">the</w>
+  <w pos="JJ" id="w54.1.6">nine-year</w>
+  <w pos="NN" id="w54.1.7">compulsory</w>
+  <w pos="NN" id="w54.1.8">school</w>
+ </chunk>
+ <chunk type="VP" id="c54.1-4">
+  <w pos="VBZ" id="w54.1.9">is</w>
+ </chunk>
+ <chunk type="ADJP" id="c54.1-5">
+  <w pos="RB" id="w54.1.10">now</w>
+  <w pos="JJ" id="w54.1.11">available</w>
+ </chunk>
+ <chunk type="PP" id="c54.1-6">
+  <w pos="IN" id="w54.1.12">for</w>
+ </chunk>
+ <chunk type="NP" id="c54.1-7">
+  <w pos="NN" id="w54.1.13">consideration</w>
+ </chunk>
+ <w pos="." id="w54.1.14">.</w>
+</s> 
+ 
+
+
+<s id="s54.2">
+ <chunk type="NP" id="c54.2-1">
+  <w pos="DT" id="w54.2.1">The</w>
+  <w pos="JJ" id="w54.2.2">upper</w>
+  <w pos="JJ" id="w54.2.3">secondary</w>
+  <w pos="NN" id="w54.2.4">school</w>
+ </chunk>
+ <chunk type="VP" id="c54.2-2">
+  <w pos="MD" id="w54.2.5">will</w>
+  <w pos="VB" id="w54.2.6">be</w>
+  <w pos="VBN" id="w54.2.7">reformed</w>
+ </chunk>
+ <w pos="." id="w54.2.8">.</w>
+</s> 
+ 
+
+
+<s id="s54.3">
+ <chunk type="NP" id="c54.3-1">
+  <w pos="DT" id="w54.3.1">This</w>
+ </chunk>
+ <chunk type="VP" id="c54.3-2">
+  <w pos="VBZ" id="w54.3.2">means</w>
+ </chunk>
+ <chunk type="NP" id="c54.3-3">
+  <w pos="NNS" id="w54.3.3">changes</w>
+ </chunk>
+ <chunk type="PP" id="c54.3-4">
+  <w pos="IN" id="w54.3.4">in</w>
+ </chunk>
+ <chunk type="NP" id="c54.3-5">
+  <w pos="DT" id="w54.3.5">both</w>
+ </chunk>
+ <chunk type="NP" id="c54.3-6">
+  <w pos="DT" id="w54.3.6">the</w>
+  <w pos="NN" id="w54.3.7">vocational</w>
+  <w pos="CC" id="w54.3.8">and</w>
+  <w pos="JJ" id="w54.3.9">theoretical</w>
+  <w pos="NN" id="w54.3.10">course</w>
+  <w pos="NNS" id="w54.3.11">programmes</w>
+ </chunk>
+ <w pos="." id="w54.3.12">.</w>
+</s> 
+ 
+
+
+<s id="s54.4">
+ <chunk type="NP" id="c54.4-1">
+  <w pos="NNS" id="w54.4.1">Places</w>
+ </chunk>
+ <chunk type="PP" id="c54.4-2">
+  <w pos="IN" id="w54.4.2">in</w>
+ </chunk>
+ <chunk type="NP" id="c54.4-3">
+  <w pos="DT" id="w54.4.3">the</w>
+  <w pos="JJ" id="w54.4.4">upper</w>
+  <w pos="JJ" id="w54.4.5">secondary</w>
+  <w pos="NN" id="w54.4.6">school</w>
+ </chunk>
+ <chunk type="VP" id="c54.4-4">
+  <w pos="MD" id="w54.4.7">will</w>
+  <w pos="VB" id="w54.4.8">be</w>
+ </chunk>
+ <chunk type="ADJP" id="c54.4-5">
+  <w pos="JJ" id="w54.4.9">available</w>
+ </chunk>
+ <chunk type="PP" id="c54.4-6">
+  <w pos="TO" id="w54.4.10">to</w>
+ </chunk>
+ <chunk type="NP" id="c54.4-7">
+  <w pos="DT" id="w54.4.11">all</w>
+  <w pos="JJ" id="w54.4.12">young</w>
+  <w pos="NNS" id="w54.4.13">people</w>
+ </chunk>
+ <chunk type="PP" id="c54.4-8">
+  <w pos="IN" id="w54.4.14">under</w>
+ </chunk>
+ <chunk type="NP" id="c54.4-9">
+  <w pos="DT" id="w54.4.15">the</w>
+  <w pos="NN" id="w54.4.16">age</w>
+ </chunk>
+ <chunk type="PP" id="c54.4-10">
+  <w pos="IN" id="w54.4.17">of</w>
+ </chunk>
+ <chunk type="NP" id="c54.4-11">
+  <w pos="CD" id="w54.4.18">20</w>
+ </chunk>
+ <w pos="." id="w54.4.19">.</w>
+</s></p>
+
+<p id="55">
+<s id="s55.1">
+ <chunk type="NP" id="c55.1-1">
+  <w pos="EX" id="w55.1.1">There</w>
+ </chunk>
+ <chunk type="VP" id="c55.1-2">
+  <w pos="MD" id="w55.1.2">will</w>
+  <w pos="VB" id="w55.1.3">be</w>
+ </chunk>
+ <chunk type="NP" id="c55.1-3">
+  <w pos="VBN" id="w55.1.4">improved</w>
+  <w pos="NN" id="w55.1.5">co-ordination</w>
+ </chunk>
+ <chunk type="PP" id="c55.1-4">
+  <w pos="IN" id="w55.1.6">of</w>
+ </chunk>
+ <chunk type="NP" id="c55.1-5">
+  <w pos="NN" id="w55.1.7">adult</w>
+  <w pos="NN" id="w55.1.8">education</w>
+ </chunk>
+ <w pos="," id="w55.1.9">,</w>
+ <chunk type="NP" id="c55.1-7">
+  <w pos="JJ" id="w55.1.10">labour</w>
+  <w pos="NN" id="w55.1.11">market</w>
+  <w pos="NN" id="w55.1.12">training</w>
+  <w pos="CC" id="w55.1.13">and</w>
+  <w pos="JJ" id="w55.1.14">personnel</w>
+  <w pos="NN" id="w55.1.15">training</w>
+ </chunk>
+ <w pos="." id="w55.1.16">.</w>
+</s></p>
+
+<p id="56">
+<s id="s56.1">
+ <chunk type="NP" id="c56.1-1">
+  <w pos="DT" id="w56.1.1">The</w>
+  <w pos="NNS" id="w56.1.2">efforts</w>
+ </chunk>
+ <chunk type="VP" id="c56.1-2">
+  <w pos="TO" id="w56.1.3">to</w>
+  <w pos="VB" id="w56.1.4">achieve</w>
+ </chunk>
+ <chunk type="NP" id="c56.1-3">
+  <w pos="VBN" id="w56.1.5">increased</w>
+  <w pos="NN" id="w56.1.6">equality</w>
+ </chunk>
+ <w pos="CC" id="w56.1.7">and</w>
+ <chunk type="NP" id="c56.1-5">
+  <w pos="DT" id="w56.1.8">a</w>
+  <w pos="RBR" id="w56.1.9">more</w>
+  <w pos="RB" id="w56.1.10">even</w>
+  <w pos="JJ" id="w56.1.11">social</w>
+  <w pos="NN" id="w56.1.12">composition</w>
+ </chunk>
+ <chunk type="PP" id="c56.1-6">
+  <w pos="IN" id="w56.1.13">in</w>
+ </chunk>
+ <chunk type="NP" id="c56.1-7">
+  <w pos="DT" id="w56.1.14">all</w>
+  <w pos="NN" id="w56.1.15">study</w>
+  <w pos="NNS" id="w56.1.16">paths</w>
+ </chunk>
+ <chunk type="VP" id="c56.1-8">
+  <w pos="MD" id="w56.1.17">will</w>
+  <w pos="VB" id="w56.1.18">be</w>
+  <w pos="VBN" id="w56.1.19">intensified</w>
+ </chunk>
+ <w pos="." id="w56.1.20">.</w>
+</s> 
+ 
+
+
+<s id="s56.2">
+ <chunk type="PP" id="c56.2-1">
+  <w pos="IN" id="w56.2.1">In</w>
+ </chunk>
+ <chunk type="NP" id="c56.2-2">
+  <w pos="DT" id="w56.2.2">this</w>
+  <w pos="NN" id="w56.2.3">context</w>
+  <w pos="RB" id="w56.2.4">,</w>
+  <w pos="JJ" id="w56.2.5">particular</w>
+  <w pos="NN" id="w56.2.6">attention</w>
+ </chunk>
+ <chunk type="VP" id="c56.2-3">
+  <w pos="MD" id="w56.2.7">will</w>
+  <w pos="VB" id="w56.2.8">be</w>
+  <w pos="VBN" id="w56.2.9">paid</w>
+ </chunk>
+ <chunk type="PP" id="c56.2-4">
+  <w pos="TO" id="w56.2.10">to</w>
+ </chunk>
+ <chunk type="NP" id="c56.2-5">
+  <w pos="DT" id="w56.2.11">the</w>
+  <w pos="NN" id="w56.2.12">situation</w>
+ </chunk>
+ <chunk type="PP" id="c56.2-6">
+  <w pos="IN" id="w56.2.13">of</w>
+ </chunk>
+ <chunk type="NP" id="c56.2-7">
+  <w pos="JJ" id="w56.2.14">young</w>
+  <w pos="NNS" id="w56.2.15">immigrants</w>
+ </chunk>
+ <w pos="." id="w56.2.16">.</w>
+</s></p>
+
+<p id="57">
+<s id="s57.1">
+ <chunk type="NP" id="c57.1-1">
+  <w pos="NNP" id="w57.1.1">International</w>
+  <w pos="NN" id="w57.1.2">co-operation</w>
+ </chunk>
+ <chunk type="PP" id="c57.1-2">
+  <w pos="IN" id="w57.1.3">within</w>
+ </chunk>
+ <chunk type="NP" id="c57.1-3">
+  <w pos="NN" id="w57.1.4">research</w>
+  <w pos="CC" id="w57.1.5">and</w>
+  <w pos="NN" id="w57.1.6">development</w>
+ </chunk>
+ <chunk type="VP" id="c57.1-4">
+  <w pos="VBZ" id="w57.1.7">is</w>
+  <w pos="VBG" id="w57.1.8">becoming</w>
+ </chunk>
+ <chunk type="ADJP" id="c57.1-5">
+  <w pos="RB" id="w57.1.9">increasingly</w>
+  <w pos="JJ" id="w57.1.10">important</w>
+ </chunk>
+ <w pos="." id="w57.1.11">.</w>
+</s> 
+ 
+
+
+<s id="s57.2">
+ <chunk type="NP" id="c57.2-1">
+  <w pos="DT" id="w57.2.1">The</w>
+  <w pos="NNP" id="w57.2.2">Government</w>
+ </chunk>
+ <chunk type="VP" id="c57.2-2">
+  <w pos="MD" id="w57.2.3">will</w>
+  <w pos="VB" id="w57.2.4">continue</w>
+ </chunk>
+ <chunk type="NP" id="c57.2-3">
+  <w pos="PRP$" id="w57.2.5">its</w>
+  <w pos="NNS" id="w57.2.6">efforts</w>
+ </chunk>
+ <chunk type="VP" id="c57.2-4">
+  <w pos="TO" id="w57.2.7">to</w>
+  <w pos="VB" id="w57.2.8">create</w>
+ </chunk>
+ <chunk type="NP" id="c57.2-5">
+  <w pos="JJ" id="w57.2.9">good</w>
+  <w pos="NNS" id="w57.2.10">opportunities</w>
+ </chunk>
+ <chunk type="PP" id="c57.2-6">
+  <w pos="IN" id="w57.2.11">for</w>
+ </chunk>
+ <chunk type="NP" id="c57.2-7">
+  <w pos="JJ" id="w57.2.12">Swedish</w>
+  <w pos="NN" id="w57.2.13">industry</w>
+  <w pos="CC" id="w57.2.14">and</w>
+  <w pos="JJ" id="w57.2.15">Swedish</w>
+  <w pos="NNS" id="w57.2.16">researchers</w>
+ </chunk>
+ <chunk type="VP" id="c57.2-8">
+  <w pos="TO" id="w57.2.17">to</w>
+  <w pos="VB" id="w57.2.18">participate</w>
+ </chunk>
+ <chunk type="PP" id="c57.2-9">
+  <w pos="IN" id="w57.2.19">in</w>
+ </chunk>
+ <chunk type="NP" id="c57.2-10">
+  <w pos="JJ" id="w57.2.20">international</w>
+  <w pos="NN" id="w57.2.21">research</w>
+  <w pos="NN" id="w57.2.22">co-operation</w>
+ </chunk>
+ <w pos="." id="w57.2.23">.</w>
+</s></p>
+
+<p id="58">
+<s id="s58.1">
+ <chunk type="PP" id="c58.1-1">
+  <w pos="IN" id="w58.1.1">During</w>
+ </chunk>
+ <chunk type="NP" id="c58.1-2">
+  <w pos="DT" id="w58.1.2">the</w>
+  <w pos="JJ" id="w58.1.3">coming</w>
+  <w pos="NN" id="w58.1.4">electoral</w>
+  <w pos="NN" id="w58.1.5">period</w>
+ </chunk>
+ <w pos="," id="w58.1.6">,</w>
+ <chunk type="NP" id="c58.1-4">
+  <w pos="RB" id="w58.1.7">SEK</w>
+  <w pos="CD" id="w58.1.8">300</w>
+  <w pos="NN" id="w58.1.9">million</w>
+ </chunk>
+ <chunk type="VP" id="c58.1-5">
+  <w pos="MD" id="w58.1.10">will</w>
+  <w pos="VB" id="w58.1.11">be</w>
+  <w pos="VBN" id="w58.1.12">earmarked</w>
+ </chunk>
+ <chunk type="PP" id="c58.1-6">
+  <w pos="IN" id="w58.1.13">for</w>
+ </chunk>
+ <chunk type="NP" id="c58.1-7">
+  <w pos="DT" id="w58.1.14">the</w>
+  <w pos="NN" id="w58.1.15">renewal</w>
+  <w pos="CC" id="w58.1.16">and</w>
+  <w pos="NN" id="w58.1.17">development</w>
+ </chunk>
+ <chunk type="PP" id="c58.1-8">
+  <w pos="IN" id="w58.1.18">of</w>
+ </chunk>
+ <chunk type="NP" id="c58.1-9">
+  <w pos="JJ" id="w58.1.19">cultural</w>
+  <w pos="NN" id="w58.1.20">life</w>
+ </chunk>
+ <w pos="." id="w58.1.21">.</w>
+</s> 
+ 
+
+
+<s id="s58.2">
+ <chunk type="NP" id="c58.2-1">
+  <w pos="NNP" id="w58.2.1">Children</w>
+  <w pos="CC" id="w58.2.2">and</w>
+  <w pos="JJ" id="w58.2.3">young</w>
+  <w pos="NNS" id="w58.2.4">people</w>
+ </chunk>
+ <chunk type="VP" id="c58.2-2">
+  <w pos="MD" id="w58.2.5">will</w>
+  <w pos="VB" id="w58.2.6">be</w>
+  <w pos="VBN" id="w58.2.7">given</w>
+ </chunk>
+ <chunk type="NP" id="c58.2-3">
+  <w pos="VBN" id="w58.2.8">increased</w>
+  <w pos="NNS" id="w58.2.9">opportunities</w>
+ </chunk>
+ <chunk type="PP" id="c58.2-4">
+  <w pos="IN" id="w58.2.10">of</w>
+ </chunk>
+ <chunk type="NP" id="c58.2-5">
+  <w pos="NN" id="w58.2.11">encountering</w>
+ </chunk>
+ <w pos="CC" id="w58.2.12">and</w>
+ <chunk type="NP" id="c58.2-7">
+  <w pos="PRP" id="w58.2.13">themselves</w>
+ </chunk>
+ <chunk type="NP" id="c58.2-8">
+  <w pos="JJ" id="w58.2.14">practising</w>
+  <w pos="NN" id="w58.2.15">music</w>
+ </chunk>
+ <w pos="," id="w58.2.16">,</w>
+ <chunk type="NP" id="c58.2-10">
+  <w pos="NN" id="w58.2.17">dancing</w>
+ </chunk>
+ <w pos="," id="w58.2.18">,</w>
+ <chunk type="NP" id="c58.2-12">
+  <w pos="NN" id="w58.2.19">singing</w>
+ </chunk>
+ <w pos="," id="w58.2.20">,</w>
+ <chunk type="NP" id="c58.2-14">
+  <w pos="NN" id="w58.2.21">literature</w>
+ </chunk>
+ <w pos="," id="w58.2.22">,</w>
+ <chunk type="NP" id="c58.2-16">
+  <w pos="NN" id="w58.2.23">theatre</w>
+ </chunk>
+ <w pos="CC" id="w58.2.24">and</w>
+ <chunk type="NP" id="c58.2-18">
+  <w pos="JJ" id="w58.2.25">other</w>
+  <w pos="JJ" id="w58.2.26">artistic</w>
+  <w pos="NNS" id="w58.2.27">activities</w>
+ </chunk>
+ <w pos="." id="w58.2.28">.</w>
+</s> 
+ 
+
+
+<s id="s58.3">
+ <chunk type="NP" id="c58.3-1">
+  <w pos="DT" id="w58.3.1">The</w>
+  <w pos="NNS" id="w58.3.2">conditions</w>
+ </chunk>
+ <chunk type="PP" id="c58.3-2">
+  <w pos="IN" id="w58.3.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c58.3-3">
+  <w pos="NNS" id="w58.3.4">professionals</w>
+ </chunk>
+ <chunk type="PP" id="c58.3-4">
+  <w pos="IN" id="w58.3.5">in</w>
+ </chunk>
+ <chunk type="NP" id="c58.3-5">
+  <w pos="DT" id="w58.3.6">the</w>
+  <w pos="JJ" id="w58.3.7">arts</w>
+  <w pos="NN" id="w58.3.8">sector</w>
+ </chunk>
+ <chunk type="VP" id="c58.3-6">
+  <w pos="MD" id="w58.3.9">will</w>
+  <w pos="VB" id="w58.3.10">be</w>
+  <w pos="VBN" id="w58.3.11">improved</w>
+ </chunk>
+ <w pos="." id="w58.3.12">.</w>
+</s> 
+ 
+
+
+<s id="s58.4">
+ <chunk type="NP" id="c58.4-1">
+  <w pos="JJ" id="w58.4.1">Cultural</w>
+  <w pos="NN" id="w58.4.2">life</w>
+ </chunk>
+ <chunk type="PP" id="c58.4-2">
+  <w pos="IN" id="w58.4.3">in</w>
+ </chunk>
+ <chunk type="NP" id="c58.4-3">
+  <w pos="DT" id="w58.4.4">the</w>
+  <w pos="JJ" id="w58.4.5">whole</w>
+  <w pos="NN" id="w58.4.6">country</w>
+ </chunk>
+ <chunk type="VP" id="c58.4-4">
+  <w pos="MD" id="w58.4.7">will</w>
+  <w pos="VB" id="w58.4.8">be</w>
+  <w pos="VBN" id="w58.4.9">strengthened</w>
+ </chunk>
+ <w pos="." id="w58.4.10">.</w>
+</s></p>
+
+<p id="59">
+<s id="s59.1">
+ <chunk type="NP" id="c59.1-1">
+  <w pos="DT" id="w59.1.1">The</w>
+  <w pos="JJ" id="w59.1.2">popular</w>
+  <w pos="NNS" id="w59.1.3">movements</w>
+ </chunk>
+ <w pos="," id="w59.1.4">,</w>
+ <chunk type="NP" id="c59.1-3">
+  <w pos="RB" id="w59.1.5">not</w>
+  <w pos="JJ" id="w59.1.6">least</w>
+  <w pos="JJ" id="w59.1.7">youth</w>
+  <w pos="NNS" id="w59.1.8">organizations</w>
+ </chunk>
+ <w pos="CC" id="w59.1.9">and</w>
+ <chunk type="NP" id="c59.1-5">
+  <w pos="DT" id="w59.1.10">the</w>
+  <w pos="NNS" id="w59.1.11">sports</w>
+  <w pos="NN" id="w59.1.12">movement</w>
+ </chunk>
+ <w pos="," id="w59.1.13">,</w>
+ <chunk type="VP" id="c59.1-7">
+  <w pos="VBP" id="w59.1.14">carry</w>
+ </chunk>
+ <chunk type="PRT" id="c59.1-8">
+  <w pos="RP" id="w59.1.15">out</w>
+ </chunk>
+ <chunk type="NP" id="c59.1-9">
+  <w pos="JJ" id="w59.1.16">valuable</w>
+  <w pos="NN" id="w59.1.17">work</w>
+ </chunk>
+ <chunk type="NP" id="c59.1-10">
+  <w pos="WDT" id="w59.1.18">which</w>
+ </chunk>
+ <chunk type="VP" id="c59.1-11">
+  <w pos="MD" id="w59.1.19">will</w>
+  <w pos="VB" id="w59.1.20">be</w>
+  <w pos="VBN" id="w59.1.21">supported</w>
+ </chunk>
+ <w pos="CC" id="w59.1.22">and</w>
+ <chunk type="VP" id="c59.1-13">
+  <w pos="VBN" id="w59.1.23">facilitated</w>
+ </chunk>
+ <w pos="." id="w59.1.24">.</w>
+</s></p>
+
+<p id="60">
+<s id="s60.1">
+ <chunk type="NP" id="c60.1-1">
+  <w pos="DT" id="w60.1.1">A</w>
+  <w pos="JJ" id="w60.1.2">sufficient</w>
+  <w pos="NN" id="w60.1.3">number</w>
+ </chunk>
+ <chunk type="PP" id="c60.1-2">
+  <w pos="IN" id="w60.1.4">of</w>
+ </chunk>
+ <chunk type="NP" id="c60.1-3">
+  <w pos="NNS" id="w60.1.5">dwellings</w>
+ </chunk>
+ <chunk type="VP" id="c60.1-4">
+  <w pos="TO" id="w60.1.6">to</w>
+  <w pos="VB" id="w60.1.7">meet</w>
+ </chunk>
+ <chunk type="NP" id="c60.1-5">
+  <w pos="NN" id="w60.1.8">housing</w>
+  <w pos="NNS" id="w60.1.9">needs</w>
+ </chunk>
+ <chunk type="VP" id="c60.1-6">
+  <w pos="VBP" id="w60.1.10">are</w>
+  <w pos="TO" id="w60.1.11">to</w>
+  <w pos="VB" id="w60.1.12">be</w>
+  <w pos="VBN" id="w60.1.13">constructed</w>
+ </chunk>
+ <w pos="." id="w60.1.14">.</w>
+</s> 
+ 
+
+
+<s id="s60.2">
+ <chunk type="NP" id="c60.2-1">
+  <w pos="NNS" id="w60.2.1">Efforts</w>
+ </chunk>
+ <chunk type="VP" id="c60.2-2">
+  <w pos="TO" id="w60.2.2">to</w>
+  <w pos="VB" id="w60.2.3">produce</w>
+ </chunk>
+ <chunk type="NP" id="c60.2-3">
+  <w pos="JJR" id="w60.2.4">more</w>
+  <w pos="NN" id="w60.2.5">housing</w>
+ </chunk>
+ <chunk type="PP" id="c60.2-4">
+  <w pos="IN" id="w60.2.6">for</w>
+ </chunk>
+ <chunk type="NP" id="c60.2-5">
+  <w pos="JJ" id="w60.2.7">young</w>
+  <w pos="NNS" id="w60.2.8">people</w>
+ </chunk>
+ <chunk type="VP" id="c60.2-6">
+  <w pos="MD" id="w60.2.9">will</w>
+  <w pos="VB" id="w60.2.10">be</w>
+  <w pos="VBN" id="w60.2.11">intensified</w>
+ </chunk>
+ <w pos="." id="w60.2.12">.</w>
+</s> 
+ 
+
+
+<s id="s60.3">
+ <chunk type="NP" id="c60.3-1">
+  <w pos="NNS" id="w60.3.1">Resources</w>
+ </chunk>
+ <chunk type="VP" id="c60.3-2">
+  <w pos="MD" id="w60.3.2">will</w>
+  <w pos="VB" id="w60.3.3">be</w>
+  <w pos="VBN" id="w60.3.4">set</w>
+ </chunk>
+ <chunk type="ADVP" id="c60.3-3">
+  <w pos="RB" id="w60.3.5">free</w>
+ </chunk>
+ <chunk type="PP" id="c60.3-4">
+  <w pos="IN" id="w60.3.6">for</w>
+ </chunk>
+ <chunk type="NP" id="c60.3-5">
+  <w pos="DT" id="w60.3.7">the</w>
+  <w pos="NN" id="w60.3.8">provision</w>
+ </chunk>
+ <chunk type="PP" id="c60.3-6">
+  <w pos="IN" id="w60.3.9">of</w>
+ </chunk>
+ <chunk type="NP" id="c60.3-7">
+  <w pos="NN" id="w60.3.10">housing</w>
+ </chunk>
+ <chunk type="PP" id="c60.3-8">
+  <w pos="IN" id="w60.3.11">by</w>
+ </chunk>
+ <chunk type="NP" id="c60.3-9">
+  <w pos="JJ" id="w60.3.12">limiting</w>
+  <w pos="JJ" id="w60.3.13">other</w>
+  <w pos="NN" id="w60.3.14">construction</w>
+  <w pos="NNS" id="w60.3.15">projects</w>
+ </chunk>
+ <chunk type="PP" id="c60.3-10">
+  <w pos="IN" id="w60.3.16">in</w>
+ </chunk>
+ <chunk type="NP" id="c60.3-11">
+  <w pos="JJ" id="w60.3.17">overheated</w>
+  <w pos="NNS" id="w60.3.18">regions</w>
+ </chunk>
+ <w pos="." id="w60.3.19">.</w>
+</s> 
+ 
+
+
+<s id="s60.4">
+ <chunk type="NP" id="c60.4-1">
+  <w pos="JJ" id="w60.4.1">Further</w>
+  <w pos="NNS" id="w60.4.2">measures</w>
+ </chunk>
+ <chunk type="VP" id="c60.4-2">
+  <w pos="TO" id="w60.4.3">to</w>
+  <w pos="VB" id="w60.4.4">curb</w>
+ </chunk>
+ <chunk type="NP" id="c60.4-3">
+  <w pos="NN" id="w60.4.5">cost</w>
+  <w pos="NNS" id="w60.4.6">trends</w>
+ </chunk>
+ <chunk type="VP" id="c60.4-4">
+  <w pos="MD" id="w60.4.7">will</w>
+  <w pos="VB" id="w60.4.8">be</w>
+  <w pos="VBN" id="w60.4.9">taken</w>
+ </chunk>
+ <w pos="." id="w60.4.10">.</w>
+</s></p>
+
+<p id="61">
+<s id="s61.1">
+ <chunk type="NP" id="c61.1-1">
+  <w pos="DT" id="w61.1.1">The</w>
+  <w pos="NNS" id="w61.1.2">policies</w>
+ </chunk>
+ <chunk type="NP" id="c61.1-2">
+  <w pos="PRP" id="w61.1.3">we</w>
+ </chunk>
+ <chunk type="VP" id="c61.1-3">
+  <w pos="VBP" id="w61.1.4">pursue</w>
+ </chunk>
+ <chunk type="PP" id="c61.1-4">
+  <w pos="IN" id="w61.1.5">in</w>
+ </chunk>
+ <chunk type="NP" id="c61.1-5">
+  <w pos="DT" id="w61.1.6">the</w>
+  <w pos="JJ" id="w61.1.7">next</w>
+  <w pos="CD" id="w61.1.8">three</w>
+  <w pos="NNS" id="w61.1.9">years</w>
+ </chunk>
+ <chunk type="VP" id="c61.1-6">
+  <w pos="MD" id="w61.1.10">will</w>
+  <w pos="VB" id="w61.1.11">leave</w>
+ </chunk>
+ <chunk type="NP" id="c61.1-7">
+  <w pos="PRP$" id="w61.1.12">their</w>
+  <w pos="NN" id="w61.1.13">mark</w>
+ </chunk>
+ <chunk type="PP" id="c61.1-8">
+  <w pos="IN" id="w61.1.14">on</w>
+ </chunk>
+ <chunk type="NP" id="c61.1-9">
+  <w pos="NNS" id="w61.1.15">developments</w>
+ </chunk>
+ <chunk type="PP" id="c61.1-10">
+  <w pos="IN" id="w61.1.16">in</w>
+ </chunk>
+ <chunk type="NP" id="c61.1-11">
+  <w pos="DT" id="w61.1.17">this</w>
+  <w pos="NN" id="w61.1.18">country</w>
+ </chunk>
+ <chunk type="PP" id="c61.1-12">
+  <w pos="IN" id="w61.1.19">during</w>
+ </chunk>
+ <chunk type="NP" id="c61.1-13">
+  <w pos="DT" id="w61.1.20">the</w>
+  <w pos="NN" id="w61.1.21">decade</w>
+ </chunk>
+ <chunk type="VP" id="c61.1-14">
+  <w pos="TO" id="w61.1.22">to</w>
+  <w pos="VB" id="w61.1.23">come</w>
+ </chunk>
+ <w pos="." id="w61.1.24">.</w>
+</s> 
+ 
+
+
+<s id="s61.2">
+ <w pos="CC" id="w61.2.1">And</w>
+ <chunk type="PP" id="c61.2-2">
+  <w pos="IN" id="w61.2.2">in</w>
+ </chunk>
+ <chunk type="NP" id="c61.2-3">
+  <w pos="DT" id="w61.2.3">the</w>
+  <w pos="JJ" id="w61.2.4">next</w>
+  <w pos="JJ" id="w61.2.5">few</w>
+  <w pos="NNS" id="w61.2.6">years</w>
+ </chunk>
+ <chunk type="NP" id="c61.2-4">
+  <w pos="PRP" id="w61.2.7">we</w>
+ </chunk>
+ <chunk type="VP" id="c61.2-5">
+  <w pos="MD" id="w61.2.8">will</w>
+  <w pos="VB" id="w61.2.9">have</w>
+  <w pos="TO" id="w61.2.10">to</w>
+  <w pos="VB" id="w61.2.11">face</w>
+ </chunk>
+ <chunk type="NP" id="c61.2-6">
+  <w pos="NNS" id="w61.2.12">challenges</w>
+ </chunk>
+ <chunk type="PP" id="c61.2-7">
+  <w pos="IN" id="w61.2.13">with</w>
+ </chunk>
+ <chunk type="NP" id="c61.2-8">
+  <w pos="NNS" id="w61.2.14">consequences</w>
+ </chunk>
+ <chunk type="PP" id="c61.2-9">
+  <w pos="IN" id="w61.2.15">for</w>
+ </chunk>
+ <chunk type="NP" id="c61.2-10">
+  <w pos="DT" id="w61.2.16">the</w>
+  <w pos="JJ" id="w61.2.17">next</w>
+  <w pos="NN" id="w61.2.18">century</w>
+ </chunk>
+ <w pos="." id="w61.2.19">.</w>
+</s></p>
+
+<p id="62">
+<s id="s62.1">
+ <chunk type="PP" id="c62.1-1">
+  <w pos="IN" id="w62.1.1">On</w>
+ </chunk>
+ <chunk type="NP" id="c62.1-2">
+  <w pos="DT" id="w62.1.2">the</w>
+  <w pos="NN" id="w62.1.3">threshold</w>
+ </chunk>
+ <chunk type="PP" id="c62.1-3">
+  <w pos="IN" id="w62.1.4">of</w>
+ </chunk>
+ <chunk type="NP" id="c62.1-4">
+  <w pos="DT" id="w62.1.5">the</w>
+  <w pos="NNS" id="w62.1.6">nineties</w>
+ </chunk>
+ <w pos="," id="w62.1.7">,</w>
+ <chunk type="NP" id="c62.1-6">
+  <w pos="PRP" id="w62.1.8">we</w>
+ </chunk>
+ <chunk type="VP" id="c62.1-7">
+  <w pos="MD" id="w62.1.9">should</w>
+  <w pos="VB" id="w62.1.10">confirm</w>
+  <w pos="CC" id="w62.1.11">and</w>
+  <w pos="VB" id="w62.1.12">strengthen</w>
+ </chunk>
+ <chunk type="PP" id="c62.1-8">
+  <w pos="IN" id="w62.1.13">in</w>
+ </chunk>
+ <chunk type="NP" id="c62.1-9">
+  <w pos="DT" id="w62.1.14">the</w>
+  <w pos="JJ" id="w62.1.15">long</w>
+  <w pos="NN" id="w62.1.16">term</w>
+ </chunk>
+ <chunk type="NP" id="c62.1-10">
+  <w pos="WP" id="w62.1.17">what</w>
+ </chunk>
+ <chunk type="VP" id="c62.1-11">
+  <w pos="MD" id="w62.1.18">must</w>
+  <w pos="VB" id="w62.1.19">be</w>
+ </chunk>
+ <chunk type="NP" id="c62.1-12">
+  <w pos="DT" id="w62.1.20">the</w>
+  <w pos="NN" id="w62.1.21">basis</w>
+ </chunk>
+ <chunk type="PP" id="c62.1-13">
+  <w pos="IN" id="w62.1.22">for</w>
+ </chunk>
+ <chunk type="NP" id="c62.1-14">
+  <w pos="JJ" id="w62.1.23">future</w>
+  <w pos="NNS" id="w62.1.24">developments</w>
+ </chunk>
+ <chunk type="NP" id="c62.1-15">
+  <w pos="RB" id="w62.1.25">too</w>
+ </chunk>
+ <w pos="VB" id="w62.1.26">:</w>
+ <chunk type="NP" id="c62.1-17">
+  <w pos="DT" id="w62.1.27">the</w>
+  <w pos="NN" id="w62.1.28">economy</w>
+ </chunk>
+ <w pos="," id="w62.1.29">,</w>
+ <chunk type="NP" id="c62.1-19">
+  <w pos="JJ" id="w62.1.30">full</w>
+  <w pos="NN" id="w62.1.31">employment</w>
+  <w pos="CC" id="w62.1.32">and</w>
+  <w pos="NN" id="w62.1.33">welfare</w>
+ </chunk>
+ <w pos="." id="w62.1.34">.</w>
+</s></p>
+
+<p id="63">
+<s id="s63.1">
+ <chunk type="NP" id="c63.1-1">
+  <w pos="PRP" id="w63.1.1">We</w>
+ </chunk>
+ <chunk type="VP" id="c63.1-2">
+  <w pos="MD" id="w63.1.2">will</w>
+  <w pos="RB" id="w63.1.3">then</w>
+  <w pos="RB" id="w63.1.4">also</w>
+  <w pos="VB" id="w63.1.5">create</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-3">
+  <w pos="DT" id="w63.1.6">the</w>
+  <w pos="NN" id="w63.1.7">scope</w>
+ </chunk>
+ <chunk type="PP" id="c63.1-4">
+  <w pos="IN" id="w63.1.8">for</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-5">
+  <w pos="NN" id="w63.1.9">action</w>
+ </chunk>
+ <chunk type="PP" id="c63.1-6">
+  <w pos="IN" id="w63.1.10">for</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-7">
+  <w pos="DT" id="w63.1.11">the</w>
+  <w pos="NN" id="w63.1.12">renewal</w>
+ </chunk>
+ <w pos="CC" id="w63.1.13">and</w>
+ <chunk type="NP" id="c63.1-9">
+  <w pos="DT" id="w63.1.14">the</w>
+  <w pos="JJ" id="w63.1.15">new</w>
+  <w pos="NNS" id="w63.1.16">efforts</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-10">
+  <w pos="WDT" id="w63.1.17">which</w>
+ </chunk>
+ <chunk type="VP" id="c63.1-11">
+  <w pos="VBP" id="w63.1.18">are</w>
+  <w pos="VBN" id="w63.1.19">required</w>
+ </chunk>
+ <chunk type="PP" id="c63.1-12">
+  <w pos="IN" id="w63.1.20">in</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-13">
+  <w pos="DT" id="w63.1.21">a</w>
+  <w pos="NN" id="w63.1.22">number</w>
+ </chunk>
+ <chunk type="PP" id="c63.1-14">
+  <w pos="IN" id="w63.1.23">of</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-15">
+  <w pos="JJ" id="w63.1.24">important</w>
+  <w pos="NNS" id="w63.1.25">areas</w>
+ </chunk>
+ <w pos=":" id="w63.1.26">:</w>
+ <chunk type="PP" id="c63.1-17">
+  <w pos="IN" id="w63.1.27">within</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-18">
+  <w pos="JJ" id="w63.1.28">environmental</w>
+  <w pos="CC" id="w63.1.29">and</w>
+  <w pos="JJ" id="w63.1.30">energy</w>
+  <w pos="NN" id="w63.1.31">policy</w>
+ </chunk>
+ <w pos="," id="w63.1.32">,</w>
+ <chunk type="PP" id="c63.1-20">
+  <w pos="IN" id="w63.1.33">in</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-21">
+  <w pos="DT" id="w63.1.34">the</w>
+  <w pos="JJ" id="w63.1.35">public</w>
+  <w pos="NN" id="w63.1.36">sector</w>
+ </chunk>
+ <w pos="," id="w63.1.37">,</w>
+ <chunk type="PP" id="c63.1-23">
+  <w pos="IN" id="w63.1.38">in</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-24">
+  <w pos="JJ" id="w63.1.39">working</w>
+  <w pos="NN" id="w63.1.40">life</w>
+ </chunk>
+ <w pos="," id="w63.1.41">,</w>
+ <chunk type="PP" id="c63.1-26">
+  <w pos="IN" id="w63.1.42">in</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-27">
+  <w pos="DT" id="w63.1.43">the</w>
+  <w pos="NN" id="w63.1.44">area</w>
+ </chunk>
+ <chunk type="PP" id="c63.1-28">
+  <w pos="IN" id="w63.1.45">of</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-29">
+  <w pos="NN" id="w63.1.46">taxation</w>
+ </chunk>
+ <w pos="," id="w63.1.47">,</w>
+ <w pos="CC" id="w63.1.48">and</w>
+ <chunk type="SBAR" id="c63.1-32">
+  <w pos="IN" id="w63.1.49">in</w>
+ </chunk>
+ <w pos="NN" id="w63.1.50">order</w>
+ <chunk type="VP" id="c63.1-34">
+  <w pos="TO" id="w63.1.51">to</w>
+  <w pos="VB" id="w63.1.52">strengthen</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-35">
+  <w pos="PRP$" id="w63.1.53">our</w>
+  <w pos="NN" id="w63.1.54">co-operation</w>
+  <w pos=":" id="w63.1.55">-</w>
+  <w pos="JJ" id="w63.1.56">economic</w>
+  <w pos="," id="w63.1.57">,</w>
+  <w pos="JJ" id="w63.1.58">social</w>
+  <w pos="CC" id="w63.1.59">and</w>
+  <w pos="JJ" id="w63.1.60">cultural</w>
+  <w pos="NN" id="w63.1.61">-</w>
+ </chunk>
+ <chunk type="PP" id="c63.1-36">
+  <w pos="IN" id="w63.1.62">with</w>
+ </chunk>
+ <chunk type="NP" id="c63.1-37">
+  <w pos="JJ" id="w63.1.63">other</w>
+  <w pos="NNS" id="w63.1.64">countries</w>
+ </chunk>
+ <w pos="." id="w63.1.65">.</w>
+</s></p>
+
+<p id="64">
+<s id="s64.1">
+ <chunk type="NP" id="c64.1-1">
+  <w pos="DT" id="w64.1.1">The</w>
+  <w pos="NNS" id="w64.1.2">preconditions</w>
+ </chunk>
+ <chunk type="PP" id="c64.1-2">
+  <w pos="IN" id="w64.1.3">for</w>
+ </chunk>
+ <chunk type="NP" id="c64.1-3">
+  <w pos="DT" id="w64.1.4">this</w>
+  <w pos="NN" id="w64.1.5">the</w>
+  <w pos="NN" id="w64.1.6">aim</w>
+  <w pos="CC" id="w64.1.7">and</w>
+  <w pos="NN" id="w64.1.8">direction</w>
+ </chunk>
+ <chunk type="PP" id="c64.1-4">
+  <w pos="IN" id="w64.1.9">of</w>
+ </chunk>
+ <chunk type="NP" id="c64.1-5">
+  <w pos="PRP$" id="w64.1.10">our</w>
+  <w pos="NN" id="w64.1.11">policy</w>
+ </chunk>
+ <chunk type="VP" id="c64.1-6">
+  <w pos="VBP" id="w64.1.12">are</w>
+ </chunk>
+ <chunk type="ADJP" id="c64.1-7">
+  <w pos="RB" id="w64.1.13">favourable</w>
+ </chunk>
+ <w pos="." id="w64.1.14">.</w>
+</s></p>
+
+<p id="65">
+<s id="s65.1">
+ <chunk type="NP" id="c65.1-1">
+  <w pos="JJ" id="w65.1.1">International</w>
+  <w pos="NNS" id="w65.1.2">developments</w>
+ </chunk>
+ <chunk type="VP" id="c65.1-2">
+  <w pos="VBP" id="w65.1.3">give</w>
+ </chunk>
+ <chunk type="NP" id="c65.1-3">
+  <w pos="NN" id="w65.1.4">hope</w>
+ </chunk>
+ <chunk type="PP" id="c65.1-4">
+  <w pos="IN" id="w65.1.5">of</w>
+ </chunk>
+ <chunk type="NP" id="c65.1-5">
+  <w pos="JJ" id="w65.1.6">further</w>
+  <w pos="NNS" id="w65.1.7">steps</w>
+ </chunk>
+ <chunk type="PP" id="c65.1-6">
+  <w pos="IN" id="w65.1.8">towards</w>
+ </chunk>
+ <chunk type="NP" id="c65.1-7">
+  <w pos="NN" id="w65.1.9">peace</w>
+ </chunk>
+ <w pos="," id="w65.1.10">,</w>
+ <chunk type="NP" id="c65.1-9">
+  <w pos="NN" id="w65.1.11">freedom</w>
+ </chunk>
+ <w pos="CC" id="w65.1.12">and</w>
+ <chunk type="NP" id="c65.1-11">
+  <w pos="VBN" id="w65.1.13">increased</w>
+  <w pos="NN" id="w65.1.14">understanding</w>
+ </chunk>
+ <chunk type="PP" id="c65.1-12">
+  <w pos="IN" id="w65.1.15">between</w>
+ </chunk>
+ <chunk type="NP" id="c65.1-13">
+  <w pos="NNS" id="w65.1.16">nations</w>
+  <w pos="CC" id="w65.1.17">and</w>
+  <w pos="NNS" id="w65.1.18">peoples</w>
+ </chunk>
+ <w pos="." id="w65.1.19">.</w>
+</s></p>
+
+<p id="66">
+<s id="s66.1">
+ <chunk type="NP" id="c66.1-1">
+  <w pos="NNP" id="w66.1.1">Sweden</w>
+ </chunk>
+ <chunk type="NP" id="c66.1-2">
+  <w pos="POS" id="w66.1.2">'s</w>
+  <w pos="JJ" id="w66.1.3">economic</w>
+  <w pos="NN" id="w66.1.4">situation</w>
+ </chunk>
+ <chunk type="VP" id="c66.1-3">
+  <w pos="VBZ" id="w66.1.5">has</w>
+  <w pos="VBN" id="w66.1.6">improved</w>
+ </chunk>
+ <chunk type="ADVP" id="c66.1-4">
+  <w pos="RB" id="w66.1.7">substantially</w>
+ </chunk>
+ <chunk type="PP" id="c66.1-5">
+  <w pos="IN" id="w66.1.8">in</w>
+ </chunk>
+ <chunk type="NP" id="c66.1-6">
+  <w pos="JJ" id="w66.1.9">recent</w>
+  <w pos="NNS" id="w66.1.10">years</w>
+ </chunk>
+ <w pos="." id="w66.1.11">.</w>
+</s> 
+ 
+
+
+<s id="s66.2">
+ <chunk type="NP" id="c66.2-1">
+  <w pos="DT" id="w66.2.1">The</w>
+  <w pos="NN" id="w66.2.2">level</w>
+ </chunk>
+ <chunk type="PP" id="c66.2-2">
+  <w pos="IN" id="w66.2.3">of</w>
+ </chunk>
+ <chunk type="NP" id="c66.2-3">
+  <w pos="NN" id="w66.2.4">employment</w>
+ </chunk>
+ <chunk type="PP" id="c66.2-4">
+  <w pos="IN" id="w66.2.5">in</w>
+ </chunk>
+ <chunk type="NP" id="c66.2-5">
+  <w pos="DT" id="w66.2.6">this</w>
+  <w pos="NN" id="w66.2.7">country</w>
+ </chunk>
+ <chunk type="VP" id="c66.2-6">
+  <w pos="VBZ" id="w66.2.8">is</w>
+ </chunk>
+ <chunk type="ADJP" id="c66.2-7">
+  <w pos="JJ" id="w66.2.9">high</w>
+ </chunk>
+ <w pos="." id="w66.2.10">.</w>
+</s> 
+ 
+
+
+<s id="s66.3">
+ <chunk type="NP" id="c66.3-1">
+  <w pos="DT" id="w66.3.1">The</w>
+  <w pos="NN" id="w66.3.2">welfare</w>
+  <w pos="NN" id="w66.3.3">state</w>
+ </chunk>
+ <chunk type="VP" id="c66.3-2">
+  <w pos="VBD" id="w66.3.4">enjoys</w>
+ </chunk>
+ <chunk type="NP" id="c66.3-3">
+  <w pos="RB" id="w66.3.5">wide</w>
+  <w pos="JJ" id="w66.3.6">popular</w>
+  <w pos="NN" id="w66.3.7">support</w>
+ </chunk>
+ <w pos="." id="w66.3.8">.</w>
+</s></p>
+
+<p id="67">
+<s id="s67.1">
+ <chunk type="NP" id="c67.1-1">
+  <w pos="EX" id="w67.1.1">There</w>
+ </chunk>
+ <chunk type="VP" id="c67.1-2">
+  <w pos="VBZ" id="w67.1.2">is</w>
+ </chunk>
+ <chunk type="NP" id="c67.1-3">
+  <w pos="JJ" id="w67.1.3">broad</w>
+  <w pos="JJ" id="w67.1.4">political</w>
+  <w pos="NN" id="w67.1.5">consensus</w>
+  <w pos="CC" id="w67.1.6">and</w>
+  <w pos="NN" id="w67.1.7">support</w>
+ </chunk>
+ <chunk type="PP" id="c67.1-4">
+  <w pos="IN" id="w67.1.8">for</w>
+ </chunk>
+ <chunk type="NP" id="c67.1-5">
+  <w pos="NN" id="w67.1.9">tackling</w>
+ </chunk>
+ <chunk type="NP" id="c67.1-6">
+  <w pos="DT" id="w67.1.10">the</w>
+  <w pos="JJ" id="w67.1.11">environmental</w>
+  <w pos="NNS" id="w67.1.12">problems</w>
+ </chunk>
+ <chunk type="ADVP" id="c67.1-7">
+  <w pos="RB" id="w67.1.13">forcefully</w>
+ </chunk>
+ <w pos="." id="w67.1.14">.</w>
+</s></p>
+
+<p id="68">
+<s id="s68.1">
+ <chunk type="NP" id="c68.1-1">
+  <w pos="PRP" id="w68.1.1">We</w>
+ </chunk>
+ <chunk type="VP" id="c68.1-2">
+  <w pos="VBP" id="w68.1.2">have</w>
+ </chunk>
+ <chunk type="NP" id="c68.1-3">
+  <w pos="JJ" id="w68.1.3">good</w>
+  <w pos="NN" id="w68.1.4">reason</w>
+ </chunk>
+ <chunk type="VP" id="c68.1-4">
+  <w pos="TO" id="w68.1.5">to</w>
+  <w pos="VB" id="w68.1.6">feel</w>
+ </chunk>
+ <chunk type="ADJP" id="c68.1-5">
+  <w pos="JJ" id="w68.1.7">optimistic</w>
+ </chunk>
+ <chunk type="NP" id="c68.1-6">
+  <w pos="JJ" id="w68.1.8">when</w>
+ </chunk>
+ <chunk type="VP" id="c68.1-7">
+  <w pos="NN" id="w68.1.9">looking</w>
+ </chunk>
+ <chunk type="PP" id="c68.1-8">
+  <w pos="TO" id="w68.1.10">to</w>
+ </chunk>
+ <chunk type="NP" id="c68.1-9">
+  <w pos="DT" id="w68.1.11">the</w>
+  <w pos="NN" id="w68.1.12">future</w>
+ </chunk>
+ <w pos="." id="w68.1.13">.</w>
+</s></p>
+
+<p id="69">
+<s id="s69.1">
+ <w pos="CC" id="w69.1.1">But</w>
+ <chunk type="NP" id="c69.1-2">
+  <w pos="EX" id="w69.1.2">there</w>
+ </chunk>
+ <chunk type="VP" id="c69.1-3">
+  <w pos="VBZ" id="w69.1.3">is</w>
+ </chunk>
+ <chunk type="NP" id="c69.1-4">
+  <w pos="JJ" id="w69.1.4">also</w>
+  <w pos="NN" id="w69.1.5">reason</w>
+ </chunk>
+ <chunk type="VP" id="c69.1-5">
+  <w pos="TO" id="w69.1.6">to</w>
+  <w pos="VB" id="w69.1.7">remind</w>
+ </chunk>
+ <chunk type="NP" id="c69.1-6">
+  <w pos="NNS" id="w69.1.8">ourselves</w>
+ </chunk>
+ <chunk type="PP" id="c69.1-7">
+  <w pos="IN" id="w69.1.9">of</w>
+ </chunk>
+ <chunk type="ADVP" id="c69.1-8">
+  <w pos="WRB" id="w69.1.10">how</w>
+  <w pos="RB" id="w69.1.11">quickly</w>
+ </chunk>
+ <chunk type="NP" id="c69.1-9">
+  <w pos="DT" id="w69.1.12">a</w>
+  <w pos="JJ" id="w69.1.13">favourable</w>
+  <w pos="NN" id="w69.1.14">development</w>
+ </chunk>
+ <chunk type="VP" id="c69.1-10">
+  <w pos="MD" id="w69.1.15">can</w>
+  <w pos="VB" id="w69.1.16">be</w>
+  <w pos="VBN" id="w69.1.17">turned</w>
+ </chunk>
+ <chunk type="PP" id="c69.1-11">
+  <w pos="IN" id="w69.1.18">into</w>
+ </chunk>
+ <chunk type="NP" id="c69.1-12">
+  <w pos="DT" id="w69.1.19">the</w>
+  <w pos="JJ" id="w69.1.20">direct</w>
+  <w pos="NN" id="w69.1.21">opposite</w>
+ </chunk>
+ <w pos="." id="w69.1.22">.</w>
+</s> 
+ 
+
+
+<s id="s69.2">
+ <chunk type="NP" id="c69.2-1">
+  <w pos="DT" id="w69.2.1">This</w>
+ </chunk>
+ <chunk type="VP" id="c69.2-2">
+  <w pos="VBD" id="w69.2.2">was</w>
+ </chunk>
+ <chunk type="NP" id="c69.2-3">
+  <w pos="DT" id="w69.2.3">the</w>
+  <w pos="NN" id="w69.2.4">case</w>
+ </chunk>
+ <chunk type="PP" id="c69.2-4">
+  <w pos="IN" id="w69.2.5">in</w>
+ </chunk>
+ <chunk type="NP" id="c69.2-5">
+  <w pos="DT" id="w69.2.6">the</w>
+  <w pos="NNS" id="w69.2.7">1970s</w>
+ </chunk>
+ <chunk type="ADVP" id="c69.2-6">
+  <w pos="WRB" id="w69.2.8">when</w>
+ </chunk>
+ <chunk type="NP" id="c69.2-7">
+  <w pos="DT" id="w69.2.9">the</w>
+  <w pos="JJ" id="w69.2.10">Swedish</w>
+  <w pos="NN" id="w69.2.11">economy</w>
+ </chunk>
+ <chunk type="VP" id="c69.2-8">
+  <w pos="VBD" id="w69.2.12">was</w>
+  <w pos="VBN" id="w69.2.13">hit</w>
+ </chunk>
+ <chunk type="PP" id="c69.2-9">
+  <w pos="IN" id="w69.2.14">by</w>
+ </chunk>
+ <chunk type="NP" id="c69.2-10">
+  <w pos="DT" id="w69.2.15">the</w>
+  <w pos="JJ" id="w69.2.16">severest</w>
+  <w pos="NN" id="w69.2.17">crisis</w>
+ </chunk>
+ <chunk type="PP" id="c69.2-11">
+  <w pos="IN" id="w69.2.18">since</w>
+ </chunk>
+ <chunk type="NP" id="c69.2-12">
+  <w pos="DT" id="w69.2.19">the</w>
+  <w pos="CD" id="w69.2.20">1930s</w>
+ </chunk>
+ <w pos="." id="w69.2.21">.</w>
+</s> 
+ 
+
+
+<s id="s69.3">
+ <chunk type="NP" id="c69.3-1">
+  <w pos="DT" id="w69.3.1">The</w>
+  <w pos="NNS" id="w69.3.2">tasks</w>
+ </chunk>
+ <chunk type="NP" id="c69.3-2">
+  <w pos="PRP" id="w69.3.3">we</w>
+ </chunk>
+ <chunk type="VP" id="c69.3-3">
+  <w pos="VBP" id="w69.3.4">have</w>
+ </chunk>
+ <chunk type="ADVP" id="c69.3-4">
+  <w pos="RB" id="w69.3.5">ahead</w>
+ </chunk>
+ <chunk type="PP" id="c69.3-5">
+  <w pos="IN" id="w69.3.6">of</w>
+ </chunk>
+ <chunk type="NP" id="c69.3-6">
+  <w pos="NNS" id="w69.3.7">us</w>
+ </chunk>
+ <w pos="," id="w69.3.8">,</w>
+ <w pos="CC" id="w69.3.9">and</w>
+ <chunk type="NP" id="c69.3-9">
+  <w pos="DT" id="w69.3.10">the</w>
+  <w pos="NN" id="w69.3.11">danger</w>
+ </chunk>
+ <chunk type="PP" id="c69.3-10">
+  <w pos="IN" id="w69.3.12">of</w>
+ </chunk>
+ <chunk type="NP" id="c69.3-11">
+  <w pos="JJ" id="w69.3.13">rapid</w>
+  <w pos="JJ" id="w69.3.14">dramatic</w>
+  <w pos="NNS" id="w69.3.15">changes</w>
+ </chunk>
+ <w pos="," id="w69.3.16">,</w>
+ <chunk type="VP" id="c69.3-13">
+  <w pos="VBP" id="w69.3.17">mean</w>
+ </chunk>
+ <chunk type="NP" id="c69.3-14">
+  <w pos="DT" id="w69.3.18">that</w>
+  <w pos="NN" id="w69.3.19">responsibility</w>
+ </chunk>
+ <w pos="," id="w69.3.20">,</w>
+ <w pos="CC" id="w69.3.21">and</w>
+ <chunk type="NP" id="c69.3-17">
+  <w pos="DT" id="w69.3.22">the</w>
+  <w pos="NN" id="w69.3.23">ability</w>
+ </chunk>
+ <chunk type="VP" id="c69.3-18">
+  <w pos="TO" id="w69.3.24">to</w>
+  <w pos="VB" id="w69.3.25">take</w>
+ </chunk>
+ <chunk type="NP" id="c69.3-19">
+  <w pos="JJ" id="w69.3.26">political</w>
+  <w pos="NN" id="w69.3.27">action</w>
+ </chunk>
+ <w pos="CC" id="w69.3.28">and</w>
+ <chunk type="PP" id="c69.3-21">
+  <w pos="TO" id="w69.3.29">to</w>
+ </chunk>
+ <chunk type="NP" id="c69.3-22">
+  <w pos="NN" id="w69.3.30">co-operate</w>
+ </chunk>
+ <chunk type="VP" id="c69.3-23">
+  <w pos="MD" id="w69.3.31">will</w>
+  <w pos="VB" id="w69.3.32">be</w>
+  <w pos="VBN" id="w69.3.33">required</w>
+ </chunk>
+ <chunk type="PP" id="c69.3-24">
+  <w pos="IN" id="w69.3.34">in</w>
+ </chunk>
+ <chunk type="NP" id="c69.3-25">
+  <w pos="DT" id="w69.3.35">the</w>
+  <w pos="NN" id="w69.3.36">future</w>
+ </chunk>
+ <chunk type="ADVP" id="c69.3-26">
+  <w pos="RB" id="w69.3.37">too</w>
+ </chunk>
+ <w pos="." id="w69.3.38">.</w>
+</s></p>
+
+<p id="70">
+<s id="s70.1">
+ <chunk type="PP" id="c70.1-1">
+  <w pos="IN" id="w70.1.1">For</w>
+ </chunk>
+ <chunk type="NP" id="c70.1-2">
+  <w pos="DT" id="w70.1.2">the</w>
+  <w pos="JJ" id="w70.1.3">first</w>
+  <w pos="NN" id="w70.1.4">time</w>
+ </chunk>
+ <chunk type="PP" id="c70.1-3">
+  <w pos="IN" id="w70.1.5">in</w>
+ </chunk>
+ <chunk type="NP" id="c70.1-4">
+  <w pos="CD" id="w70.1.6">70</w>
+  <w pos="NNS" id="w70.1.7">years</w>
+ </chunk>
+ <chunk type="NP" id="c70.1-5">
+  <w pos="DT" id="w70.1.8">a</w>
+  <w pos="JJ" id="w70.1.9">new</w>
+  <w pos="NN" id="w70.1.10">party</w>
+ </chunk>
+ <chunk type="VP" id="c70.1-6">
+  <w pos="VBZ" id="w70.1.11">is</w>
+  <w pos="RB" id="w70.1.12">now</w>
+  <w pos="VBG" id="w70.1.13">entering</w>
+ </chunk>
+ <chunk type="NP" id="c70.1-7">
+  <w pos="NNP" id="w70.1.14">Parliament</w>
+ </chunk>
+ <w pos="." id="w70.1.15">.</w>
+</s> 
+ 
+
+
+<s id="s70.2">
+ <chunk type="NP" id="c70.2-1">
+  <w pos="PRP" id="w70.2.1">I</w>
+ </chunk>
+ <chunk type="VP" id="c70.2-2">
+  <w pos="MD" id="w70.2.2">should</w>
+  <w pos="VB" id="w70.2.3">like</w>
+  <w pos="TO" id="w70.2.4">to</w>
+  <w pos="VB" id="w70.2.5">welcome</w>
+ </chunk>
+ <chunk type="NP" id="c70.2-3">
+  <w pos="DT" id="w70.2.6">the</w>
+  <w pos="NNS" id="w70.2.7">members</w>
+ </chunk>
+ <chunk type="PP" id="c70.2-4">
+  <w pos="IN" id="w70.2.8">of</w>
+ </chunk>
+ <chunk type="NP" id="c70.2-5">
+  <w pos="DT" id="w70.2.9">the</w>
+  <w pos="NNP" id="w70.2.10">Environment</w>
+  <w pos="NNP" id="w70.2.11">Party</w>
+ </chunk>
+ <chunk type="VP" id="c70.2-6">
+  <w pos="VBD" id="w70.2.12">the</w>
+ </chunk>
+ <chunk type="NP" id="c70.2-7">
+  <w pos="NNP" id="w70.2.13">Greens</w>
+ </chunk>
+ <chunk type="PP" id="c70.2-8">
+  <w pos="TO" id="w70.2.14">to</w>
+ </chunk>
+ <chunk type="NP" id="c70.2-9">
+  <w pos="WP" id="w70.2.15">what</w>
+ </chunk>
+ <chunk type="NP" id="c70.2-10">
+  <w pos="PRP" id="w70.2.16">I</w>
+ </chunk>
+ <chunk type="VP" id="c70.2-11">
+  <w pos="VBP" id="w70.2.17">hope</w>
+  <w pos="MD" id="w70.2.18">will</w>
+  <w pos="VB" id="w70.2.19">be</w>
+ </chunk>
+ <chunk type="NP" id="c70.2-12">
+  <w pos="JJ" id="w70.2.20">inspiring</w>
+  <w pos="JJ" id="w70.2.21">parliamentary</w>
+  <w pos="NN" id="w70.2.22">work</w>
+ </chunk>
+ <w pos="." id="w70.2.23">.</w>
+</s></p>
+
+<p id="71">
+<s id="s71.1">
+ <chunk type="NP" id="c71.1-1">
+  <w pos="PRP" id="w71.1.1">We</w>
+ </chunk>
+ <chunk type="ADVP" id="c71.1-2">
+  <w pos="RB" id="w71.1.2">all</w>
+ </chunk>
+ <chunk type="VP" id="c71.1-3">
+  <w pos="VBP" id="w71.1.3">bear</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-4">
+  <w pos="DT" id="w71.1.4">a</w>
+  <w pos="JJ" id="w71.1.5">joint</w>
+  <w pos="NN" id="w71.1.6">responsibility</w>
+ </chunk>
+ <chunk type="VP" id="c71.1-5">
+  <w pos="TO" id="w71.1.7">to</w>
+  <w pos="VB" id="w71.1.8">make</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-6">
+  <w pos="DT" id="w71.1.9">the</w>
+  <w pos="NN" id="w71.1.10">three</w>
+  <w pos="VBG" id="w71.1.11">coming</w>
+  <w pos="NNS" id="w71.1.12">years</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-7">
+  <w pos="JJ" id="w71.1.13">good</w>
+  <w pos="NNS" id="w71.1.14">ones</w>
+ </chunk>
+ <chunk type="PP" id="c71.1-8">
+  <w pos="IN" id="w71.1.15">for</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-9">
+  <w pos="DT" id="w71.1.16">this</w>
+  <w pos="NN" id="w71.1.17">country</w>
+ </chunk>
+ <w pos="CC" id="w71.1.18">and</w>
+ <chunk type="NP" id="c71.1-11">
+  <w pos="PDT" id="w71.1.19">all</w>
+  <w pos="PRP$" id="w71.1.20">its</w>
+  <w pos="NNS" id="w71.1.21">inhabitants</w>
+ </chunk>
+ <w pos="," id="w71.1.22">,</w>
+ <chunk type="PP" id="c71.1-13">
+  <w pos="IN" id="w71.1.23">for</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-14">
+  <w pos="DT" id="w71.1.24">the</w>
+  <w pos="NN" id="w71.1.25">environment</w>
+ </chunk>
+ <w pos="," id="w71.1.26">,</w>
+ <chunk type="PP" id="c71.1-16">
+  <w pos="IN" id="w71.1.27">for</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-17">
+  <w pos="PRP$" id="w71.1.28">our</w>
+  <w pos="NNS" id="w71.1.29">relations</w>
+ </chunk>
+ <chunk type="PP" id="c71.1-18">
+  <w pos="IN" id="w71.1.30">with</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-19">
+  <w pos="JJ" id="w71.1.31">other</w>
+  <w pos="NNS" id="w71.1.32">countries</w>
+ </chunk>
+ <w pos="CC" id="w71.1.33">and</w>
+ <chunk type="PP" id="c71.1-21">
+  <w pos="IN" id="w71.1.34">for</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-22">
+  <w pos="PRP$" id="w71.1.35">our</w>
+  <w pos="JJ" id="w71.1.36">own</w>
+  <w pos="JJ" id="w71.1.37">daily</w>
+  <w pos="NNS" id="w71.1.38">contacts</w>
+  <w pos="CC" id="w71.1.39">and</w>
+  <w pos="NNS" id="w71.1.40">relations</w>
+ </chunk>
+ <chunk type="PP" id="c71.1-23">
+  <w pos="IN" id="w71.1.41">with</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-24">
+  <w pos="JJ" id="w71.1.42">other</w>
+  <w pos="NNS" id="w71.1.43">people</w>
+ </chunk>
+ <chunk type="ADVP" id="c71.1-25">
+  <w pos="DT" id="w71.1.44">no</w>
+  <w pos="NN" id="w71.1.45">matter</w>
+ </chunk>
+ <chunk type="ADVP" id="c71.1-26">
+  <w pos="WRB" id="w71.1.46">where</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-27">
+  <w pos="PRP" id="w71.1.47">we</w>
+ </chunk>
+ <chunk type="VP" id="c71.1-28">
+  <w pos="VBP" id="w71.1.48">have</w>
+ </chunk>
+ <chunk type="NP" id="c71.1-29">
+  <w pos="PRP$" id="w71.1.49">our</w>
+  <w pos="NNS" id="w71.1.50">roots</w>
+ </chunk>
+ <w pos="." id="w71.1.51">.</w>
+</s></p>
+
+<p id="72">
+<s id="s72.1">
+ <chunk type="NP" id="c72.1-1">
+  <w pos="PRP" id="w72.1.1">It</w>
+ </chunk>
+ <chunk type="VP" id="c72.1-2">
+  <w pos="VBZ" id="w72.1.2">is</w>
+ </chunk>
+ <chunk type="NP" id="c72.1-3">
+  <w pos="DT" id="w72.1.3">the</w>
+  <w pos="NNP" id="w72.1.4">Government</w>
+ </chunk>
+ <chunk type="NP" id="c72.1-4">
+  <w pos="POS" id="w72.1.5">'s</w>
+  <w pos="NN" id="w72.1.6">resposibility</w>
+  <w pos="CC" id="w72.1.7">and</w>
+  <w pos="NN" id="w72.1.8">aim</w>
+ </chunk>
+ <chunk type="VP" id="c72.1-5">
+  <w pos="TO" id="w72.1.9">to</w>
+  <w pos="VB" id="w72.1.10">put</w>
+  <w pos="TO" id="w72.1.11">to</w>
+  <w pos="VB" id="w72.1.12">use</w>
+ </chunk>
+ <chunk type="NP" id="c72.1-6">
+  <w pos="DT" id="w72.1.13">all</w>
+  <w pos="JJ" id="w72.1.14">good</w>
+  <w pos="NNS" id="w72.1.15">initiatives</w>
+ </chunk>
+ <w pos="VBP" id="w72.1.16">,</w>
+ <chunk type="VP" id="c72.1-8">
+  <w pos="TO" id="w72.1.17">to</w>
+  <w pos="VB" id="w72.1.18">work</w>
+ </chunk>
+ <chunk type="PP" id="c72.1-9">
+  <w pos="IN" id="w72.1.19">for</w>
+ </chunk>
+ <chunk type="NP" id="c72.1-10">
+  <w pos="JJ" id="w72.1.20">broad</w>
+  <w pos="NNS" id="w72.1.21">solutions</w>
+ </chunk>
+ <w pos="CC" id="w72.1.22">and</w>
+ <chunk type="VP" id="c72.1-12">
+  <w pos="TO" id="w72.1.23">to</w>
+  <w pos="VB" id="w72.1.24">pursue</w>
+ </chunk>
+ <chunk type="NP" id="c72.1-13">
+  <w pos="DT" id="w72.1.25">a</w>
+  <w pos="NN" id="w72.1.26">policy</w>
+ </chunk>
+ <chunk type="PP" id="c72.1-14">
+  <w pos="IN" id="w72.1.27">in</w>
+ </chunk>
+ <chunk type="NP" id="c72.1-15">
+  <w pos="DT" id="w72.1.28">the</w>
+  <w pos="NNS" id="w72.1.29">interests</w>
+ </chunk>
+ <chunk type="PP" id="c72.1-16">
+  <w pos="IN" id="w72.1.30">of</w>
+ </chunk>
+ <chunk type="NP" id="c72.1-17">
+  <w pos="DT" id="w72.1.31">the</w>
+  <w pos="JJ" id="w72.1.32">whole</w>
+  <w pos="NN" id="w72.1.33">nation</w>
+ </chunk>
+ <w pos="." id="w72.1.34">.</w>
+</s></p></text>

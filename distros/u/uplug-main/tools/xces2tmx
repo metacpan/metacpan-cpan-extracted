@@ -1,0 +1,241 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id $
+#
+# usage: xces2tmx [-m max] [-s srclang] [-t trglang] xces-file
+#
+#  -m max: show <max> number of sentence alignments
+#
+
+
+use strict;
+use FindBin qw($Bin);
+
+
+my $time = localtime();
+my $srclang='en';
+my $trglang='nl';
+my $dir='xml';       # additional subdir for path (checked if doc's not found)
+
+my $max=0;
+while ($ARGV[0]=~/^\-/){
+    my $o=shift(@ARGV);
+    if ($o=~/^\-m/){$max=shift @ARGV;}
+    if ($o=~/^\-s/){$srclang=shift @ARGV;}
+    if ($o=~/^\-t/){$trglang=shift @ARGV;}
+    if ($o=~/^\-d/){$dir=shift @ARGV;}
+}
+
+my $ALIGN=shift(@ARGV);
+
+my $srcdoc='';
+my $trgdoc='';
+
+
+if ((not -e "$ALIGN") and (-e "$ALIGN.gz")){$ALIGN="$ALIGN.gz";}
+if (not -e $ALIGN){die "Alignment file $ALIGN does not exist!\n";}
+
+if ($ALIGN=~/\.gz/){
+    open F,"gzip -cd <$ALIGN |";
+}
+else{
+    open F,"<$ALIGN";
+}
+
+&PrintTMXHeader();
+
+my $firstSrc=1;
+my $firstTrg=1;
+
+my $count=0;
+while (<F>){
+    if (/fromDoc=\"([^\"]+)\"/){
+	if ($srcdoc ne $1){
+	    $srcdoc=$1;
+	    if (not $firstSrc){close SRC;}
+	    if ((not -e $srcdoc) and (-e "$srcdoc.gz")){
+		$srcdoc="$srcdoc.gz";
+	    }
+	    elsif ((not -e $srcdoc) and (-e "$dir/$srcdoc")){
+		$srcdoc="$dir/$srcdoc";
+	    }
+	    elsif ((not -e $srcdoc) and (-e "$dir/$srcdoc.gz")){
+		$srcdoc="$dir/$srcdoc.gz";
+	    }
+	    if ($srcdoc=~/\.gz$/){
+		open SRC,"gzip -cd <$srcdoc |";
+	    }
+	    else{
+		open SRC,"<$srcdoc";
+	    }
+	    $firstSrc=0;
+	}
+    }
+    if (/toDoc=\"([^\"]+)\"/){
+	if ($trgdoc ne $1){
+	    $trgdoc=$1;
+	    if (not $firstTrg){close TRG;}
+	    if ((not -e $trgdoc) and (-e "$trgdoc.gz")){
+		$trgdoc="$trgdoc.gz";
+	    }
+	    elsif ((not -e $trgdoc) and (-e "$dir/$trgdoc")){
+		$trgdoc="$dir/$trgdoc";
+	    }
+	    elsif ((not -e $trgdoc) and (-e "$dir/$trgdoc.gz")){
+		$trgdoc="$dir/$trgdoc.gz";
+	    }
+	    if ($trgdoc=~/\.gz$/){
+		open TRG,"gzip -cd <$trgdoc |";
+	    }
+	    else{
+		open TRG,"<$trgdoc";
+	    }
+	    $firstTrg=0;
+	}
+    }
+    if (/xtargets=\"([^\"]*)\s*\;\s*([^\"]*)\"/){
+
+
+	my $srceof=1;
+	my $trgeof=1;
+	$count++;
+	if ($max and ($count>$max)){last;}
+	my $src=$1;
+	my $trg=$2;
+	my @srcsent=split(/\s/,$src);
+	my @trgsent=split(/\s/,$trg);
+
+	next if (not @srcsent);    # skip empty alignments
+	next if (not @trgsent);
+
+#	print "    <tu srclang=\"$srclang\">\n";
+	print "    <tu>\n";
+	print "      <tuv xml:lang=\"$srclang\"><seg>";
+#	print "      <tuv xml:lang=\"$srclang\">";
+
+	my $oldDel=$/;
+	$/='</s>';
+	foreach (@srcsent){
+	    if (/s12\.8/){
+		print '';
+	    }
+	    while (my $sent=<SRC>){
+		$srceof=0;
+		if ($sent=~/s [^\>]*id="$_"/s){
+		    $sent=~s/^.*<s [^\>]*>//s;
+		    $sent=~s/\n/ /gs;
+		    $sent=~s/\<[^\>]*>//gs;
+		    $sent=~s/  +/ /gs;
+#		    $sent=&Str2XML($sent);
+# multiple seg's are not valid in TMX!
+#		    print "<seg id=\"$srclang$_.\">";
+		    print $sent,' ';
+#		    print '</seg>';
+		    last;
+		}
+		$srceof=1;
+	    }
+	}
+
+	print "</seg></tuv>\n";
+#	print "</tuv>\n";
+	print "      <tuv xml:lang=\"$trglang\"><seg>";
+#	print "      <tuv xml:lang=\"$trglang\">";
+
+	foreach (@trgsent){
+	    while (my $sent=<TRG>){
+		$trgeof=0;
+		if ($sent=~/s [^\>]*id="$_"/s){
+		    $sent=~s/^.*<s [^\>]*>//s;
+		    $sent=~s/\n/ /gs;
+		    $sent=~s/\<[^\>]*>//gs;
+		    $sent=~s/  +/ /gs;
+#		    $sent=&Str2XML($sent);
+# multiple seg's are not valid in TMX!
+#		    print "<seg id=\"$trglang$_.\">";
+		    print $sent,' ';
+#		    print '</seg>';
+		    last;
+		}
+		$trgeof=1;
+	    }
+	}
+        if ($trgeof){
+            close TRG;
+            if ($trgdoc=~/\.gz$/){open TRG,"gzip -cd <$trgdoc |";}
+            else{open TRG,"<$trgdoc";}
+        }
+        if ($srceof){
+            close SRC;
+            if ($srcdoc=~/\.gz$/){open SRC,"gzip -cd <$srcdoc |";}
+            else{open SRC,"<$srcdoc";}
+        }
+	$/=$oldDel;
+
+	print "</seg></tuv>\n";
+#	print "</tuv>\n";
+	print "    </tu>\n";
+
+    }
+}
+
+
+if (not $firstSrc){close SRC;}
+if (not $firstTrg){close TRG;}
+close F;
+
+&PrintTMXTail();
+
+
+
+
+
+
+sub Str2XML{
+    my $string=shift;
+    $string=~s/\&/\&amp\;/gs;
+    $string=~s/\</\&lt\;/gs;
+    $string=~s/\>/\&gt\;/gs;
+    return $string;
+}
+
+sub PrintTMXHeader{
+    print '<?xml version="1.0" encoding="UTF-8" ?>'."\n";
+    print '<tmx version="1.4">'."\n";
+    print '<header creationdate="';
+    print $time;
+    print '"'."\n";
+    print '          srclang="'.$srclang."\"\n";
+    print '          adminlang="'.$srclang."\"\n";
+    print "          o-tmf=\"unknown\"\n";
+    print "          segtype=\"sentence\"\n";
+    print '          creationtool="Uplug"'."\n";
+    print '          creationtoolversion="unknown"'."\n";
+    print '          datatype="PlainText" />'."\n";
+    print '  <body>'."\n";
+}
+
+
+
+sub PrintTMXTail{
+    print '  </body>'."\n";
+    print '</tmx>'."\n";
+}
+

@@ -1,0 +1,114 @@
+=head1 NAME
+
+urpmi.update - Updates package lists for specified media
+
+=head1 SYNOPSIS
+
+    urpmi.update [options] [<names>]
+
+=head1 DESCRIPTION
+
+urpmi.update scans the specified urpmi media to update their package list.
+<I<names>> is a list of names you first told to urpmi.addmedia.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--force-key>
+
+Force update of GPG key.
+
+=item B<--ignore>, B<--no-ignore>
+
+Don't update media, but mark them as ignored (that is, disables them).
+B<--no-ignore> has the reverse behaviour: it marks the media as enabled.
+
+=item B<--limit-rate I<rate>>
+
+Try to limit the download speed, I<rate> is given in bytes/sec. This
+option is not active by default.
+
+=item B<--no-md5sum>
+
+Disable MD5SUM file checking.
+
+=item B<--proxy> I<proxyhost[:port|1080]>
+
+Use specified HTTP proxy.
+
+=item B<--proxy-user> I<user:password>
+
+Use specified user and password to use for proxy authentication.
+Specifying B<--proxy-user=ask> will cause urpmi.update to prompt for a
+username and a password.
+
+=item B<--urpmi-root> I<directory>
+
+Use the file system tree rooted for urpmi database and rpm install. Contrary
+to B<--root>, the urpmi configuration comes from the rooted tree.
+
+=item B<--wait-lock>
+
+If the urpmi or rpm db is busy, wait until it is available
+
+=item B<--update>
+
+Use only update media.
+
+=item B<--curl>
+
+Use curl for downloading distant
+files. By default curl is used if available, or wget instead.
+
+=item B<--wget>
+
+Use wget for downloading distant files. By default curl
+is used if available, or wget instead.
+
+=item B<--curl-options> I<'options'>
+
+=item B<--rsync-options> I<'options'>
+
+=item B<--wget-options> I<'options'>
+
+Specify additional command-line options to be passed to curl, rsync or
+wget when retrieving files. If several options are to be passed, separate
+them with spaces and enclose them in quotes.
+
+Note that the rsync options will also be used for ssh media.
+
+=item B<-a>
+
+Select all enabled non-static media to update them.
+
+=item B<-f>
+
+Force updating synthesis
+
+=item B<-ff>
+
+Really force updating synthesis
+
+=item B<--probe-rpms>
+
+Do not use synthesis, use rpm files directly
+
+=item B<-q>
+
+Quiet mode.
+
+=item B<-v>
+
+Verbose mode.
+
+=back
+
+=head1 SEE ALSO
+
+urpmi(8), urpmi.addmedia(8), urpmi.removemedia(8).
+
+=head1 AUTHOR
+
+Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+FranE<ccedil>ois Pons, Rafael Garcia-Suarez 

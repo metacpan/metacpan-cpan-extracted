@@ -1,0 +1,62 @@
+{
+  'input' => {
+    'source text' => {
+      'format' => 'XML',
+      'file' => 'datasource.xml',
+      'root' => 's',
+    },
+    'target text' => {
+      'format' => 'XML',
+      'file' => 'datatarget.xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'bitext' => {
+      'format' => 'xces align',
+      'write_mode' => 'overwrite',
+    }
+  },
+  'parameter' => {
+      'paragraph boundary' => '(p|head)',
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source text:file',
+       'trg' => 'input:target text:file',
+       'out' => 'output:bitext:file',
+       'p'   => 'parameter:paragraph boundary',
+       'dic' => 'parameter:dictionary',
+       'd'   => 'parameter:dictionary',
+       'b'   => 'parameter:bisent mode',
+       's'     => 'parameter:source language',
+       't'     => 'parameter:target language',
+       'tok'   => 'parameter:tokenize',
+       'tok-s' => 'parameter:tokenize source',
+       'tok-t' => 'parameter:tokenize target',
+       'l'     => 'parameter:lowercase',
+       'ls'    => 'parameter:lowercase source',
+       'lt'    => 'parameter:lowercase target',
+       'time'  => 'parameter:timeout',
+       'no-dic'     => 'parameter:skip dictionary',
+       'no-realign' => 'parameter:skip realign',
+    }
+  },
+  'module' => {
+    'program' => 'uplug-hunalign',
+    'location' => '$UplugBin',
+    'name' => 'hunalign sentence aligner',
+    'stdout' => 'bitext',
+  },
+  'description' => 'This module calls an external hunalign sentence aligner.',
+  'widgets' => {
+       'input' => {
+	  'source text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk))'
+	  },
+	  'target text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk))'
+	  },
+       },
+  }
+}

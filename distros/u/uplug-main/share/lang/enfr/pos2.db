@@ -1,0 +1,84 @@
+# features (source): { 'pos' => undef }
+# features (target): { 'pos' => undef }
+CC	CON:coo		# coordinating CONJUNCTION
+CD	ADJ:num		# cardinal number
+DT	DET:def		# DETERMINER
+DT	DET:indef		# DETERMINER
+.	PON:sep		# PUNCTUATION
+,	PON:comma		# PUNCTUATION
+:	PON		# PUNCTUATION
+:	PON:sep		# PUNCTUATION
+(	PON:sep		# PUNCTUATION
+)	PON:sep		# PUNCTUATION
+IN	CON:sub		# preposition, subordinating conjunction
+IN	CON:sub:1st		# preposition, subordinating conjunction
+IN	CON:sub:2nd		# preposition, subordinating conjunction
+IN	PRE		# preposition, subordinating conjunction
+IN	PRE:1st		# preposition, subordinating conjunction
+IN	PRE:2nd		# preposition, subordinating conjunction
+IN	PRE:det		# preposition, subordinating conjunction
+IN	PRE:det:2nd		# preposition, subordinating conjunction
+JJ	ADJ		# ADJECTIVE
+JJR	ADJ		# ADJECTIVE, comparative
+JJS	ADJ		# ADJECTIVE, superlative
+MD	VER:aux:cond		# modal
+MD	VER:aux:futu		# modal
+MD	VER:aux:impf		# modal
+MD	VER:aux:infi		# modal
+MD	VER:aux:pper		# modal
+MD	VER:aux:ppre		# modal
+MD	VER:aux:pres		# modal
+MD	VER:aux:simp		# modal
+MD	VER:aux:subi		# modal
+MD	VER:aux:subp		# modal
+NN	NOM		# NOUN
+NNS	NOM		# NOUN plural
+NNP	NOM		# proper NOUN
+NNPS	NOM		# proper NOUN, plural
+NNP	NPR		# proper NOUN
+NNPS	NPR		# proper NOUN, plural
+PR	PRO:clit		# PRONOUN
+PR	PRO:demo:attr		# PRONOUN
+PR	PRO:demo:pred		# PRONOUN
+PR	PRO:indef:attr		# PRONOUN
+PR	PRO:indef:pred		# PRONOUN
+PR	PRO:inter		# PRONOUN
+PR	PRO:poss		# PRONOUN
+PR	PRO:rel		# PRONOUN
+PRP	PRO:pers:clit		# personal PRONOUN
+PRP	PRO:pers:conj		# personal PRONOUN
+PRP	PRO:pers:disj		# personal PRONOUN
+PRP	PRO:pers:refl		# personal PRONOUN
+RB	ADV		# ADVERB
+RB	ADV:1st		# ADVERB
+RB	ADV:2nd		# ADVERB
+RB	ADV:neg:1st		# ADVERB
+RB	ADV:neg:2nd		# ADVERB
+RBR	ADV		# ADVERB, comparative
+RBR	ADV:1st		# ADVERB
+RBR	ADV:2nd		# ADVERB
+RBR	ADV:neg:1st		# ADVERB
+RBR	ADV:neg:2nd		# ADVERB
+RBS	ADV		# ADVERB, superlative
+RBS	ADV:1st		# ADVERB
+RBS	ADV:2nd		# ADVERB
+RBS	ADV:neg:1st		# ADVERB
+RBS	ADV:neg:2nd		# ADVERB
+TO	PRE		# to go, to him
+TO	VERB:infi		# to go, to him
+VB	VER:infi		# VERB, base form
+VB	VER:pres		# VERB, base form
+VB	VER:futu		# VERB, base form
+VB	VER:cond		# VERB, base form
+VBD	VER:impf		# VERB, past tense
+VBG	VER:ppre		# VERB, gerund/present participle
+VBN	VER:pper		# VERB, past participle
+VBN	VER:ppre		# VERB, past participle
+VBP	VER:pres		# VERB, sing. present, non-3d
+VBZ	VER:pres		# VERB, 3rd person sing. present
+WDT	Det		# WH-determiner
+WRB	CON:sub		# WH-adverb
+WRB	CON:sub:1st		# WH-adverb
+WRB	CON:sub:snd		# WH-adverb
+$	ADJ:num		# currency (?)
+NN:NN	NOM:PRE:NOM		# NP

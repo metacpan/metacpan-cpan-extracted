@@ -1,0 +1,85 @@
+{
+  'encoding' => 'iso-8859-1',
+  'module' => {
+    'name' => 'XML markup',
+    'program' => 'uplug-markup',
+    'location' => '$UplugBin',
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This module converts plain text files into XML
+  using some basic markup. It adds XML tags for headers, paragraph
+  tags and page break tags. Header tags are added to short text lines
+  which are separated from surrounding text. Paragraph and page break
+  tags are added wherever a certain amount of empty lines are found in
+  the text.',
+  'input' => {
+    'text' => {
+      'format' => 'text',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+#      'DocRootTag' => 'cesDoc',
+#      'DocHeaderTag' => 'cesHeader',
+      'DocBodyTag' => 'text',
+      'write_mode' => 'overwrite',
+	'status' => 'markup',
+    }
+  },
+  'parameter' => {
+    'header' => {
+      'max nr of characters' => 40,
+      'start character' => '\p{Lu}\p{N}',
+#      'start character' => 'A-ZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ0-9',
+    },
+    'paragraph break' => {
+      'nr of empty lines' => 1
+    },
+    'page break' => {
+      'nr of empty lines' => 5
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'is' => 'input:text:stream name',
+       'os' => 'output:text:stream name',
+       'in' => 'input:text:file',
+       'o' => 'output:text:file',
+       'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+       'pb' => 'parameter:page break:nr of empty lines',
+       'p' => 'parameter:paragraph break:nr of empty lines',
+    }
+  },
+  'help' => {
+    'shortcuts' => {
+      'ci' => 'character encoding (input),       default=iso-8859-1',
+      'co' => 'character encoding (output),      default=utf-8',
+      'in' => 'input text file                   default=STDIN',
+      'out' => 'output file                       default=STDOUT',
+      'pb' => 'nr empty lines == page break      default=2',
+      'p' => 'nr empty lines == paragraph break default=1',
+    },
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,status=text)'
+	  },
+       },
+       'parameter' => {
+            'header' => {
+               'max nr of characters' => 'scale (1,100,1,10)',
+            },
+            'paragraph break' => {
+               'nr of empty lines' => 'scale (1,10,1,1)',
+            },
+            'page break' => {
+               'nr of empty lines' => 'scale (1,10,1,1)',
+            },
+        }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#	'encoding' => 'iso-8859-1',
+	'status' => 'tagTree',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+	'segments' => {
+		'tag' => 'w',
+	},
+     'tagger' => {
+      'language' => 'french',
+      'startup base' => 'tree_',
+     },
+     'output' => {
+#        'attribute' => 'pos',
+        'attributes' => 'text:pos:lem',
+        'pattern' => '^(.*)\t+(.*)\t+(.*)$',
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n<s>\n",
+        'tag delimiter' => '\s+',
+	'encoding' => 'iso-8859-1',
+     },
+     'input' => {
+        'token delimiter' => " ",
+        'sentence delimiter' => "\n<s>\n",
+     },
+     'output replacements' => {
+        '<unknown>' => '',
+     },
+  },
+  'module' => {
+    'program' => 'uplug-toktag',
+    'location' => '$UplugBin',
+    'name' => 'tree tagger (german)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+      'out' => 'output:text:file',
+      'lang' => 'parameter:tagger:language',
+      'l' => 'parameter:tagger:language',
+      'in' => 'input:text:file',
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'attr' => 'parameter:output:attribute',
+       'char' => 'output:text:encoding',
+	'lang' => 'parameter:tagger:language',
+	'outchar' => 'output:text:encoding',
+	'inchar' => 'input:text:encoding',
+       'inroot' => 'input:text:root',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk),language=fr)'
+	  },
+       },
+#       'parameter' => {
+#          'output' => {
+#	     'attribute' => 'optionmenu (pos,tree)',
+#	  }
+#       }
+  }
+}

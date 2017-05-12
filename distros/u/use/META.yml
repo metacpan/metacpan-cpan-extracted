@@ -1,0 +1,32 @@
+---
+abstract: 'Import several modules with a single use statement'
+author:
+  - '唐鳳 <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: use
+name: use
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Hook::LexWrap: 0.24
+  perl: 5.8.0
+  version: 0.86
+resources:
+  homepage: https://github.com/audreyt/use/tree
+  repository:
+    type: git
+    url: git://github.com/audreyt/use.git
+    web: https://github.com/audreyt/use/tree
+version: 0.05

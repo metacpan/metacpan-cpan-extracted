@@ -1,0 +1,136 @@
+=head1 NAME
+
+urpme - rpm deinstaller
+
+=head1 SYNOPSIS
+
+    urpme [options] [package_name...]
+    urpme [options] --auto-orphans
+
+=head1 DESCRIPTION
+
+urpme allows packages to be deinstalled, including all their dependencies.
+I<package_names> must have one of the forms I<name>, I<name-version>,
+I<name-version-release>, or I<name-version-release.architecture>. If you
+want to specify packages more broadly, use the B<-a> option.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+Prints a help message and exit (this is the same as B<-h> or B<-?>).
+
+=item B<-a>
+
+If multiple packages match the given substring, deinstall them all.
+
+=item B<--verbose>
+
+Proposes a verbose mode with various messages.
+
+=item B<-v>
+
+This is the same as B<--verbose>.
+
+=item B<--auto>
+
+Removes packages non-interactively, without asking questions.
+
+=item B<--auto-orphans>
+
+Removes orphans.
+
+=item B<--test>
+
+Test deinstallation of packages but do not modify the system.
+
+=item B<--force>
+
+Force invocation even if some packages do not exist.
+
+=item B<--justdb>
+
+Update only the database, not the filesystem.
+
+=item B<--noscripts>
+
+Don't execute the scriptlets. This is equivalent to B<rpm --noscripts>.
+This can be useful to remove packages where uninstall scriptlets fail for
+some reason.
+
+=item B<--parallel> I<alias>
+
+Activate distributed execution of urpmi to other machines (it is mandatory
+that urpmi is installed, but it is not necessary to have media defined on
+any machines). I<alias> defines which extension module is to be used by
+urpmi (currently, urpmi-parallel-ka-run or urpmi-parallel-ssh are
+available) and which machines should be updated. This alias is defined in
+the file F</etc/urpmi/parallel.cfg> as described below.
+
+=item B<--repackage>
+
+Save previous state of upgraded packages; in other words, save the old
+rpms (usually in F</var/spool/repackage>, but you can override this with
+an rpm macro.) This is equivalent to providing the B<--repackage> flag to
+rpm.
+
+If you want to use the repackage/rollback functionality of rpm, you should
+check out the C<urpmi.recover> tool.
+
+=item B<--root> I<directory>
+
+Use the file system tree rooted for rpm install. All operations and
+scripts will run after chroot(2). The rpm database that lies in the
+rooted tree will be used, but the urpmi configuration comes from the
+normal system.
+
+=item B<--urpmi-root> I<directory>
+
+Use the file system tree rooted for urpmi database and rpm install. Contrary
+to B<--root>, the urpmi configuration comes from the rooted tree.
+
+=item B<--use-distrib> I<directory>
+
+Configure urpme on the fly from a distribution tree.
+
+=item B<--wait-lock>
+
+If the urpmi or rpm db is busy, wait until it is available
+
+=back
+
+=head1 FILES
+
+See urpmi.files(5).
+
+=head1 EXIT CODES
+
+=over
+
+=item 0
+
+Success; or nothing was found to remove; or the user cancelled the whole
+operation.
+
+=item 1
+
+Command line inconsistency, invocation failure (you are not root), or
+packages not found.
+
+=item 2
+
+Removal of packages failed.
+
+=back
+
+=head1 AUTHORS
+
+Pascal Rigaux <pixel@mandriva.com> (current maintainer), 
+Francois Pons, Rafael Garcia-Suarez 
+
+=head1 SEE ALSO
+
+urpmi.addmedia(8), urpmi.update(8), urpmi.removemedia(8), urpmf(8),
+urpmi(8), urpmq(8), urpmi.files(5), urpmi.recover(8).

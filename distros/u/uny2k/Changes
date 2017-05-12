@@ -1,0 +1,23 @@
+19.1080828  Thu Aug 28 15:36:56 PDT 2008
+    No change, just a gamma release.
+
+19.108_0823  Sat Aug 23 18:03:48 PDT 2008
+    [Install Fixes]
+    * The user no longer has to have pod2test installed to install uny2k.
+
+19.108  Thu Aug 21 14:49:32 PDT 2008
+    [Bug Fixes]
+    * Removed dodgy psuedo-hash code so it works in 5.10
+      [Thanks to Rick Myers for catching that]
+
+    [Other]
+    * Added a license.
+    * Cleaned up a bunch of cruft.
+
+19.101  Fri Jul 27 19:13:17 GMT 2001
+    [Bug Fixes]
+    * Fixed bug with localtime(time) and gmtime(time)
+    * localtime mistakenly returning gmtime
+
+19.100  Sat Apr  1 20:52:37 GMT 2001
+    * First version

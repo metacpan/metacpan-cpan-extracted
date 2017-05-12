@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+#-*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: xces2poslink,v 1.1 2007/05/08 08:52:36 joerg72 Exp $
+#----------------------------------------------------------------------------
+# extract features from word alignments (default: text:POS)
+# USAGE: xces2poslink wordalign-file
+# 
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/..";
+
+use Uplug::Data::Align;
+use Uplug::IO::Any;
+
+my %InputStream=('format' => 'xces align');
+$InputStream{file}=shift(@ARGV);
+
+#---------------------------------------------------------------------------
+
+my $input=Uplug::IO::Any->new(\%InputStream);
+$input->open('read',\%InputStream);
+
+
+## specify your features here:
+my %SrcParam=('features' => {'#text' => undef,     # text 
+			     'pos' => undef});     # pos attribute
+my %TrgParam=('features' => {'#text' => undef,     # the same for the
+			     'pos' => undef});     # target language
+
+#---------------------------------------------------------------------------
+
+
+my $data=Uplug::Data::Align->new();
+
+my $count=0;
+while ($input->read($data)){
+    $count++;
+    if (not ($count % 100)){
+	$|=1;print STDERR '.';$|=0;
+    }
+    if (not ($count % 1000)){
+	$|=1;print STDERR "$count\n";$|=0;
+    }
+
+    ## 'link' subtree in XML
+    my $link=$data->linkData();
+    ## all word alignment nodes (wordLink tags)
+    my @nodes=$link->findNodes('wordLink');
+
+
+    foreach my $n (0..$#nodes){
+
+	## get xtarget attribute
+	my $xtrg=$link->attribute($ids[$n],'xtargets');
+	my ($srcID,$trgID)=split(/\;/,$xtrg);
+
+	## get word nodes (source and target) corresponding to the current link
+	my @srcPhrNodes=&GetPhraseNodes($data->{source},$srcID);
+	my @trgPhrNodes=&GetPhraseNodes($data->{target},$trgID);
+
+	## get features according to features specifications
+	my $SrcFeat=$data->getSrcPhraseFeature(\@srcPhrNodes,\%SrcParam);
+	my $TrgFeat=$data->getTrgPhraseFeature(\@trgPhrNodes,\%TrgParam);
+
+	## print source and target features
+	print $SrcFeat,"\t",$TrgFeat,"\n";
+    }
+}
+$input->close;
+
+
+
+
+
+
+
+sub GetPhraseNodes{
+    my $data=shift;
+    my $idStr=shift;
+    my @ids=split(/[\:\+]/,$idStr);
+    my @nodes=();
+    foreach (@ids){
+	my ($node)=$data->findNodes('.*',{id => $_});
+	if (ref($node)){
+	    push (@nodes,$node);
+	}
+    }
+    if ((not @nodes) and (@ids)){        # in case the nodes haven't been found
+	my @n=$data->contentElements();  # (e.g. no IDs in the XML-file)
+	foreach (@ids){
+	    push (@nodes,$n[$_]);
+	}
+    }
+    return @nodes;
+}
+

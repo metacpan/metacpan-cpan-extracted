@@ -1,0 +1,41 @@
+Tue Jul 15 14:43:56 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * add onboot setup for vm
+
+Tue Jul 15 14:40:04 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * don't try to start a running machine
+
+Tue Jul 15 14:35:29 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * add status functions
+
+Tue Jul 15 14:35:20 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * check user is defined when running as root
+
+Tue Jul 15 14:34:12 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * umid can be setup in the config
+
+Tue Jul 15 14:33:29 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * add tests over Umlmgr
+
+Tue Jul 15 13:39:40 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * improve functions and doc
+
+Tue Jul 15 13:32:38 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * add a default config file
+
+Tue Jul 15 13:02:20 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * ensure Umlmgr object is correctly loaded
+
+Tue Jul 15 13:01:33 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * get_machine function return just one machine
+
+Tue Jul 15 12:56:38 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * fix test (take care to umid)
+
+Tue Jul 15 12:33:32 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * add umltty
+
+Tue Jul 15 12:33:11 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * add umlmgr
+
+Tue Jul 15 11:15:17 CEST 2008  Olivier Thauvin <nanardon@nanardon.zarb.org>
+  * Init project

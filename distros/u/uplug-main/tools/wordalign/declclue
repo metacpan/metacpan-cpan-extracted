@@ -1,0 +1,161 @@
+#!/usr/bin/perl
+#-----------------------------------------------------------------------
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# declclue.pl: load declarative clues into DBM-databases
+#              this script OVERWRITES ./clue.dbm        and 
+#                                     ./clue.dbm.head
+#-----------------------------------------------------------------------
+# usage: declclue.pl [OPTIONS] <clue.db
+#
+# OPTIONS:
+#   -d delimiter .... specify a column delimiter
+#   -p .............. the 3rd (last) column is filled with probabilities
+#   -o out.... ...... the clue database is stored in the given file
+#   -ci encoding .... input encoding (e.g. 'iso-8859-1') default='utf-8'
+#   -co encoding .... output encoding (e.g. 'iso-8859-1') default='utf-8'
+#   -c columns ...... columns in input file (e.g. 'target,source,value')
+#                     (can be any combination of target, source and value)
+#
+# clue.db is a plain text-file with feature pairs:
+#
+#     header: all lines starting with '#'
+#             required: feature definition for source and target!!!
+#
+#                # features (source): FEATURE-DEF-HASH
+#                # features (target): FEATURE-DEF-HASH
+#
+#             FEATURE-HASH: a perl-hash dumped into a string
+#
+#     body: all lines have 2 or 3 TAB-separated fields!
+#
+#             source1 <TAB> target1 <TAB> frequency1
+#             source2 <TAB> target2 <TAB> frequency2
+#
+#           frequencies are optional!
+#
+#-----------------------------------------------------------------------
+# example clue.db file:
+#
+#         #-------------------------------------------------------------
+#         #<--- this is column 0 in the file
+#         #     data fields have to be speparated with ONE tab-character
+#         #
+#         # features (source): { 'c.*:type' => undef }
+#         # features (target): { 'c.*:type' => undef }
+#         #
+#         NP      NP
+#         NPMAX   NP PP   10
+#         NPMAX   NP APMIN PP     5
+#         NPMAX   NP PP NP        200
+#         NPMAX   NP      8
+#         APMIN   ADVP
+#         PP      PP
+#         VC      VP
+#         ADVP    ADVP
+#         INFP    VP
+#         #------------------------------- end of the file ------------
+# 
+#
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/..";
+use Uplug::Data;
+use Uplug::IO::Any;
+
+my $prob=0;
+my $delimiter="\t";
+
+my %dic=('file' => 'clue.dbm',
+	 'format' => 'dbm',
+	 'write_mode' => 'overwrite',
+	 'key' => ['source','target']);
+my %inStream=('format' => 'tab',
+	      'columns' => ['source','target','value',],
+	      'field delimiter' => $delimiter);
+
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift(@ARGV);
+    if ($opt eq '-d'){
+	$delimiter=shift(@ARGV);
+	$inStream{'field delimiter'}=$delimiter;
+    }
+    if ($opt eq '-c'){
+	my $col=shift(@ARGV);
+	@{$inStream{columns}}=split(/[\,\:]/,$col);
+    }
+    if ($opt eq '-ci'){
+	$inStream{encoding}=shift(@ARGV);
+    }
+    if ($opt eq '-co'){
+	$dic{encoding}=shift(@ARGV);
+    }
+    if ($opt eq '-p'){$prob=1;}
+    if ($opt eq '-f'){$prob=1;}
+    if ($opt eq '-o'){$dic{file}=shift(@ARGV);}
+}
+
+
+my %lex=();
+my $data=Uplug::Data->new;
+
+my $in=Uplug::IO::Any->new(\%inStream);
+$in->open('read',\%inStream);
+while ($in->read($data)){
+    my $src=$data->attribute('source');
+    my $trg=$data->attribute('target');
+    if ((not $src) or (not $trg)){next;}
+    my $value=$data->attribute('value');
+    if (not $value){$value=1;}
+    if ($value<1){$prob=1;}                      # value<1 --> probabilities
+    if ($prob){$lex{$src}{$trg}=$value;}         # probabilities: set value
+    else{$lex{$src}{$trg}+=$value;}              # frequencies: add up
+    if (($src=~s/\_/ /gs) or ($trg=~s/\_/ /gs)){ # (for giza-clue:)
+	if ($prob){$lex{$src}{$trg}=$value;}     #   '_' means ' '
+	else{$lex{$src}{$trg}+=$value;}
+    }
+}
+my $header=$in->header;
+
+
+my $out=Uplug::IO::Any->new(\%dic);
+$out->open('write',\%dic);
+$out->addheader($header);
+$out->writeheader();
+
+foreach my $s (keys %lex){
+    my $total;
+    if (not $prob){map ($total+=$_,values %{$lex{$s}});}
+    foreach my $t (keys %{$lex{$s}}){
+	my $score=$lex{$s}{$t};
+	if (not $prob){               # for frequencies:
+	    if (not $total){next;}    #   calculate relative frequencies
+	    $score/=$total;           #   score = freq/total-freq
+	}
+	my $data=Uplug::Data->new;
+	$data->setAttribute('source',$s);
+	$data->setAttribute('target',$t);
+	$data->setAttribute('score',$score);
+	$out->write($data);
+    }
+}
+
+$out->close;
+$in->close;

@@ -1,0 +1,18 @@
+[Changes for 0.05 - Sun Oct 21 22:06:29 CST 2012]
+
+* Rebuild with up-to-date Module::Install 1.06; no functional changes.
+
+[Changes for 0.04 - Tue May 29 14:32:37 CST 2012]
+
+* Inline perl5.pm into use::perl5 rather than depending on it,
+  to avoid installation issues from Strawberry Perl.
+
+  Reported by: Rohan Carly
+
+[Changes for 0.03 - Tue Jul 19 22:10:15 CST 2011]
+
+* Uses perl5.pm instead of rig.pm
+
+[Changes for 0.01 - Sun Jul  3 10:29:46 CST 2011]
+
+* Initial release to CPAN.

@@ -1,0 +1,26 @@
+Revision history for uni-perl
+
+0.92    2014-05-06
+        Fix for perl 5.18
+
+0.91    2012-06-01
+        Fix deprecation warning test. :locked was deprecated later than 5.10.0
+
+0.90    2012-05-29
+        Remove blackjack and hookers ;)
+        Make autogeneration, like in common::sense
+        Support for feature unicode_strings
+        Fixes for 5.15+
+        Added xd (Devel::Hexdump)
+        Added utf::(encode|decode) by default
+        Some dist cleanup
+
+0.03    2009-10-15
+        Fix geps
+
+0.02    2009-10-14
+        Fix mro;
+
+0.01    2009-10-14
+        First version
+        Initial features: :ru :ua :dumper

@@ -1,0 +1,54 @@
+
+#!start included /usr/lib/perl5/5.10.0/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\b_darcs\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+^Makefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+# Avoid RPM debug helper files
+^debugfiles.list$
+^debugsources.list$
+#!end included /usr/lib/perl5/5.10.0/ExtUtils/MANIFEST.SKIP
+
+\B\.svn\b
+^\.pms
+~$
+\.orig$
+^toto
+^l$
+\.old$
+\.bak$
+\B\.perl_checker
+\bTAGS$
+^t/media/
+^t/VERSION$
+^blib/
+^pm_to_blib$
+^Makefile$
+^po/.*\.mo$

@@ -1,0 +1,52 @@
+#! /bin/sh
+#
+# umlmgr       A tools to manage UML virtual machines
+#
+# chkconfig: 345 11 89
+# description: A tools to manage UML virtual machines
+# processname: uml_switch
+#
+### BEGIN INIT INFO
+# Provides: $umlmgr
+# Required-Start: $network
+# Required-Stop: $network
+# Default-Start: 3 4 5
+# Short-Description: UML manager
+# Description: A tools to manage UML virtual machines
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Get network configuration
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "${NETWORKING}" = "no" ] && exit 0
+
+# Set defaults and load configuration
+NAME=umlmgr
+LOCKFILE=/var/lock/subsys/${NAME}
+
+# See how we were called.
+case "$1" in
+    start)
+    action "Starting $NAME" $NAME start
+	;;
+    stop)
+    action "Stoping $NAME" $NAME stop
+	;;
+    status)
+	$NAME status
+	;;
+    restart|reload)
+	$0 stop
+	$0 start
+	;;
+    *)
+	gprintf "Usage: %s {start|stop|status|restart|reload}\n" "$0"
+	exit 1
+	;;
+esac
+
+exit $?

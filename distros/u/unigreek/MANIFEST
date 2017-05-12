@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/UniGreek.pm
+LICENSE
+MANIFEST			This list of files
+README.md
+t/1_use.t
+t/2_from_unigreek.t
+t/3_to_unigreek.t
+META.yml
+META.json
+Makefile.PL

@@ -1,0 +1,382 @@
+#!/usr/bin/env perl
+#
+# beaparse.pl: a simple UPLUG wrapper for Bea's parser
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id$
+#----------------------------------------------------------------------------
+#
+# 
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Uplug::Data;
+use Uplug::IO::Any;
+use Uplug::Config;
+
+my $UplugHome="$Bin/../";
+$ENV{UPLUGHOME}=$UplugHome;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='beaparse.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+my ($InputStreamName,$InputStream)=
+    each %{$IniData{'input'}};               # the first input stream;
+my ($OutputStreamName,$OutputStream)=         # take only
+    each %{$IniData{'output'}};               # the first output stream
+
+my $input=Uplug::IO::Any->new($InputStream);
+my $output=Uplug::IO::Any->new($OutputStream);
+
+#---------------------------------------------------------------------------
+
+my $lang=$IniData{parameter}{parser}{language};
+my $prg=$IniData{parameter}{parser}{'startup base'};
+my $POSattr=$IniData{parameter}{input}{'POS attribute'};
+my $InTokDel=$IniData{parameter}{input}{'token delimiter'};
+my $OutTokDel=$IniData{parameter}{output}{'token delimiter'};
+my $InSentDel=$IniData{parameter}{input}{'sentence delimiter'};
+my $OutSentDel=$IniData{parameter}{output}{'sentence delimiter'};
+my $InTagDel=$IniData{parameter}{input}{'POS tag delimiter'};
+my $ConstTag=$IniData{parameter}{output}{'constituent tag'};
+# my $OutTagDel=$IniData{parameter}{output}{'POS tag delimiter'};
+# my $ChunkTagDel=$IniData{parameter}{output}{'chunk tag delimiter'};
+# my $ChunkTag=$IniData{parameter}{output}{'chunk tag'};
+my %TokReplace=();
+if (ref($IniData{parameter}{'input token replacements'}) eq 'HASH'){
+    %TokReplace=%{$IniData{parameter}{'input token replacements'}};
+}
+my %TagReplace=();
+if (ref($IniData{parameter}{'input tag replacements'}) eq 'HASH'){
+    %TagReplace=%{$IniData{parameter}{'input tag replacements'}};
+}
+my %InputReplace=();
+if (ref($IniData{parameter}{'input replacements'}) eq 'HASH'){
+    %InputReplace=%{$IniData{parameter}{'input replacements'}};
+}
+
+my %OutputReplace=();
+if (ref($IniData{parameter}{'output replacements'}) eq 'HASH'){
+    %OutputReplace=%{$IniData{parameter}{'output replacements'}};
+}
+
+#---------------------------------------------------------------------------
+
+
+
+if ($UplugHome!~/^[\\\/]/){
+    use Cwd;
+    $UplugHome=getcwd.'/'.$UplugHome;
+}
+
+my $ParserDir=$UplugHome.'ext/parser/';
+# my $TmpUnparsed=$ParserDir.'unparsed.'.$$;
+# my $TmpParsed=$ParserDir.'parsed.'.$$;
+my $TmpUnparsed=Uplug::IO::Any::GetTempFileName;
+my $TmpParsed=Uplug::IO::Any::GetTempFileName;
+
+my $ParserPrg=$ParserDir.$prg.$lang;
+
+#---------------------------------------------------------------------------
+
+my $data=Uplug::Data->new;
+
+$input->open('read',$InputStream);
+my $UplugEncoding=$input->getInternalEncoding();
+my $OutEncoding=$IniData{parameter}{output}{encoding};
+if (not defined $OutEncoding){$OutEncoding=$UplugEncoding;}
+
+open F,">$TmpUnparsed";
+
+my $count=0;
+while ($input->read($data)){
+
+    $count++;
+    my @nodes=$data->contentElements;
+    my @tok=$data->content(\@nodes);
+    my @attr=$data->attribute(\@nodes);
+
+    map(s/^\s*//,@tok);                    # remove initial white-spaces
+    map(s/\s*$//,@tok);                    # remove final white-spaces
+
+    map($tok[$_]=&FixParserData($tok[$_],\%TokReplace),0..$#tok);
+
+    foreach (0..$#tok){
+	if ($tok[$_]!~/\S/){next;}
+	if (defined $attr[$_]{$POSattr}){
+	    $attr[$_]{$POSattr}=&FixParserData($attr[$_]{$POSattr},
+						\%TagReplace);
+	    $tok[$_].=$InTagDel.$attr[$_]{$POSattr};
+	}
+    }
+    map($tok[$_]=&FixParserData($tok[$_],\%InputReplace),0..$#tok);
+    if ($OutEncoding ne $UplugEncoding){
+	map($tok[$_]=&Uplug::Encoding::convert($tok[$_],$UplugEncoding,
+					       $OutEncoding),
+	    0..$#tok);
+    }
+    @tok=grep(/\S/,@tok);                  # take only non-empty tokens
+    if (@tok){                             # print them if any left
+	print F join $InTokDel,@tok;
+	print F $InSentDel;
+    }
+}
+
+close F;
+$input->close;
+
+#---------------------------------------------------------------------------
+
+print STDERR "# beaparse.pl: run parser!\n";
+print STDERR "# beaparse.pl: $ParserPrg $TmpUnparsed $TmpParsed\n";
+ 
+`$ParserPrg $TmpUnparsed $TmpParsed`;
+
+#---------------------------------------------------------------------------
+
+my $InputSeperator=$/;
+$/=$OutSentDel;
+
+$input->open('read',$InputStream);
+$output->open('write',$OutputStream);
+open F,"<$TmpParsed";
+
+my $data=Uplug::Data->new;    # use a new data-object (new XML parser!)
+while ($input->read($data)){
+    my @nodes=$data->contentElements;
+    if (not @nodes){$output->write($data);next;}
+    my $parsed=undef;
+    do{
+	if ($parsed=<F>){
+	    $parsed=&FixParserData($parsed,\%OutputReplace);
+	}
+	else{$output->write($data);last;}
+    }
+    until($parsed=~/\S/);
+
+    chomp $parsed;
+    my $parse;
+    &MakeParseArray($parsed,\$parse);
+    if (ref($parse) ne 'ARRAY'){
+	$output->write($data);
+	next;
+    }
+    my @const=();
+    &GetConstituents($parse,\@const);
+    my $id=$data->attribute('id');
+    $id=~s/^./c/;
+    &AddConstituents($data,\@const,$id);
+    $output->write($data);
+}
+close F;
+$input->close;
+$output->close;
+
+$/=$InputSeperator;
+
+END {
+    unlink $TmpUnparsed;
+    unlink $TmpParsed;
+}
+
+############################################################################
+
+sub AddConstituents{
+    my ($data,$const,$id)=@_;
+
+    my @nodes=$data->contentElements;
+    my $count=0;
+    pop @{$const};
+    foreach my $c (sort {$a <=> $b} @{$const}){
+	my ($level,$start,$end,$type)=split(/\:/,$c);
+	$count++;
+	my @children=();
+	foreach ($start..$end){
+	    push (@children,$nodes[$_]);
+	}
+        if (not @children){next;}
+	my %ParentAttr=();
+	if ($type){
+	    $ParentAttr{type}=$type;
+	}
+	$ParentAttr{id}=$id."-$count";
+	$data->addParent(\@children,$ConstTag,\%ParentAttr);
+    }
+}
+
+
+sub GetConstituents{
+    my ($parse,$const,$pos,$level)=@_;
+
+    if (not defined $pos){$pos=0;}
+    if (not defined $level){$level=0;}
+    my $start=$pos;
+    my $type=undef;
+    if (ref($parse->[0]) ne 'ARRAY'){
+	$type=shift @{$parse};
+	chop $type;
+	pop @{$parse};
+    }
+    while (@{$parse}){
+	if (ref($parse->[0]) eq 'ARRAY'){
+	    $pos=&GetConstituents($parse->[0],$const,$pos,$level+1);
+	}
+	$pos++;
+	shift @{$parse};
+    }
+    my $end=$pos-1;
+    if ($pos){
+	my $sort=100000*$level+$start;
+	push (@{$const},"$sort:$start:$end:$type");
+    }
+    return $pos-1;
+}
+
+
+sub MakeParseArray{
+    my $string=shift;
+    my $arr=shift;
+
+    $string=~s/^/\[SENT\* /;                # add initial phrase type
+    $string=~s/$/ \*\SENT\]/;               # add final ]
+    $string=~s/\'/\&quot\;/gs;
+    $string=~s/([^\[\]])(\s)/$1\'$2/g;      # add ' after each word
+    $string=~s/(\s)([^\[\]])/$1\'$2/g;      # add ' in front of each word
+
+    $string=~s/(\[)([^\[\]])/$1\'$2/g;      # add missing ' after [
+    $string=~s/([^\[\]])(\])/$1\'$2/g;      # add missing ' in front of ]
+    $string=~s/ +/\,/g;                     # replace space with , 
+
+
+    $$arr=eval $string;
+
+    if ($@){
+	print STDERR "# beaparse.pl: couldn't parse:\n$string\n";
+    }
+
+#    &AddLeafs($$arr);                      # DOMData uses XML::DOM now!!!
+}
+
+
+# !!!! old!!!!
+# DOMData uses XML::DOM now --> mixed content is allowed now!
+# 
+# SimpleTree cannot handle mixed content!!!!
+# --> add empty-type tags for leafs (very dirty ...)
+
+sub AddLeafs{
+    my $arr=shift;
+    if (grep(ref($arr->[$_]) eq 'ARRAY',(0..$#{$arr}))){
+	foreach (1..$#{$arr}-1){
+	    if (ref($arr->[$_]) eq 'ARRAY'){
+		&AddLeafs($arr->[$_]);
+	    }
+	}
+	my @leafs=grep(ref($arr->[$_]) ne 'ARRAY',(0..$#{$arr}));
+	shift(@leafs);
+	pop(@leafs);
+	foreach (@leafs){
+	    my $word=$arr->[$_];
+	    $arr->[$_]=[ '*',$word,'*' ];
+	}
+    }
+}
+
+
+
+sub FixParserData{
+    my ($string,$subst)=@_;
+    foreach (keys %{$subst}){
+	$string=~s/$_/$subst->{$_}/sg;
+    }
+    return $string;
+}
+
+
+sub GetDefaultIni{
+
+    my $DefaultIni = 
+{
+  'module' => {
+    'name' => 'beas parser (swedish)',
+    'program' => 'beaparse.pl',
+    'location' => '$UplugBin',
+#    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'XML',
+      'root' => 's',
+    },
+  },
+  'output' => {
+    'text' => {
+      'format' => 'XML',
+      'root' => 's',
+#	'encoding' => 'iso-8859-1',
+      'write_mode' => 'overwrite',
+	'status' => 'chunk',
+    }
+  },
+  'parameter' => {
+    'input' => {
+      'token delimiter' => ' ',
+      'sentence delimiter' => '
+',
+      'POS tag delimiter' => '/',
+      'POS attribute' => 'pos'
+    },
+    'output' => {
+      'token delimiter' => '\\s+',
+      'constituent tag' => 'c',
+      'sentence delimiter' => '
+',
+      'POS tag delimiter' => '\\/',
+	'encoding' => 'iso-8859-1',
+    },
+    'input token replacements' => {
+      '\\,' => 'COMMA',
+        ' ' => '_',
+      '\[' => '&lpar;',
+      '\]' => '&rpar;',
+    },
+    'parser' => {
+      'language' => 'swedish',
+      'startup base' => 'parser_'
+    },
+    'input tag replacements' => {
+      '\\,' => 'COMMA'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'pos' => 'parameter:input:POS attribute',
+       'char' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'tag' => 'parameter:output:constituent tag',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=tag,language=sv)'
+	  },
+       },
+       'parameter' => {
+          'input' => {
+	     'POS attribute' => 'optionmenu (pos,tnt)',
+	  }
+       }
+  }
+};
+
+    return %{$DefaultIni};
+}

@@ -1,0 +1,3258 @@
+# urpmi Bahasa Melayu (Malay) (ms)
+# Copyright (C) 2001, 2008 Free Software Foundation, Inc.
+# Yuzz <yuzz@emasonline.com>, 2002
+# Sharuzzaman Ahmat Raslan <sharuzzaman@myrealbox.com>, 2008
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: urpmi\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-01 19:38+0200\n"
+"PO-Revision-Date: 2008-08-21 23:48+0800\n"
+"Last-Translator: Sharuzzaman Ahmat Raslan <sharuzzaman@myrealbox.com>\n"
+"Language-Team: Malay <translation-team-ms@lists.sourceforge.net>\n"
+"Language: ms\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gurpmi:32
+#, c-format
+msgid "RPM installation"
+msgstr "Pemasangan RPM"
+
+#: ../gurpmi:46
+#, c-format
+msgid "Error: unable to find file %s, will cancel operation"
+msgstr ""
+
+#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#, c-format
+msgid "_Ok"
+msgstr "_Ok"
+
+#: ../gurpmi:67
+#, c-format
+msgid ""
+"You have selected a source package:\n"
+"\n"
+"%s\n"
+"\n"
+"You probably didn't want to install it on your computer (installing it would "
+"allow you to make modifications to its sourcecode then compile it).\n"
+"\n"
+"What would you like to do?"
+msgstr ""
+
+#: ../gurpmi:75 ../gurpmi:86
+#, c-format
+msgid ""
+"You are about to install the following software packages on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"Proceed?"
+msgstr ""
+"Anda akan memasang pakej perisian berikut dalam komputer anda:\n"
+"\n"
+"%s\n"
+"\n"
+"Teruskan?"
+
+#: ../gurpmi:81
+#, c-format
+msgid ""
+"You are about to install the following software package on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"You may prefer to just save it. What is your choice?"
+msgstr ""
+
+#: ../gurpmi:99
+#, c-format
+msgid "_Install"
+msgstr "_Pasang"
+
+#: ../gurpmi:100
+#, c-format
+msgid "_Save"
+msgstr "_Simpan"
+
+#: ../gurpmi:101 ../gurpmi2:197
+#, c-format
+msgid "_Cancel"
+msgstr "_Batal"
+
+#: ../gurpmi:109
+#, c-format
+msgid "Choose location to save file"
+msgstr "Pilih lokasi untuk menyimpan fail"
+
+#: ../gurpmi.pm:41
+#, fuzzy, c-format
+msgid "Options:"
+msgstr "<b>Pilihan</b>"
+
+#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#, c-format
+msgid "  --help         - print this help message.\n"
+msgstr "  --help         - cetak mesej bantuan ini.\n"
+
+#: ../gurpmi.pm:43 ../urpmi:74
+#, c-format
+msgid ""
+"  --auto         - non-interactive mode, assume default answers to "
+"questions.\n"
+msgstr ""
+
+#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#, c-format
+msgid ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+msgstr ""
+
+#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#, c-format
+msgid ""
+"  --force        - force invocation even if some packages do not exist.\n"
+msgstr "  --force        - paksa instal meskipun beberapa pakej tiada.\n"
+
+#: ../gurpmi.pm:46 ../urpmi:129
+#, c-format
+msgid ""
+"  --verify-rpm   - verify rpm signature before installation\n"
+"                   (--no-verify-rpm disables it, default is enabled).\n"
+msgstr ""
+
+#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#, fuzzy, c-format
+msgid "  --media        - use only the given media, separated by comma.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../gurpmi.pm:49 ../urpmi:146
+#, c-format
+msgid "  -p             - allow search in provides to find package.\n"
+msgstr "  -p             - izinkan carian dlm sediaada utk mencari pakej.\n"
+
+#: ../gurpmi.pm:50 ../urpmi:147
+#, c-format
+msgid "  -P             - do not search in provides to find package.\n"
+msgstr "  -P             - jangan cari dalam tersedia utk mencari pakej.\n"
+
+#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#, fuzzy, c-format
+msgid "  --root         - use another root for rpm installation.\n"
+msgstr "  --root         - guna root lain untuk membuang rpm.\n"
+
+#: ../gurpmi.pm:52 ../urpmi:131
+#, c-format
+msgid ""
+"  --test         - only verify if the installation can be achieved "
+"correctly.\n"
+msgstr ""
+
+#: ../gurpmi.pm:53 ../urpmi:71
+#, fuzzy, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested packages.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../gurpmi.pm:96
+#, c-format
+msgid "No packages specified"
+msgstr "Tiada pakej dinyatakan"
+
+#: ../gurpmi2:55
+#, c-format
+msgid "Please wait..."
+msgstr "Sila tunggu..."
+
+#: ../gurpmi2:64
+#, c-format
+msgid "Must be root"
+msgstr "Mesti menjadi root"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Distribution Upgrade"
+msgstr "Mulakan %s:"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Packages installation"
+msgstr "Pemasangan pakej..."
+
+#: ../gurpmi2:98
+#, fuzzy, c-format
+msgid "Preparing packages installation..."
+msgstr "Pemasangan pakej..."
+
+#: ../gurpmi2:113 ../urpmi:505
+#, fuzzy, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s"
+msgstr "semua telah diinstal"
+
+#: ../gurpmi2:121
+#, fuzzy, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr "semua telah diinstal"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Warning"
+msgstr "Amaran"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Ok"
+msgstr "Ok"
+
+#: ../gurpmi2:193
+#, c-format
+msgid " (to upgrade)"
+msgstr " (untuk naiktaraf)"
+
+#: ../gurpmi2:194
+#, c-format
+msgid " (to install)"
+msgstr " (untuk memasang)"
+
+#: ../gurpmi2:197
+#, c-format
+msgid "Package choice"
+msgstr "Pilihan pakej"
+
+#: ../gurpmi2:198
+#, c-format
+msgid "One of the following packages is needed:"
+msgstr "Salah satu pakej berikut diperlukan:"
+
+#: ../gurpmi2:223
+#, c-format
+msgid "_Abort"
+msgstr "_Batal"
+
+#: ../gurpmi2:258
+#, fuzzy, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Pakej berikut perlu dibuang untuk yang lain dinaiktaraf:\n"
+"%s\n"
+"Teruskan?"
+
+#: ../gurpmi2:277 ../urpmi:605
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following package is going to be installed:"
+msgstr "Pakej berikut akan dihapus agar syarat kebergantungan dipenuhi (%d MB)"
+
+#: ../gurpmi2:278 ../urpmi:606
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following packages are going to be installed:"
+msgstr ""
+"Untuk memenuhi kebergantungan, %d pakej berikut perlu dipasang:\n"
+"%s\n"
+
+#: ../gurpmi2:280
+#, fuzzy, c-format
+msgid "(%d package, %d MB)"
+msgid_plural "(%d packages, %d MB)"
+msgstr[0] "_Saiz (MB):"
+msgstr[1] ""
+
+#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#, c-format
+msgid "unable to get source packages, aborting"
+msgstr "tidak dapat mengambil pakej asal, batal"
+
+#: ../gurpmi2:320 ../urpm/install.pm:104
+#, c-format
+msgid "Preparing..."
+msgstr "Menyediakan..."
+
+#: ../gurpmi2:326
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Install pakej `%s' (%s/%s)..."
+
+#: ../gurpmi2:344 ../urpmi:633
+#, fuzzy, c-format
+msgid "Please insert the medium named \"%s\""
+msgstr "Sila tunggu, mengeluarkan medium..."
+
+#: ../gurpmi2:358
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Memuatturun pakej `%s'..."
+
+#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
+#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
+#: ../urpm/media.pm:1657
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "...gagal terambil: %s"
+
+#: ../gurpmi2:387
+#, c-format
+msgid "_Done"
+msgstr "_Selesai"
+
+#: ../gurpmi2:404 ../urpm/main_loop.pm:82
+#, fuzzy, c-format
+msgid ""
+"Installation failed, some files are missing:\n"
+"%s"
+msgstr "Instalasi gagal"
+
+#: ../gurpmi2:407
+#, c-format
+msgid "You may want to update your urpmi database."
+msgstr ""
+
+#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
+#, fuzzy, c-format
+msgid "Installation failed:"
+msgstr "Instalasi gagal"
+
+#: ../gurpmi2:416
+#, c-format
+msgid "The package(s) are already installed"
+msgstr "semua telah diinstal"
+
+#: ../gurpmi2:418
+#, c-format
+msgid "Installation finished"
+msgstr "Pemasangan selesai"
+
+#: ../gurpmi2:419 ../urpme:165
+#, c-format
+msgid "removing %s"
+msgstr "membuang %s"
+
+#: ../gurpmi2:430 ../urpmi:691
+#, fuzzy, c-format
+msgid "restarting urpmi"
+msgstr "Tambah media urpmi"
+
+#: ../rpm-find-leaves:15
+#, c-format
+msgid ""
+"usage: %s [options]\n"
+"where [options] are from\n"
+msgstr ""
+
+#: ../rpm-find-leaves:17
+#, c-format
+msgid "   -h|--help      - print this help message.\n"
+msgstr "   -h|--help      - cetak mesej bantuan ini.\n"
+
+#: ../rpm-find-leaves:18
+#, c-format
+msgid "   --root <path>  - use the given root instead of /\n"
+msgstr "   --root <path>  - guna root yang diberi selain dari /\n"
+
+#: ../rpm-find-leaves:19
+#, c-format
+msgid "   -g [group]     - restrict results to specified group.\n"
+msgstr ""
+"   -g [kumpulan]   - hadkan keputusan kepada kumpulan yang diberikan.\n"
+
+#: ../rpm-find-leaves:20
+#, c-format
+msgid "                    defaults to %s.\n"
+msgstr "                    default adalah %s.\n"
+
+#: ../rpm-find-leaves:21
+#, fuzzy, c-format
+msgid "   -f             - output rpm full name (NVRA)\n"
+msgstr "  -f             - cetak versi, keluaran dan arch dgn nama.\n"
+
+#: ../rurpmi:11 ../urpmi:265
+#, c-format
+msgid "Only superuser is allowed to install packages"
+msgstr "Hanya superuser yang boleh menginstal pakej"
+
+#: ../rurpmi:18
+#, c-format
+msgid "Running urpmi in restricted mode..."
+msgstr "Melaksanakan urpmi dalam mod terhad..."
+
+#: ../urpm.pm:23
+#, c-format
+msgid "While some packages may have been installed, there were failures.\n"
+msgstr ""
+
+#: ../urpm.pm:110
+#, fuzzy, c-format
+msgid "fail to create directory %s"
+msgstr "gagal untuk mencipta direktori %s: %s\n"
+
+#: ../urpm.pm:111
+#, fuzzy, c-format
+msgid "invalid owner for directory %s"
+msgstr "Nilai baru utk direktori: %s\n"
+
+#: ../urpm.pm:135
+#, fuzzy, c-format
+msgid "Can not download packages into %s"
+msgstr "Memuatturun pakej `%s'..."
+
+#: ../urpm.pm:150
+#, fuzzy, c-format
+msgid "Environment directory %s does not exist"
+msgstr "Direktori didalam nama path yang diberi tidak wujud."
+
+#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#, fuzzy, c-format
+msgid "using specific environment on %s\n"
+msgstr "Mencipta swap dienkrip pada %s using %s:"
+
+#: ../urpm.pm:313
+#, c-format
+msgid "unable to open rpmdb"
+msgstr "tidak dapat membuka rpmdb"
+
+#: ../urpm.pm:327
+#, c-format
+msgid "invalid rpm file name [%s]"
+msgstr "nama fail rpm [%s] tidak sah"
+
+#: ../urpm.pm:333
+#, c-format
+msgid "retrieving rpm file [%s] ..."
+msgstr "mengambil fail rpm [%s] ..."
+
+#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#, c-format
+msgid "...retrieving done"
+msgstr "...capaian selesai"
+
+#: ../urpm.pm:343
+#, c-format
+msgid "unable to access rpm file [%s]"
+msgstr "gagal akses fail rpm [%s]"
+
+#: ../urpm.pm:348
+#, fuzzy, c-format
+msgid "unable to parse spec file %s [%s]"
+msgstr "tidak dapat menghurai \"%s\" dalam fail [%s]"
+
+#: ../urpm.pm:356
+#, c-format
+msgid "unable to register rpm file"
+msgstr "tidak dapat mendaftarkan fail rpm"
+
+#: ../urpm.pm:358
+#, fuzzy, c-format
+msgid "Incompatible architecture for rpm [%s]"
+msgstr "  --root         - guna root lain untuk membuang rpm.\n"
+
+#: ../urpm.pm:362
+#, c-format
+msgid "error registering local packages"
+msgstr "ralat pendaftaran pakej setempat"
+
+#: ../urpm.pm:450
+#, c-format
+msgid "This operation is forbidden while running in restricted mode"
+msgstr ""
+
+#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#, c-format
+msgid "bad proxy declaration on command line\n"
+msgstr ""
+
+#: ../urpm/args.pm:306
+#, c-format
+msgid "urpmq: cannot read rpm file \"%s\"\n"
+msgstr "urpmq: tidak dapat membaca fail rpm \"%s\"\n"
+
+#: ../urpm/args.pm:384
+#, fuzzy, c-format
+msgid "unexpected expression %s"
+msgstr "hujah tidak dijangka"
+
+#: ../urpm/args.pm:385
+#, fuzzy, c-format
+msgid "missing expression before %s"
+msgstr "12 pt sebelum"
+
+#: ../urpm/args.pm:391
+#, c-format
+msgid "unexpected expression %s (suggestion: use -a or -o ?)"
+msgstr ""
+
+#: ../urpm/args.pm:395
+#, fuzzy, c-format
+msgid "no expression to close"
+msgstr "Ungkapan corak:\n"
+
+#: ../urpm/args.pm:404
+#, c-format
+msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
+msgstr ""
+
+#: ../urpm/args.pm:478
+#, c-format
+msgid "chroot directory doesn't exist"
+msgstr ""
+
+#: ../urpm/args.pm:501
+#, fuzzy, c-format
+msgid "Can't use %s without %s"
+msgstr "Tutup Tanpa Simpan"
+
+#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#, fuzzy, c-format
+msgid "Can't use %s with %s"
+msgstr "hidupkan penggunaan TLS dengan LDAP"
+
+#: ../urpm/args.pm:515
+#, fuzzy, c-format
+msgid "Too many arguments\n"
+msgstr "%s: terlalu banyak hujah\n"
+
+#: ../urpm/args.pm:523
+#, c-format
+msgid ""
+"%s version %s\n"
+"%s\n"
+"This is free software and may be redistributed under the terms of the GNU "
+"GPL.\n"
+"\n"
+"usage:\n"
+msgstr ""
+"versi %s %s\n"
+"%s\n"
+"Ini adalah perisian percuma dan boleh disebarkan dibawah akta GNU GPL.\n"
+"\n"
+"penggunaan:\n"
+
+#: ../urpm/args.pm:529
+#, c-format
+msgid "Copyright (C) %s by %s"
+msgstr "Hakcipta (C) %s %s"
+
+#: ../urpm/bug_report.pm:67 ../urpmi:255
+#, fuzzy, c-format
+msgid "Copying failed"
+msgstr "...gagal menyalin"
+
+#: ../urpm/cdrom.pm:80
+#, c-format
+msgid ""
+"You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
+"automatically)"
+msgstr ""
+
+#: ../urpm/cdrom.pm:82
+#, c-format
+msgid "Udisks daemon (udisks-daemon) is not running or not ready"
+msgstr ""
+
+#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
+#, fuzzy, c-format
+msgid "medium \"%s\" is not available"
+msgstr "%s adalah nama hos yang tidak sah"
+
+#: ../urpm/cdrom.pm:218
+#, c-format
+msgid "unable to read rpm file [%s] from medium \"%s\""
+msgstr "gagal baca fail rpm [%s] dari media \"%s\""
+
+#: ../urpm/cfg.pm:82
+#, fuzzy, c-format
+msgid "syntax error in config file at line %s"
+msgstr "gagal tulis fail konfigurasi [%s]"
+
+#: ../urpm/cfg.pm:115
+#, fuzzy, c-format
+msgid "unable to read config file [%s]"
+msgstr "gagal tulis fail konfigurasi [%s]"
+
+#: ../urpm/cfg.pm:141
+#, c-format
+msgid "medium `%s' is defined twice, aborting"
+msgstr ""
+
+#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#, c-format
+msgid "unable to write config file [%s]"
+msgstr "gagal tulis fail konfigurasi [%s]"
+
+#: ../urpm/download.pm:95
+#, c-format
+msgid "%s is not available, falling back on %s"
+msgstr ""
+
+#: ../urpm/download.pm:178
+#, c-format
+msgid "can not read proxy settings (not enough rights to read %s)"
+msgstr ""
+
+#: ../urpm/download.pm:208
+#, c-format
+msgid "Please enter your credentials for accessing proxy\n"
+msgstr ""
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "User name:"
+msgstr "Nama pengguna:"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "Password:"
+msgstr "Katalaluan:"
+
+#: ../urpm/download.pm:295
+#, fuzzy, c-format
+msgid "Unknown webfetch `%s' !!!\n"
+msgstr "Hos tidak diketahui"
+
+#: ../urpm/download.pm:303
+#, c-format
+msgid "%s failed: exited with signal %d"
+msgstr ""
+
+#: ../urpm/download.pm:304
+#, fuzzy, c-format
+msgid "%s failed: exited with %d"
+msgstr "Aksara (dengan ruang):"
+
+#: ../urpm/download.pm:338
+#, fuzzy, c-format
+msgid "copy failed"
+msgstr "Sambungan Gagal"
+
+#: ../urpm/download.pm:344
+#, fuzzy, c-format
+msgid "wget is missing\n"
+msgstr "kerana kehilangan %s"
+
+#: ../urpm/download.pm:411
+#, fuzzy, c-format
+msgid "curl is missing\n"
+msgstr "kerana kehilangan %s"
+
+#: ../urpm/download.pm:547
+#, c-format
+msgid "curl failed: upload canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:548
+#, c-format
+msgid "curl failed: download canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:583
+#, fuzzy, c-format
+msgid "rsync is missing\n"
+msgstr "kerana kehilangan %s"
+
+#: ../urpm/download.pm:651
+#, fuzzy, c-format
+msgid "ssh is missing\n"
+msgstr "kerana kehilangan %s"
+
+#: ../urpm/download.pm:670
+#, fuzzy, c-format
+msgid "prozilla is missing\n"
+msgstr "kerana kehilangan %s"
+
+#: ../urpm/download.pm:686
+#, fuzzy, c-format
+msgid "Couldn't execute prozilla\n"
+msgstr "Laksana skrip bantuan"
+
+#: ../urpm/download.pm:696
+#, fuzzy, c-format
+msgid "aria2 is missing\n"
+msgstr "kerana kehilangan %s"
+
+#: ../urpm/download.pm:740
+#, c-format
+msgid "Failed to download %s"
+msgstr ""
+
+#: ../urpm/download.pm:835
+#, c-format
+msgid "        %s%% of %s completed, ETA = %s, speed = %s"
+msgstr ""
+
+#: ../urpm/download.pm:836
+#, fuzzy, c-format
+msgid "        %s%% completed, speed = %s"
+msgstr "Muatturun `%s', kelajuan:%s"
+
+#: ../urpm/download.pm:921
+#, fuzzy, c-format
+msgid "retrieving %s"
+msgstr "Menerima"
+
+#: ../urpm/download.pm:932
+#, fuzzy, c-format
+msgid "retrieved %s"
+msgstr "%s tidak diambil... "
+
+#: ../urpm/download.pm:994
+#, c-format
+msgid "unknown protocol defined for %s"
+msgstr "tiada protokol ditakrif untuk `%s'"
+
+#: ../urpm/download.pm:1008
+#, c-format
+msgid "no webfetch found, supported webfetch are: %s\n"
+msgstr "tiada webfetch dijumpai, webfetch yang disokong adalah: %s\n"
+
+#: ../urpm/download.pm:1023
+#, c-format
+msgid "unable to handle protocol: %s"
+msgstr "tidak dapat mengawal protokol: %s"
+
+#: ../urpm/get_pkgs.pm:29
+#, fuzzy, c-format
+msgid "cleaning %s and %s"
+msgstr "&Pengepala dan Footer"
+
+#: ../urpm/get_pkgs.pm:141
+#, c-format
+msgid "package %s is not found."
+msgstr "pakej %s tidak dijumpai."
+
+#: ../urpm/get_pkgs.pm:277
+#, c-format
+msgid "retrieving rpm files from medium \"%s\"..."
+msgstr "mendapatkan fail rpm dari media \"%s\"..."
+
+#: ../urpm/install.pm:110
+#, c-format
+msgid "[repackaging]"
+msgstr ""
+
+#: ../urpm/install.pm:201
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+
+#: ../urpm/install.pm:204
+#, c-format
+msgid "unable to create transaction"
+msgstr "tidak dapat mencipta transaksi"
+
+#: ../urpm/install.pm:229
+#, c-format
+msgid "unable to extract rpm from delta-rpm package %s"
+msgstr "tidak dapat mengekstrak rpm daripada pakej delta-rpm %s"
+
+#: ../urpm/install.pm:242
+#, c-format
+msgid "unable to install package %s"
+msgstr "tidak dapat memasang pakej %s"
+
+#: ../urpm/install.pm:245
+#, fuzzy, c-format
+msgid "removing bad rpm (%s) from %s"
+msgstr "mendapatkan fail rpm dari media \"%s\"..."
+
+#: ../urpm/install.pm:246 ../urpm/install.pm:311
+#, fuzzy, c-format
+msgid "removing %s failed: %s"
+msgstr "Sambungan Gagal"
+
+#: ../urpm/install.pm:292
+#, fuzzy, c-format
+msgid "Removing package %s"
+msgstr "membuang pakej %s"
+
+#: ../urpm/install.pm:293
+#, c-format
+msgid "removing package %s"
+msgstr "membuang pakej %s"
+
+#: ../urpm/install.pm:309
+#, fuzzy, c-format
+msgid "removing installed rpms (%s) from %s"
+msgstr "Sahkan RPM untuk dipasang:"
+
+#: ../urpm/install.pm:318
+#, c-format
+msgid "More information on package %s"
+msgstr "Lebih maklumat pada pakej %s"
+
+#: ../urpm/ldap.pm:44
+#, c-format
+msgid "Cannot create ldap cache directory"
+msgstr ""
+
+#: ../urpm/ldap.pm:46
+#, c-format
+msgid "Cannot write cache file for ldap\n"
+msgstr ""
+
+#: ../urpm/ldap.pm:181
+#, c-format
+msgid "No server defined, missing uri or host"
+msgstr ""
+
+#: ../urpm/ldap.pm:182
+#, fuzzy, c-format
+msgid "No base defined"
+msgstr " tiada kad bunyi ditakrif."
+
+#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#, c-format
+msgid "Cannot connect to ldap uri:"
+msgstr ""
+
+#: ../urpm/lock.pm:99
+#, fuzzy, c-format
+msgid "%s database is locked, process %d is already using it"
+msgstr "Pentadbiran Pangkalan Data Mergeant"
+
+#: ../urpm/lock.pm:101
+#, c-format
+msgid "%s database is locked (another program is already using it)"
+msgstr ""
+
+#: ../urpm/lock.pm:115
+#, fuzzy, c-format
+msgid "%s database is locked. Waiting..."
+msgstr "Pentadbiran Pangkalan Data Mergeant"
+
+#: ../urpm/lock.pm:116
+#, fuzzy, c-format
+msgid "aborting"
+msgstr "@r adalah bukan @d; menghentikan.\n"
+
+#: ../urpm/main_loop.pm:58
+#, c-format
+msgid "Retry?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:85
+#, c-format
+msgid "You may need to update your urpmi database."
+msgstr ""
+
+#: ../urpm/main_loop.pm:89
+#, fuzzy, c-format
+msgid ""
+"Installation failed, bad rpms:\n"
+"%s"
+msgstr "Instalasi gagal"
+
+#: ../urpm/main_loop.pm:108
+#, c-format
+msgid ""
+"There is not enough space on your filesystem to download all packages (%s "
+"needed, %s available).\n"
+"Are you sure you want to continue?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:138
+#, fuzzy, c-format
+msgid "The following package has bad signature"
+msgstr ""
+"mengambil\n"
+" pakej berikut berjaya:\n"
+"\n"
+
+#: ../urpm/main_loop.pm:139
+#, fuzzy, c-format
+msgid "The following packages have bad signatures"
+msgstr "Salah satu pakej berikut diperlukan:"
+
+#: ../urpm/main_loop.pm:140
+#, fuzzy, c-format
+msgid "Do you want to continue installation ?"
+msgstr "Adakah anda pasti untuk meneruskan"
+
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
+#: ../urpm/main_loop.pm:296
+#, c-format
+msgid "Installation failed"
+msgstr "Instalasi gagal"
+
+#: ../urpm/main_loop.pm:159
+#, fuzzy, c-format
+msgid "removing installed rpms (%s)"
+msgstr "Sahkan RPM untuk dipasang:"
+
+#: ../urpm/main_loop.pm:185
+#, c-format
+msgid "Try to continue anyway?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:234
+#, fuzzy, c-format
+msgid "installing %s from %s"
+msgstr "Dari Fail"
+
+#: ../urpm/main_loop.pm:236
+#, fuzzy, c-format
+msgid "installing %s"
+msgstr "Memasang %s\n"
+
+#: ../urpm/main_loop.pm:243
+#, fuzzy, c-format
+msgid "distributing %s"
+msgstr "Mulakan %s:"
+
+#: ../urpm/main_loop.pm:289
+#, fuzzy, c-format
+msgid "Try installation without checking dependencies?"
+msgstr "Cuba instalasi tanpa periksa kebergantungan? (y/T) "
+
+#: ../urpm/main_loop.pm:297
+#, fuzzy, c-format
+msgid "Try harder to install (--force)?"
+msgstr "Cuba instalasi lebih keras (--force)? (y/T) "
+
+#: ../urpm/main_loop.pm:490
+#, c-format
+msgid "Packages are up to date"
+msgstr ""
+
+#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#, fuzzy, c-format
+msgid "Installation is possible"
+msgstr "Pemasangan sekecil mungkin"
+
+#: ../urpm/md5sum.pm:55
+#, c-format
+msgid "warning: md5sum for %s unavailable in MD5SUM file"
+msgstr ""
+
+#: ../urpm/media.pm:270
+#, c-format
+msgid "virtual medium \"%s\" should have a clear url, medium ignored"
+msgstr "medium maya \"%s\" perlu mempunyai url yang jelas, medium diabaikan"
+
+#: ../urpm/media.pm:272
+#, c-format
+msgid "unable to access list file of \"%s\", medium ignored"
+msgstr "gagal mengakses fail list \"%s\", media diabaikan"
+
+#: ../urpm/media.pm:275
+#, fuzzy, c-format
+msgid "unable to access synthesis file of \"%s\", medium ignored"
+msgstr "gagal mengakses fail list \"%s\", media diabaikan"
+
+#: ../urpm/media.pm:301
+#, c-format
+msgid "trying to override existing medium \"%s\", skipping"
+msgstr "mencuba untuk mengatasi media sedia ada \"%s\", melangkau"
+
+#: ../urpm/media.pm:517
+#, c-format
+msgid "failed to migrate removable device, ignoring media"
+msgstr ""
+
+#: ../urpm/media.pm:555
+#, c-format
+msgid "wrote config file [%s]"
+msgstr "tulis fail konfigurasi [%s]"
+
+#: ../urpm/media.pm:598
+#, c-format
+msgid "Can't use parallel mode with use-distrib mode"
+msgstr ""
+
+#: ../urpm/media.pm:606
+#, c-format
+msgid "using associated media for parallel mode: %s"
+msgstr ""
+
+#: ../urpm/media.pm:622
+#, c-format
+msgid ""
+"--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
+"update, --use-distrib or --parallel"
+msgstr ""
+
+#: ../urpm/media.pm:731
+#, c-format
+msgid "Search start: %s end: %s"
+msgstr "Carian mula: %s tamat: %s"
+
+#: ../urpm/media.pm:748
+#, c-format
+msgid "skipping package %s"
+msgstr "melangkau pakej %s"
+
+#: ../urpm/media.pm:764
+#, fuzzy, c-format
+msgid "would install instead of upgrade package %s"
+msgstr "tidak dapat membuang pakej %s"
+
+#: ../urpm/media.pm:840
+#, c-format
+msgid "medium \"%s\" already exists"
+msgstr "media \"%s\" telah ada"
+
+#: ../urpm/media.pm:882
+#, fuzzy, c-format
+msgid "(ignored by default)"
+msgstr "hidupkan katalaluan bayang secara default"
+
+#: ../urpm/media.pm:888
+#, fuzzy, c-format
+msgid "adding medium \"%s\" before remote medium \"%s\""
+msgstr "Gagal apabila menambah media"
+
+#: ../urpm/media.pm:894
+#, fuzzy, c-format
+msgid "adding medium \"%s\""
+msgstr "Menambah media:"
+
+#: ../urpm/media.pm:918
+#, fuzzy, c-format
+msgid "failed to copy media.cfg to %s (%d)"
+msgstr "tidak dapat menghurai \"%s\" dalam fail [%s]"
+
+#: ../urpm/media.pm:960
+#, fuzzy, c-format
+msgid "directory %s does not exist"
+msgstr "Partisyen Diminta Tidak Wujud"
+
+#: ../urpm/media.pm:968
+#, c-format
+msgid "this location doesn't seem to contain any distribution"
+msgstr ""
+
+#: ../urpm/media.pm:992
+#, fuzzy, c-format
+msgid "unable to parse media.cfg"
+msgstr "tidak dapat menghurai \"%s\" dalam fail [%s]"
+
+#: ../urpm/media.pm:995
+#, fuzzy, c-format
+msgid "unable to access the distribution medium (no media.cfg file found)"
+msgstr "gagal mengakses media instalasi pertama (fail hdlists tidak dijumpai)"
+
+#: ../urpm/media.pm:1016
+#, c-format
+msgid "skipping non compatible media `%s' (for %s)"
+msgstr ""
+
+#: ../urpm/media.pm:1031
+#, fuzzy, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr "Media Storan"
+
+#: ../urpm/media.pm:1074
+#, fuzzy, c-format
+msgid "retrieving media.cfg file..."
+msgstr "ambil fail hdlist..."
+
+#: ../urpm/media.pm:1117
+#, c-format
+msgid "trying to select nonexistent medium \"%s\""
+msgstr "cubaan untuk memilih media tidak wujud \"%s\""
+
+#: ../urpm/media.pm:1120
+#, c-format
+msgid "selecting multiple media: %s"
+msgstr "memilih pelbagai media: %s"
+
+#: ../urpm/media.pm:1179
+#, c-format
+msgid "removing medium \"%s\""
+msgstr "hapus media \"%s\""
+
+#: ../urpm/media.pm:1262
+#, c-format
+msgid "reconfiguring urpmi for media \"%s\""
+msgstr "mengulangtetap urpmi untuk media \"%s\""
+
+#: ../urpm/media.pm:1296
+#, c-format
+msgid "...reconfiguration failed"
+msgstr "...gagal mengulangtetap"
+
+#: ../urpm/media.pm:1302
+#, c-format
+msgid "reconfiguration done"
+msgstr "selesai ulangtetap"
+
+#: ../urpm/media.pm:1318
+#, c-format
+msgid "Error generating names file: dependency %d not found"
+msgstr ""
+
+#: ../urpm/media.pm:1339
+#, fuzzy, c-format
+msgid "medium \"%s\" is up-to-date"
+msgstr "media \"%s\" tidak dipilih"
+
+#: ../urpm/media.pm:1350
+#, c-format
+msgid "examining synthesis file [%s]"
+msgstr "periksa file sintesis [%s]"
+
+#: ../urpm/media.pm:1370
+#, c-format
+msgid "problem reading synthesis file of medium \"%s\""
+msgstr "masalah membaca fail sintesis untuk media \"%s\""
+
+#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
+#, fuzzy, c-format
+msgid "copying [%s] for medium \"%s\"..."
+msgstr "Medium Boleh Buang Terlekap"
+
+#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#, c-format
+msgid "...copying failed"
+msgstr "...gagal menyalin"
+
+#: ../urpm/media.pm:1451
+#, c-format
+msgid "copying description file of \"%s\"..."
+msgstr "fail deskripsi \"%s\" sedang disalin"
+
+#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#, c-format
+msgid "...copying done"
+msgstr "...salin selesai"
+
+#: ../urpm/media.pm:1484
+#, fuzzy, c-format
+msgid "copy of [%s] failed (file is suspiciously small)"
+msgstr "salinan [%s] gagal (md5sum tidak sepadan)"
+
+#: ../urpm/media.pm:1532
+#, fuzzy, c-format
+msgid "computing md5sum of retrieved source synthesis"
+msgstr "mengira md5sum salinan sumber hdlist (atau sintesis)"
+
+#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
+#, fuzzy, c-format
+msgid "retrieval of [%s] failed (md5sum mismatch)"
+msgstr "salinan [%s] gagal (md5sum tidak sepadan)"
+
+#: ../urpm/media.pm:1549
+#, fuzzy, c-format
+msgid "genhdlist2 failed on %s"
+msgstr "dikemaskini pada %(date)s"
+
+#: ../urpm/media.pm:1559
+#, fuzzy, c-format
+msgid "comparing %s and %s"
+msgstr "Membaca dan membanding:"
+
+#: ../urpm/media.pm:1589
+#, fuzzy, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr "fail hdlist utk media \"%s\" tak dijumpai"
+
+#: ../urpm/media.pm:1615
+#, fuzzy, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr "fail deskripsi \"%s\" sedang disalin"
+
+#: ../urpm/media.pm:1655
+#, fuzzy, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr "nama fail rpm [%s] tidak sah"
+
+#: ../urpm/media.pm:1658
+#, fuzzy, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr "fail hdlist utk media \"%s\" tak dijumpai"
+
+#: ../urpm/media.pm:1690
+#, fuzzy, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr "periksa file sintesis [%s]"
+
+#: ../urpm/media.pm:1756
+#, c-format
+msgid "examining pubkey file of \"%s\"..."
+msgstr "memeriksa fail pubkey \"%s\"..."
+
+#: ../urpm/media.pm:1768
+#, fuzzy, c-format
+msgid "...imported key %s from pubkey file of \"%s\""
+msgstr "tidak dapat mengimport fail pubkey \"%s\""
+
+#: ../urpm/media.pm:1772
+#, c-format
+msgid "unable to import pubkey file of \"%s\""
+msgstr "tidak dapat mengimport fail pubkey \"%s\""
+
+#: ../urpm/media.pm:1813
+#, fuzzy, c-format
+msgid "no synthesis file found for medium \"%s\""
+msgstr "fail hdlist utk media \"%s\" tak dijumpai"
+
+#: ../urpm/media.pm:1846
+#, fuzzy, c-format
+msgid "updated medium \"%s\""
+msgstr "Tambah medium"
+
+#: ../urpm/media.pm:1968
+#, fuzzy, c-format
+msgid "retrieval of [%s] failed"
+msgstr "Sambungan Gagal"
+
+#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#, c-format
+msgid "trying again with mirror %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:112
+#, c-format
+msgid "Could not find a mirror from mirrorlist %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:260
+#, c-format
+msgid "found geolocalisation %s %.2f %.2f from timezone %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:305
+#, fuzzy, c-format
+msgid "getting mirror list from %s"
+msgstr "Pilih dokumen dari senarai:"
+
+#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#, c-format
+msgid "Nn"
+msgstr "NnTt"
+
+#. -PO: Add here the keys which might be pressed in the "Yes"-case.
+#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#, c-format
+msgid "Yy"
+msgstr "Yy"
+
+#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#, c-format
+msgid " (y/N) "
+msgstr " (y/T) "
+
+#: ../urpm/msg.pm:139
+#, c-format
+msgid "Sorry, bad choice, try again\n"
+msgstr "Salah pilih, cuba lagi\n"
+
+#: ../urpm/msg.pm:170
+#, fuzzy, c-format
+msgid "Package"
+msgstr "Pakej:"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Version"
+msgstr "Versi"
+
+#: ../urpm/msg.pm:170
+#, fuzzy, c-format
+msgid "Release"
+msgstr "Nota Keluaran Fedora"
+
+#: ../urpm/msg.pm:170
+#, fuzzy, c-format
+msgid "Arch"
+msgstr "Cari"
+
+#: ../urpm/msg.pm:179
+#, fuzzy, c-format
+msgid "(suggested)"
+msgstr "    Penyelesaian dicadangkan:\n"
+
+#: ../urpm/msg.pm:194
+#, fuzzy, c-format
+msgid "medium \"%s\""
+msgstr "Sederhana"
+
+#: ../urpm/msg.pm:194
+#, fuzzy, c-format
+msgid "command line"
+msgstr "Arahan Baris"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "B"
+msgstr "B"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "KB"
+msgstr "KB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "MB"
+msgstr "MB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "GB"
+msgstr "GB"
+
+#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#, c-format
+msgid "TB"
+msgstr "TB"
+
+#: ../urpm/orphans.pm:79
+#, c-format
+msgid "Marking %s as manually installed, it won't be auto-orphaned"
+msgstr ""
+
+#: ../urpm/orphans.pm:522
+#, fuzzy, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned."
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned."
+msgstr[0] "Salah satu pakej berikut diperlukan:"
+msgstr[1] "Salah satu pakej berikut diperlukan:"
+
+#: ../urpm/orphans.pm:525
+#, fuzzy, c-format
+msgid "You may wish to remove it."
+msgid_plural "You may wish to remove them."
+msgstr[0] "gagal untuk membuang direktori %s: %s\n"
+msgstr[1] "gagal untuk membuang direktori %s: %s\n"
+
+#: ../urpm/orphans.pm:542
+#, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans"
+"\""
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
+"orphans\""
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpm/parallel.pm:15
+#, c-format
+msgid "unable to parse \"%s\" in file [%s]"
+msgstr "tidak dapat menghurai \"%s\" dalam fail [%s]"
+
+#: ../urpm/parallel.pm:24
+#, c-format
+msgid "examining parallel handler in file [%s]"
+msgstr "memeriksa parallel handler dalam fail [%s]"
+
+#: ../urpm/parallel.pm:35
+#, fuzzy, c-format
+msgid "found parallel handler for nodes: %s"
+msgstr "memeriksa parallel handler dalam fail [%s]"
+
+#: ../urpm/parallel.pm:39
+#, c-format
+msgid "unable to use parallel option \"%s\""
+msgstr "tidak dapat menggunakan pilihan parallel \"%s\""
+
+#: ../urpm/parallel.pm:94
+#, fuzzy, c-format
+msgid "on node %s"
+msgstr "Berasaskan:"
+
+#: ../urpm/parallel.pm:294
+#, fuzzy, c-format
+msgid "Installation failed on node %s"
+msgstr "Instalasi gagal"
+
+#: ../urpm/parallel_ka_run.pm:58
+#, c-format
+msgid "rshp failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ka_run.pm:80
+#, c-format
+msgid "mput failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:27
+#, c-format
+msgid "scp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:39
+#, c-format
+msgid "cp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:86
+#, c-format
+msgid ""
+"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
+"code: %d)"
+msgstr ""
+
+#: ../urpm/removable.pm:46
+#, fuzzy, c-format
+msgid "unable to access medium \"%s\"."
+msgstr "Tidak dapat mencipta media."
+
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#, c-format
+msgid "mounting %s"
+msgstr "mounting %s"
+
+#: ../urpm/removable.pm:117
+#, c-format
+msgid "unmounting %s"
+msgstr "unmount %s"
+
+#: ../urpm/select.pm:45
+#, c-format
+msgid "urpmi was restarted, and the list of priority packages did not change"
+msgstr ""
+
+#: ../urpm/select.pm:47
+#, c-format
+msgid ""
+"urpmi was restarted, and the list of priority packages did change: %s vs %s"
+msgstr ""
+
+#: ../urpm/select.pm:217
+#, c-format
+msgid "No package named %s"
+msgstr "Tiada pakej bernama %s"
+
+#: ../urpm/select.pm:219 ../urpme:113
+#, c-format
+msgid "The following packages contain %s: %s"
+msgstr "Pakej berikut mengandungi %s: %s"
+
+#: ../urpm/select.pm:221
+#, c-format
+msgid "You should use \"-a\" to use all of them"
+msgstr ""
+
+#: ../urpm/select.pm:368
+#, fuzzy, c-format
+msgid "found package(s) %s in urpmi db, but none are installed"
+msgstr "semua telah diinstal"
+
+#: ../urpm/select.pm:600
+#, fuzzy, c-format
+msgid "Package %s is already installed"
+msgstr "semua telah diinstal"
+
+#: ../urpm/select.pm:601
+#, fuzzy, c-format
+msgid "Packages %s are already installed"
+msgstr "semua telah diinstal"
+
+#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#, c-format
+msgid "due to conflicts with %s"
+msgstr "kerana konflik dengan %s"
+
+#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#, c-format
+msgid "due to unsatisfied %s"
+msgstr "kerana ketidakpuasan %s"
+
+#: ../urpm/select.pm:625
+#, c-format
+msgid "trying to promote %s"
+msgstr "cuba untuk menaikkan %s"
+
+#: ../urpm/select.pm:626
+#, c-format
+msgid "in order to keep %s"
+msgstr "untuk menyimpan %s"
+
+#: ../urpm/select.pm:667
+#, fuzzy, c-format
+msgid ""
+"The following package has to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Pakej berikut perlu dibuang untuk yang lain dinaiktaraf:\n"
+"%s\n"
+"Teruskan?"
+
+#: ../urpm/select.pm:668
+#, fuzzy, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Pakej berikut perlu dibuang untuk yang lain dinaiktaraf:\n"
+"%s\n"
+"Teruskan?"
+
+#: ../urpm/select.pm:695
+#, c-format
+msgid "in order to install %s"
+msgstr "untuk memasang %s"
+
+#: ../urpm/select.pm:701
+#, c-format
+msgid "due to missing %s"
+msgstr "kerana kehilangan %s"
+
+#: ../urpm/signature.pm:62
+#, c-format
+msgid "Invalid signature (%s)"
+msgstr "Tandatangan tidak sah (%s)"
+
+#: ../urpm/signature.pm:77
+#, fuzzy, c-format
+msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
+msgstr "Pakej berikut mengandungi %s: %s"
+
+#: ../urpm/signature.pm:83
+#, c-format
+msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
+msgstr ""
+
+#: ../urpm/signature.pm:102
+#, c-format
+msgid "Invalid Key ID (%s)"
+msgstr "Kekunci ID tidak sah (%s)"
+
+#: ../urpm/signature.pm:104
+#, c-format
+msgid "Missing signature (%s)"
+msgstr "Tandatangan tiada (%s)"
+
+#: ../urpm/signature.pm:107
+#, c-format
+msgid "SECURITY: Medium \"%s\" has no key (%s)!"
+msgstr ""
+
+#: ../urpm/signature.pm:109
+#, c-format
+msgid "Medium without key (%s)"
+msgstr ""
+
+#: ../urpm/sys.pm:225
+#, fuzzy, c-format
+msgid "system"
+msgstr "Sistem"
+
+#: ../urpm/sys.pm:262
+#, fuzzy, c-format
+msgid "You should restart your computer for %s"
+msgstr "Anda mesti nyatakan label bagi kemasukan"
+
+#: ../urpm/sys.pm:264
+#, fuzzy, c-format
+msgid "You should restart your session for %s"
+msgstr "Anda mesti nyatakan label bagi kemasukan"
+
+#: ../urpm/sys.pm:266
+#, fuzzy, c-format
+msgid "You should restart %s for %s"
+msgstr "Anda mesti nyatakan label bagi kemasukan"
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't write file"
+msgstr "Tidak dapat menulis kepada fail %s"
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't open file"
+msgstr "tidak dapat membuka fail `%s'"
+
+#: ../urpm/sys.pm:417
+#, fuzzy, c-format
+msgid "Can't move file %s to %s"
+msgstr "Fail untuk menyimpan suntingan:"
+
+#: ../urpme:43
+#, fuzzy, c-format
+msgid "  --auto         - automatically select a package in choices.\n"
+msgstr "  -a             - pilih semua yg sama dgn baris perintah.\n"
+
+#: ../urpme:44
+#, fuzzy, c-format
+msgid "  --auto-orphans - remove orphans\n"
+msgstr "Buang perubahan yang dicadangkan"
+
+#: ../urpme:45
+#, c-format
+msgid "  --test         - verify if the removal can be achieved correctly.\n"
+msgstr ""
+
+#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#, c-format
+msgid "  --parallel     - distributed urpmi across machines of alias.\n"
+msgstr ""
+
+#: ../urpme:48 ../urpmi:138
+#, fuzzy, c-format
+msgid "  --repackage    - Re-package the files before erasing\n"
+msgstr "Tidak dapat menulis tag!"
+
+#: ../urpme:49
+#, c-format
+msgid "  --root         - use another root for rpm removal.\n"
+msgstr "  --root         - guna root lain untuk membuang rpm.\n"
+
+#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
+#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, fuzzy, c-format
+msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
+msgstr "  --root         - guna root lain untuk membuang rpm.\n"
+
+#: ../urpme:51 ../urpmi:96
+#, fuzzy, c-format
+msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../urpme:52
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr "Pakej Hilang"
+
+#: ../urpme:53
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
+"                   to (un)install a chroot with --root option.\n"
+msgstr ""
+
+#: ../urpme:55 ../urpmi:149 ../urpmq:87
+#, fuzzy, c-format
+msgid "  --verbose, -v  - verbose mode.\n"
+msgstr "  --verbose      - mod verbos.\n"
+
+#: ../urpme:56
+#, fuzzy, c-format
+msgid "  -a             - select all packages matching expression.\n"
+msgstr "  -a             - pilih semua yg sama dgn baris perintah.\n"
+
+#: ../urpme:71
+#, c-format
+msgid "Only superuser is allowed to remove packages"
+msgstr "Hanya superuser dibenarkan untuk membuang pakej"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown packages"
+msgstr "pakej tidak diketahui"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown package"
+msgstr "pakej tidak diketahui"
+
+#: ../urpme:119
+#, fuzzy, c-format
+msgid "Removing the following package will break your system:"
+msgid_plural "Removing the following packages will break your system:"
+msgstr[0] "Salah satu pakej berikut diperlukan:"
+msgstr[1] "Salah satu pakej berikut diperlukan:"
+
+#: ../urpme:124
+#, c-format
+msgid "Nothing to remove"
+msgstr "Tiada untuk dibuang"
+
+#: ../urpme:141
+#, fuzzy, c-format
+msgid "No orphans to remove"
+msgstr "gagal untuk membuang direktori %s: %s\n"
+
+#: ../urpme:147
+#, fuzzy, c-format
+msgid "To satisfy dependencies, the following package will be removed"
+msgid_plural ""
+"To satisfy dependencies, the following %d packages will be removed"
+msgstr[0] ""
+"Untuk memenuhi kebergantungan, %d pakej berikut perlu dipasang:\n"
+"%s\n"
+msgstr[1] ""
+"Untuk memenuhi kebergantungan, %d pakej berikut perlu dipasang:\n"
+"%s\n"
+
+#: ../urpme:152
+#, fuzzy, c-format
+msgid "(orphan package)"
+msgid_plural "(orphan packages)"
+msgstr[0] "Pelihat Pakej"
+msgstr[1] "pakej tidak diketahui"
+
+#: ../urpme:159
+#, fuzzy, c-format
+msgid "Remove %d package?"
+msgid_plural "Remove %d packages?"
+msgstr[0] "Buang kekunci"
+msgstr[1] "membuang pakej %s"
+
+#: ../urpme:164
+#, fuzzy, c-format
+msgid "testing removal of %s"
+msgstr "Membuang Sumber"
+
+#: ../urpme:181
+#, c-format
+msgid "Removal failed"
+msgstr "Pembuangan gagal"
+
+#: ../urpme:183
+#, fuzzy, c-format
+msgid "Removal is possible"
+msgstr "Pemasangan sekecil mungkin"
+
+#: ../urpmf:31
+#, c-format
+msgid "  --version      - print this tool's version number.\n"
+msgstr "  --version       - cetak nombor versi alatan ini.\n"
+
+#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#, c-format
+msgid "  --env          - use specific environment (typically a bug report).\n"
+msgstr ""
+
+#: ../urpmf:33 ../urpmi:69 ../urpmq:45
+#, c-format
+msgid "  --excludemedia - do not use the given media, separated by comma.\n"
+msgstr ""
+
+#: ../urpmf:34
+#, c-format
+msgid ""
+"  --literal, -l  - don't match patterns, use argument as a literal string.\n"
+msgstr ""
+
+#: ../urpmf:37 ../urpmi:72 ../urpmq:46
+#, c-format
+msgid ""
+"  --sortmedia    - sort media according to substrings separated by comma.\n"
+msgstr ""
+
+#: ../urpmf:38
+#, fuzzy, c-format
+msgid "  --use-distrib  - use the given path to access media\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../urpmf:39 ../urpmi:73 ../urpmq:47
+#, c-format
+msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+msgstr ""
+
+#: ../urpmf:40
+#, c-format
+msgid "  --uniq         - do not print identical lines twice.\n"
+msgstr "  --uniq         - jangan cetak baris yang sama.\n"
+
+#: ../urpmf:41 ../urpmi:70 ../urpmq:42
+#, c-format
+msgid "  --update       - use only update media.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../urpmf:42
+#, c-format
+msgid "  --verbose      - verbose mode.\n"
+msgstr "  --verbose      - mod verbos.\n"
+
+#: ../urpmf:43
+#, fuzzy, c-format
+msgid "  -i             - ignore case distinctions in patterns.\n"
+msgstr "-i  --ignore-case  Abai perbezaan case dalam kandungan fail."
+
+#: ../urpmf:44
+#, fuzzy, c-format
+msgid "  -I             - honor case distinctions in patterns (default).\n"
+msgstr "-i  --ignore-case  Abai perbezaan case dalam kandungan fail."
+
+#: ../urpmf:45
+#, c-format
+msgid "  -F<str>        - change field separator (defaults to ':').\n"
+msgstr ""
+
+#: ../urpmf:46
+#, c-format
+msgid "Pattern expressions:\n"
+msgstr "Ungkapan corak:\n"
+
+#: ../urpmf:47
+#, c-format
+msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
+msgstr ""
+
+#: ../urpmf:48
+#, fuzzy, c-format
+msgid "  -e             - include perl code directly as perl -e.\n"
+msgstr "  -c             - bersihkan direktori kache header.\n"
+
+#: ../urpmf:49
+#, c-format
+msgid "  -a             - binary AND operator.\n"
+msgstr "  -a             - operator binari AND.\n"
+
+#: ../urpmf:50
+#, c-format
+msgid "  -o             - binary OR operator.\n"
+msgstr "  -o             - operator binari OR.\n"
+
+#: ../urpmf:51
+#, c-format
+msgid "  !              - unary NOT.\n"
+msgstr "  !              - unari NOT.\n"
+
+#: ../urpmf:52
+#, c-format
+msgid "  ( )            - left and right parentheses.\n"
+msgstr "  ( )            - kurungan kiri dan kanan.\n"
+
+#: ../urpmf:53
+#, c-format
+msgid "List of tags:\n"
+msgstr "Senarai tag:\n"
+
+#: ../urpmf:54
+#, c-format
+msgid "  --qf           - specify a printf-like output format\n"
+msgstr "  --qf           - nyatakan format keluaran seperti printf\n"
+
+#: ../urpmf:55
+#, c-format
+msgid "                   example: '%%name:%%files'\n"
+msgstr "                   contoh: '%%name:%%files'\n"
+
+#: ../urpmf:56
+#, fuzzy, c-format
+msgid "  --arch         - architecture\n"
+msgstr "Rekabentuk Sasaran:"
+
+#: ../urpmf:57
+#, fuzzy, c-format
+msgid "  --buildhost    - build host\n"
+msgstr "%s %s pemasangan pada hos %s"
+
+#: ../urpmf:58
+#, fuzzy, c-format
+msgid "  --buildtime    - build time\n"
+msgstr "Tarikh/masa bolehubah"
+
+#: ../urpmf:59
+#, fuzzy, c-format
+msgid "  --conffiles    - configuration files\n"
+msgstr "kemaskini semua fail tetapan"
+
+#: ../urpmf:60
+#, fuzzy, c-format
+msgid "  --conflicts    - conflict tags\n"
+msgstr "dijangkakan %d pengurangan/pengurangan konflik"
+
+#: ../urpmf:61
+#, fuzzy, c-format
+msgid "  --description  - package description\n"
+msgstr "Pelihat Pakej"
+
+#: ../urpmf:62
+#, fuzzy, c-format
+msgid "  --distribution - distribution\n"
+msgstr "Sumber edaran"
+
+#: ../urpmf:63
+#, fuzzy, c-format
+msgid "  --epoch        - epoch\n"
+msgstr "Saat semenjak permulaan zaman"
+
+#: ../urpmf:64
+#, fuzzy, c-format
+msgid "  --filename     - filename of the package\n"
+msgstr "Pelihat Pakej"
+
+#: ../urpmf:65
+#, fuzzy, c-format
+msgid "  --files        - list of files contained in the package\n"
+msgstr "Cache Fail Pakej Jauh"
+
+#: ../urpmf:66
+#, fuzzy, c-format
+msgid "  --group        - group\n"
+msgstr "Kumpulan"
+
+#: ../urpmf:67
+#, fuzzy, c-format
+msgid "  --license      - license\n"
+msgstr "Nama Pakej"
+
+#: ../urpmf:68
+#, fuzzy, c-format
+msgid "  --name         - package name\n"
+msgstr "Pelihat Pakej"
+
+#: ../urpmf:69
+#, fuzzy, c-format
+msgid "  --obsoletes    - obsoletes tags\n"
+msgstr "Senarai tag:\n"
+
+#: ../urpmf:70
+#, fuzzy, c-format
+msgid "  --packager     - packager\n"
+msgstr "Tidak dapat menulis tag!"
+
+#: ../urpmf:71
+#, fuzzy, c-format
+msgid "  --provides     - provides tags\n"
+msgstr "Senarai tag:\n"
+
+#: ../urpmf:72
+#, fuzzy, c-format
+msgid "  --requires     - requires tags\n"
+msgstr "Senarai tag:\n"
+
+#: ../urpmf:73
+#, fuzzy, c-format
+msgid "  --size         - installed size\n"
+msgstr "% dari saiz normal"
+
+#: ../urpmf:74
+#, fuzzy, c-format
+msgid "  --sourcerpm    - source rpm name\n"
+msgstr "nama fail rpm [%s] tidak sah"
+
+#: ../urpmf:75
+#, fuzzy, c-format
+msgid "  --suggests     - suggests tags\n"
+msgstr "Senarai tag:\n"
+
+#: ../urpmf:76
+#, fuzzy, c-format
+msgid "  --summary      - summary\n"
+msgstr "Ringkasan"
+
+#: ../urpmf:77
+#, fuzzy, c-format
+msgid "  --url          - url\n"
+msgstr "URL:"
+
+#: ../urpmf:78
+#, fuzzy, c-format
+msgid "  --vendor       - vendor\n"
+msgstr "Pengeluar"
+
+#: ../urpmf:79
+#, fuzzy, c-format
+msgid "  -m             - the media in which the package was found\n"
+msgstr "Cache Fail Pakej Jauh"
+
+#: ../urpmf:80 ../urpmq:97
+#, c-format
+msgid "  -f             - print version, release and arch with name.\n"
+msgstr "  -f             - cetak versi, keluaran dan arch dgn nama.\n"
+
+#: ../urpmf:148
+#, fuzzy, c-format
+msgid "unterminated expression (%s)"
+msgstr "Penyunting Ungkapan Nalar (regexp)"
+
+#: ../urpmf:193
+#, c-format
+msgid "Incorrect format: you may use only one multi-valued tag"
+msgstr ""
+
+#: ../urpmf:286
+#, fuzzy, c-format
+msgid "no hdlist available for medium \"%s\""
+msgstr "Tiada status tersedia utk pakej ini\n"
+
+#: ../urpmf:293
+#, fuzzy, c-format
+msgid "no synthesis available for medium \"%s\""
+msgstr "Tiada status tersedia utk pakej ini\n"
+
+#: ../urpmf:302
+#, fuzzy, c-format
+msgid "no xml-info available for medium \"%s\""
+msgstr "menulis senarai fail untuk media \"%s\""
+
+#: ../urpmi:76
+#, fuzzy, c-format
+msgid "  --auto-update  - update media then upgrade the system.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../urpmi:77
+#, c-format
+msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr ""
+
+#: ../urpmi:78
+#, c-format
+msgid "    --force-key    - force update of gpg key.\n"
+msgstr ""
+
+#: ../urpmi:79
+#, c-format
+msgid "  --auto-orphans - remove orphans without asking\n"
+msgstr ""
+
+#: ../urpmi:80 ../urpmq:52
+#, fuzzy, c-format
+msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
+msgstr "Senarai tag:\n"
+
+#: ../urpmi:81
+#, c-format
+msgid ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+msgstr ""
+
+#: ../urpmi:82
+#, c-format
+msgid "  --no-install   - don't install packages (only download)\n"
+msgstr ""
+
+#: ../urpmi:83 ../urpmq:54
+#, c-format
+msgid ""
+"  --keep         - keep existing packages if possible, reject requested\n"
+"                   packages that lead to removals.\n"
+msgstr ""
+
+#: ../urpmi:85
+#, c-format
+msgid ""
+"  --split-level  - split in small transaction if more than given packages\n"
+"                   are going to be installed or upgraded,\n"
+"                   default is %d.\n"
+msgstr ""
+
+#: ../urpmi:89
+#, c-format
+msgid "  --split-length - small transaction length, default is %d.\n"
+msgstr ""
+
+#: ../urpmi:91
+#, fuzzy, c-format
+msgid "  --fuzzy, -y    - impose fuzzy search.\n"
+msgstr "  --fuzzy        - lakukan pencarian fuzzy (sama dengan -y).\n"
+
+#: ../urpmi:92
+#, fuzzy, c-format
+msgid "  --buildrequires - install the buildrequires of the packages\n"
+msgstr "Simpan pilihan pakej"
+
+#: ../urpmi:93
+#, c-format
+msgid "  --install-src  - install only source package (no binaries).\n"
+msgstr ""
+
+#: ../urpmi:94
+#, fuzzy, c-format
+msgid "  --clean        - remove rpm from cache before anything else.\n"
+msgstr "  --noclean      - jaga rpm tidak dipakai dalam kache.\n"
+
+#: ../urpmi:95
+#, fuzzy, c-format
+msgid "  --noclean      - don't clean rpms from cache.\n"
+msgstr "  --noclean      - jaga rpm tidak dipakai dalam kache.\n"
+
+#: ../urpmi:97
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr ""
+
+#: ../urpmi:99
+#, c-format
+msgid ""
+"  --allow-nodeps - allow asking user to install packages without\n"
+"                   dependencies checking.\n"
+msgstr ""
+
+#: ../urpmi:101
+#, c-format
+msgid ""
+"  --allow-force  - allow asking user to install packages without\n"
+"                   dependencies checking and integrity.\n"
+msgstr ""
+
+#: ../urpmi:103
+#, fuzzy, c-format
+msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
+msgstr "Senarai tag:\n"
+
+#: ../urpmi:107
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to install a chroot with --root option.\n"
+msgstr ""
+
+#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#, c-format
+msgid "  --metalink     - generate and use a local metalink.\n"
+msgstr ""
+
+#: ../urpmi:110
+#, c-format
+msgid ""
+"  --download-all - download all needed packages before trying to install "
+"them\n"
+msgstr ""
+
+#: ../urpmi:111
+#, c-format
+msgid ""
+"  --downloader   - program to use to retrieve distant files. \n"
+"                   known programs: %s\n"
+msgstr ""
+
+#: ../urpmi:114
+#, c-format
+msgid "  --curl-options - additional options to pass to curl\n"
+msgstr ""
+
+#: ../urpmi:115
+#, c-format
+msgid "  --rsync-options- additional options to pass to rsync\n"
+msgstr ""
+
+#: ../urpmi:116
+#, c-format
+msgid "  --wget-options - additional options to pass to wget\n"
+msgstr ""
+
+#: ../urpmi:117
+#, c-format
+msgid "  --prozilla-options - additional options to pass to prozilla\n"
+msgstr ""
+
+#: ../urpmi:118
+#, c-format
+msgid "  --aria2-options - additional options to pass to aria2\n"
+msgstr ""
+
+#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#, c-format
+msgid "  --limit-rate   - limit the download speed.\n"
+msgstr ""
+
+#: ../urpmi:120
+#, c-format
+msgid ""
+"  --resume       - resume transfer of partially-downloaded files\n"
+"                   (--no-resume disables it, default is disabled).\n"
+msgstr ""
+
+#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#, c-format
+msgid ""
+"  --proxy        - use specified HTTP proxy, the port number is assumed\n"
+"                   to be 1080 by default (format is <proxyhost[:port]>).\n"
+msgstr ""
+
+#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#, c-format
+msgid ""
+"  --proxy-user   - specify user and password to use for proxy\n"
+"                   authentication (format is <user:password>).\n"
+msgstr ""
+
+#: ../urpmi:126
+#, c-format
+msgid ""
+"  --bug          - output a bug report in directory indicated by\n"
+"                   next arg.\n"
+msgstr ""
+
+#: ../urpmi:132
+#, c-format
+msgid "  --excludepath  - exclude path separated by comma.\n"
+msgstr ""
+
+#: ../urpmi:133
+#, fuzzy, c-format
+msgid "  --excludedocs  - exclude doc files.\n"
+msgstr "-x PAT  --exclude=PAT  Asing fail yang sepadan PAT."
+
+#: ../urpmi:134
+#, c-format
+msgid "  --ignoresize   - don't verify disk space before installation.\n"
+msgstr ""
+
+#: ../urpmi:135
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr "Rekabentuk Sasaran:"
+
+#: ../urpmi:136
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr "Pakej Hilang"
+
+#: ../urpmi:137
+#, fuzzy, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr "  --conflicts    - papar konflik.\n"
+
+#: ../urpmi:139
+#, c-format
+msgid "  --skip         - packages which installation should be skipped\n"
+msgstr ""
+
+#: ../urpmi:140
+#, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr ""
+
+#: ../urpmi:141
+#, c-format
+msgid ""
+"  --more-choices - when several packages are found, propose more choices\n"
+"                   than the default.\n"
+msgstr ""
+
+#: ../urpmi:143
+#, fuzzy, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr "  --noclean      - jaga rpm tidak dipakai dalam kache.\n"
+
+#: ../urpmi:144
+#, c-format
+msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
+msgstr ""
+
+#: ../urpmi:145 ../urpmq:95
+#, c-format
+msgid "  -a             - select all matches on command line.\n"
+msgstr "  -a             - pilih semua yg sama dgn baris perintah.\n"
+
+#: ../urpmi:148
+#, fuzzy, c-format
+msgid "  --quiet, -q    - quiet mode.\n"
+msgstr "  -q             - mod diam.\n"
+
+#: ../urpmi:150
+#, fuzzy, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr "  --verbose      - mod verbos.\n"
+
+#: ../urpmi:151
+#, fuzzy, c-format
+msgid "  names or rpm files given on command line will be installed.\n"
+msgstr "  dicarikan nama atau fail rpm yg tertera pada baris perintah.\n"
+
+#: ../urpmi:179
+#, c-format
+msgid "Error: can't use --auto-select along with package list.\n"
+msgstr ""
+
+#: ../urpmi:186
+#, c-format
+msgid ""
+"Error: To generate a bug report, specify the usual command-line arguments\n"
+"along with --bug.\n"
+msgstr ""
+
+#: ../urpmi:216
+#, c-format
+msgid "You can't install binary rpm files when using --install-src"
+msgstr ""
+
+#: ../urpmi:217
+#, c-format
+msgid "You can't install spec files"
+msgstr ""
+
+#: ../urpmi:224
+#, fuzzy, c-format
+msgid "defaulting to --buildrequires"
+msgstr "&Lompat ke hiperlink"
+
+#: ../urpmi:229
+#, c-format
+msgid ""
+"please use --buildrequires or --install-src, defaulting to --buildrequires"
+msgstr ""
+
+#: ../urpmi:249
+#, c-format
+msgid ""
+"Directory [%s] already exists, please use another directory for bug report "
+"or delete it"
+msgstr ""
+
+#: ../urpmi:250
+#, c-format
+msgid "Unable to create directory [%s] for bug report"
+msgstr ""
+
+#: ../urpmi:271
+#, c-format
+msgid ""
+"Error: %s appears to be mounted read-only.\n"
+"Use --allow-force to force operation."
+msgstr ""
+
+#. -PO: here format is "<package_name>: <summary> (to upgrade)"
+#: ../urpmi:425
+#, fuzzy, c-format
+msgid "%s: %s (to upgrade)"
+msgstr " (untuk naiktaraf)"
+
+#. -PO: here format is "<package_name> (to upgrade)"
+#: ../urpmi:427
+#, fuzzy, c-format
+msgid "%s (to upgrade)"
+msgstr " (untuk naiktaraf)"
+
+#. -PO: here format is "<package_name>: <summary> (to install)"
+#: ../urpmi:431
+#, fuzzy, c-format
+msgid "%s: %s (to install)"
+msgstr " (untuk memasang)"
+
+#. -PO: here format is "<package_name> (to install)"
+#: ../urpmi:433
+#, fuzzy, c-format
+msgid "%s (to install)"
+msgstr " (untuk memasang)"
+
+#: ../urpmi:439
+#, fuzzy, c-format
+msgid ""
+"In order to satisfy the '%s' dependency, one of the following packages is "
+"needed:"
+msgstr ""
+"Untuk memenuhi kebergantungan, %d pakej berikut perlu dipasang:\n"
+"%s\n"
+
+#: ../urpmi:442
+#, c-format
+msgid "What is your choice? (1-%d) "
+msgstr "Pilihan Anda? (1-%d) "
+
+#: ../urpmi:484
+#, c-format
+msgid ""
+"The following package cannot be installed because it depends on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+
+#: ../urpmi:486
+#, c-format
+msgid ""
+"The following packages can't be installed because they depend on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+
+#: ../urpmi:492 ../urpmi:510
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Continue installation anyway?"
+msgstr "Teruskan juga?"
+
+#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#, c-format
+msgid " (Y/n) "
+msgstr " (Y/t) "
+
+#: ../urpmi:504
+#, fuzzy, c-format
+msgid ""
+"A requested package cannot be installed:\n"
+"%s"
+msgstr "semua telah diinstal"
+
+#: ../urpmi:525
+#, c-format
+msgid "removing package %s will break your system"
+msgstr ""
+
+#: ../urpmi:533
+#, fuzzy, c-format
+msgid ""
+"The installation cannot continue because the following package\n"
+"has to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Pakej berikut perlu dibuang untuk yang lain dinaiktaraf:\n"
+"%s\n"
+"Teruskan?"
+
+#: ../urpmi:535
+#, fuzzy, c-format
+msgid ""
+"The installation cannot continue because the following packages\n"
+"have to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Pakej berikut perlu dibuang untuk yang lain dinaiktaraf:\n"
+"%s\n"
+"Teruskan?"
+
+#: ../urpmi:543
+#, c-format
+msgid "(test only, removal will not be actually done)"
+msgstr ""
+
+#: ../urpmi:562
+#, fuzzy, c-format
+msgid ""
+"You must first call urpmi with --buildrequires to install the following "
+"dependencies:\n"
+"%s\n"
+msgstr ""
+"Anda perlu menjadi root utk install kebergantungan berikutnya:\n"
+"%s\n"
+
+#: ../urpmi:572
+#, fuzzy, c-format
+msgid "The following orphan package will be removed."
+msgid_plural "The following orphan packages will be removed."
+msgstr[0] "  -c             - keluaran lengkap dengan pakej untuk dibuang.\n"
+msgstr[1] ""
+"Untuk memenuhi kebergantungan, %d pakej berikut perlu dipasang:\n"
+"%s\n"
+
+#: ../urpmi:596
+#, c-format
+msgid "WARNING: %s option is in use. Some strange problems may happen"
+msgstr ""
+
+#: ../urpmi:608
+#, c-format
+msgid "(test only, installation will not be actually done)"
+msgstr ""
+
+#: ../urpmi:614
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr ""
+
+#: ../urpmi:615
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr ""
+
+#: ../urpmi:616
+#, fuzzy, c-format
+msgid "%s of packages will be retrieved."
+msgstr "%s mestilah nombor"
+
+#: ../urpmi:617
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpmi:639
+#, fuzzy, c-format
+msgid "Press Enter when mounted..."
+msgstr "Tekan <enter> untuk shell"
+
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
+#: ../urpmi.addmedia:36
+#, fuzzy, c-format
+msgid ""
+"usage: urpmi.addmedia [options] <name> <url>\n"
+"where <url> is one of\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"usage: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"usage: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"examples:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"and [options] are from\n"
+msgstr ""
+"penggunaan: urpmi.addmedia [pilihan] <nama> <url> [with <path_relatif>]\n"
+"keterangan: <url> adalah\n"
+"       [file:/]/<path> with <namafail relatif hdlist>\n"
+"       ftp://<login>:<sandi>@<host>/<path> with <namafail relatif hdlist>\n"
+"       ftp://<host>/<path> with <namafail relatif hdlist>\n"
+"       http://<host>/<path> with <namafail relatif hdlist>\n"
+"       removable://<path> with <namafail relatif hdlist>\n"
+"\n"
+"dan [pilihan] dari\n"
+
+#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#, c-format
+msgid "  --wget         - use wget to retrieve distant files.\n"
+msgstr "  --wget         - guna wget utk mengambil fail jauh.\n"
+
+#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#, c-format
+msgid "  --curl         - use curl to retrieve distant files.\n"
+msgstr "  --curl         - guna curl utk mengambil fail jauh.\n"
+
+#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
+#, fuzzy, c-format
+msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
+msgstr "  --wget         - guna wget utk mengambil fail jauh.\n"
+
+#: ../urpmi.addmedia:59 ../urpmi.update:36
+#, fuzzy, c-format
+msgid "  --aria2        - use aria2 to retrieve distant files.\n"
+msgstr "  --wget         - guna wget utk mengambil fail jauh.\n"
+
+#: ../urpmi.addmedia:66
+#, c-format
+msgid ""
+"  --update       - create an update medium, \n"
+"                   or discard non-update media (when used with --distrib)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:68
+#, c-format
+msgid ""
+"  --xml-info     - use the specific policy for downloading xml info files\n"
+"                   one of: never, on-demand, update-only, always. cf urpmi."
+"cfg(5)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:70
+#, fuzzy, c-format
+msgid "  --probe-synthesis - use synthesis file.\n"
+msgstr "masalah membaca fail sintesis untuk media \"%s\""
+
+#: ../urpmi.addmedia:71
+#, c-format
+msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
+msgstr ""
+
+#: ../urpmi.addmedia:72
+#, fuzzy, c-format
+msgid "  --no-probe     - do not try to find any synthesis file.\n"
+msgstr "  --uniq         - jangan cetak baris yang sama.\n"
+
+#: ../urpmi.addmedia:74
+#, c-format
+msgid ""
+"  --distrib      - automatically create all media from an installation\n"
+"                   medium.\n"
+msgstr ""
+
+#: ../urpmi.addmedia:76
+#, c-format
+msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
+msgstr ""
+
+#: ../urpmi.addmedia:77
+#, fuzzy, c-format
+msgid "  --all-media    - with --distrib, add every listed media\n"
+msgstr "Ralat mendapatkan senarai pakej yang ada"
+
+#: ../urpmi.addmedia:78
+#, c-format
+msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
+msgstr ""
+
+#: ../urpmi.addmedia:79 ../urpmi.update:44
+#, c-format
+msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr ""
+
+#: ../urpmi.addmedia:80
+#, c-format
+msgid "  --nopubkey     - don't import pubkey of added media\n"
+msgstr ""
+
+#: ../urpmi.addmedia:81
+#, c-format
+msgid "  --raw          - add the media in config, but don't update it.\n"
+msgstr ""
+
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#, c-format
+msgid "  -q             - quiet mode.\n"
+msgstr "  -q             - mod diam.\n"
+
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#, c-format
+msgid "  -v             - verbose mode.\n"
+msgstr "  -v             - mod verbos.\n"
+
+#: ../urpmi.addmedia:96
+#, c-format
+msgid "known xml-info policies are %s"
+msgstr ""
+
+#: ../urpmi.addmedia:107
+#, c-format
+msgid "no argument needed for --distrib --mirrorlist <url>"
+msgstr ""
+
+#: ../urpmi.addmedia:112
+#, c-format
+msgid "bad <url> (for local directory, the path must be absolute)"
+msgstr ""
+
+#: ../urpmi.addmedia:116
+#, fuzzy, c-format
+msgid "Only superuser is allowed to add media"
+msgstr "Hanya superuser yang boleh menginstal pakej"
+
+#: ../urpmi.addmedia:119
+#, fuzzy, c-format
+msgid "creating config file [%s]"
+msgstr "Fail Config Ruang Kerja"
+
+#: ../urpmi.addmedia:120
+#, fuzzy, c-format
+msgid "Can't create config file [%s]"
+msgstr "gagal tulis fail konfigurasi [%s]"
+
+#: ../urpmi.addmedia:128
+#, fuzzy, c-format
+msgid "no need to give <relative path of synthesis> with --distrib"
+msgstr "tak perlu memberikan <path relatif hdlist> dgn --distrib"
+
+#: ../urpmi.addmedia:136
+#, c-format
+msgid ""
+"\n"
+"Do you want to add media '%s'?"
+msgstr ""
+
+#: ../urpmi.addmedia:156 ../urpmi.addmedia:181
+#, fuzzy, c-format
+msgid "unable to add medium"
+msgstr "Tidak dapat mencipta media."
+
+#: ../urpmi.addmedia:164
+#, fuzzy, c-format
+msgid "<relative path of synthesis> missing\n"
+msgstr "<path relatif hdlist> hilang\n"
+
+#: ../urpmi.addmedia:167
+#, c-format
+msgid "Can't use %s with remote medium"
+msgstr ""
+
+#: ../urpmi.recover:30
+#, c-format
+msgid "  --checkpoint   - set repackaging start now\n"
+msgstr ""
+
+#: ../urpmi.recover:31
+#, fuzzy, c-format
+msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
+msgstr "  --noclean      - jaga rpm tidak dipakai dalam kache.\n"
+
+#: ../urpmi.recover:33
+#, c-format
+msgid ""
+"  --list         - list transactions since provided date/duration argument\n"
+msgstr ""
+
+#: ../urpmi.recover:34
+#, c-format
+msgid "  --list-all     - list all transactions in rpmdb (long)\n"
+msgstr ""
+
+#: ../urpmi.recover:35
+#, c-format
+msgid "  --list-safe    - list transactions since checkpoint\n"
+msgstr ""
+
+#: ../urpmi.recover:36
+#, c-format
+msgid ""
+"  --rollback     - rollback until specified date,\n"
+"                   or rollback the specified number of transactions\n"
+msgstr ""
+
+#: ../urpmi.recover:38
+#, fuzzy, c-format
+msgid "  --disable      - turn off repackaging\n"
+msgstr "Pakej Hilang"
+
+#: ../urpmi.recover:53
+#, fuzzy, c-format
+msgid "Invalid date or duration [%s]\n"
+msgstr "Selit tarikh dan/atau masa"
+
+#: ../urpmi.recover:61
+#, fuzzy, c-format
+msgid "Repackage directory not defined\n"
+msgstr "Anda telah memilih fail, bukan direktori"
+
+#: ../urpmi.recover:64
+#, fuzzy, c-format
+msgid "Can't write to repackage directory [%s]\n"
+msgstr "gagal untuk mencipta direktori %s: %s\n"
+
+#: ../urpmi.recover:66
+#, fuzzy, c-format
+msgid "Cleaning up repackage directory [%s]...\n"
+msgstr "gagal untuk mencipta direktori %s: %s\n"
+
+#: ../urpmi.recover:68
+#, fuzzy, c-format
+msgid "%d file removed\n"
+msgid_plural "%d files removed\n"
+msgstr[0] "Extension &fail:"
+msgstr[1] ""
+
+#: ../urpmi.recover:78
+#, fuzzy, c-format
+msgid "Spurious command-line arguments [%s]\n"
+msgstr "Hadkan pilihan arahan baris"
+
+#: ../urpmi.recover:80
+#, c-format
+msgid "You can't specify --checkpoint and --rollback at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:82
+#, c-format
+msgid "You can't specify --checkpoint and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:84
+#, c-format
+msgid "You can't specify --rollback and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:86
+#, c-format
+msgid "You can't specify --disable along with another option"
+msgstr ""
+
+#: ../urpmi.recover:111
+#, fuzzy, c-format
+msgid "No transaction found since %s\n"
+msgstr "tiada webfetch dijumpai, webfetch yang disokong adalah: %s\n"
+
+#: ../urpmi.recover:126
+#, fuzzy, c-format
+msgid "You must be superuser to do this"
+msgstr "Maaf, anda mestilah root untuk melakukannya..."
+
+#: ../urpmi.recover:139 ../urpmi.recover:205
+#, fuzzy, c-format
+msgid "Writing rpm macros file [%s]...\n"
+msgstr "nama fail rpm [%s] tidak sah"
+
+#: ../urpmi.recover:181
+#, fuzzy, c-format
+msgid "No rollback date found\n"
+msgstr "tiada webfetch dijumpai, webfetch yang disokong adalah: %s\n"
+
+#: ../urpmi.recover:184
+#, c-format
+msgid "Rollback until %s...\n"
+msgstr ""
+
+#: ../urpmi.recover:191
+#, fuzzy, c-format
+msgid "Disabling repackaging\n"
+msgstr "Menidakupayakan Supermount"
+
+#: ../urpmi.removemedia:38
+#, c-format
+msgid ""
+"usage: urpmi.removemedia (-a | <name> ...)\n"
+"where <name> is a medium name to remove.\n"
+msgstr ""
+"penggunan: urpmi.removemedia (-a | <nama> ...)\n"
+"<nama> adalah nama media yg akan dihapus.\n"
+
+#: ../urpmi.removemedia:41
+#, c-format
+msgid "  -a             - select all media.\n"
+msgstr "  -a             - pilih semua media.\n"
+
+#: ../urpmi.removemedia:42
+#, fuzzy, c-format
+msgid "  -y             - fuzzy match on media names.\n"
+msgstr "  -a             - pilih semua yg sama dgn baris perintah.\n"
+
+#: ../urpmi.removemedia:59
+#, fuzzy, c-format
+msgid "Only superuser is allowed to remove media"
+msgstr "Hanya superuser dibenarkan untuk membuang pakej"
+
+#: ../urpmi.removemedia:71
+#, c-format
+msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
+msgstr "tiada penghapusan (guna urpmi.addmedia utk tambah media)\n"
+
+#: ../urpmi.removemedia:77
+#, c-format
+msgid ""
+"the entry to remove is missing\n"
+"(one of %s)\n"
+msgstr ""
+"masukan utk penghapusan hilang\n"
+"(satu dari %s)\n"
+
+#: ../urpmi.update:30
+#, c-format
+msgid ""
+"usage: urpmi.update [options] <name> ...\n"
+"where <name> is a medium name to update.\n"
+msgstr ""
+"penggunaan: urpmi.update [pilihan] <nama> ...\n"
+"<nama> adalah media yg akan dikemaskini.\n"
+
+#: ../urpmi.update:43
+#, fuzzy, c-format
+msgid "  --update       - update only update media.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../urpmi.update:45
+#, c-format
+msgid "  --force-key    - force update of gpg key.\n"
+msgstr ""
+
+#: ../urpmi.update:46
+#, fuzzy, c-format
+msgid "  --ignore       - don't update, mark the media as ignored.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../urpmi.update:47
+#, c-format
+msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
+msgstr ""
+
+#: ../urpmi.update:49
+#, c-format
+msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
+msgstr ""
+
+#: ../urpmi.update:50
+#, fuzzy, c-format
+msgid "  -a             - select all enabled non-removable media.\n"
+msgstr "  -a             - pilih semua media non-removable.\n"
+
+#: ../urpmi.update:51
+#, fuzzy, c-format
+msgid "  -f             - force updating synthesis\n"
+msgstr "periksa file sintesis [%s]"
+
+#: ../urpmi.update:52
+#, fuzzy, c-format
+msgid "  -ff            - really force updating synthesis\n"
+msgstr "  -f             - paksa buat fail hdlist.\n"
+
+#: ../urpmi.update:69
+#, fuzzy, c-format
+msgid "Only superuser is allowed to update media"
+msgstr "Hanya superuser yang boleh menginstal pakej"
+
+#: ../urpmi.update:86
+#, c-format
+msgid "nothing to update (use urpmi.addmedia to add a media)\n"
+msgstr ""
+"tiada apa-apa yang perlu dikemaskini (guna urpmi.addmedia utk tambah media)\n"
+
+#: ../urpmi.update:87
+#, c-format
+msgid ""
+"the entry to update is missing\n"
+"(one of %s)\n"
+msgstr ""
+"masukan kemaskini hilang\n"
+"(satu dari %s)\n"
+
+#: ../urpmi.update:98
+#, c-format
+msgid "\"%s\""
+msgstr "\"%s\""
+
+#: ../urpmi.update:99
+#, fuzzy, c-format
+msgid "ignoring media %s"
+msgstr "Media Storan"
+
+#: ../urpmi.update:99
+#, fuzzy, c-format
+msgid "enabling media %s"
+msgstr "Media Storan"
+
+#: ../urpmq:44
+#, fuzzy, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+msgstr "  --update       - guna hanya kemaskini media.\n"
+
+#: ../urpmq:49
+#, fuzzy, c-format
+msgid "  --auto-orphans - list orphans\n"
+msgstr "Label Senarai Semasa"
+
+#: ../urpmq:50
+#, c-format
+msgid ""
+"  --not-available\n"
+"                 - list installed packages not available on any media.\n"
+msgstr ""
+
+#: ../urpmq:53
+#, c-format
+msgid "  --fuzzy        - impose fuzzy search (same as -y).\n"
+msgstr "  --fuzzy        - lakukan pencarian fuzzy (sama dengan -y).\n"
+
+#: ../urpmq:56
+#, fuzzy, c-format
+msgid "  --list         - list available packages.\n"
+msgstr "Simpan pilihan pakej"
+
+#: ../urpmq:57
+#, fuzzy, c-format
+msgid "  --list-media   - list available media.\n"
+msgstr "Bantuan tidak ada"
+
+#: ../urpmq:58
+#, c-format
+msgid "  --list-url     - list available media and their url.\n"
+msgstr ""
+
+#: ../urpmq:59
+#, c-format
+msgid "  --list-nodes   - list available nodes when using --parallel.\n"
+msgstr ""
+
+#: ../urpmq:60
+#, fuzzy, c-format
+msgid "  --list-aliases - list available parallel aliases.\n"
+msgstr "Ralat mendapatkan senarai pakej yang ada"
+
+#: ../urpmq:61
+#, c-format
+msgid ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+msgstr ""
+
+#: ../urpmq:62
+#, c-format
+msgid "  --src          - next package is a source package (same as -s).\n"
+msgstr "  --src          - pakej berikut adalah pakej sumber (sama dgn -s).\n"
+
+#: ../urpmq:63
+#, fuzzy, c-format
+msgid "  --sources      - print source URLs of selected packages\n"
+msgstr "  --sourcerpm    - papar sumber rpm.\n"
+
+#: ../urpmq:65
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
+msgstr "Rekabentuk Sasaran:"
+
+#: ../urpmq:69
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
+"                   This permit to querying a distro.\n"
+msgstr ""
+
+#: ../urpmq:79
+#, c-format
+msgid "  --changelog    - print changelog.\n"
+msgstr "  --changelog    - papar log perubahan.\n"
+
+#: ../urpmq:80
+#, c-format
+msgid "  --conflicts    - print conflicts.\n"
+msgstr "  --conflicts    - papar konflik.\n"
+
+#: ../urpmq:81
+#, c-format
+msgid "  --obsoletes    - print obsoletes.\n"
+msgstr "  --obsoletes    - papar lapuk.\n"
+
+#: ../urpmq:82
+#, c-format
+msgid "  --provides     - print provides.\n"
+msgstr "  --provides     - papar menyediakan.\n"
+
+#: ../urpmq:83
+#, c-format
+msgid "  --requires     - print requires.\n"
+msgstr "  --requires     - papar diperlukan.\n"
+
+#: ../urpmq:84
+#, c-format
+msgid "  --suggests     - print suggests.\n"
+msgstr "  --suggests     - papar cadangan.\n"
+
+#: ../urpmq:85
+#, c-format
+msgid "  --sourcerpm    - print sourcerpm.\n"
+msgstr "  --sourcerpm    - papar sumber rpm.\n"
+
+#: ../urpmq:86
+#, c-format
+msgid "  --summary, -S  - print summary.\n"
+msgstr "  --summary, -S  - papar ringkasan.\n"
+
+#: ../urpmq:88
+#, c-format
+msgid ""
+"  --requires-recursive, -d\n"
+"                   - query package dependencies.\n"
+msgstr ""
+"  --requires-recursive, -d\n"
+"                   - soal kebergantungan pakej.\n"
+
+#: ../urpmq:90
+#, c-format
+msgid "  --whatrequires - reverse search to what requires package.\n"
+msgstr "  --whatrequires - carian undur untuk pakej apa diperlukan.\n"
+
+#: ../urpmq:91
+#, c-format
+msgid ""
+"  --whatrequires-recursive\n"
+"                   - extended reverse search (includes virtual packages).\n"
+msgstr ""
+"  --whatrequires-recursive\n"
+"                   - carian undur lanjutan (termasuk pakej maya).\n"
+
+#: ../urpmq:93
+#, c-format
+msgid ""
+"  --whatprovides, -p\n"
+"                   - search in provides to find package.\n"
+msgstr ""
+"  --whatprovides, -p\n"
+"                   - cari dalam penyediaan untuk mencari pakej.\n"
+
+#: ../urpmq:96
+#, c-format
+msgid "  -c             - complete output with package to be removed.\n"
+msgstr "  -c             - keluaran lengkap dengan pakej untuk dibuang.\n"
+
+#: ../urpmq:98
+#, c-format
+msgid "  -g             - print groups with name also.\n"
+msgstr "  -g             - cetak kumpulan dengan nama juga.\n"
+
+#: ../urpmq:99
+#, c-format
+msgid "  -i             - print useful information in human readable form.\n"
+msgstr ""
+"  -i             - cetak maklumat berguna dalam bentuk boleh dibaca "
+"manusia.\n"
+
+#: ../urpmq:100
+#, c-format
+msgid "  -l             - list files in package.\n"
+msgstr "  -l             - senaraikan fail dalam pakej.\n"
+
+#: ../urpmq:101
+#, c-format
+msgid "  -m             - equivalent to -du\n"
+msgstr "  -m             - bersamaan dengan -du\n"
+
+#: ../urpmq:102
+#, c-format
+msgid "  -r             - print version and release with name also.\n"
+msgstr "  -r             - cetak versi dan keluaran dengan nama juga.\n"
+
+#: ../urpmq:103
+#, c-format
+msgid "  -s             - next package is a source package (same as --src).\n"
+msgstr ""
+"  -s             - pakej berikut adalah pakej sumber (sama dgn --src).\n"
+
+#: ../urpmq:104
+#, c-format
+msgid ""
+"  -u             - remove package if a more recent version is already "
+"installed.\n"
+msgstr ""
+"  -u             - buang pakej jika versi lebih terkini telah dipasang.\n"
+
+#: ../urpmq:105
+#, c-format
+msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
+msgstr "  -y             - lakukan pencarian fuzzy (sama dengan --fuzzy).\n"
+
+#: ../urpmq:106
+#, c-format
+msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
+msgstr ""
+"  -Y             - seperti -y, tetapi memaksa untuk memadan tidak kira huruf "
+"besar atau kecil.\n"
+
+#: ../urpmq:107
+#, c-format
+msgid "  names or rpm files given on command line are queried.\n"
+msgstr "  dicarikan nama atau fail rpm yg tertera pada baris perintah.\n"
+
+#: ../urpmq:154
+#, c-format
+msgid "usage: \"urpmq --auto-orphans\" with no argument"
+msgstr ""
+
+#: ../urpmq:207
+#, c-format
+msgid "--list-nodes can only be used with --parallel"
+msgstr ""
+
+#: ../urpmq:231
+#, c-format
+msgid "use -l to list files"
+msgstr "guna -l untuk menyenaraikan fail"
+
+#: ../urpmq:416
+#, c-format
+msgid "no xml info for medium \"%s\", only partial result for package %s"
+msgstr ""
+
+#: ../urpmq:417
+#, c-format
+msgid "no xml info for medium \"%s\", only partial result for packages %s"
+msgstr ""
+
+#: ../urpmq:420
+#, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for package %s"
+msgstr ""
+
+#: ../urpmq:421
+#, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for packages %s"
+msgstr ""
+
+#: ../urpmq:488
+#, c-format
+msgid "No changelog found\n"
+msgstr "Tiada log perubahan dijumpai\n"
+
+#: ../gurpmi.desktop.in.h:1
+msgid "Software Installer"
+msgstr "Penginstal perisian"
+
+#: ../gurpmi.desktop.in.h:2
+#, fuzzy
+msgid "Graphical front end to install RPM files"
+msgstr "Antaramuka depan  Ghostscript untuk melihat fail PostScript"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpme version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "versi mdkupdate %s\n"
+#~ "Hakmilik (C) %s Mandriva.\n"
+#~ "Ini adalah perisian percuma dan boleh disebarkan dibawah akta GNU GPL.\n"
+#~ "\n"
+#~ "penggunaan:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage: urpmf [options] pattern-expression\n"
+#~ msgstr ""
+#~ "versi mdkupdate %s\n"
+#~ "Hakmilik (C) %s Mandriva.\n"
+#~ "Ini adalah perisian percuma dan boleh disebarkan dibawah akta GNU GPL.\n"
+#~ "\n"
+#~ "penggunaan:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmi.recover version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "versi mdkupdate %s\n"
+#~ "Hakmilik (C) %s Mandriva.\n"
+#~ "Ini adalah perisian percuma dan boleh disebarkan dibawah akta GNU GPL.\n"
+#~ "\n"
+#~ "penggunaan:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmq version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "versi mdkupdate %s\n"
+#~ "Hakmilik (C) %s Mandriva.\n"
+#~ "Ini adalah perisian percuma dan boleh disebarkan dibawah akta GNU GPL.\n"
+#~ "\n"
+#~ "penggunaan:\n"
+
+#~ msgid "Cancel"
+#~ msgstr "Batal"
+
+#, fuzzy
+#~ msgid "Cannot write DUDF file.\n"
+#~ msgstr "Tidak dapat menulis kepada fail %s"
+
+#~ msgid ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+#~ msgstr ""
+#~ "  --sources      - beri semua pakej sumber sebelum muatturun (hanya "
+#~ "root).\n"
+
+#, fuzzy
+#~ msgid "due to already installed %s"
+#~ msgstr "semua telah diinstal"
+
+#, fuzzy
+#~ msgid "Updating media...\n"
+#~ msgstr "Sila tunggu, mengemaskini media..."
+
+#, fuzzy
+#~ msgid "examining %s file"
+#~ msgstr "periksa file sintesis [%s]"
+
+#, fuzzy
+#~ msgid "invalid MD5SUM file"
+#~ msgstr "nama fail rpm [%s] tidak sah"
+
+#, fuzzy
+#~ msgid "found probed synthesis as %s"
+#~ msgstr "menjumpai hdlist dikesan (atau sintesis) seperti %s"
+
+#~ msgid "  --update       - create an update medium.\n"
+#~ msgstr "  --update       - buat media update.\n"

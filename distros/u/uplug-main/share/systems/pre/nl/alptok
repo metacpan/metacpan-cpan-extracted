@@ -1,0 +1,70 @@
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#	'encoding' => 'iso-8859-1',
+	'encoding' => 'utf-8',
+	'status' => 'tok',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+     'segments' => {
+	 'add IDs' => 1,
+	 'add parent id' => 1,
+	 'tag' => 'w',
+     },
+     'tokenizer' => {
+	 'language' => 'dutch',
+	 'startup base' => 'tok_',
+#	'encoding' => 'iso-8859-1',
+	'encoding' => 'utf-8',
+     },
+     'output' => {
+        'token delimiter' => ' ',
+        'sentence delimiter' => "\n",
+#	'encoding' => 'iso-8859-1',
+     },
+     'input' => {
+        'token delimiter' => " ",
+        'sentence delimiter' => "\n",
+     },
+  },
+  'module' => {
+    'program' => 'uplug-tokext',
+    'location' => '$UplugBin',
+    'name' => 'tokenizer (dutch)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+      'lang' => 'parameter:tokenizer:language',
+       'attr' => 'parameter:output:attribute',
+       'char' => 'output:text:encoding',
+       'co' => 'output:text:encoding',
+       'ci' => 'input:text:encoding',
+       'r' => 'input:text:root',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=sent,language=en)'
+	  },
+       },
+  }
+}

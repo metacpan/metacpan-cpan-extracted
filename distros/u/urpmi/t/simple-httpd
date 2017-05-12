@@ -1,0 +1,191 @@
+#!/usr/bin/perl -w
+
+###----------------------------------------###
+###     httpd server class                 ###
+###----------------------------------------###
+
+use base qw(Net::Server::Single);
+use strict;
+
+@ARGV == 3 or die "usage: simple-httpd <document root> <log dir> <port>\n";
+my ($DOCUMENT_ROOT, $SERVER_ROOT, $PORT) = @ARGV;
+
+### run the server
+__PACKAGE__->run;
+exit;
+
+###----------------------------------------------------------------###
+
+### set up some server parameters
+sub configure_hook {
+  my $self = shift;
+
+  my $root = $self->{server_root} = $SERVER_ROOT;
+
+  $self->{server}->{port}     = "*:$PORT";   # port and addr to bind
+  $self->{server}->{user}     = 'nobody'; # user to run as
+  $self->{server}->{group}    = 'nogroup'; # group to run as
+  $self->{server}->{setsid}   = 1;        # daemonize
+  $self->{server}->{log_file} = "$root/server.log";
+
+
+  $self->{document_root} = $DOCUMENT_ROOT;
+  $self->{access_log}    = "$root/access.log";
+  $self->{error_log}     = "$root/error.log";
+
+  $self->{default_index} = [ qw(index.html index.htm main.htm) ];
+
+  $self->{mime_types} = {
+    html => 'text/html',
+    htm  => 'text/html',
+    gif  => 'image/gif',
+    jpg  => 'image/jpeg',
+  };
+  $self->{mime_default} = 'text/plain';
+
+}
+
+sub post_configure_hook {
+  my $self = shift;
+
+  open(STDERR, ">>". $self->{error_log})  || die "Couldn't open STDERR: $!";
+  open(ACCESS, ">>". $self->{access_log}) || die "Couldn't open ACCESS: $!";
+  my $old = select ACCESS;
+  $| = 1;
+  select STDERR;
+  $| = 1;
+  select $old;
+}
+
+
+### process the request
+sub process_request {
+  my $self = shift;
+
+  local %ENV = ();
+  local $self->{needs_header} = 1;
+
+  ### read the first line of response
+  my $line = <STDIN> || return $self->error(400, "No Data");
+  $line =~ s/[\r\n]+$//;
+  if ($line !~ /^ (\w+) \ + (\S+) \ + (HTTP\/[01].\d) $ /x) {
+    return $self->error(400, "Bad request $line");
+  }
+  my ($method, $req, $protocol) = ($1, $2, $3);
+  print ACCESS join(" ", time, $method, $req)."\n";
+
+  ### read in other headers
+  $self->read_headers || return $self->error(400, "Strange headers");
+
+  ### do we support the type
+  if ($method !~ /GET|POST|HEAD/) {
+    return $self->error(400, "Unsupported Method");
+  }
+  $ENV{REQUEST_METHOD} = $method;
+
+  ### can we read that request
+  if ($req !~ m|^ (?:http://[^/]+)? (.*) $|x) {
+    return $self->error(400, "Malformed URL");
+  }
+  $ENV{REQUEST_URI} = $1;
+
+  ### parse out the uri and query string
+  my $uri = '';
+  $ENV{QUERY_STRING} = '';
+  if ($ENV{REQUEST_URI} =~ m|^ ([^\?]+) (?:\?(.+))? $|x) {
+    $ENV{QUERY_STRING} = defined($2) ? $2 : '';
+    $uri = $1;
+  }
+
+  ### clean up uri
+  if ($uri =~ /[\ \;]/) {
+    return $self->error(400, "Malformed URL");
+  }
+  $uri =~ s/%(\w\w)/chr(hex($1))/eg;
+  1 while $uri =~ s|^\.\./+||; # can't go below doc root
+
+
+  ### at this point the uri should be ready to use
+  $uri = "$self->{document_root}$uri";
+
+  ### see if there's an index page
+  if (-d $uri) {
+    foreach (@{ $self->{default_index} }){
+      if (-e "$uri/$_") {
+        $uri = "$uri/$_";
+        last;
+      }
+    }
+  }
+
+  ### error 404
+  if (! -e $uri) {
+    return $self->error(404, "file not found");
+
+  ### directory listing
+  } elsif (-d $uri) {
+    ### need work on this
+    print $self->content_type('text/html'),"\r\n";
+    print "Directory listing not supported";
+
+  }
+
+  ### spit it out
+  open(my $fh, "<$uri") || return $self->error(500, "Can't open file [$!]");
+
+  my ($type) = $uri =~ /([^\.]+)$/;
+  $type = $self->{mime_types}->{$type} || $self->{mime_default};
+
+  print $self->status(200), $self->content_type($type), "\r\n";
+
+  print STDOUT $_ while read $fh, $_, 8192;
+  close $fh;
+
+}
+
+sub read_headers {
+  my $self = shift;
+
+  $self->{headers} = {};
+
+  while (defined($_ = <STDIN>)) {
+    s/[\r\n]+$//;
+    last unless length $_;
+    return 0 if ! /^ ([\w\-]+) :[\ \t]+ (.+) $/x;
+    my $key = "HTTP_" . uc($1);
+    $key =~ tr/-/_/;
+    $self->{headers}->{$key} = $2;
+  }
+
+  return 1;
+}
+
+sub content_type {
+  my ($self, $type) = @_;
+  $self->http_header;
+  return "Content-type: $type\r\n";
+}
+
+sub error{
+  my ($self, $number, $msg) = @_;
+  print $self->status($number, $msg), "\r\n";
+  warn "Error - $number - $msg\n";
+}
+
+sub status {
+  my ($self, $number, $msg) = @_;
+  $msg = '' if ! defined $msg;
+  return if $self->http_header($number);
+  return "Status $number: $msg\r\n";
+}
+
+sub http_header {
+  my $self = shift;
+  my $number = shift || 200;
+  return if ! delete $self->{needs_header};
+  print "HTTP/1.0 $number\r\n";
+  return 1;
+}
+
+1;
+

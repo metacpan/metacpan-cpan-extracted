@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="robots" content="index,follow" />
+	<meta name="revisit-after" content="7 days" />
+	<meta name="keywords" content="MaltParser, dependency parsing, Nivre, NLP, CoNLL, treebank, machine learning, data-driven, parsing" />
+	<meta name="description" content="MaltParser is a system for data-driven dependency parsing. This web page explains how to install or build the MaltParser system." />
+	<title>MaltParser - Installation</title>
+	<style type="text/css" media="all">
+      @import url("style.css");
+    </style>
+</head>
+<body>
+<h1>MaltParser</h1>
+<div id="navtop">
+Modified: July 15 2010
+</div>
+<div id="leftcol">
+  <div id="navcol">
+    <ul>
+		<li class="none"><a href="index.html">Home</a></li>        
+    </ul>
+	<h5>Get MaltParser</h5>
+   	<ul>
+		<li class="none"><a href="download.html">Download</a></li>        
+    	<li class="none"><a href="changes.html">Changes</a></li>      
+    	<li class="none"><a href="license.html">License</a></li>
+    </ul>
+    <h5>Documentation</h5>
+   	<ul>
+		<li class="none"><a href="intro.html">Introduction</a></li>        
+    	<li class="none"><a href="install.html">Installing MaltParser</a></li>      
+    	<li class="none"><a href="userguide.html">User guide</a></li>
+    	<li class="none"><a href="options.html">Options (short version)</a></li>
+    	<li class="none"><a href="optiondesc.html">Options (long version)</a></li>
+    	<li class="none"><a href="api/index.html">JavaDoc</a></li>
+    </ul>
+    <h5>Resources</h5>
+    <ul>
+    	<li class="none"><a href="mco/mco.html">Pre-trained models</a></li>
+    	<li class="none"><a href="plugin/plugin.html">Plugin</a></li>
+    	<li class="none"><a href="publications.html">Publications</a></li>
+    	<li class="none"><a href="conll.html">CoNLL Shared Task</a></li>
+    </ul>
+    <h5>Contact</h5>
+   	<ul>
+		<li class="none"><a href="contact.html">Contact</a></li>        
+    </ul>
+  </div>
+</div>
+
+
+<div id="bodycol">
+        <div class="section">
+<a name="install"></a>
+<h2>Installing MaltParser</h2>
+<p>The latest version of MaltParser is available from the 
+MaltParser <a href="download.html">download page</a>.</p>
+
+<p>Unpack the MaltParser distribution <b>malt-1.4.1.zip</b> or <b>malt-1.4.1.tar.gz</b> by 
+running one of the following commands:
+<h3>Alternative 1</h3>
+<pre>
+prompt> tar -zxvf malt-1.4.1.tar.gz
+</pre>
+
+<h3>Alternative 2</h3>
+<pre>
+prompt> gunzip malt-1.4.1.tar.gz
+prompt> tar -xvf malt-1.4.1.tar
+</pre>
+
+<h3>Alternative 3</h3>
+<pre>
+prompt> unzip malt-1.4.1.zip
+</pre>
+
+<h2>Distribution</h2>
+<p>The distribution of MaltParser contains the following files and directories:</p>
+<table>
+<tr><td>LICENSE</td><td>License information</td><tr>
+<tr><td>NOTICE</td><td>Acknowledgement</td><tr>
+<tr><td>README</td><td>Readme file</td><tr>
+<tr><td>appdata</td><td>Application data</td><tr>
+<tr><td>build.properties</td><td>Build properties</td><tr>
+<tr><td>build.xml</td><td>Ant build script</td><tr>
+<tr><td>docs</td><td>User guide and MaltParser source documentation</td><tr>
+<tr><td>examples</td><td>Examples of treebank data, option files, feature specification files and examples that shows how to use MaltParser from other applications</td><tr>
+<tr><td>lib</td><td>Jar-files used by MaltParser</td><tr>
+<tr><td>malt.jar</td><td>MaltParser executable jar-file</td><tr>
+<tr><td>src</td><td>Java source of MaltParser</td><tr>
+</table>
+
+<a name="test"></a>
+<h2>Testing your installation</h2>
+<p>After installing MaltParser, you can run it to verify that it is working properly on your system. To be able to run MaltParser you need 
+<b>Java Runtime Environment (JRE)</b>. You need version JRE 1.5 (Java 5) or later version. If you dont have <b>JRE</b> installed on 
+your system, download and install the latest version of <a href="http://java.sun.com/" target="_blank">Java Runtime Environment</a>.</p>
+<p>To run MaltParser type the following at the command line prompt (it is important that you are in the <b>malt-1.4.1 directory</b>):
+<pre>
+prompt> java -jar malt.jar 
+</pre>
+If MaltParser displays something like the message below, the distribution has been installed successfully.
+<pre>
+-----------------------------------------------------------------------------
+                          MaltParser 1.4.1
+-----------------------------------------------------------------------------
+         MALT (Models and Algorithms for Language Technology) Group
+             Vaxjo University and Uppsala University
+                             Sweden
+-----------------------------------------------------------------------------
+
+Usage:
+   java -jar malt.jar -f &lt;path to option file&gt; &lt;options&gt;
+   java -jar malt.jar -h for more help and options
+
+help                  (  -h) : Show options
+-----------------------------------------------------------------------------
+option_file           (  -f) : Path to option file
+-----------------------------------------------------------------------------
+verbosity            *(  -v) : Verbosity level
+  debug      - Logging of debugging messages
+  error      - Logging of error events
+  fatal      - Logging of very severe error events
+  info       - Logging of informational messages
+  off        - Logging turned off
+  warn       - Logging of harmful situations
+-----------------------------------------------------------------------------
+
+Documentation: docs/index.html
+</pre>
+</p>
+
+<a name="build"></a>
+<h2>Building MaltParser</h2>
+<p>MaltParser is distributed both in binary form and with all source code and documentation. If you only want to use MaltParser as a parser you only need to 
+install the distribution (follow the installation guidelines above), but if you need to build the system you should follow these guidelines. 
+To be able to build MaltParser you need <a href="http://java.sun.com/" target="_blank">Java SE Development Kit (JDK) 6</a> 
+and <a href="http://ant.apache.org/" target="_blank">Apache Ant 1.7.0</a>.  If you dont have these tools please download and install them by following 
+the instructions on their web sites.</p>
+
+<p>To build the MaltParser distribution:</p>
+<pre>
+prompt> cd &lt;path to malt-1.4.1 directory&gt;
+prompt> ant dist
+</pre>
+<i>&lt;path to malt-1.4.1 directory&gt;</i> should be replaced by the actual path to the directory where malt-1.4.1 is installed.</p>
+
+<p id="footer">Copyright &copy; Johan Hall, Jens Nilsson and Joakim Nivre</p>
+</div>
+</div>
+</body>
+</html>

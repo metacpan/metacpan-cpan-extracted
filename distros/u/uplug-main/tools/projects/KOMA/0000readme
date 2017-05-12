@@ -1,0 +1,12 @@
+
+KOMA/		scripts from the KOMA project 
+		(http://www.ida.liu.se/~nlplab/koma/)
+
+gold2koma		convert UWA gold standards to Uplug XCES
+koma2dic		get type links from XCES align files (sorted by freq)
+koma2text		convert XCES align files to plain text files
+koma2xces		convert Liu XML to XCES XML (sentence align files)
+plug2koma		convert PLUG XML to XCES align files (still working?)
+uwa2koma		convert UWA-token-link files to XCES align files
+xces2koma		convert XCES align files to Liu XML
+xces2uwadic             get type links from XCES align files (UWA-style)

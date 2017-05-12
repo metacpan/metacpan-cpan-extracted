@@ -1,0 +1,71 @@
+==================================================
+Changes from 2009-04-08 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version .06 at 2014-04-07 15:14:02 +0000
+----------------------------------------
+
+  Change: 5649a69499a8a21882f384808499e26f5c6fd733
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-04-07 16:14:02 +0000
+
+    Release engineering for 0.06 
+
+  Change: 95f819d5b268427a509aafb10760081092639a69
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2014-04-07 16:13:01 +0000
+
+    Merge pull request #1 from karenetheridge/patch-1
+
+    see also L<if> 
+
+  Change: 3d1c2c7081a6bbc2cdc70bba8d531b2658df1a5d
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2014-04-03 11:25:39 +0000
+
+    see also L<if>
+
+    also the remainder of the SEE ALSO pod from if.pm is included. 
+
+----------------------------------------
+version .04 at 2014-04-03 17:51:13 +0000
+----------------------------------------
+
+  Change: 929a3eb2a97f805e62e8b0e745096439502d8a11
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-04-03 18:51:13 +0000
+
+    This is release 0.04 
+
+  Change: 518b2264d8efeb069a422f1a25b2e7ce0092e8e4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-04-03 18:50:40 +0000
+
+    Port upstream if fixes for ` 
+
+  Change: 4507019289b622737c72e1d0af3186f162de8e84
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-04-03 18:46:01 +0000
+
+    Use Test::More in the tests 
+
+----------------------------------------
+version .02 at 2012-01-13 00:08:07 +0000
+----------------------------------------
+
+  Change: bd2fb109ff3ee40b7b36b08036f685692caa3e24
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-01-13 00:08:07 +0000
+
+    Foolish +x permissions 
+
+  Change: cf9436bac695d3a29d630f5c98252d5bef13a052
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-01-13 00:07:28 +0000
+
+    If unless 
+
+================
+End of releases.
+================

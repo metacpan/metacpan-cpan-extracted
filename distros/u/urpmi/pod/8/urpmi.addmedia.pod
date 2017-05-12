@@ -1,0 +1,253 @@
+=head1 NAME
+
+urpmi.addmedia - adds a new rpm media to be used by urpmi
+
+=head1 SYNOPSIS
+
+    urpmi.addmedia [options] <name> <url>
+
+=head1 DESCRIPTION
+
+urpmi.addmedia is used to add a new media to be used by urpmi, so it can
+find new rpms at the specified location. Currently supported media types
+are: local drives, removable drives (such as CDs), and networked media via
+different protocols (http, ftp, ssh and rsync). One of the following modes
+must be chosen:
+
+=over
+
+=item B<urpmi.addmedia> [I<options>] --distrib --mirrorlist [<I<url>>]
+
+A mirror list is a special API to describe mirrors available. urpmi will pick
+the nearest mirror, and will dynamically handle new mirrors. Example:
+
+  urpmi.addmedia --distrib --mirrorlist
+
+=item B<urpmi.addmedia> [I<options>] --mirrorlist <I<url>> <I<name>> <I<relative path>>
+
+Example:
+
+  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports
+
+=item B<urpmi.addmedia> [I<options>] <I<name>> http://<I<login>>:<I<pass>>@<I<host>>/<I<path>>
+
+where <I<name>> is a human-readable name for the new media (e.g.
+"updates"). <I<name>> is optional if B<--distrib> is given in the options
+list. <I<host>>/<I<path>> is the location of the media directory on the
+net (e.g. C<media/main>). The location is given relative to
+<I<path>>. B<curl> is used by default to download files, B<wget> may be
+used if B<curl> is not installed or if or B<--wget> is given in
+I<options>. Example:
+
+    urpmi.addmedia http http://jpackage.sf.net/rpm/free
+
+=item B<urpmi.addmedia> [I<options>] <I<name>> ftp://<I<login>>:<I<pass>>@<I<host>>/<I<path>>
+
+The same as for http. Add your login and password if required (note that
+you don't need to specify B<anonymous> as login for anonymous access ftp
+servers). If B<wget> is used to download files with a firewall you may
+have to ensure that the B<passive_ftp> option is on in B</etc/wgetrc>
+(that's usually the default). Example:
+
+    urpmi.addmedia ftp ftp://a:a@leia//export/media/main
+
+=item B<urpmi.addmedia> [I<options>] <I<name>> ssh://<I<login>>@<I<host>>/<I<path>>
+
+The same as for http and ftp; add your login and password if required. You
+may want to export the public key in order not to have to type your
+password. rsync over an ssh connection will be used to get files. urpmi
+will try to re-use the same ssh connection over multiple invocations.
+
+Example:
+
+    urpmi.addmedia ssh ssh://fpons@bi/c/i586/media/main
+
+=item B<urpmi.addmedia> [I<options>] <I<name>> rsync://<I<login>>@<I<host>>:<I<port>>/<I<path>>
+
+The same as for http; you can use the <I<host>>::<I<path>> syntax too. Example:
+
+    urpmi.addmedia rsync rsync://ftp.orst.edu::mandrake-devel/contrib/ppc
+
+=item B<urpmi.addmedia> [I<options>] <I<name>> file://<I<path>>
+
+where <I<name>> is a human-readable name for the new media (e.g.
+"local updates"). <I<path>> is the location of the media directory on your
+machine (e.g. C<media/main>).
+
+=item B<urpmi.addmedia> [I<options>] <I<name>> cdrom://<I<path>>
+
+<I<path>> is the location of the media directory in the CDROM or DVD.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item B<--wget>
+
+Use wget only for downloading distant files. By default curl is used if
+available.
+
+=item B<--curl>
+
+Use curl only for downloading distant files. This is the default if curl
+is available.
+
+=item B<--curl-options> I<'options'>
+
+=item B<--rsync-options> I<'options'>
+
+=item B<--wget-options> I<'options'>
+
+Specify additional command-line options to be passed to curl, rsync or
+wget when retrieving files. If several options are to be passed, separate
+them with spaces and enclose them in quotes.
+
+Note that the rsync options will also be used for ssh media.
+
+=item B<--limit-rate I<rate>>
+
+Try to limit the download speed, I<rate> is given in bytes/sec. This option
+is not active by default.
+
+=item B<--proxy> I<proxyhost[:port|1080]>
+
+Use specified HTTP proxy.
+
+=item B<--proxy-user> I<user:password>
+
+Use specified user and password to use for proxy authentication.
+Specifying B<--proxy-user=ask> will cause C<urpmi.addmedia> to prompt for a
+username and a password.
+
+=item B<--update>
+
+Adds a media which will be taken into account by B<MageiaUpdate> or by
+C<urpmi --update> when looking for updates.
+
+If used together with B<--distrib>, it will only add media flagged "update".
+
+=item B<--verify-rpm>
+
+=item B<--no-verify-rpm>
+
+Activate or deactivate rpm signature checking of newly added media.
+It's activated by default, and can be overriden in global configuration.
+
+=item B<--xml-info>
+
+Use the specific policy for downloading xml info files. 
+It must be one of: never, on-demand, update-only, always.
+See urpmi.cfg(5) for more information.
+
+=item B<--probe-synthesis>
+
+Use synthesis file.
+
+=item B<--probe-rpms>
+
+Use rpm files (instead of synthesis).
+
+=item B<--mirrorlist>
+
+Use the given url as a mirror list. It is quite special, please see examples
+at the beginning of this page.
+
+You can also give a space seperated list of urls. Each url can be either a
+mirrorlist or a mirror url. This is useful if you have a mirror to use inside
+a local network, but still use standard mirrors when the local mirror is not
+available.
+
+
+nb: $MIRRORLIST is a special variable which gives the default URL for the
+current distribution/arch. $MIRRORLIST is the default mirrorlist.
+
+=item B<--zeroconf>
+
+Find a media repository for the current distribution using zeroconf (DNS-SD).
+It can be used together with B<--distrib> or by specifying a media name and a
+path to the media directory, relative to the repository root.
+
+=item B<--distrib>
+
+Retrieve a set of media from a distribution. Typically, the URL provided
+to C<urpmi.addmedia> will represent the parent directory of a directory
+B<media>, which in turn will contain various subdirectories for each
+medium of the distribution. <I<name>> is combined with medium names found
+to create newer medium names in the urpmi database.
+
+=item B<--interactive>
+
+This option is to be used with B<--distrib>. With it, C<urpmi.addmedia>
+will ask for confirmation for each media it finds for the specified
+distribution.
+
+=item B<--all-media>
+
+This option is to be used with B<--distrib>. With it, C<urpmi.addmedia>
+will attempt to add all media it finds. By default, it won't add media
+containing source rpms, or media corresponding to supplementary CD-ROMs
+on distributions.
+
+=item B<--urpmi-root> I<directory>
+
+Use the file system tree rooted for urpmi database and rpm install. Contrary
+to B<--root>, the urpmi configuration comes from the rooted tree.
+
+=item B<--wait-lock>
+
+If the urpmi or rpm db is busy, wait until it is available
+
+=item B<--virtual>
+
+Creates a virtual medium: the medium is always up-to-date and so it does not
+need to be updated by C<urpmi.update>.
+
+=item B<--raw>
+
+Add the new media in the urpmi configuration file, but don't update it nor
+proceed to any download. The media, to be usable, will need to be updated
+with C<urpmi.update>; it's ignored until then.
+
+=item B<--nopubkey>
+
+Don't import pubkey of added media.
+
+=back
+
+=head1 Variables
+
+Beginning with urpmi 4.6.16, you can use variables in media URLs (for
+example F</mnt/mirror/$RELEASE/$ARCH/media/main>). The variables supported
+so far are:
+
+=over
+
+=item B<$ARCH>
+
+The architecture (if found in F</etc/release>).
+
+=item B<$RELEASE>
+
+The OS release (if found in F</etc/release>; its value should be B<cauldron>
+on a Mageia cauldron system.)
+
+=item B<$HOST>
+
+The canonical hostname of the machine urpmi runs on.
+
+=item B<$MIRRORLIST>
+
+The url of the default mirrorlist for the distribution.
+
+=back
+
+=head1 SEE ALSO
+
+urpmi(8), urpmi.update(8), urpmi.removemedia(8), urpmf(8), urpmq(8), urpmi.files(5).
+
+=head1 Author
+
+Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+FranE<ccedil>ois Pons, Rafael Garcia-Suarez 

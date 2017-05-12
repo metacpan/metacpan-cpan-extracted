@@ -1,0 +1,46 @@
+{
+  'input' => {
+    'source text' => {
+      'format' => 'XML',
+      'root' => 's',
+    },
+    'target text' => {
+      'format' => 'XML',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'bitext' => {
+      'format' => 'xces align',
+      'write_mode' => 'overwrite'
+    }
+  },
+  'parameter' => {
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source text:file',
+       'trg' => 'input:target text:file',
+       'out' => 'output:bitext:file',
+       'srclang' => 'parameter:language (source)',
+       'trglang' => 'parameter:language (target)',
+    }
+  },
+  'module' => {
+    'program' => 'uplug-gma',
+    'location' => '$UplugBin',
+    'name' => 'GMA sentence aligner',
+    'stdout' => 'bitext',
+  },
+  'description' => 'This module calls the GMA aligner',
+  'widgets' => {
+       'input' => {
+	  'source text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk))'
+	  },
+	  'target text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk))'
+	  },
+       },
+  }
+}

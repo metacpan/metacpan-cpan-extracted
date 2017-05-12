@@ -1,0 +1,194 @@
+#!/usr/bin/perl
+
+# $Id: urpme 271299 2010-11-21 15:54:30Z peroyvind $
+
+#- Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005 MandrakeSoft SA
+#- Copyright (C) 2005-2010 Mandriva SA
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+use strict;
+use urpm;
+use urpm::args;
+use urpm::msg;
+use urpm::install;
+use urpm::media;
+use urpm::select;
+use urpm::orphans;
+
+
+$ENV{PATH} = "/sbin:/usr/sbin:/bin:/usr/bin";
+delete @ENV{qw(ENV BASH_ENV IFS CDPATH)};
+
+our ($test, $parallel, $force, $env);
+my $yesexpr =
+  #-PO: Add here the keys which might be pressed in the "Yes"-case.
+  N("Yy");
+
+sub usage() {
+    print urpm::args::copyright('urpme', [ '1999-2010', 'Mandriva' ], [ '2012', 'Mageia' ])
+   . N("  --help         - print this help message.
+") . N("  --auto         - automatically select a package in choices.
+") . N("  --auto-orphans - remove orphans
+") . N("  --test         - verify if the removal can be achieved correctly.
+") . N("  --force        - force invocation even if some packages do not exist.
+") . N("  --parallel     - distributed urpmi across machines of alias.
+") . N("  --repackage    - Re-package the files before erasing
+") . N("  --root         - use another root for rpm removal.
+") . N("  --urpmi-root   - use another root for urpmi db & rpm installation.
+") . N("  --justdb       - update only the rpm db, not the filesystem.
+") . N("  --noscripts    - do not execute package scriptlet(s).
+") . N("  --use-distrib  - configure urpme on the fly from a distrib tree, useful
+                   to (un)install a chroot with --root option.
+") . N("  --verbose, -v  - verbose mode.
+") . N("  -a             - select all packages matching expression.
+");
+    exit(1);
+}
+
+my @origARGV = @ARGV;
+my $urpm = urpm->new_parse_cmdline or exit(1);
+my @cmdline_pkgs_to_remove = @ARGV;
+@cmdline_pkgs_to_remove || $options{matches} || $options{auto_orphans} or usage();
+
+my $state = {};
+
+if ($env) {
+    urpm::set_env($urpm, $env);
+} elsif ($< && !$test) {
+    $urpm->{fatal}(1, N("Only superuser is allowed to remove packages"));
+}
+
+#- rurpme checks
+if ($options{restricted}) {
+    urpm::error_restricted($urpm) if $urpm->{root} || $options{usedistrib} || $urpm->{options}{noscripts} || $parallel;
+}
+
+unless ($test) {
+    sys_log("called with: @origARGV");
+}
+
+#- just configure parallel mode if available.
+my $_urpmi_lock = !$env && urpm::lock::urpmi_db($urpm, '', wait => $options{wait_lock});
+urpm::media::configure($urpm,
+    synthesis => ($parallel ? 'none' : ''),
+    parallel => $parallel,
+    probe_with => $options{probe_with},
+    usedistrib => $options{usedistrib},
+);
+
+#- examine packages...
+my @toremove;
+if (@cmdline_pkgs_to_remove || $options{matches}) {
+    @toremove = urpm::select::find_packages_to_remove(
+	$urpm,
+	$state,
+	\@cmdline_pkgs_to_remove,
+	matches => $options{matches},
+	force => $force,
+	callback_notfound => sub {
+	    my $urpm = shift @_;
+	    #- Warning : the following message is parsed in urpm::parallel_*
+	    $urpm->{fatal}(1, (@_ > 1 ? N("unknown packages") : N("unknown package")) .
+			     ': ' . join(', ', @_)); 
+	    0;
+	},
+	callback_fuzzy => sub {
+	    my $urpm = shift @_;
+	    my $match = shift @_;
+	    my $pkgs = $urpm::msg::no_translation ? join(' ', @_) : join('', map { "\n$_" } sort @_);
+	    #- Warning : the following message is parsed in urpm::parallel_*
+	    $urpm->{fatal}(1, N("The following packages contain %s: %s", $match, $pkgs)); 
+	    0;
+	},
+	callback_base => sub {
+	    my ($urpm, @l) = @_;
+	    #- Warning : the following message is parsed in urpm::parallel_*
+	    $urpm->{fatal}(1, P("Removing the following package will break your system:",
+				"Removing the following packages will break your system:", int(@l))
+			     . "\n" . add_leading_spaces(urpm::select::translate_why_removed($urpm, $state, @l)));
+	    0;
+	},
+    ) or $urpm->{fatal}(0, N("Nothing to remove"));
+}
+
+my $may_be_orphans = 1;
+if (@toremove && !$urpm->{options}{auto}) {
+    urpm::orphans::unrequested_orphans_after_remove($urpm, \@toremove)
+	or $may_be_orphans = 0;
+}
+
+my @toremove_no_orphans = @toremove;
+my @orphans;
+if ($options{auto_orphans} && $may_be_orphans) {
+    urpm::orphans::compute_future_unrequested_orphans($urpm, $state);
+    @orphans = map { scalar $_->fullname } @{$state->{orphans_to_remove}};
+
+    push @toremove, @orphans;
+    if (!@toremove) {
+	print N("No orphans to remove"), "\n";
+	exit 0;
+    }
+}
+
+my $msg = 
+  P("To satisfy dependencies, the following package will be removed",
+    "To satisfy dependencies, the following %d packages will be removed",
+    scalar(@toremove), scalar(@toremove))
+  . sprintf(" (%s)", formatXiB(-$urpm->selected_size($state))) . ":\n"
+  . add_leading_spaces(urpm::select::translate_why_removed($urpm, $state, @toremove_no_orphans)) . "\n"
+  . (@orphans ? P("(orphan package)", "(orphan packages)", scalar(@orphans)) . "\n" .
+                add_leading_spaces(join("\n", sort @orphans) . "\n") : ());
+
+if ($urpm->{options}{auto} || $env) {
+    $test and print STDOUT $msg;
+} elsif ($parallel || @toremove > @cmdline_pkgs_to_remove) {
+    print STDOUT $msg;
+    $force || message_input_(P("Remove %d package?", "Remove %d packages?", scalar(@toremove), scalar(@toremove)) . N(" (y/N) "), boolean => 1) =~ /[$yesexpr]/ or exit 0;
+}
+
+print($test ? 
+  #- Warning : the following message is parsed in urpm::parallel_*
+  N("testing removal of %s", join(' ', sort @toremove)) :
+  N("removing %s", join(' ', sort @toremove)), "\n");
+
+exit 0 if $env;
+
+my %remove_options = (
+    test => $test,
+    force => $force,
+    justdb => $options{justdb},
+    urpm::install::options($urpm),
+);
+my @errors = $parallel
+    ? urpm::parallel::remove($urpm, \@toremove, %remove_options)
+    : urpm::install::install($urpm, \@toremove, {}, {}, %remove_options);
+
+if (@errors) {
+    #- Warning : the following message is parsed in urpm::parallel_*
+    $urpm->{fatal}(2, N("Removal failed") . ":\n" . join("\n",  map { "\t$_" } @errors));
+} elsif ($test) {
+    print N("Removal is possible"), "\n";
+} elsif ($may_be_orphans && !$options{auto_orphans}) {
+    if (my $msg = urpm::orphans::get_now_orphans_msg($urpm)) {
+	print "\n", $msg;
+    }
+}
+
+sub add_leading_spaces {
+    my ($s) = @_;
+    $s =~ s/^/  /gm;
+    $s;
+}

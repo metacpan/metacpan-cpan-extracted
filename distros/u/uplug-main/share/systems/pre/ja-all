@@ -1,0 +1,50 @@
+{
+  'module' => {
+    'name' => 'Japanese pre-processing',
+    'submodules' => [
+        'pre/markup',
+        'pre/sent',
+        'pre/ja/toktag',
+    ],
+    'submodule names' => [
+        'basic XML markup',
+	'sentence splitter',
+        'Japanese tokenizer+tagger',
+    ],
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This is the pre-processing module for Swedish
+  corpora. It includes a basic XML markup tool, a general sentence
+  splitter, and the morphological analyzer 
+  <a href="http:/chasen.aist-nara.ac.jp/">ChaSen</a> for tokenization
+  and some other linguistic markup.',
+  'input' => {
+    'text' => {
+      'format' => 'text',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'tag'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+	'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=ja)'
+	  },
+       },
+  }
+}

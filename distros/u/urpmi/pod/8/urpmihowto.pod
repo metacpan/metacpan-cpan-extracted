@@ -1,0 +1,396 @@
+=head1 NAME
+
+urpmihowto - urpmi Advanced How-To
+
+=head1 Basic notions
+
+=head2 Packages and media
+
+The urpmi suite of tools has for main purpose to download and to install
+RPM packages easily.
+
+Software packages often depend on each other; urpmi is able to recognize
+those dependencies, to download missing required packages as needed, and
+to remove conflicting packages if it needs to.
+
+urpmi gets the list of available RPMs, and the RPMs themselves, from a
+B<media>. Roughly speaking, a media is described by a name and by a
+location, specified by an URL. Currently supported media types are: local
+drives, removable drives (such as CDs), ISO images, and networked media
+via different protocols (http, ftp, ssh and rsync). NFS mounted
+directories are treated like local drives.
+
+=head2 Installing and updating RPMs
+
+The tool used to install RPMs is urpmi. Its basic usage is as follows:
+
+    urpmi <list of package names>
+
+That prompts urpmi to fetch and install all packages and their unmet
+dependencies from the media you have configured. In the process, urpmi
+might ask a few questions. Notably, if some packages need to be upgraded,
+or if some new (unspecified) packages should be installed, it will ask for
+confirmation. If some packages need to be removed (due to conflicts with
+the requested packages), urpmi will ask for confirmation as well. In some
+cases, urpmi will also propose a choice between different alternatives,
+usually proposing the "best" package as a default.
+
+Another very useful mode of action for urpmi is to ask it to upgrade all
+packages to the latest version found on the media. This is done by
+
+    urpmi --auto-update
+
+urpmi can also help installing RPM files directly. Instead of using
+C<rpm -i foobar.rpm>, you can pass the path to the rpm file to urpmi: it
+will then try to resolve the needed dependencies.
+
+Useful options to urpmi include :
+
+=over 4
+
+=item --auto
+
+automatic mode: urpmi will not ask questions and always select the default
+choice.
+
+=item --test
+
+tests the installation of packages, but do not actually install anything or
+modify the system.
+
+=item --media I<media1,...,mediaN>
+
+Use only the specified media, instead of defaulting to all available
+media. You can also specify a substring of media names, and urpmi will
+select all media that contain this substring. (For example,
+
+    urpmi --auto-update --media updates
+
+will search updates from all media that have "updates" in their name.)
+
+=back
+
+See the urpmi(8) manpage for the complete reference of all options that
+urpmi supports.
+
+=head2 Removing RPMs
+
+The tool used to deinstall RPMs is urpme. The command
+
+    urpme <list of package names>
+
+will attempt to remove all listed packages, plus the packages that depend
+on them. It will refuse to uninstall "important" packages (that is, the
+ones that are part of the base system.)
+
+See the urpme(8) manpage for the reference of all options urpme supports.
+
+urpme will detect packages that are no longer used: for example, libraries
+that no application requires. To remove them, use B<urpme --auto-orphans>
+
+=head1 Media management
+
+=head2 Adding media
+
+urpmi is usable only when you have defined some media. Usually the OS
+installation procedure configures a predefined set of media, which
+correspond to the installation method you've selected: that might be
+installation CDs, or an HTTP or FTP server if you installed from a
+networked mirror, and so on. But you might want to add media yourself.
+For that, you should use the urpmi.addmedia program. Its usage is as
+follows:
+
+    urpmi.addmedia [options] <name> <url>
+
+In this synopsis, C<< <name> >> is the name of the new media,
+C<< <url> >> the URL where the RPMs are to be found.
+
+Supported URLs can be C<http://>, C<ftp://>, C<rsync://>, C<ssh://> (this
+will use rsync over ssh), C<file://>, and C<cdrom://>. If the media requires
+authentication, you can use the usual URL syntax:
+
+    <scheme>://<login>:<pass>@host/path
+
+Those credentials won't be stored in any world-readable file.
+
+In some cases, if your media points at an external HTTP or FTP server, you
+might want to use a proxy to access it. This is possible by using the
+C<--proxy> and C<--proxy-user> options (the second one in case of your
+proxy requires authentication.)
+
+=head2 Removing media
+
+This is straightforward; to remove a media C<foo>, simply use the
+command:
+
+    urpmi.removemedia foo
+
+=head2 Updating media
+
+Some media never change; this is the case, for example, for CD-ROMs and
+the like. However, some other ones -- typically updates -- grow; new RPMs
+are added to them, and old ones are removed. Thus, before using them, from
+time to time, you should instruct urpmi that their contents might have
+changed.
+
+To do this, use the urpmi.update program. You can either update all media:
+
+    urpmi.update -a
+
+or update only media specifically named:
+
+    urpmi.update updates-one updates-two
+
+=head2 Creating your own media
+
+The easiest way to create your own media is to let urpmi.addmedia do it.
+However, this will work well only if you have a small number of rpms,
+stored on disk or on a shared NFS mount. To do that, assuming that your
+RPMs are under a directory /var/my-rpms, simply enter the command:
+
+    urpmi.addmedia my-media /var/my-rpms
+
+However, to create media containing a large number of RPMs, or to be put
+on a shared server, you'll need to use the gendistrib tool. It comes in
+the C<rpmtools> package. It is able to generate a mirror tree for one or
+several media.
+
+A typical media repository, under a root directory F</ROOT/>, has the
+following structure: (here, we have two media, named C<first> and
+C<second>)
+
+    ROOT/ - media/
+            |- first/
+            |   `- media_info/
+            |- second/
+            |   `- media_info/
+            `- media_info/
+
+The RPMs are place in the C<first> and C<second> subdirectories.
+Repository metadata is contained in the top-level F<media_info> directory.
+Per-media metadata are contained in the F<first/media_info> and
+F<second/media_info> subdirectories.
+
+Per-media metadata consists in an C<hdlist.cz> file, that contains the
+gzipped headers of the RPMs in the media, a C<synthesis.hdlist.cz> file,
+much smaller than the hdlist and that contains only the information
+necessary to urpmi to resolve dependencies, and optionnally a C<pubkey>
+file if the RPMs are signed (so urpmi can check that the RPMs it downloads
+are signed with the key associated to this media.)
+
+Before using F<gendistrib>, you must create a file F<media_info/media.cfg>
+to describe this media repository. The syntax of this file is reminiscent
+of F<.ini> files. It contains one section per media: for example,
+
+    [first]
+    hdlist=hdlist_first.cz
+    name=First supplementary media
+
+Here, C<first> is the directory name, C<hdlist_first.cz> is the name of
+the hdlist file that will be created (it must end with C<.cz>), and
+C<name=> gives a human-readable descriptive name for the media.
+
+Then, you can run gendistrib. It should be passed the F</ROOT/> directory as
+parameter. It will then generate the hdlist and synthesis files and all
+other files needed for proper repository operation.
+
+For further information, see the gendistrib(1) manpage.
+
+=head1 Searching for packages
+
+=head2 urpmf
+
+urpmf is a grep-like tool for the urpmi database (the database of all RPMs
+in the media). By default, it will search through the file names contained
+in packages, but a variety of options allows to search through package
+names, provides, requires, RPM descriptions, etc. (or several of those at
+once.)
+
+For example, to find all packages that begin with "apache-" :
+
+    urpmf --name '^apache-'
+
+(the ^ being the beginning-of-line anchor used in standard regular
+expressions.)
+
+To find all packages that contain files whose pathname includes
+/etc/httpd.conf.d :
+
+    urpmf /etc/httpd.conf.d
+
+To find all packages that provide "mail-server", with their version and
+release number (-f) :
+
+    urpmf --provides -f mail-server
+
+See the urpmf(8) manpage for more examples and the list of all options.
+
+=head2 urpmq
+
+urpmq is a tool to query the urpmi database. It has several modes of
+operation. Here are a couple of useful uses.
+
+    urpmq -i package
+
+will list the information for that package (like C<rpm -qi> would do for
+installed packages.) The C<--summary> option is similar, but gives only
+one-line concise information.
+
+    urpmq --sources package
+
+will give the URL from which the package can be retrieved.
+
+    urpmq --requires-recursive package
+
+will give the list of all RPMs that are required by the specified package
+(recursively).
+
+Inversely, the command
+
+    urpmq --whatrequires package
+
+will give the list of all RPMs that require the specified package.
+
+See the urpmq(8) manpage for the list of all options.
+
+=head1 urpmi-parallel
+
+urpmi-parallel is an add-on to urpmi that is useful to install packages on
+a network: it will run an urpmi command in parallel on a specified number
+of hosts. In more detail, the machine you run the command on (the
+"server") tests its result on each machine in the group in turn (the
+"clients"), downloads all necessary packages for all machines in the
+group, distributes the appropriate packages to each machine, then calls
+urpmi on the machine to do the actual installation.
+
+urpmi must be installed on all client machines, but it is not necessary to
+have media defined on these.
+
+To use it, follow those steps :
+
+=over 4
+
+=item *
+
+make sure you can ssh from the server to each client machine as root (you
+can use ssh-add on the server host to avoid entering your passphrase
+and/or password many times).
+
+=item *
+
+install urpmi-parallel-ssh and/or urpmi-parallel-ka-run on the server
+machine. The first plugin uses plain ssh to distribute commands to other
+hosts, the second one uses ka-run, an efficient parallelization method on
+top of any remote shell (rsh or ssh), adapted to clusters.
+
+=item *
+
+Edit /etc/urpmi/parallel.cfg to look something like this:
+
+    mynetwork:ssh:host1:host2:host3
+
+On this line, C<mynetwork> is the name of the alias you'll use to specify
+the network to urpmi, C<ssh> is the install method (to use C<ka-run>, look
+up the entry for /etc/urpmi/parallel.cfg in urpmi.files(5)), and hostN are
+the hostnames of all clients on your network. You can put C<localhost> in
+this list.
+
+=item *
+
+Run the urpmi command : for example, to install "package_name" :
+
+    urpmi --parallel mynetwork package_name
+
+=back
+
+=head1 urpmi.recover
+
+urpmi.recover is a tool to help management of RPM rollbacks. One rarely
+used feature of RPM is that it can "repackage" the RPMs it deinstalls
+(either because they are upgraded to a newer version, or because they are
+plainly erased), and then reinstall the repackaged RPMs, thereby restoring
+the system to a previous (hopefully more stable) state.
+
+urpmi.recover has three main functions:
+
+=over 4
+
+=item define a checkpoint
+
+C<urpmi.recover --checkpoint> is used to define a point in your system
+that you consider stable, and to start storing info that will enable you
+to rollback to this state (or to any later state).
+
+=item list installations you've done
+
+C<urpmi.recover --list date> is used to list chronologically all
+installations and upgrades on your system up to the specified date. The
+output format gives them grouped by installation transactions. (This
+option has two variants, C<--list-all> and C<--list-safe>.) Here are some
+examples :
+
+List all installations made during the last day :
+
+    urpmi.recover --list '1 day ago'
+
+List all installations since 7th february 2006 :
+
+    urpmi.recover --list 2006-02-07
+
+List all installations since the checkpoint :
+
+    urpmi.recover --list-safe
+
+Lists all installations and upgrades known to the RPM database :
+
+    urpmi.recover --list-all
+
+=item perform rollbacks
+
+C<urpmi.recover --rollback> is used to roll back installations and
+upgrades to a previous point in the past (at most until your checkpoint.)
+It has two variants :
+
+To roll back until a specified date :
+
+    urpmi.recover --rollback <date>
+
+The date can be a duration (for example "2 hours ago") or a date given
+in YYYY-MM-SS hh:mm format.
+
+To roll back a specified number of transactions :
+
+    urpmi.recover --rollback <number of transactions>
+
+In both cases, be careful not to rollback beyond the checkpoint!
+
+=back
+
+Once you've defined a checkpoint, when you use urpmi, urpme or directly
+rpm to install or remove packages, the older packages will be stored in
+/var/spool/repackage. You thus must make sure you have enough space on
+this partition to store all repackaged RPMs.
+
+Technically, defining a checkpoint is equivalent to writing a file
+/etc/rpm/macros.d/urpmi.recover.macros that overrides the rpm macros
+used to set up the repackaging functionalities of rpm. You can change
+C<%_repackage_dir> there if you want to, if you don't want to store
+repackaged RPMs in /var/spool/repackage.
+
+If you want to disable the repackaging functionality and clean up the
+repackage spool, use C<urpmi.recover --disable>. Warning: rollbacks won't
+be possible anymore.
+
+=head1 Restricted urpmi
+
+urpmi has a "restricted" counterpart: rurpmi. It is similar to urpmi, but
+has a stripped-down set of features. It's intended to be used by users
+without root privileges, but with sudo rights on it, preventing any abuse
+of this tool to compromise the system.
+
+Its syntax is similar to the one of urpmi, but it disallows installing
+arbitrary RPMs: those are forcibly downloaded from a registered media.
+A number of dangerous options, listed in the rurpmi(8) manpage, are also
+forbidden.
+
+=cut

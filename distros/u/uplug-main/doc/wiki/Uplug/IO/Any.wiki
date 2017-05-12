@@ -1,0 +1,108 @@
+
+== NAME ==
+
+Uplug::IO::Any - libraries for handling various kinds of input/output
+
+
+== SYNOPSIS ==
+
+
+{{{
+ * use Uplug::IOAny;
+ * use UplugData;
+
+  %InSpec = (
+    format      => 'text',
+    file        => $input_filename,
+    access_mode => 'read',
+    encoding    => 'iso-8859-1' );
+
+  %OutSpec = (
+    format      => 'xml',
+    file        => $output_filename,
+    access_mode => 'overwrite',
+    root        => 's' );
+
+
+ * $input  = new Uplug::IOAny( \%InSpec )
+ * $output = new Uplug::IOAny( \%OutSpec )
+
+ * $data=UplugData->new();
+
+ while ($input->read($data)){
+    # do somwthing with the data
+    $output->write($data);
+ }
+
+ $input->close;
+ $output->close;
+}}}
+
+== DESCRIPTION ==
+
+This is a class factory for creating data streams of various kinds. Supported sub-classes are:
+
+
+{{{
+ * Uplug::IOText ........... plain text
+ * Uplug::IOXML ............ generic XML class
+
+ * Uplug::IOXCESAlign ...... XCES-based sentence alignment
+ * Uplug::IOMosesWordAlign . word alignment in Moses format
+ * Uplug::IOPlugXML ........ parallel corpus format (used in the project PLUG)
+ * Uplug::IOLWA ............ format used by the Linköping Word Aligner (PLUG)
+ * Uplug::IOLiuAlign ....... Linköping's parallel corpus format (PLUG)
+
+ * Uplug::IODBM ............ databases using AnyDBM
+ * Uplug::IOTab ............ tab-separated data
+ * Uplug::IOStorable ....... storable objects
+ * Uplug::IOCollection ..... generic class to combine several input streams
+}}}
+
+== Methods ==
+
+
+=== Constructor ===
+
+
+{{{
+ * $handler = new Uplug::IOAny( \%spec, $format );
+}}}
+Create a new I/O handler according to the specifications of **%spec** and the optional format **$format**. If **%spec** includes the key **stream name**: Try to load the specifications of a named stream (see Uplug::Config for more information).
+
+Accepted data formats:
+
+
+{{{
+ IO-class                    format parameter
+ -----------------------------------------------
+ * Uplug::IOText ........... text
+ * Uplug::IOXML ............ xml
+
+ * Uplug::IOXCESAlign ...... align | xces
+ * Uplug::IOMosesWordAlign . moses
+ * Uplug::IOPlugXML ........ plug
+ * Uplug::IOLWA ............ lwa
+ * Uplug::IOLiuAlign ....... liu | koma
+
+ * Uplug::IODBM ............ dbm
+ * Uplug::IOTab ............ tab | uwa tab
+ * Uplug::IOStorable ....... storable
+ * Uplug::IOCollection ..... collection
+}}}
+If no format is given: Check file name extension:
+
+
+{{{
+ * *.dbm ..................... Uplug::IODBM
+ * *.uwa ..................... Uplug::IOTab
+ * *.txt ..................... Uplug::IOText
+ * *.xml ..................... Uplug::IOXML
+}}}
+
+== POD ERRORS ==
+
+Hey! '''The above document had some coding errors, which are explained below:'''
+
+ * Around line 70: Non-ASCII character seen before =encoding in 'Linköping'. Assuming ISO8859-1
+

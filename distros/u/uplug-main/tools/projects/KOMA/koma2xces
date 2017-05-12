@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id$
+
+sed 's/liu-align.dtd/xcesAlign.dtd/' $1 $2 $3 $4 $5 $6 $7 $8 $9 |\
+sed 's/<linkList>//' |\
+sed 's#</linkList>##' |\
+sed 's/<liuAlign/<cesDoc><cesAlign><linkList><linkGrp/' |\
+sed 's/<liuHeader>//' |\
+sed 's#</liuHeader>##' |\
+sed 's/sentLink /link /' |\
+sed 's#/sentLink#/link#' |\
+sed 's#</liuAlign>#</linkGrp></linkList></cesAlign></cesDoc>#' |\
+sed 's/liuAlign/cesAlign/' |\
+sed 's/\+/ /' |\
+sed 's/;/ ; /'
+
+

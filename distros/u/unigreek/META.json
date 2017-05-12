@@ -1,0 +1,52 @@
+{
+   "abstract" : "convert from unigreek notation and back",
+   "author" : [
+      "Nicolas Franck <nicolas.franck@ugent.be>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "unigreek",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "FindBin" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0,
+            "Unicode::Normalize" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "UniGreek" : {
+         "file" : "lib/UniGreek.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/nicolasfranck/unigreek"
+      }
+   },
+   "version" : "0.2"
+}

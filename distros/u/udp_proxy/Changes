@@ -1,0 +1,13 @@
+Revision history for Perl extension udp_proxy.
+
+0.03  Fri Nov 27 22:29:16 2015
+	- fixed pod and generated META.json/META.yml
+	- updated udpxy to the latest version
+
+0.02  Sun Dec 18 17:49:33 2011
+	- release
+
+0.01  Sun Dec  4 17:11:51 2011
+	- original version; created by h2xs 1.23 with options
+		-A -n udp_proxy
+

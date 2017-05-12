@@ -1,0 +1,63 @@
+#!/usr/local/bin/perl
+
+########################################################################
+# Author:  I. Dan Melamed
+# Computes:     link tokens
+# Loads:        axes
+# Streams:      bitext map
+#######################################################################
+
+##################### CONSTANTS ################################
+$TRUE = 1;
+$FALSE = 0;
+$INFINITY = 9999999999;
+$TINY = 0.0000001;
+################################################################
+
+
+##################### PARAMETERS ###############################
+#check for correct usage
+if ($#ARGV < 1) {
+    print "usage:  map2tokpairs <horizontal axis> <vertical axis> [<map>]\n";
+    exit; 
+};
+################################################################
+
+push(@INC, "$ENV{bin}");
+require "idmlib.pl";
+
+############################ AXES ##############################
+print STDERR "Reading horizontal axis...";
+open(F, $ARGV[0]) || die "Couldn't open $ARGV[0]: $!\n";
+while (<F>) {
+    tr/A-Z/a-z/;
+    $_ =~ m/([\d\.]+) (.+)/;
+    # the + 0 gets rid of extra 0's on the end, which may have
+    # been produced by `axis_from_list`
+    $hword{$1 + 0} = $2;
+};
+close(F);
+print STDERR " done.\n";
+shift;
+
+print STDERR "Reading vertical axis...";
+open(E, $ARGV[0]) || die "Couldn't open $ARGV[0]: $!\n";
+while (<E>) {
+    tr/A-Z/a-z/;
+    $_ =~ m/([\d\.]+) (.+)/;
+    # the + 0 gets rid of extra 0's on the end, which may have
+    # been produced by `axis_from_list`
+    $vword{$1 + 0} = $2;
+};
+close(E);
+print STDERR " done.\n";
+shift;
+################################################################
+
+while (<>) {
+    ($x, $y) = split;
+
+    $x = &round(.5, $x);
+    $y = &round(.5, $y);
+    print "$hword{$x} $vword{$y}\n";
+};

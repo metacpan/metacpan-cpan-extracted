@@ -1,0 +1,45 @@
+{
+  'module' => {
+    'name' => 'phrase marker',
+    'program' => 'uplug-markphr',
+    'location' => '$UplugBin',
+    'stin' => 'text',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'XML',
+      'root' => 's',
+    },
+    'phrases' => {
+      'format' => 'uwa tab',
+#      'columns' => ['phrase'],
+    },
+  },
+  'output' => {
+    'text' => {
+      'format' => 'XML',
+      'root' => 's',
+	'write_mode' => 'overwrite',
+    }
+  },
+  'parameter' => {
+    'language' => 'default',
+    'phrase label' => 'ngram',
+    'verbose' => 1,
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+	'phrformat' => 'input:phrases:format',
+        'phrkey' => 'input:phrases:key',
+        'phrcol' => 'input:phrases:columns',
+       'sort' => 'parameter:sort',         # phrase sorting (e.g. 'best first')
+       'phrase' => 'input:phrases:file',
+       'out' => 'output:text:file',
+       'l' => 'parameter:language',
+       'lang' => 'parameter:language',
+       'label' => 'parameter:phrase label',
+    }
+  },
+}

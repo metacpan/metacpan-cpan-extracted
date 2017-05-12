@@ -1,0 +1,295 @@
+0.5.9
+-----
+
+Implemented Dollars in categories, e.g. s\$/s\$. (Jason)
+
+
+0.5.8
+-----
+Summary: The gui is back, grok has a new multi-word expression package
+and noun phrase chunker package.  Lots of changes to the categorial
+data structures.
+
+Unification has been generalized from just Unifiables to
+Objects. (Jason) 
+
+Syntactic rules return a list of results instead of just one. (Jason)
+
+Added new package for noun phrase chunking. (Joerg)
+
+The part-of-speech tagger is now independent of English.  Previously
+there were a few filters that used English specific data. The
+POSTaggerME class can now be used without these filters or with an
+implementation appropriate for different languages supplied. (Jason)
+
+Resurrected the GUI, which is held in the opennlp.grokkit
+package. (Meghan)
+
+Added bin directory with "tgrok" script for running command line
+interface for parsing and "grok" script for starting the gui. (Jason)
+
+Added multi-word expression package opennlp.grok.preprocess.mwe for
+finding bits of text like "ad hoc" which contain multiple words, but
+which behave syntactically like one word. (Mike)
+
+Improved the efficiency of the Tokenizer. (Jason)
+
+Added WebStuffDetector pipelink for detecting URLs and emails. (Jason)
+
+Changed CurriedCat so that it is not implemented in a recursive
+manner. Added data structures CatList and SlashList to support the
+flatter view on CurriedCats. (Jason)
+
+Added ArgStack class which holds a CatList and SlashList inside.
+CurriedCat now uses an ArgStack rather than both a CatList and
+SlashList. (Jason)
+
+Added hard-coded rule heirarchy for clever Rule implementations which
+scan the input categories and perform less unifications and failing
+more quickly than generic rules. (Jason)
+
+Removed RulesModel and RulesItem. (Jason)
+
+
+0.5.6 - Getting There
+---------------------
+Summary: Parsing is getting a bit more interesting with hybrid logic
+interpretations, and the lexicon is beginning to show the signs of
+what it is eventually intended to be.  Still much work to go!
+
+Rewrote a bunch of stuff in the preprocessing components so that they
+use fast method calls instead of memory hungry gnu-regexps to find
+information about the text. (Jason)
+
+Build system now includes a build.bat for Windows development. (Meg)
+
+Inheritance in the lexicon is now supported. (Jason)
+
+Updated Grok for a bunch of removals and changes in the opennlp.common
+packages. (Jason)
+
+Updated the opennlp.grok.preprocess.namefind package to improve its
+accuracy and memory usage.  Also retrained the model. (Jason)
+
+Added constructor to SDEventStream which takes a ContextGenerator.
+The default behavior for the class is to create an instance of
+SDContextGenerator.  This is now parameterized so that the Stream
+can use a ContextGenerator which knows about a Set of induced
+abbreviations. (Eric)
+
+Upgraded trove to version 0.1.1 (Eric)
+
+Made it possible for feature values to be transfered from one category
+to another within a complex category, thus simplifying the declaration
+of categories in the lexicon. (Jason)
+
+Moved Pipeline and PipelineException to OpenNLP Common. (Jason)
+
+
+
+0.5.5 - Stripped
+----------------
+Summary: This release is Grok with a whole bunch of stuff cut out of
+it, and the preprocessing components using the new XML structure of
+NLPDocuments appropriately.
+
+Jason: fixed a number of bugs in the XML preprocessing stuff
+
+Jason: hacked out a number of classes from Grok as part of Grok's
+refocussing on only parsing.  The opennlp.grok.knowledge and
+opennlp.grok.gen packages are gone, a bunch of the Category classes
+are gone from opennlp.grok.expression, and the Agent and Unify classes
+are gone, along with a bunch of others.
+
+Jason: removed CatParse stuff so that freebies.jar is no longer
+needed.  Will eventually replace with an ANTLR parser.
+
+
+0.5.4 - Deadwood
+----------------
+Summary: Lots of changes, but the main reason for this release is to
+have a code capsule before bunches of code gets cut.
+
+Jason: Improvements to Grokling front-end.
+
+Jason: Parsing has been resurrected.  Parsing capabilities are still
+greatly reduced from 0.5.0, but it is coming back steadily.
+
+Jason: Grok updated for changes to unification architecture of
+OpenNLP.  Also updated for many other OpenNLP interfaces.
+
+Joao: use of XML in preprocessing components now made to conform with
+JDOM and the changes in the handling of XML in OpenNLP.  xml.jar was
+finally dropped from Grok's dependencies.
+
+Eric: Modified opennlp.grok.preprocess.sentdetect package so that it
+doesn't need to use gnu-regexp objects to scan sentences.  Added
+EndOfSentenceScanner interface, which defines an API for classes which
+are able to find end of sentence tokens in Strings, StringBuffers, and
+char[] arrays. Removed gnu-regexp.jar dependency from Grok.
+
+Eric: Various performance improvements to
+opennlp.grok.preprocess.sentdetect package.
+
+Jason: Trained new sentence detection model which is built on the new
+version of the sentence detector.  Trained a new category tagger on
+less data so that the Grok download would be smalled.
+
+Jason: Fixed a minor bug in the tokenizer in which it was possible to
+have an empty string token created.
+
+Jason: Added a main class that calls Grokling and changed build.xml so
+that an executable jar could be created.  Unfortunately, a
+segmentation error occurs when trying to execute the jar on a grammar,
+so this will have to be sorted out before actually releasing any exe
+jars.
+
+Jason: Added samples directory in the source code.  Included a simple
+example of building a pipeline and a small sample grammar.
+
+Jason: Swapped java.util classes for Trove classes in a number of
+places.
+
+0.5.3
+-----
+Fixed a problem in the build.xml file that was causing the maxent
+models to be corrupted when the grok jar was created.
+
+Improved the infrastructure for creating and releasing the Grok
+homepage.
+
+
+0.5.2
+-----
+Improvements made to the sentence detection code as per changes made
+in the Maxent package.  All maxent models converted to the single file
+format supported by Maxent v1.2. (Work sponsored by eTranslate.)
+
+Part-of-speech tagging model is trained on much more data and uses a
+number of word stems to avoid some errors which the old model was
+producing. (Work sponsored by Electric Knowledge.)
+
+Grok updated for changes in the OpenNLP Common interfaces.
+
+Grok now uses Ant to build, and the directory structure has been
+changed considerably to facilitate the creation of the distribution
+files and to ensure that source code and supporting libraries are
+always provided with the distribution.
+
+Lots of other little changes have gone on since the last release, but
+they are numerous and I can't remember them... 
+
+Note: The lexicon system is broken and should be fixed in the next
+version.  So, that means that Grok cannot be used to parse, but the
+improvements in preprocessing components warrant a new release for
+Grok.  A version suitable for parsing should be available in a month
+or two.
+
+
+0.5.0
+-----
+LMR can now be started with a flag to grokexe (or the grok script)
+Fixed lingering LMR bugs
+
+Experimental
+  Added simple negation handling.
+  Some basic consistency checking is done when resolving anaphora.  The
+    antecedent must be consistent with its surrounding context.  So in
+    "John is not a dog."  "John likes Bill."  "Mary likes the other dog"
+    the other dog will not refer to John since he is know to not be a dog.
+
+0.4.1
+-----
+Distribution bugs fixed
+
+0.4.0
+-----
+Complete reorganization of everything
+Maximum Entropy modules for:
+	Name Recognition
+	Tokenization
+	Sentence Detection
+	Semantics Inferring
+Decision Tree support
+Clean up of many interfaces
+More documentation
+Beginning of incremental resolution (Strube salience alg)
+
+Lots lots more...
+
+0.2.1 
+-----
+Added Syner class as companion to Denoter
+Set up database (jdbc) connectivity for Julia lexicon and morphology
+Preliminary foray into using Julia's learned lexicon.
+Grok now parses with Set-CCG.  Not fully tested.
+Prettied up the options menu of gui.
+Modules are now defined by interfaces and act pretty much how I'd like them to
+  The only thing I'd like now is to be able to specify a module on a 
+  per request basis rather than for all requests.
+Added a hook interface.
+Fixed up how queries are instantiated and resolved.
+
+0.2.0 
+-----
+Switched to Metamata Parse to parse Categories (no more JavaCUP and JLex)
+Switched to combined representation of syntax, semantics, and presups
+Added Resolver so we now do some realistic semantic resolution
+Added anaphora resolution and the DominanceComputer and DominanceHandler for
+  computing and using the dominance relationships in Logical Forms.
+Serious changes to Brain to allow reasonable interpretation of most of
+  English sample file.  ISAInstantiator is gone and is replaced by
+  simpler, non table-driven version, in SimpleInstantiator.
+Added AccommodationPolicy interface and the AccommodateAll instance to allow
+  varying levels of accommodation when asking for FC's
+Reorganized Category and its extending classes.  Now, Category is an interface
+  which is implemented by CategoryAdapter, which all of the other
+  sub-category classes now extend.  The semantic category classes now also
+  implement the Denoter interface, so that now the Brain, DM and all the
+  semantic-y classes only see Denoters rather than Categories.
+Large directory reorganization
+Can now turn off entries in lmr
+Added automatic creation of options menu.  Needs to be cleaned up.
+Wrote external documention---incomplete and messy, but at least its a start.
+Wrote a fair amount of code documentation.
+
+Broken: anything to do with intonation
+
+0.1.6 
+-----
+Fixed up LMR grammar and added sample files
+Fixed some bugs in LMRLexicon
+Added regression test
+
+0.1.5 
+-----
+Set up ICoS demo
+Fixed a few brain problems
+Finished first pass of LMR grammar
+
+0.1.4 
+-----
+ISA display cleaned up
+Added lmr compatible Rules and Lexicon classes
+Added start of lmred English grammar
+Added emacs keymap
+Semantics now are displayed with lambdas
+
+0.1.3
+-----
+Feature unification is non-destructive
+New intonation added-- only uses accent features on syntax
+
+0.1.2 
+-----
+Added speech synthesis
+new module system
+    - Parser, Synthesizer
+
+0.1.1 
+-----
+Minor bug fixes for running outside of developer environment
+
+0.1.0
+-----
+Initial Release

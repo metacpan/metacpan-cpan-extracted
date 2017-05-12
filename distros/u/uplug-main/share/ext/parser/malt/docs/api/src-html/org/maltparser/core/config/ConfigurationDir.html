@@ -1,0 +1,1168 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package org.maltparser.core.config;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import java.io.BufferedInputStream;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import java.io.BufferedOutputStream;<a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.io.BufferedReader;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import java.io.BufferedWriter;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import java.io.File;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import java.io.FileInputStream;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import java.io.FileNotFoundException;<a name="line.9"></a>
+<FONT color="green">010</FONT>    import java.io.FileOutputStream;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import java.io.FileReader;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import java.io.FileWriter;<a name="line.12"></a>
+<FONT color="green">013</FONT>    import java.io.IOException;<a name="line.13"></a>
+<FONT color="green">014</FONT>    import java.io.InputStream;<a name="line.14"></a>
+<FONT color="green">015</FONT>    import java.io.InputStreamReader;<a name="line.15"></a>
+<FONT color="green">016</FONT>    import java.io.OutputStreamWriter;<a name="line.16"></a>
+<FONT color="green">017</FONT>    import java.io.UnsupportedEncodingException;<a name="line.17"></a>
+<FONT color="green">018</FONT>    import java.net.MalformedURLException;<a name="line.18"></a>
+<FONT color="green">019</FONT>    import java.net.URL;<a name="line.19"></a>
+<FONT color="green">020</FONT>    import java.util.Date;<a name="line.20"></a>
+<FONT color="green">021</FONT>    import java.util.Enumeration;<a name="line.21"></a>
+<FONT color="green">022</FONT>    import java.util.HashMap;<a name="line.22"></a>
+<FONT color="green">023</FONT>    import java.util.HashSet;<a name="line.23"></a>
+<FONT color="green">024</FONT>    import java.util.SortedSet;<a name="line.24"></a>
+<FONT color="green">025</FONT>    import java.util.TreeSet;<a name="line.25"></a>
+<FONT color="green">026</FONT>    import java.util.jar.JarEntry;<a name="line.26"></a>
+<FONT color="green">027</FONT>    import java.util.jar.JarFile;<a name="line.27"></a>
+<FONT color="green">028</FONT>    import java.util.jar.JarInputStream;<a name="line.28"></a>
+<FONT color="green">029</FONT>    import java.util.jar.JarOutputStream;<a name="line.29"></a>
+<FONT color="green">030</FONT>    <a name="line.30"></a>
+<FONT color="green">031</FONT>    import org.maltparser.core.config.version.Versioning;<a name="line.31"></a>
+<FONT color="green">032</FONT>    import org.maltparser.core.exception.MaltChainedException;<a name="line.32"></a>
+<FONT color="green">033</FONT>    import org.maltparser.core.helper.SystemInfo;<a name="line.33"></a>
+<FONT color="green">034</FONT>    import org.maltparser.core.helper.SystemLogger;<a name="line.34"></a>
+<FONT color="green">035</FONT>    import org.maltparser.core.helper.Util;<a name="line.35"></a>
+<FONT color="green">036</FONT>    import org.maltparser.core.io.dataformat.DataFormatInstance;<a name="line.36"></a>
+<FONT color="green">037</FONT>    import org.maltparser.core.io.dataformat.DataFormatManager;<a name="line.37"></a>
+<FONT color="green">038</FONT>    import org.maltparser.core.options.OptionManager;<a name="line.38"></a>
+<FONT color="green">039</FONT>    import org.maltparser.core.symbol.SymbolTableHandler;<a name="line.39"></a>
+<FONT color="green">040</FONT>    import org.maltparser.core.symbol.trie.TrieSymbolTableHandler;<a name="line.40"></a>
+<FONT color="green">041</FONT>    <a name="line.41"></a>
+<FONT color="green">042</FONT>    <a name="line.42"></a>
+<FONT color="green">043</FONT>    /**<a name="line.43"></a>
+<FONT color="green">044</FONT>    * This class contains methods for handle the configuration directory.<a name="line.44"></a>
+<FONT color="green">045</FONT>    *<a name="line.45"></a>
+<FONT color="green">046</FONT>    * @author Johan Hall<a name="line.46"></a>
+<FONT color="green">047</FONT>    */<a name="line.47"></a>
+<FONT color="green">048</FONT>    public class ConfigurationDir  {<a name="line.48"></a>
+<FONT color="green">049</FONT>            protected static final int BUFFER = 4096;<a name="line.49"></a>
+<FONT color="green">050</FONT>            protected File configDirectory;<a name="line.50"></a>
+<FONT color="green">051</FONT>            protected String name;<a name="line.51"></a>
+<FONT color="green">052</FONT>            protected String type;<a name="line.52"></a>
+<FONT color="green">053</FONT>            protected File workingDirectory;<a name="line.53"></a>
+<FONT color="green">054</FONT>            protected URL url = null;<a name="line.54"></a>
+<FONT color="green">055</FONT>            protected int containerIndex;<a name="line.55"></a>
+<FONT color="green">056</FONT>            protected BufferedWriter infoFile = null;<a name="line.56"></a>
+<FONT color="green">057</FONT>            protected String createdByMaltParserVersion;<a name="line.57"></a>
+<FONT color="green">058</FONT>    <a name="line.58"></a>
+<FONT color="green">059</FONT>            private SymbolTableHandler symbolTables;<a name="line.59"></a>
+<FONT color="green">060</FONT>            private DataFormatManager dataFormatManager;<a name="line.60"></a>
+<FONT color="green">061</FONT>            private HashMap&lt;String,DataFormatInstance&gt; dataFormatInstances;<a name="line.61"></a>
+<FONT color="green">062</FONT>            <a name="line.62"></a>
+<FONT color="green">063</FONT>            <a name="line.63"></a>
+<FONT color="green">064</FONT>            /**<a name="line.64"></a>
+<FONT color="green">065</FONT>             * Creates a configuration directory from a mco-file specified by an URL.<a name="line.65"></a>
+<FONT color="green">066</FONT>             * <a name="line.66"></a>
+<FONT color="green">067</FONT>             * @param url   an URL to a mco-file<a name="line.67"></a>
+<FONT color="green">068</FONT>             * @throws MaltChainedException<a name="line.68"></a>
+<FONT color="green">069</FONT>             */<a name="line.69"></a>
+<FONT color="green">070</FONT>            public ConfigurationDir(URL url) throws MaltChainedException {<a name="line.70"></a>
+<FONT color="green">071</FONT>                    initWorkingDirectory();<a name="line.71"></a>
+<FONT color="green">072</FONT>                    setUrl(url);<a name="line.72"></a>
+<FONT color="green">073</FONT>                    initNameNTypeFromInfoFile(url);<a name="line.73"></a>
+<FONT color="green">074</FONT>    //              initData();<a name="line.74"></a>
+<FONT color="green">075</FONT>            }<a name="line.75"></a>
+<FONT color="green">076</FONT>            <a name="line.76"></a>
+<FONT color="green">077</FONT>            /**<a name="line.77"></a>
+<FONT color="green">078</FONT>             * Creates a new configuration directory or a configuration directory from a mco-file<a name="line.78"></a>
+<FONT color="green">079</FONT>             * <a name="line.79"></a>
+<FONT color="green">080</FONT>             * @param name  the name of the configuration<a name="line.80"></a>
+<FONT color="green">081</FONT>             * @param type  the type of configuration<a name="line.81"></a>
+<FONT color="green">082</FONT>             * @param containerIndex        the container index<a name="line.82"></a>
+<FONT color="green">083</FONT>             * @throws MaltChainedException<a name="line.83"></a>
+<FONT color="green">084</FONT>             */<a name="line.84"></a>
+<FONT color="green">085</FONT>            public ConfigurationDir(String name, String type, int containerIndex) throws MaltChainedException {<a name="line.85"></a>
+<FONT color="green">086</FONT>                    setContainerIndex(containerIndex);<a name="line.86"></a>
+<FONT color="green">087</FONT>    <a name="line.87"></a>
+<FONT color="green">088</FONT>                    initWorkingDirectory();<a name="line.88"></a>
+<FONT color="green">089</FONT>                    if (name != null &amp;&amp; name.length() &gt; 0 &amp;&amp; type != null &amp;&amp; type.length() &gt; 0) {<a name="line.89"></a>
+<FONT color="green">090</FONT>                            setName(name);<a name="line.90"></a>
+<FONT color="green">091</FONT>                            setType(type);<a name="line.91"></a>
+<FONT color="green">092</FONT>                    } else {<a name="line.92"></a>
+<FONT color="green">093</FONT>                            throw new ConfigurationException("The configuration name is not specified. ");<a name="line.93"></a>
+<FONT color="green">094</FONT>                    }<a name="line.94"></a>
+<FONT color="green">095</FONT>                    setConfigDirectory(new File(workingDirectory.getPath()+File.separator+getName()));<a name="line.95"></a>
+<FONT color="green">096</FONT>            }<a name="line.96"></a>
+<FONT color="green">097</FONT>            <a name="line.97"></a>
+<FONT color="green">098</FONT>            public void initDataFormat() throws MaltChainedException {<a name="line.98"></a>
+<FONT color="green">099</FONT>                    String inputFormatName = OptionManager.instance().getOptionValue(containerIndex, "input", "format").toString().trim();<a name="line.99"></a>
+<FONT color="green">100</FONT>                    String outputFormatName = OptionManager.instance().getOptionValue(containerIndex, "output", "format").toString().trim();<a name="line.100"></a>
+<FONT color="green">101</FONT>    //              SystemLogger.logger().info(inputFormatName + "\n");<a name="line.101"></a>
+<FONT color="green">102</FONT>    //              SystemLogger.logger().info(outputFormatName + "\n");<a name="line.102"></a>
+<FONT color="green">103</FONT>                    if (configDirectory != null &amp;&amp; configDirectory.exists()) {<a name="line.103"></a>
+<FONT color="green">104</FONT>                            if (outputFormatName.length() == 0 || inputFormatName.equals(outputFormatName)) {<a name="line.104"></a>
+<FONT color="green">105</FONT>                                    URL inputFormatURL = Util.findURLinJars(inputFormatName);<a name="line.105"></a>
+<FONT color="green">106</FONT>                                    if (inputFormatURL != null) {<a name="line.106"></a>
+<FONT color="green">107</FONT>                                            outputFormatName = inputFormatName = this.copyToConfig(inputFormatURL);<a name="line.107"></a>
+<FONT color="green">108</FONT>                                    } else {<a name="line.108"></a>
+<FONT color="green">109</FONT>                                            outputFormatName = inputFormatName = this.copyToConfig(inputFormatName);<a name="line.109"></a>
+<FONT color="green">110</FONT>                                    }<a name="line.110"></a>
+<FONT color="green">111</FONT>                            } else {<a name="line.111"></a>
+<FONT color="green">112</FONT>                                    URL inputFormatURL = Util.findURLinJars(inputFormatName);<a name="line.112"></a>
+<FONT color="green">113</FONT>                                    if (inputFormatURL != null) {<a name="line.113"></a>
+<FONT color="green">114</FONT>                                            inputFormatName = this.copyToConfig(inputFormatURL);<a name="line.114"></a>
+<FONT color="green">115</FONT>                                    } else {<a name="line.115"></a>
+<FONT color="green">116</FONT>                                            inputFormatName = this.copyToConfig(inputFormatName);<a name="line.116"></a>
+<FONT color="green">117</FONT>                                    }<a name="line.117"></a>
+<FONT color="green">118</FONT>                                    URL outputFormatURL = Util.findURLinJars(outputFormatName);<a name="line.118"></a>
+<FONT color="green">119</FONT>                                    if (inputFormatURL != null) {<a name="line.119"></a>
+<FONT color="green">120</FONT>                                            outputFormatName = this.copyToConfig(outputFormatURL);<a name="line.120"></a>
+<FONT color="green">121</FONT>                                    } else {<a name="line.121"></a>
+<FONT color="green">122</FONT>                                            outputFormatName = this.copyToConfig(outputFormatName);<a name="line.122"></a>
+<FONT color="green">123</FONT>                                    }<a name="line.123"></a>
+<FONT color="green">124</FONT>                            }<a name="line.124"></a>
+<FONT color="green">125</FONT>                            OptionManager.instance().overloadOptionValue(containerIndex, "input", "format", inputFormatName);<a name="line.125"></a>
+<FONT color="green">126</FONT>                    } else {<a name="line.126"></a>
+<FONT color="green">127</FONT>                            if (outputFormatName.length() == 0) {<a name="line.127"></a>
+<FONT color="green">128</FONT>                                    outputFormatName = inputFormatName;<a name="line.128"></a>
+<FONT color="green">129</FONT>                            }<a name="line.129"></a>
+<FONT color="green">130</FONT>                    }<a name="line.130"></a>
+<FONT color="green">131</FONT>                    dataFormatInstances = new HashMap&lt;String, DataFormatInstance&gt;(3);<a name="line.131"></a>
+<FONT color="green">132</FONT>    <a name="line.132"></a>
+<FONT color="green">133</FONT>                    URL inURL = findURL(inputFormatName);<a name="line.133"></a>
+<FONT color="green">134</FONT>                    URL outURL = findURL(outputFormatName);<a name="line.134"></a>
+<FONT color="green">135</FONT>    <a name="line.135"></a>
+<FONT color="green">136</FONT>                    <a name="line.136"></a>
+<FONT color="green">137</FONT>                    if (outURL != null) {<a name="line.137"></a>
+<FONT color="green">138</FONT>                            try {<a name="line.138"></a>
+<FONT color="green">139</FONT>                                    InputStream is = outURL.openStream();<a name="line.139"></a>
+<FONT color="green">140</FONT>                            } catch (FileNotFoundException e) {<a name="line.140"></a>
+<FONT color="green">141</FONT>                                    outURL = Util.findURL(outputFormatName);<a name="line.141"></a>
+<FONT color="green">142</FONT>                            } catch (IOException e) {<a name="line.142"></a>
+<FONT color="green">143</FONT>                                    outURL = Util.findURL(outputFormatName);<a name="line.143"></a>
+<FONT color="green">144</FONT>                            }<a name="line.144"></a>
+<FONT color="green">145</FONT>                    } else {<a name="line.145"></a>
+<FONT color="green">146</FONT>                            outURL = Util.findURL(outputFormatName);<a name="line.146"></a>
+<FONT color="green">147</FONT>                    }<a name="line.147"></a>
+<FONT color="green">148</FONT>                    <a name="line.148"></a>
+<FONT color="green">149</FONT>                    dataFormatManager = new DataFormatManager(inURL, outURL);<a name="line.149"></a>
+<FONT color="green">150</FONT>                    symbolTables = new TrieSymbolTableHandler();<a name="line.150"></a>
+<FONT color="green">151</FONT>            }<a name="line.151"></a>
+<FONT color="green">152</FONT>            <a name="line.152"></a>
+<FONT color="green">153</FONT>            private URL findURL(String specModelFileName) throws MaltChainedException {<a name="line.153"></a>
+<FONT color="green">154</FONT>                    URL url = null;<a name="line.154"></a>
+<FONT color="green">155</FONT>                    File specFile = this.getFile(specModelFileName);<a name="line.155"></a>
+<FONT color="green">156</FONT>                    if (specFile.exists()) {<a name="line.156"></a>
+<FONT color="green">157</FONT>                            try {<a name="line.157"></a>
+<FONT color="green">158</FONT>                                    url = new URL("file:///"+specFile.getAbsolutePath());<a name="line.158"></a>
+<FONT color="green">159</FONT>                            } catch (MalformedURLException e) {<a name="line.159"></a>
+<FONT color="green">160</FONT>                                    throw new MaltChainedException("Malformed URL: "+specFile, e);<a name="line.160"></a>
+<FONT color="green">161</FONT>                            }<a name="line.161"></a>
+<FONT color="green">162</FONT>                    } else {<a name="line.162"></a>
+<FONT color="green">163</FONT>                            url = this.getConfigFileEntryURL(specModelFileName);<a name="line.163"></a>
+<FONT color="green">164</FONT>                    }<a name="line.164"></a>
+<FONT color="green">165</FONT>                    return url;<a name="line.165"></a>
+<FONT color="green">166</FONT>            }<a name="line.166"></a>
+<FONT color="green">167</FONT>            <a name="line.167"></a>
+<FONT color="green">168</FONT>            /**<a name="line.168"></a>
+<FONT color="green">169</FONT>             * Creates an output stream writer, where the corresponding file will be included in the configuration directory<a name="line.169"></a>
+<FONT color="green">170</FONT>             * <a name="line.170"></a>
+<FONT color="green">171</FONT>             * @param fileName      a file name<a name="line.171"></a>
+<FONT color="green">172</FONT>             * @param charSet       a char set<a name="line.172"></a>
+<FONT color="green">173</FONT>             * @return      an output stream writer for writing to a file within the configuration directory<a name="line.173"></a>
+<FONT color="green">174</FONT>             * @throws MaltChainedException<a name="line.174"></a>
+<FONT color="green">175</FONT>             */<a name="line.175"></a>
+<FONT color="green">176</FONT>            public OutputStreamWriter getOutputStreamWriter(String fileName, String charSet) throws MaltChainedException {<a name="line.176"></a>
+<FONT color="green">177</FONT>                    try {<a name="line.177"></a>
+<FONT color="green">178</FONT>                            return new OutputStreamWriter(new FileOutputStream(configDirectory.getPath()+File.separator+fileName), charSet);<a name="line.178"></a>
+<FONT color="green">179</FONT>                    } catch (FileNotFoundException e) {<a name="line.179"></a>
+<FONT color="green">180</FONT>                            throw new ConfigurationException("The file '"+fileName+"' cannot be created. ", e);<a name="line.180"></a>
+<FONT color="green">181</FONT>                    } catch (UnsupportedEncodingException e) {<a name="line.181"></a>
+<FONT color="green">182</FONT>                            throw new ConfigurationException("The char set '"+charSet+"' is not supported. ", e);<a name="line.182"></a>
+<FONT color="green">183</FONT>                    }<a name="line.183"></a>
+<FONT color="green">184</FONT>            }<a name="line.184"></a>
+<FONT color="green">185</FONT>            <a name="line.185"></a>
+<FONT color="green">186</FONT>            /**<a name="line.186"></a>
+<FONT color="green">187</FONT>             * Creates an output stream writer, where the corresponding file will be included in the <a name="line.187"></a>
+<FONT color="green">188</FONT>             * configuration directory. Uses UTF-8 for character encoding.<a name="line.188"></a>
+<FONT color="green">189</FONT>             * <a name="line.189"></a>
+<FONT color="green">190</FONT>             * @param fileName      a file name<a name="line.190"></a>
+<FONT color="green">191</FONT>             * @return an output stream writer for writing to a file within the configuration directory<a name="line.191"></a>
+<FONT color="green">192</FONT>             * @throws MaltChainedException<a name="line.192"></a>
+<FONT color="green">193</FONT>             */<a name="line.193"></a>
+<FONT color="green">194</FONT>            public OutputStreamWriter getOutputStreamWriter(String fileName) throws MaltChainedException {<a name="line.194"></a>
+<FONT color="green">195</FONT>                    try {<a name="line.195"></a>
+<FONT color="green">196</FONT>                            return new OutputStreamWriter(new FileOutputStream(configDirectory.getPath()+File.separator+fileName, true), "UTF-8");<a name="line.196"></a>
+<FONT color="green">197</FONT>                    } catch (FileNotFoundException e) {<a name="line.197"></a>
+<FONT color="green">198</FONT>                            throw new ConfigurationException("The file '"+fileName+"' cannot be created. ", e);<a name="line.198"></a>
+<FONT color="green">199</FONT>                    } catch (UnsupportedEncodingException e) {<a name="line.199"></a>
+<FONT color="green">200</FONT>                            throw new ConfigurationException("The char set 'UTF-8' is not supported. ", e);<a name="line.200"></a>
+<FONT color="green">201</FONT>                    }<a name="line.201"></a>
+<FONT color="green">202</FONT>            }<a name="line.202"></a>
+<FONT color="green">203</FONT>            /**<a name="line.203"></a>
+<FONT color="green">204</FONT>             * This method acts the same as getOutputStreamWriter with the difference that the writer append in the file<a name="line.204"></a>
+<FONT color="green">205</FONT>             * if it already exists instead of deleting the previous content before starting to write.<a name="line.205"></a>
+<FONT color="green">206</FONT>             * <a name="line.206"></a>
+<FONT color="green">207</FONT>             * @param fileName      a file name<a name="line.207"></a>
+<FONT color="green">208</FONT>             * @return an output stream writer for writing to a file within the configuration directory<a name="line.208"></a>
+<FONT color="green">209</FONT>             * @throws MaltChainedException<a name="line.209"></a>
+<FONT color="green">210</FONT>             */<a name="line.210"></a>
+<FONT color="green">211</FONT>            public OutputStreamWriter getAppendOutputStreamWriter(String fileName) throws MaltChainedException {<a name="line.211"></a>
+<FONT color="green">212</FONT>                    try {<a name="line.212"></a>
+<FONT color="green">213</FONT>                            return new OutputStreamWriter(new FileOutputStream(configDirectory.getPath()+File.separator+fileName, true), "UTF-8");<a name="line.213"></a>
+<FONT color="green">214</FONT>                    } catch (FileNotFoundException e) {<a name="line.214"></a>
+<FONT color="green">215</FONT>                            throw new ConfigurationException("The file '"+fileName+"' cannot be created. ", e);<a name="line.215"></a>
+<FONT color="green">216</FONT>                    } catch (UnsupportedEncodingException e) {<a name="line.216"></a>
+<FONT color="green">217</FONT>                            throw new ConfigurationException("The char set 'UTF-8' is not supported. ", e);<a name="line.217"></a>
+<FONT color="green">218</FONT>                    }<a name="line.218"></a>
+<FONT color="green">219</FONT>            }<a name="line.219"></a>
+<FONT color="green">220</FONT>            <a name="line.220"></a>
+<FONT color="green">221</FONT>            /**<a name="line.221"></a>
+<FONT color="green">222</FONT>             * Creates an input stream reader for reading a file within the configuration directory<a name="line.222"></a>
+<FONT color="green">223</FONT>             * <a name="line.223"></a>
+<FONT color="green">224</FONT>             * @param fileName      a file name<a name="line.224"></a>
+<FONT color="green">225</FONT>             * @param charSet       a char set<a name="line.225"></a>
+<FONT color="green">226</FONT>             * @return an input stream reader for reading a file within the configuration directory<a name="line.226"></a>
+<FONT color="green">227</FONT>             * @throws MaltChainedException<a name="line.227"></a>
+<FONT color="green">228</FONT>             */<a name="line.228"></a>
+<FONT color="green">229</FONT>            public InputStreamReader getInputStreamReader(String fileName, String charSet) throws MaltChainedException {<a name="line.229"></a>
+<FONT color="green">230</FONT>                    try {<a name="line.230"></a>
+<FONT color="green">231</FONT>                            return new InputStreamReader(new FileInputStream(configDirectory.getPath()+File.separator+fileName), charSet);<a name="line.231"></a>
+<FONT color="green">232</FONT>                    } catch (FileNotFoundException e) {<a name="line.232"></a>
+<FONT color="green">233</FONT>                            throw new ConfigurationException("The file '"+fileName+"' cannot be found. ", e);<a name="line.233"></a>
+<FONT color="green">234</FONT>                    } catch (UnsupportedEncodingException e) {<a name="line.234"></a>
+<FONT color="green">235</FONT>                            throw new ConfigurationException("The char set '"+charSet+"' is not supported. ", e);<a name="line.235"></a>
+<FONT color="green">236</FONT>                    }<a name="line.236"></a>
+<FONT color="green">237</FONT>            }<a name="line.237"></a>
+<FONT color="green">238</FONT>            <a name="line.238"></a>
+<FONT color="green">239</FONT>            /**<a name="line.239"></a>
+<FONT color="green">240</FONT>             * Creates an input stream reader for reading a file within the configuration directory.<a name="line.240"></a>
+<FONT color="green">241</FONT>             * Uses UTF-8 for character encoding.<a name="line.241"></a>
+<FONT color="green">242</FONT>             * <a name="line.242"></a>
+<FONT color="green">243</FONT>             * @param fileName      a file name<a name="line.243"></a>
+<FONT color="green">244</FONT>             * @return      an input stream reader for reading a file within the configuration directory<a name="line.244"></a>
+<FONT color="green">245</FONT>             * @throws MaltChainedException<a name="line.245"></a>
+<FONT color="green">246</FONT>             */<a name="line.246"></a>
+<FONT color="green">247</FONT>            public InputStreamReader getInputStreamReader(String fileName) throws MaltChainedException {<a name="line.247"></a>
+<FONT color="green">248</FONT>                    return getInputStreamReader(fileName, "UTF-8");<a name="line.248"></a>
+<FONT color="green">249</FONT>            }<a name="line.249"></a>
+<FONT color="green">250</FONT>            <a name="line.250"></a>
+<FONT color="green">251</FONT>            public JarEntry getConfigFileEntry(String fileName) throws MaltChainedException {<a name="line.251"></a>
+<FONT color="green">252</FONT>                    File mcoPath = new File(workingDirectory.getPath()+File.separator+getName()+".mco");<a name="line.252"></a>
+<FONT color="green">253</FONT>                    try {<a name="line.253"></a>
+<FONT color="green">254</FONT>                            JarFile mcoFile = new JarFile(mcoPath.getAbsolutePath());<a name="line.254"></a>
+<FONT color="green">255</FONT>                            JarEntry entry = mcoFile.getJarEntry(getName()+'/'+fileName);<a name="line.255"></a>
+<FONT color="green">256</FONT>                            if (entry == null) {<a name="line.256"></a>
+<FONT color="green">257</FONT>                                    entry = mcoFile.getJarEntry(getName()+'\\'+fileName);<a name="line.257"></a>
+<FONT color="green">258</FONT>                            }<a name="line.258"></a>
+<FONT color="green">259</FONT>                            return entry;<a name="line.259"></a>
+<FONT color="green">260</FONT>                    } catch (FileNotFoundException e) {<a name="line.260"></a>
+<FONT color="green">261</FONT>                            throw new ConfigurationException("The file entry '"+fileName+"' in mco-file '"+mcoPath+"' cannot be found. ", e);<a name="line.261"></a>
+<FONT color="green">262</FONT>                    } catch (IOException e) {<a name="line.262"></a>
+<FONT color="green">263</FONT>                            throw new ConfigurationException("The file entry '"+fileName+"' in mco-file '"+mcoPath+"' cannot be found. ", e);<a name="line.263"></a>
+<FONT color="green">264</FONT>                    }<a name="line.264"></a>
+<FONT color="green">265</FONT>            }<a name="line.265"></a>
+<FONT color="green">266</FONT>            <a name="line.266"></a>
+<FONT color="green">267</FONT>            public InputStreamReader getInputStreamReaderFromConfigFileEntry(String fileName, String charSet) throws MaltChainedException {<a name="line.267"></a>
+<FONT color="green">268</FONT>                    File mcoPath = new File(workingDirectory.getPath()+File.separator+getName()+".mco");<a name="line.268"></a>
+<FONT color="green">269</FONT>                    try {<a name="line.269"></a>
+<FONT color="green">270</FONT>                            JarFile mcoFile = new JarFile(mcoPath.getAbsolutePath());<a name="line.270"></a>
+<FONT color="green">271</FONT>                            JarEntry entry = mcoFile.getJarEntry(getName()+'/'+fileName);<a name="line.271"></a>
+<FONT color="green">272</FONT>                            if (entry == null) {<a name="line.272"></a>
+<FONT color="green">273</FONT>                                    entry = mcoFile.getJarEntry(getName()+'\\'+fileName);<a name="line.273"></a>
+<FONT color="green">274</FONT>                            }<a name="line.274"></a>
+<FONT color="green">275</FONT>                            if (entry == null) {<a name="line.275"></a>
+<FONT color="green">276</FONT>                                    throw new FileNotFoundException();<a name="line.276"></a>
+<FONT color="green">277</FONT>                            }<a name="line.277"></a>
+<FONT color="green">278</FONT>                            return new InputStreamReader(mcoFile.getInputStream(entry),  charSet);<a name="line.278"></a>
+<FONT color="green">279</FONT>                    } catch (FileNotFoundException e) {<a name="line.279"></a>
+<FONT color="green">280</FONT>                            throw new ConfigurationException("The file entry '"+fileName+"' in the mco file '"+mcoPath+"' cannot be found. ", e);<a name="line.280"></a>
+<FONT color="green">281</FONT>                    } catch (UnsupportedEncodingException e) {<a name="line.281"></a>
+<FONT color="green">282</FONT>                            throw new ConfigurationException("The char set '"+charSet+"' is not supported. ", e);<a name="line.282"></a>
+<FONT color="green">283</FONT>                    } catch (IOException e) {<a name="line.283"></a>
+<FONT color="green">284</FONT>                            throw new ConfigurationException("The file entry '"+fileName+"' in the mco file '"+mcoPath+"' cannot be loaded. ", e);<a name="line.284"></a>
+<FONT color="green">285</FONT>                    }<a name="line.285"></a>
+<FONT color="green">286</FONT>            }<a name="line.286"></a>
+<FONT color="green">287</FONT>            <a name="line.287"></a>
+<FONT color="green">288</FONT>            public InputStreamReader getInputStreamReaderFromConfigFile(String fileName) throws MaltChainedException {<a name="line.288"></a>
+<FONT color="green">289</FONT>                    return getInputStreamReaderFromConfigFileEntry(fileName, "UTF-8");<a name="line.289"></a>
+<FONT color="green">290</FONT>            }<a name="line.290"></a>
+<FONT color="green">291</FONT>            <a name="line.291"></a>
+<FONT color="green">292</FONT>            /**<a name="line.292"></a>
+<FONT color="green">293</FONT>             * Returns a file handler object of a file within the configuration directory<a name="line.293"></a>
+<FONT color="green">294</FONT>             * <a name="line.294"></a>
+<FONT color="green">295</FONT>             * @param fileName      a file name<a name="line.295"></a>
+<FONT color="green">296</FONT>             * @return      a file handler object of a file within the configuration directory<a name="line.296"></a>
+<FONT color="green">297</FONT>             * @throws MaltChainedException<a name="line.297"></a>
+<FONT color="green">298</FONT>             */<a name="line.298"></a>
+<FONT color="green">299</FONT>            public File getFile(String fileName) throws MaltChainedException {<a name="line.299"></a>
+<FONT color="green">300</FONT>                    return new File(configDirectory.getPath()+File.separator+fileName);<a name="line.300"></a>
+<FONT color="green">301</FONT>            }<a name="line.301"></a>
+<FONT color="green">302</FONT>            <a name="line.302"></a>
+<FONT color="green">303</FONT>            public URL getConfigFileEntryURL(String fileName) throws MaltChainedException {<a name="line.303"></a>
+<FONT color="green">304</FONT>                    File mcoPath = new File(workingDirectory.getPath()+File.separator+getName()+".mco");<a name="line.304"></a>
+<FONT color="green">305</FONT>                    try {<a name="line.305"></a>
+<FONT color="green">306</FONT>                            if (!mcoPath.exists()) {<a name="line.306"></a>
+<FONT color="green">307</FONT>                                    throw new ConfigurationException("Couldn't find mco-file '" +mcoPath.getAbsolutePath()+ "'");<a name="line.307"></a>
+<FONT color="green">308</FONT>                            }<a name="line.308"></a>
+<FONT color="green">309</FONT>    //                      new URL("file", null, mcoPath.getAbsolutePath());<a name="line.309"></a>
+<FONT color="green">310</FONT>                            URL url = new URL("jar:"+new URL("file", null, mcoPath.getAbsolutePath())+"!/"+getName()+'/'+fileName + "\n");<a name="line.310"></a>
+<FONT color="green">311</FONT>                            try { <a name="line.311"></a>
+<FONT color="green">312</FONT>                                    InputStream is = url.openStream();<a name="line.312"></a>
+<FONT color="green">313</FONT>                                    is.close();<a name="line.313"></a>
+<FONT color="green">314</FONT>                            } catch (IOException e) {<a name="line.314"></a>
+<FONT color="green">315</FONT>                                    url = new URL("jar:"+new URL("file", null, mcoPath.getAbsolutePath())+"!/"+getName()+'\\'+fileName + "\n");<a name="line.315"></a>
+<FONT color="green">316</FONT>                            }<a name="line.316"></a>
+<FONT color="green">317</FONT>                            return url;<a name="line.317"></a>
+<FONT color="green">318</FONT>                    } catch (MalformedURLException e) {<a name="line.318"></a>
+<FONT color="green">319</FONT>                            throw new ConfigurationException("Couldn't find the URL '" +"jar:"+mcoPath.getAbsolutePath()+"!/"+getName()+'/'+fileName+ "'", e);<a name="line.319"></a>
+<FONT color="green">320</FONT>                    }<a name="line.320"></a>
+<FONT color="green">321</FONT>            }<a name="line.321"></a>
+<FONT color="green">322</FONT>            <a name="line.322"></a>
+<FONT color="green">323</FONT>        /**<a name="line.323"></a>
+<FONT color="green">324</FONT>         * Copies a file into the configuration directory.<a name="line.324"></a>
+<FONT color="green">325</FONT>         * <a name="line.325"></a>
+<FONT color="green">326</FONT>         * @param source    a path to file <a name="line.326"></a>
+<FONT color="green">327</FONT>         * @throws MaltChainedException<a name="line.327"></a>
+<FONT color="green">328</FONT>         */<a name="line.328"></a>
+<FONT color="green">329</FONT>        public String copyToConfig(File source) throws MaltChainedException {<a name="line.329"></a>
+<FONT color="green">330</FONT>            byte[] readBuffer = new byte[BUFFER];<a name="line.330"></a>
+<FONT color="green">331</FONT>            String destination = configDirectory.getPath()+File.separator+source.getName();<a name="line.331"></a>
+<FONT color="green">332</FONT>            try {<a name="line.332"></a>
+<FONT color="green">333</FONT>                    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(source));<a name="line.333"></a>
+<FONT color="green">334</FONT>                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(destination), BUFFER);<a name="line.334"></a>
+<FONT color="green">335</FONT>                <a name="line.335"></a>
+<FONT color="green">336</FONT>                    int n = 0;<a name="line.336"></a>
+<FONT color="green">337</FONT>                        while ((n = bis.read(readBuffer, 0, BUFFER)) != -1) {<a name="line.337"></a>
+<FONT color="green">338</FONT>                            bos.write(readBuffer, 0, n);<a name="line.338"></a>
+<FONT color="green">339</FONT>                        }<a name="line.339"></a>
+<FONT color="green">340</FONT>                    bos.flush();<a name="line.340"></a>
+<FONT color="green">341</FONT>                    bos.close();<a name="line.341"></a>
+<FONT color="green">342</FONT>                    bis.close();<a name="line.342"></a>
+<FONT color="green">343</FONT>                    } catch (FileNotFoundException e) {<a name="line.343"></a>
+<FONT color="green">344</FONT>                            throw new ConfigurationException("The source file '"+source+"' cannot be found or the destination file '"+destination+"' cannot be created when coping the file. ", e);<a name="line.344"></a>
+<FONT color="green">345</FONT>                    } catch (IOException e) {<a name="line.345"></a>
+<FONT color="green">346</FONT>                            throw new ConfigurationException("The source file '"+source+"' cannot be copied to destination '"+destination+"'. ", e);<a name="line.346"></a>
+<FONT color="green">347</FONT>                    }<a name="line.347"></a>
+<FONT color="green">348</FONT>                    return source.getName();<a name="line.348"></a>
+<FONT color="green">349</FONT>        }<a name="line.349"></a>
+<FONT color="green">350</FONT>        <a name="line.350"></a>
+<FONT color="green">351</FONT>    <a name="line.351"></a>
+<FONT color="green">352</FONT>        public String copyToConfig(String fileUrl) throws MaltChainedException {<a name="line.352"></a>
+<FONT color="green">353</FONT>            URL url = Util.findURL(fileUrl);<a name="line.353"></a>
+<FONT color="green">354</FONT>            if (url == null) {<a name="line.354"></a>
+<FONT color="green">355</FONT>                    throw new ConfigurationException("The file or URL '"+fileUrl+"' could not be found. ");<a name="line.355"></a>
+<FONT color="green">356</FONT>            }<a name="line.356"></a>
+<FONT color="green">357</FONT>            return copyToConfig(url);<a name="line.357"></a>
+<FONT color="green">358</FONT>        }<a name="line.358"></a>
+<FONT color="green">359</FONT>        <a name="line.359"></a>
+<FONT color="green">360</FONT>        public String copyToConfig(URL url) throws MaltChainedException {<a name="line.360"></a>
+<FONT color="green">361</FONT>            if (url == null) {<a name="line.361"></a>
+<FONT color="green">362</FONT>                    throw new ConfigurationException("URL could not be found. ");<a name="line.362"></a>
+<FONT color="green">363</FONT>            }<a name="line.363"></a>
+<FONT color="green">364</FONT>            byte[] readBuffer = new byte[BUFFER];<a name="line.364"></a>
+<FONT color="green">365</FONT>            String destFileName = url.getPath();<a name="line.365"></a>
+<FONT color="green">366</FONT>                    int indexSlash = destFileName.lastIndexOf('/');<a name="line.366"></a>
+<FONT color="green">367</FONT>                    if (indexSlash == -1) {<a name="line.367"></a>
+<FONT color="green">368</FONT>                            indexSlash = destFileName.lastIndexOf('\\');<a name="line.368"></a>
+<FONT color="green">369</FONT>                    }<a name="line.369"></a>
+<FONT color="green">370</FONT>            <a name="line.370"></a>
+<FONT color="green">371</FONT>                    if (indexSlash != -1) {<a name="line.371"></a>
+<FONT color="green">372</FONT>                            destFileName = destFileName.substring(indexSlash+1);<a name="line.372"></a>
+<FONT color="green">373</FONT>                    }<a name="line.373"></a>
+<FONT color="green">374</FONT>            <a name="line.374"></a>
+<FONT color="green">375</FONT>            String destination = configDirectory.getPath()+File.separator+destFileName;<a name="line.375"></a>
+<FONT color="green">376</FONT>            try {<a name="line.376"></a>
+<FONT color="green">377</FONT>                    BufferedInputStream bis = new BufferedInputStream(url.openStream());<a name="line.377"></a>
+<FONT color="green">378</FONT>                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(destination), BUFFER);<a name="line.378"></a>
+<FONT color="green">379</FONT>                <a name="line.379"></a>
+<FONT color="green">380</FONT>                    int n = 0;<a name="line.380"></a>
+<FONT color="green">381</FONT>                        while ((n = bis.read(readBuffer, 0, BUFFER)) != -1) {<a name="line.381"></a>
+<FONT color="green">382</FONT>                            bos.write(readBuffer, 0, n);<a name="line.382"></a>
+<FONT color="green">383</FONT>                        }<a name="line.383"></a>
+<FONT color="green">384</FONT>                    bos.flush();<a name="line.384"></a>
+<FONT color="green">385</FONT>                    bos.close();<a name="line.385"></a>
+<FONT color="green">386</FONT>                    bis.close();<a name="line.386"></a>
+<FONT color="green">387</FONT>                    } catch (FileNotFoundException e) {<a name="line.387"></a>
+<FONT color="green">388</FONT>                            throw new ConfigurationException("The destination file '"+destination+"' cannot be created when coping the file. ", e);<a name="line.388"></a>
+<FONT color="green">389</FONT>                    } catch (IOException e) {<a name="line.389"></a>
+<FONT color="green">390</FONT>                            throw new ConfigurationException("The URL '"+url+"' cannot be copied to destination '"+destination+"'. ", e);<a name="line.390"></a>
+<FONT color="green">391</FONT>                    }<a name="line.391"></a>
+<FONT color="green">392</FONT>                    return destFileName;<a name="line.392"></a>
+<FONT color="green">393</FONT>        }<a name="line.393"></a>
+<FONT color="green">394</FONT>     <a name="line.394"></a>
+<FONT color="green">395</FONT>        <a name="line.395"></a>
+<FONT color="green">396</FONT>            /**<a name="line.396"></a>
+<FONT color="green">397</FONT>             * Removes the configuration directory, if it exists and it contains a .info file. <a name="line.397"></a>
+<FONT color="green">398</FONT>             * <a name="line.398"></a>
+<FONT color="green">399</FONT>             * @throws MaltChainedException<a name="line.399"></a>
+<FONT color="green">400</FONT>             */<a name="line.400"></a>
+<FONT color="green">401</FONT>            public void deleteConfigDirectory() throws MaltChainedException {<a name="line.401"></a>
+<FONT color="green">402</FONT>                    if (!configDirectory.exists()) {<a name="line.402"></a>
+<FONT color="green">403</FONT>                            return;<a name="line.403"></a>
+<FONT color="green">404</FONT>                    }<a name="line.404"></a>
+<FONT color="green">405</FONT>                    File infoFile = new File(configDirectory.getPath()+File.separator+getName()+"_"+getType()+".info");<a name="line.405"></a>
+<FONT color="green">406</FONT>                    if (infoFile.exists()) {<a name="line.406"></a>
+<FONT color="green">407</FONT>                            deleteConfigDirectory(configDirectory);<a name="line.407"></a>
+<FONT color="green">408</FONT>                    } else {<a name="line.408"></a>
+<FONT color="green">409</FONT>                            throw new ConfigurationException("There exists a directory that is not a MaltParser configuration directory. ");<a name="line.409"></a>
+<FONT color="green">410</FONT>                    }<a name="line.410"></a>
+<FONT color="green">411</FONT>            }<a name="line.411"></a>
+<FONT color="green">412</FONT>            <a name="line.412"></a>
+<FONT color="green">413</FONT>            private void deleteConfigDirectory(File directory) throws MaltChainedException {<a name="line.413"></a>
+<FONT color="green">414</FONT>                    if (directory.exists()) {<a name="line.414"></a>
+<FONT color="green">415</FONT>                            File[] files = directory.listFiles();<a name="line.415"></a>
+<FONT color="green">416</FONT>                            for (int i = 0; i &lt; files.length; i++) {<a name="line.416"></a>
+<FONT color="green">417</FONT>                                    if (files[i].isDirectory()) {<a name="line.417"></a>
+<FONT color="green">418</FONT>                                            deleteConfigDirectory(files[i]);<a name="line.418"></a>
+<FONT color="green">419</FONT>                                    } else {<a name="line.419"></a>
+<FONT color="green">420</FONT>                                            files[i].delete();<a name="line.420"></a>
+<FONT color="green">421</FONT>                                    }<a name="line.421"></a>
+<FONT color="green">422</FONT>                            }<a name="line.422"></a>
+<FONT color="green">423</FONT>                    } else {<a name="line.423"></a>
+<FONT color="green">424</FONT>                            throw new ConfigurationException("The directory '"+directory.getPath()+ "' cannot be found. ");<a name="line.424"></a>
+<FONT color="green">425</FONT>                    }<a name="line.425"></a>
+<FONT color="green">426</FONT>                    directory.delete();<a name="line.426"></a>
+<FONT color="green">427</FONT>            }<a name="line.427"></a>
+<FONT color="green">428</FONT>            <a name="line.428"></a>
+<FONT color="green">429</FONT>            /**<a name="line.429"></a>
+<FONT color="green">430</FONT>             * Returns a file handler object for the configuration directory<a name="line.430"></a>
+<FONT color="green">431</FONT>             * <a name="line.431"></a>
+<FONT color="green">432</FONT>             * @return a file handler object for the configuration directory<a name="line.432"></a>
+<FONT color="green">433</FONT>             */<a name="line.433"></a>
+<FONT color="green">434</FONT>            public File getConfigDirectory() {<a name="line.434"></a>
+<FONT color="green">435</FONT>                    return configDirectory;<a name="line.435"></a>
+<FONT color="green">436</FONT>            }<a name="line.436"></a>
+<FONT color="green">437</FONT>    <a name="line.437"></a>
+<FONT color="green">438</FONT>            protected void setConfigDirectory(File dir) {<a name="line.438"></a>
+<FONT color="green">439</FONT>                    this.configDirectory = dir;<a name="line.439"></a>
+<FONT color="green">440</FONT>            }<a name="line.440"></a>
+<FONT color="green">441</FONT>    <a name="line.441"></a>
+<FONT color="green">442</FONT>            /**<a name="line.442"></a>
+<FONT color="green">443</FONT>             * Creates the configuration directory<a name="line.443"></a>
+<FONT color="green">444</FONT>             * <a name="line.444"></a>
+<FONT color="green">445</FONT>             * @throws MaltChainedException<a name="line.445"></a>
+<FONT color="green">446</FONT>             */<a name="line.446"></a>
+<FONT color="green">447</FONT>            public void createConfigDirectory() throws MaltChainedException {<a name="line.447"></a>
+<FONT color="green">448</FONT>                    checkConfigDirectory();<a name="line.448"></a>
+<FONT color="green">449</FONT>                    configDirectory.mkdir();<a name="line.449"></a>
+<FONT color="green">450</FONT>                    createInfoFile();<a name="line.450"></a>
+<FONT color="green">451</FONT>            }<a name="line.451"></a>
+<FONT color="green">452</FONT>            <a name="line.452"></a>
+<FONT color="green">453</FONT>            protected void checkConfigDirectory()  throws MaltChainedException {<a name="line.453"></a>
+<FONT color="green">454</FONT>                    if (configDirectory.exists() &amp;&amp; !configDirectory.isDirectory()) {<a name="line.454"></a>
+<FONT color="green">455</FONT>                            throw new ConfigurationException("The configuration directory name already exists and is not a directory. ");<a name="line.455"></a>
+<FONT color="green">456</FONT>                    }<a name="line.456"></a>
+<FONT color="green">457</FONT>                    <a name="line.457"></a>
+<FONT color="green">458</FONT>                    if (configDirectory.exists()) {<a name="line.458"></a>
+<FONT color="green">459</FONT>                            deleteConfigDirectory();<a name="line.459"></a>
+<FONT color="green">460</FONT>                    } <a name="line.460"></a>
+<FONT color="green">461</FONT>            }<a name="line.461"></a>
+<FONT color="green">462</FONT>            <a name="line.462"></a>
+<FONT color="green">463</FONT>            protected void createInfoFile() throws MaltChainedException {<a name="line.463"></a>
+<FONT color="green">464</FONT>                    infoFile = new BufferedWriter(getOutputStreamWriter(getName()+"_"+getType()+".info"));<a name="line.464"></a>
+<FONT color="green">465</FONT>                    try {<a name="line.465"></a>
+<FONT color="green">466</FONT>                            infoFile.write("CONFIGURATION\n");<a name="line.466"></a>
+<FONT color="green">467</FONT>                            infoFile.write("Configuration name:   "+getName()+"\n");<a name="line.467"></a>
+<FONT color="green">468</FONT>                            infoFile.write("Configuration type:   "+getType()+"\n");<a name="line.468"></a>
+<FONT color="green">469</FONT>                            infoFile.write("Created:              "+new Date(System.currentTimeMillis())+"\n");<a name="line.469"></a>
+<FONT color="green">470</FONT>                            <a name="line.470"></a>
+<FONT color="green">471</FONT>                            infoFile.write("\nSYSTEM\n");<a name="line.471"></a>
+<FONT color="green">472</FONT>                            infoFile.write("Operating system architecture: "+System.getProperty("os.arch")+"\n");<a name="line.472"></a>
+<FONT color="green">473</FONT>                            infoFile.write("Operating system name:         "+System.getProperty("os.name")+"\n");<a name="line.473"></a>
+<FONT color="green">474</FONT>                            infoFile.write("JRE vendor name:               "+System.getProperty("java.vendor")+"\n");<a name="line.474"></a>
+<FONT color="green">475</FONT>                            infoFile.write("JRE version number:            "+System.getProperty("java.version")+"\n");<a name="line.475"></a>
+<FONT color="green">476</FONT>                            <a name="line.476"></a>
+<FONT color="green">477</FONT>                            infoFile.write("\nMALTPARSER\n");<a name="line.477"></a>
+<FONT color="green">478</FONT>                            infoFile.write("Version:                       "+SystemInfo.getVersion()+"\n");<a name="line.478"></a>
+<FONT color="green">479</FONT>                            infoFile.write("Build date:                    "+SystemInfo.getBuildDate()+"\n");<a name="line.479"></a>
+<FONT color="green">480</FONT>                            HashSet&lt;String&gt; excludeGroups = new HashSet&lt;String&gt;();<a name="line.480"></a>
+<FONT color="green">481</FONT>                            excludeGroups.add("system");<a name="line.481"></a>
+<FONT color="green">482</FONT>                            infoFile.write("\nSETTINGS\n");<a name="line.482"></a>
+<FONT color="green">483</FONT>                            infoFile.write(OptionManager.instance().toStringPrettyValues(containerIndex, excludeGroups));<a name="line.483"></a>
+<FONT color="green">484</FONT>                            infoFile.flush();<a name="line.484"></a>
+<FONT color="green">485</FONT>                    } catch (IOException e) {<a name="line.485"></a>
+<FONT color="green">486</FONT>                            throw new ConfigurationException("Could not create the maltparser info file. ");<a name="line.486"></a>
+<FONT color="green">487</FONT>                    }<a name="line.487"></a>
+<FONT color="green">488</FONT>            }<a name="line.488"></a>
+<FONT color="green">489</FONT>            <a name="line.489"></a>
+<FONT color="green">490</FONT>            /**<a name="line.490"></a>
+<FONT color="green">491</FONT>             * Returns a writer to the configuration information file<a name="line.491"></a>
+<FONT color="green">492</FONT>             * <a name="line.492"></a>
+<FONT color="green">493</FONT>             * @return      a writer to the configuration information file<a name="line.493"></a>
+<FONT color="green">494</FONT>             * @throws MaltChainedException<a name="line.494"></a>
+<FONT color="green">495</FONT>             */<a name="line.495"></a>
+<FONT color="green">496</FONT>            public BufferedWriter getInfoFileWriter() throws MaltChainedException {<a name="line.496"></a>
+<FONT color="green">497</FONT>                    return infoFile;<a name="line.497"></a>
+<FONT color="green">498</FONT>            }<a name="line.498"></a>
+<FONT color="green">499</FONT>            <a name="line.499"></a>
+<FONT color="green">500</FONT>            /**<a name="line.500"></a>
+<FONT color="green">501</FONT>             * Creates the malt configuration file (.mco). This file is compressed.   <a name="line.501"></a>
+<FONT color="green">502</FONT>             * <a name="line.502"></a>
+<FONT color="green">503</FONT>             * @throws MaltChainedException<a name="line.503"></a>
+<FONT color="green">504</FONT>             */<a name="line.504"></a>
+<FONT color="green">505</FONT>            public void createConfigFile() throws MaltChainedException {<a name="line.505"></a>
+<FONT color="green">506</FONT>                    try {<a name="line.506"></a>
+<FONT color="green">507</FONT>                            JarOutputStream jos = new JarOutputStream(new FileOutputStream(workingDirectory.getPath()+File.separator+getName()+".mco"));<a name="line.507"></a>
+<FONT color="green">508</FONT>    //                      configLogger.info("Creates configuration file '"+workingDirectory.getPath()+File.separator+getName()+".mco' ...\n");<a name="line.508"></a>
+<FONT color="green">509</FONT>                            createConfigFile(configDirectory.getPath(), jos);<a name="line.509"></a>
+<FONT color="green">510</FONT>                            jos.close();<a name="line.510"></a>
+<FONT color="green">511</FONT>                    } catch (FileNotFoundException e) {<a name="line.511"></a>
+<FONT color="green">512</FONT>                            throw new ConfigurationException("The maltparser configurtation file '"+workingDirectory.getPath()+File.separator+getName()+".mco"+"' cannot be found. ", e);<a name="line.512"></a>
+<FONT color="green">513</FONT>                    } catch (IOException e) {<a name="line.513"></a>
+<FONT color="green">514</FONT>                            throw new ConfigurationException("The maltparser configurtation file '"+workingDirectory.getPath()+File.separator+getName()+".mco"+"' cannot be created. ", e);<a name="line.514"></a>
+<FONT color="green">515</FONT>                    } <a name="line.515"></a>
+<FONT color="green">516</FONT>            }<a name="line.516"></a>
+<FONT color="green">517</FONT>    <a name="line.517"></a>
+<FONT color="green">518</FONT>            private void createConfigFile(String directory, JarOutputStream jos) throws MaltChainedException {<a name="line.518"></a>
+<FONT color="green">519</FONT>            byte[] readBuffer = new byte[BUFFER];<a name="line.519"></a>
+<FONT color="green">520</FONT>                    try {<a name="line.520"></a>
+<FONT color="green">521</FONT>                            File zipDir = new File(directory);<a name="line.521"></a>
+<FONT color="green">522</FONT>                            String[] dirList = zipDir.list();<a name="line.522"></a>
+<FONT color="green">523</FONT>                            <a name="line.523"></a>
+<FONT color="green">524</FONT>                            int bytesIn = 0;<a name="line.524"></a>
+<FONT color="green">525</FONT>            <a name="line.525"></a>
+<FONT color="green">526</FONT>                            for (int i = 0; i &lt; dirList.length; i++) {<a name="line.526"></a>
+<FONT color="green">527</FONT>                                    File f = new File(zipDir, dirList[i]);<a name="line.527"></a>
+<FONT color="green">528</FONT>                                    if (f.isDirectory()) {<a name="line.528"></a>
+<FONT color="green">529</FONT>                                            String filePath = f.getPath();<a name="line.529"></a>
+<FONT color="green">530</FONT>                                            createConfigFile(filePath, jos);<a name="line.530"></a>
+<FONT color="green">531</FONT>                                            continue;<a name="line.531"></a>
+<FONT color="green">532</FONT>                                    }<a name="line.532"></a>
+<FONT color="green">533</FONT>            <a name="line.533"></a>
+<FONT color="green">534</FONT>                                    FileInputStream fis = new FileInputStream(f);<a name="line.534"></a>
+<FONT color="green">535</FONT>                                    <a name="line.535"></a>
+<FONT color="green">536</FONT>                                    String entryPath = f.getPath().substring(workingDirectory.getPath().length()+1);<a name="line.536"></a>
+<FONT color="green">537</FONT>                                    entryPath = entryPath.replace('\\', '/');<a name="line.537"></a>
+<FONT color="green">538</FONT>                                    JarEntry entry = new JarEntry(entryPath);<a name="line.538"></a>
+<FONT color="green">539</FONT>                                    jos.putNextEntry(entry);<a name="line.539"></a>
+<FONT color="green">540</FONT>            <a name="line.540"></a>
+<FONT color="green">541</FONT>                                    while ((bytesIn = fis.read(readBuffer)) != -1) {<a name="line.541"></a>
+<FONT color="green">542</FONT>                                            jos.write(readBuffer, 0, bytesIn);<a name="line.542"></a>
+<FONT color="green">543</FONT>                                    }<a name="line.543"></a>
+<FONT color="green">544</FONT>            <a name="line.544"></a>
+<FONT color="green">545</FONT>                                    fis.close();<a name="line.545"></a>
+<FONT color="green">546</FONT>                            }<a name="line.546"></a>
+<FONT color="green">547</FONT>                    } catch (FileNotFoundException e) {<a name="line.547"></a>
+<FONT color="green">548</FONT>                            throw new ConfigurationException("The directory '"+directory+"' cannot be found. ", e);<a name="line.548"></a>
+<FONT color="green">549</FONT>                    } catch (IOException e) {<a name="line.549"></a>
+<FONT color="green">550</FONT>                            throw new ConfigurationException("The directory '"+directory+"' cannot be compressed into a mco file. ", e);<a name="line.550"></a>
+<FONT color="green">551</FONT>                    } <a name="line.551"></a>
+<FONT color="green">552</FONT>            }<a name="line.552"></a>
+<FONT color="green">553</FONT>            <a name="line.553"></a>
+<FONT color="green">554</FONT>    <a name="line.554"></a>
+<FONT color="green">555</FONT>            public void copyConfigFile(File in, File out, Versioning versioning) throws MaltChainedException {<a name="line.555"></a>
+<FONT color="green">556</FONT>                    try {<a name="line.556"></a>
+<FONT color="green">557</FONT>                            JarFile jar = new JarFile(in);<a name="line.557"></a>
+<FONT color="green">558</FONT>                            JarOutputStream tempJar = new JarOutputStream(new FileOutputStream(out));<a name="line.558"></a>
+<FONT color="green">559</FONT>                    byte[] buffer = new byte[BUFFER];<a name="line.559"></a>
+<FONT color="green">560</FONT>                    int bytesRead;<a name="line.560"></a>
+<FONT color="green">561</FONT>                    StringBuilder sb = new StringBuilder();<a name="line.561"></a>
+<FONT color="green">562</FONT>    <a name="line.562"></a>
+<FONT color="green">563</FONT>                    for (Enumeration&lt;JarEntry&gt; entries = jar.entries(); entries.hasMoreElements(); ) {<a name="line.563"></a>
+<FONT color="green">564</FONT>                        JarEntry inEntry = (JarEntry) entries.nextElement();<a name="line.564"></a>
+<FONT color="green">565</FONT>                        InputStream entryStream = jar.getInputStream(inEntry);<a name="line.565"></a>
+<FONT color="green">566</FONT>                        JarEntry outEntry = versioning.getJarEntry(inEntry);<a name="line.566"></a>
+<FONT color="green">567</FONT>                        <a name="line.567"></a>
+<FONT color="green">568</FONT>                        if (!versioning.hasChanges(inEntry, outEntry)) {<a name="line.568"></a>
+<FONT color="green">569</FONT>                                tempJar.putNextEntry(outEntry);<a name="line.569"></a>
+<FONT color="green">570</FONT>                                while ((bytesRead = entryStream.read(buffer)) != -1) {<a name="line.570"></a>
+<FONT color="green">571</FONT>                                    tempJar.write(buffer, 0, bytesRead);<a name="line.571"></a>
+<FONT color="green">572</FONT>                                }<a name="line.572"></a>
+<FONT color="green">573</FONT>                        } else {<a name="line.573"></a>
+<FONT color="green">574</FONT>                            tempJar.putNextEntry(outEntry);<a name="line.574"></a>
+<FONT color="green">575</FONT>                            BufferedReader br = new BufferedReader(new InputStreamReader(entryStream));<a name="line.575"></a>
+<FONT color="green">576</FONT>                            String line = null;<a name="line.576"></a>
+<FONT color="green">577</FONT>                            sb.setLength(0);<a name="line.577"></a>
+<FONT color="green">578</FONT>                            while ((line = br.readLine()) != null) {<a name="line.578"></a>
+<FONT color="green">579</FONT>                                    sb.append(line);<a name="line.579"></a>
+<FONT color="green">580</FONT>                                    sb.append('\n');<a name="line.580"></a>
+<FONT color="green">581</FONT>                            }<a name="line.581"></a>
+<FONT color="green">582</FONT>                            String outString = versioning.modifyJarEntry(inEntry, outEntry, sb);<a name="line.582"></a>
+<FONT color="green">583</FONT>                            tempJar.write(outString.getBytes());<a name="line.583"></a>
+<FONT color="green">584</FONT>                        }<a name="line.584"></a>
+<FONT color="green">585</FONT>                    }<a name="line.585"></a>
+<FONT color="green">586</FONT>                    if (versioning.getFeatureModelXML() != null &amp;&amp; versioning.getFeatureModelXML().startsWith("/appdata")) {<a name="line.586"></a>
+<FONT color="green">587</FONT>                            int index = versioning.getFeatureModelXML().lastIndexOf('/');<a name="line.587"></a>
+<FONT color="green">588</FONT>                    BufferedInputStream bis = new BufferedInputStream(Util.findURLinJars(versioning.getFeatureModelXML()).openStream());<a name="line.588"></a>
+<FONT color="green">589</FONT>                    tempJar.putNextEntry(new JarEntry(versioning.getNewConfigName()+"/" +versioning.getFeatureModelXML().substring(index+1)));<a name="line.589"></a>
+<FONT color="green">590</FONT>                    int n = 0;<a name="line.590"></a>
+<FONT color="green">591</FONT>                        while ((n = bis.read(buffer, 0, BUFFER)) != -1) {<a name="line.591"></a>
+<FONT color="green">592</FONT>                            tempJar.write(buffer, 0, n);<a name="line.592"></a>
+<FONT color="green">593</FONT>                        }<a name="line.593"></a>
+<FONT color="green">594</FONT>                    bis.close();<a name="line.594"></a>
+<FONT color="green">595</FONT>                    }<a name="line.595"></a>
+<FONT color="green">596</FONT>                    if (versioning.getInputFormatXML() != null &amp;&amp; versioning.getInputFormatXML().startsWith("/appdata")) {<a name="line.596"></a>
+<FONT color="green">597</FONT>                            int index = versioning.getInputFormatXML().lastIndexOf('/');<a name="line.597"></a>
+<FONT color="green">598</FONT>                    BufferedInputStream bis = new BufferedInputStream(Util.findURLinJars(versioning.getInputFormatXML()).openStream());<a name="line.598"></a>
+<FONT color="green">599</FONT>                    tempJar.putNextEntry(new JarEntry(versioning.getNewConfigName()+"/" +versioning.getInputFormatXML().substring(index+1)));<a name="line.599"></a>
+<FONT color="green">600</FONT>                    int n = 0;<a name="line.600"></a>
+<FONT color="green">601</FONT>                        while ((n = bis.read(buffer, 0, BUFFER)) != -1) {<a name="line.601"></a>
+<FONT color="green">602</FONT>                            tempJar.write(buffer, 0, n);<a name="line.602"></a>
+<FONT color="green">603</FONT>                        }<a name="line.603"></a>
+<FONT color="green">604</FONT>                    bis.close();<a name="line.604"></a>
+<FONT color="green">605</FONT>                    }<a name="line.605"></a>
+<FONT color="green">606</FONT>                    tempJar.flush();<a name="line.606"></a>
+<FONT color="green">607</FONT>                    tempJar.close();<a name="line.607"></a>
+<FONT color="green">608</FONT>                    jar.close();<a name="line.608"></a>
+<FONT color="green">609</FONT>                    } catch (IOException e) {<a name="line.609"></a>
+<FONT color="green">610</FONT>                            throw new ConfigurationException("", e);<a name="line.610"></a>
+<FONT color="green">611</FONT>                    }<a name="line.611"></a>
+<FONT color="green">612</FONT>            }<a name="line.612"></a>
+<FONT color="green">613</FONT>            <a name="line.613"></a>
+<FONT color="green">614</FONT>        protected void initNameNTypeFromInfoFile(URL url) throws MaltChainedException {<a name="line.614"></a>
+<FONT color="green">615</FONT>                    if (url == null) {<a name="line.615"></a>
+<FONT color="green">616</FONT>                            throw new ConfigurationException("The URL cannot be found. ");<a name="line.616"></a>
+<FONT color="green">617</FONT>                    }       <a name="line.617"></a>
+<FONT color="green">618</FONT>                    try {<a name="line.618"></a>
+<FONT color="green">619</FONT>                            JarEntry je;<a name="line.619"></a>
+<FONT color="green">620</FONT>                            JarInputStream jis = new JarInputStream(url.openConnection().getInputStream());<a name="line.620"></a>
+<FONT color="green">621</FONT>                            while ((je = jis.getNextJarEntry()) != null) {<a name="line.621"></a>
+<FONT color="green">622</FONT>                                    String entryName = je.getName();<a name="line.622"></a>
+<FONT color="green">623</FONT>                                    if (entryName.endsWith(".info")) {<a name="line.623"></a>
+<FONT color="green">624</FONT>                                            int indexUnderScore = entryName.lastIndexOf('_');<a name="line.624"></a>
+<FONT color="green">625</FONT>                                            int indexSeparator = entryName.lastIndexOf(File.separator);<a name="line.625"></a>
+<FONT color="green">626</FONT>                                            if (indexSeparator == -1) {<a name="line.626"></a>
+<FONT color="green">627</FONT>                                                    indexSeparator = entryName.lastIndexOf('/');<a name="line.627"></a>
+<FONT color="green">628</FONT>                                            }<a name="line.628"></a>
+<FONT color="green">629</FONT>                                            if (indexSeparator == -1) {<a name="line.629"></a>
+<FONT color="green">630</FONT>                                                    indexSeparator = entryName.lastIndexOf('\\');<a name="line.630"></a>
+<FONT color="green">631</FONT>                                            }<a name="line.631"></a>
+<FONT color="green">632</FONT>                                            int indexDot = entryName.lastIndexOf('.');<a name="line.632"></a>
+<FONT color="green">633</FONT>                                            if (indexUnderScore == -1 || indexDot == -1) {<a name="line.633"></a>
+<FONT color="green">634</FONT>                                                    throw new ConfigurationException("Could not find the configuration name and type from the URL '"+url.toString()+"'. ");<a name="line.634"></a>
+<FONT color="green">635</FONT>                                            }<a name="line.635"></a>
+<FONT color="green">636</FONT>                                            setName(entryName.substring(indexSeparator+1, indexUnderScore));<a name="line.636"></a>
+<FONT color="green">637</FONT>                                            setType(entryName.substring(indexUnderScore+1, indexDot));<a name="line.637"></a>
+<FONT color="green">638</FONT>                                            setConfigDirectory(new File(workingDirectory.getPath()+File.separator+getName()));<a name="line.638"></a>
+<FONT color="green">639</FONT>                                            jis.close();<a name="line.639"></a>
+<FONT color="green">640</FONT>                                            return;<a name="line.640"></a>
+<FONT color="green">641</FONT>                                    }<a name="line.641"></a>
+<FONT color="green">642</FONT>                            }<a name="line.642"></a>
+<FONT color="green">643</FONT>                            <a name="line.643"></a>
+<FONT color="green">644</FONT>                    } catch (IOException e) {<a name="line.644"></a>
+<FONT color="green">645</FONT>                            throw new ConfigurationException("Could not find the configuration name and type from the URL '"+url.toString()+"'. ", e);<a name="line.645"></a>
+<FONT color="green">646</FONT>                    }<a name="line.646"></a>
+<FONT color="green">647</FONT>        }<a name="line.647"></a>
+<FONT color="green">648</FONT>        <a name="line.648"></a>
+<FONT color="green">649</FONT>        /**<a name="line.649"></a>
+<FONT color="green">650</FONT>         * Prints the content of the configuration information file to the system logger<a name="line.650"></a>
+<FONT color="green">651</FONT>         * <a name="line.651"></a>
+<FONT color="green">652</FONT>         * @throws MaltChainedException<a name="line.652"></a>
+<FONT color="green">653</FONT>         */<a name="line.653"></a>
+<FONT color="green">654</FONT>        public void echoInfoFile() throws MaltChainedException {<a name="line.654"></a>
+<FONT color="green">655</FONT>            checkConfigDirectory();<a name="line.655"></a>
+<FONT color="green">656</FONT>            JarInputStream jis;<a name="line.656"></a>
+<FONT color="green">657</FONT>            try {<a name="line.657"></a>
+<FONT color="green">658</FONT>                    if (url == null) {<a name="line.658"></a>
+<FONT color="green">659</FONT>                            jis = new JarInputStream(new FileInputStream(workingDirectory.getPath()+File.separator+getName()+".mco"));<a name="line.659"></a>
+<FONT color="green">660</FONT>                    } else {<a name="line.660"></a>
+<FONT color="green">661</FONT>                            jis = new JarInputStream(url.openConnection().getInputStream());<a name="line.661"></a>
+<FONT color="green">662</FONT>                    }<a name="line.662"></a>
+<FONT color="green">663</FONT>                            JarEntry je;<a name="line.663"></a>
+<FONT color="green">664</FONT>    <a name="line.664"></a>
+<FONT color="green">665</FONT>                            while ((je = jis.getNextJarEntry()) != null) {<a name="line.665"></a>
+<FONT color="green">666</FONT>                            String entryName = je.getName();<a name="line.666"></a>
+<FONT color="green">667</FONT>    <a name="line.667"></a>
+<FONT color="green">668</FONT>                            if (entryName.endsWith(getName()+"_"+getType()+".info")) {<a name="line.668"></a>
+<FONT color="green">669</FONT>                                    int c;<a name="line.669"></a>
+<FONT color="green">670</FONT>                                        while ((c = jis.read()) != -1) {<a name="line.670"></a>
+<FONT color="green">671</FONT>                                            SystemLogger.logger().info((char)c);<a name="line.671"></a>
+<FONT color="green">672</FONT>                                        }   <a name="line.672"></a>
+<FONT color="green">673</FONT>                            }<a name="line.673"></a>
+<FONT color="green">674</FONT>                            }<a name="line.674"></a>
+<FONT color="green">675</FONT>                    jis.close();<a name="line.675"></a>
+<FONT color="green">676</FONT>            } catch (FileNotFoundException e) {<a name="line.676"></a>
+<FONT color="green">677</FONT>                    throw new ConfigurationException("Could not print configuration information file. The configuration file '"+workingDirectory.getPath()+File.separator+getName()+".mco"+"' cannot be found. ", e);<a name="line.677"></a>
+<FONT color="green">678</FONT>            } catch (IOException e) {<a name="line.678"></a>
+<FONT color="green">679</FONT>                            throw new ConfigurationException("Could not print configuration information file. ", e);<a name="line.679"></a>
+<FONT color="green">680</FONT>                    }<a name="line.680"></a>
+<FONT color="green">681</FONT>    <a name="line.681"></a>
+<FONT color="green">682</FONT>        }<a name="line.682"></a>
+<FONT color="green">683</FONT>        <a name="line.683"></a>
+<FONT color="green">684</FONT>        /**<a name="line.684"></a>
+<FONT color="green">685</FONT>         * Unpacks the malt configuration file (.mco).<a name="line.685"></a>
+<FONT color="green">686</FONT>         * <a name="line.686"></a>
+<FONT color="green">687</FONT>         * @throws MaltChainedException<a name="line.687"></a>
+<FONT color="green">688</FONT>         */<a name="line.688"></a>
+<FONT color="green">689</FONT>        public void unpackConfigFile() throws MaltChainedException {<a name="line.689"></a>
+<FONT color="green">690</FONT>            checkConfigDirectory();<a name="line.690"></a>
+<FONT color="green">691</FONT>            JarInputStream jis;<a name="line.691"></a>
+<FONT color="green">692</FONT>            try {<a name="line.692"></a>
+<FONT color="green">693</FONT>                    if (url == null) {<a name="line.693"></a>
+<FONT color="green">694</FONT>                            jis = new JarInputStream(new FileInputStream(workingDirectory.getPath()+File.separator+getName()+".mco"));<a name="line.694"></a>
+<FONT color="green">695</FONT>                    } else {<a name="line.695"></a>
+<FONT color="green">696</FONT>                            jis = new JarInputStream(url.openConnection().getInputStream());<a name="line.696"></a>
+<FONT color="green">697</FONT>                    }<a name="line.697"></a>
+<FONT color="green">698</FONT>                    unpackConfigFile(jis);<a name="line.698"></a>
+<FONT color="green">699</FONT>                    jis.close();<a name="line.699"></a>
+<FONT color="green">700</FONT>            } catch (FileNotFoundException e) {<a name="line.700"></a>
+<FONT color="green">701</FONT>                    throw new ConfigurationException("Could not unpack configuration. The configuration file '"+workingDirectory.getPath()+File.separator+getName()+".mco"+"' cannot be found. ", e);<a name="line.701"></a>
+<FONT color="green">702</FONT>            } catch (IOException e) {<a name="line.702"></a>
+<FONT color="green">703</FONT>                    if (configDirectory.exists()) {<a name="line.703"></a>
+<FONT color="green">704</FONT>                            deleteConfigDirectory();<a name="line.704"></a>
+<FONT color="green">705</FONT>                    }<a name="line.705"></a>
+<FONT color="green">706</FONT>                            throw new ConfigurationException("Could not unpack configuration. ", e);<a name="line.706"></a>
+<FONT color="green">707</FONT>                    }<a name="line.707"></a>
+<FONT color="green">708</FONT>            initCreatedByMaltParserVersionFromInfoFile();<a name="line.708"></a>
+<FONT color="green">709</FONT>        }<a name="line.709"></a>
+<FONT color="green">710</FONT>    <a name="line.710"></a>
+<FONT color="green">711</FONT>        protected void unpackConfigFile(JarInputStream jis) throws MaltChainedException {<a name="line.711"></a>
+<FONT color="green">712</FONT>                    try {<a name="line.712"></a>
+<FONT color="green">713</FONT>                            JarEntry je;<a name="line.713"></a>
+<FONT color="green">714</FONT>                            byte[] readBuffer = new byte[BUFFER];<a name="line.714"></a>
+<FONT color="green">715</FONT>                    SortedSet&lt;String&gt; directoryCache  = new TreeSet&lt;String&gt;();<a name="line.715"></a>
+<FONT color="green">716</FONT>                            while ((je = jis.getNextJarEntry()) != null) {<a name="line.716"></a>
+<FONT color="green">717</FONT>                            String entryName = je.getName();<a name="line.717"></a>
+<FONT color="green">718</FONT>    <a name="line.718"></a>
+<FONT color="green">719</FONT>                            if (entryName.startsWith("/")) {<a name="line.719"></a>
+<FONT color="green">720</FONT>                                    entryName = entryName.substring(1);<a name="line.720"></a>
+<FONT color="green">721</FONT>                            }<a name="line.721"></a>
+<FONT color="green">722</FONT>                            if (entryName.endsWith(File.separator) || entryName.endsWith("/")) {<a name="line.722"></a>
+<FONT color="green">723</FONT>                                return;<a name="line.723"></a>
+<FONT color="green">724</FONT>                            }<a name="line.724"></a>
+<FONT color="green">725</FONT>                            int index = -1;<a name="line.725"></a>
+<FONT color="green">726</FONT>                            if (File.separator.equals("\\")) {<a name="line.726"></a>
+<FONT color="green">727</FONT>                                    entryName = entryName.replace('/', '\\');<a name="line.727"></a>
+<FONT color="green">728</FONT>                                    index = entryName.lastIndexOf("\\");<a name="line.728"></a>
+<FONT color="green">729</FONT>                            } else if (File.separator.equals("/")) {<a name="line.729"></a>
+<FONT color="green">730</FONT>                                    entryName = entryName.replace('\\', '/');<a name="line.730"></a>
+<FONT color="green">731</FONT>                                    index = entryName.lastIndexOf("/");<a name="line.731"></a>
+<FONT color="green">732</FONT>                            }<a name="line.732"></a>
+<FONT color="green">733</FONT>                            if (index &gt; 0) {<a name="line.733"></a>
+<FONT color="green">734</FONT>                                String dirName = entryName.substring(0, index);<a name="line.734"></a>
+<FONT color="green">735</FONT>                                if (!directoryCache.contains(dirName)) {<a name="line.735"></a>
+<FONT color="green">736</FONT>                                    File directory = new File(workingDirectory.getPath()+File.separator+dirName);<a name="line.736"></a>
+<FONT color="green">737</FONT>                                    if (!(directory.exists() &amp;&amp; directory.isDirectory())) {<a name="line.737"></a>
+<FONT color="green">738</FONT>                                        if (!directory.mkdirs()) {<a name="line.738"></a>
+<FONT color="green">739</FONT>                                            throw new ConfigurationException("Unable to make directory '" + dirName +"'. ");<a name="line.739"></a>
+<FONT color="green">740</FONT>                                        }<a name="line.740"></a>
+<FONT color="green">741</FONT>                                        directoryCache.add(dirName);<a name="line.741"></a>
+<FONT color="green">742</FONT>                                    }<a name="line.742"></a>
+<FONT color="green">743</FONT>                                }<a name="line.743"></a>
+<FONT color="green">744</FONT>                            }<a name="line.744"></a>
+<FONT color="green">745</FONT>                           <a name="line.745"></a>
+<FONT color="green">746</FONT>                            if (new File(workingDirectory.getPath()+File.separator+entryName).isDirectory() &amp;&amp; new File(workingDirectory.getPath()+File.separator+entryName).exists()) {<a name="line.746"></a>
+<FONT color="green">747</FONT>                                    continue;<a name="line.747"></a>
+<FONT color="green">748</FONT>                            }<a name="line.748"></a>
+<FONT color="green">749</FONT>                            BufferedOutputStream bos;<a name="line.749"></a>
+<FONT color="green">750</FONT>                            try {<a name="line.750"></a>
+<FONT color="green">751</FONT>                                    bos = new BufferedOutputStream(new FileOutputStream(workingDirectory.getPath()+File.separator+entryName), BUFFER);<a name="line.751"></a>
+<FONT color="green">752</FONT>                            } catch (FileNotFoundException e) {<a name="line.752"></a>
+<FONT color="green">753</FONT>                                            throw new ConfigurationException("Could not unpack configuration. The file '"+workingDirectory.getPath()+File.separator+entryName+"' cannot be unpacked. ", e);<a name="line.753"></a>
+<FONT color="green">754</FONT>                            }<a name="line.754"></a>
+<FONT color="green">755</FONT>                                    int n = 0;<a name="line.755"></a>
+<FONT color="green">756</FONT>                                while ((n = jis.read(readBuffer, 0, BUFFER)) != -1) {<a name="line.756"></a>
+<FONT color="green">757</FONT>                                    bos.write(readBuffer, 0, n);<a name="line.757"></a>
+<FONT color="green">758</FONT>                                }<a name="line.758"></a>
+<FONT color="green">759</FONT>                                bos.flush();<a name="line.759"></a>
+<FONT color="green">760</FONT>                                bos.close();<a name="line.760"></a>
+<FONT color="green">761</FONT>                            }<a name="line.761"></a>
+<FONT color="green">762</FONT>                    } catch (IOException e) {<a name="line.762"></a>
+<FONT color="green">763</FONT>                            throw new ConfigurationException("Could not unpack configuration. ", e);<a name="line.763"></a>
+<FONT color="green">764</FONT>                    }<a name="line.764"></a>
+<FONT color="green">765</FONT>        }<a name="line.765"></a>
+<FONT color="green">766</FONT>                <a name="line.766"></a>
+<FONT color="green">767</FONT>            /**<a name="line.767"></a>
+<FONT color="green">768</FONT>             * Returns the name of the configuration directory<a name="line.768"></a>
+<FONT color="green">769</FONT>             * <a name="line.769"></a>
+<FONT color="green">770</FONT>             * @return the name of the configuration directory<a name="line.770"></a>
+<FONT color="green">771</FONT>             */<a name="line.771"></a>
+<FONT color="green">772</FONT>            public String getName() {<a name="line.772"></a>
+<FONT color="green">773</FONT>                    return name;<a name="line.773"></a>
+<FONT color="green">774</FONT>            }<a name="line.774"></a>
+<FONT color="green">775</FONT>    <a name="line.775"></a>
+<FONT color="green">776</FONT>            protected void setName(String name) {<a name="line.776"></a>
+<FONT color="green">777</FONT>                    this.name = name;<a name="line.777"></a>
+<FONT color="green">778</FONT>            }<a name="line.778"></a>
+<FONT color="green">779</FONT>    <a name="line.779"></a>
+<FONT color="green">780</FONT>            /**<a name="line.780"></a>
+<FONT color="green">781</FONT>             * Returns the type of the configuration directory<a name="line.781"></a>
+<FONT color="green">782</FONT>             * <a name="line.782"></a>
+<FONT color="green">783</FONT>             * @return the type of the configuration directory<a name="line.783"></a>
+<FONT color="green">784</FONT>             */<a name="line.784"></a>
+<FONT color="green">785</FONT>            public String getType() {<a name="line.785"></a>
+<FONT color="green">786</FONT>                    return type;<a name="line.786"></a>
+<FONT color="green">787</FONT>            }<a name="line.787"></a>
+<FONT color="green">788</FONT>    <a name="line.788"></a>
+<FONT color="green">789</FONT>            protected void setType(String type) {<a name="line.789"></a>
+<FONT color="green">790</FONT>                    this.type = type;<a name="line.790"></a>
+<FONT color="green">791</FONT>            }<a name="line.791"></a>
+<FONT color="green">792</FONT>            <a name="line.792"></a>
+<FONT color="green">793</FONT>            /**<a name="line.793"></a>
+<FONT color="green">794</FONT>             * Returns a file handler object for the working directory<a name="line.794"></a>
+<FONT color="green">795</FONT>             * <a name="line.795"></a>
+<FONT color="green">796</FONT>             * @return a file handler object for the working directory<a name="line.796"></a>
+<FONT color="green">797</FONT>             */<a name="line.797"></a>
+<FONT color="green">798</FONT>            public File getWorkingDirectory() {<a name="line.798"></a>
+<FONT color="green">799</FONT>                    return workingDirectory;<a name="line.799"></a>
+<FONT color="green">800</FONT>            }<a name="line.800"></a>
+<FONT color="green">801</FONT>    <a name="line.801"></a>
+<FONT color="green">802</FONT>            /**<a name="line.802"></a>
+<FONT color="green">803</FONT>             * Initialize the working directory<a name="line.803"></a>
+<FONT color="green">804</FONT>             * <a name="line.804"></a>
+<FONT color="green">805</FONT>             * @throws MaltChainedException<a name="line.805"></a>
+<FONT color="green">806</FONT>             */<a name="line.806"></a>
+<FONT color="green">807</FONT>            public void initWorkingDirectory() throws MaltChainedException {<a name="line.807"></a>
+<FONT color="green">808</FONT>                    try {<a name="line.808"></a>
+<FONT color="green">809</FONT>                            initWorkingDirectory(OptionManager.instance().getOptionValue(0, "config", "workingdir").toString());<a name="line.809"></a>
+<FONT color="green">810</FONT>                    } catch (NullPointerException e) {<a name="line.810"></a>
+<FONT color="green">811</FONT>                            throw new ConfigurationException("The configuration cannot be found.", e);<a name="line.811"></a>
+<FONT color="green">812</FONT>                    }<a name="line.812"></a>
+<FONT color="green">813</FONT>            }<a name="line.813"></a>
+<FONT color="green">814</FONT>    <a name="line.814"></a>
+<FONT color="green">815</FONT>            /**<a name="line.815"></a>
+<FONT color="green">816</FONT>             * Initialize the working directory according to the path. If the path is equals to "user.dir" or current directory, then the current directory<a name="line.816"></a>
+<FONT color="green">817</FONT>             *  will be the working directory.<a name="line.817"></a>
+<FONT color="green">818</FONT>             * <a name="line.818"></a>
+<FONT color="green">819</FONT>             * @param pathPrefixString      the path to the working directory<a name="line.819"></a>
+<FONT color="green">820</FONT>             * @throws MaltChainedException<a name="line.820"></a>
+<FONT color="green">821</FONT>             */<a name="line.821"></a>
+<FONT color="green">822</FONT>            public void initWorkingDirectory(String pathPrefixString) throws MaltChainedException {<a name="line.822"></a>
+<FONT color="green">823</FONT>                    if (pathPrefixString == null || pathPrefixString.equalsIgnoreCase("user.dir") || pathPrefixString.equalsIgnoreCase(".")) {<a name="line.823"></a>
+<FONT color="green">824</FONT>                            workingDirectory = new File(System.getProperty("user.dir"));<a name="line.824"></a>
+<FONT color="green">825</FONT>                    } else {<a name="line.825"></a>
+<FONT color="green">826</FONT>                            workingDirectory = new File(pathPrefixString);<a name="line.826"></a>
+<FONT color="green">827</FONT>                    }<a name="line.827"></a>
+<FONT color="green">828</FONT>    <a name="line.828"></a>
+<FONT color="green">829</FONT>                    if (workingDirectory == null || !workingDirectory.isDirectory()) {<a name="line.829"></a>
+<FONT color="green">830</FONT>                            new ConfigurationException("The specified working directory '"+pathPrefixString+"' is not a directory. ");<a name="line.830"></a>
+<FONT color="green">831</FONT>                    }<a name="line.831"></a>
+<FONT color="green">832</FONT>            }<a name="line.832"></a>
+<FONT color="green">833</FONT>            <a name="line.833"></a>
+<FONT color="green">834</FONT>            /**<a name="line.834"></a>
+<FONT color="green">835</FONT>             * Returns the URL to the malt configuration file (.mco) <a name="line.835"></a>
+<FONT color="green">836</FONT>             * <a name="line.836"></a>
+<FONT color="green">837</FONT>             * @return the URL to the malt configuration file (.mco)<a name="line.837"></a>
+<FONT color="green">838</FONT>             */<a name="line.838"></a>
+<FONT color="green">839</FONT>            public URL getUrl() {<a name="line.839"></a>
+<FONT color="green">840</FONT>                    return url;<a name="line.840"></a>
+<FONT color="green">841</FONT>            }<a name="line.841"></a>
+<FONT color="green">842</FONT>    <a name="line.842"></a>
+<FONT color="green">843</FONT>            protected void setUrl(URL url) {<a name="line.843"></a>
+<FONT color="green">844</FONT>                    this.url = url;<a name="line.844"></a>
+<FONT color="green">845</FONT>            }<a name="line.845"></a>
+<FONT color="green">846</FONT>            <a name="line.846"></a>
+<FONT color="green">847</FONT>            /**<a name="line.847"></a>
+<FONT color="green">848</FONT>             * Returns the option container index<a name="line.848"></a>
+<FONT color="green">849</FONT>             * <a name="line.849"></a>
+<FONT color="green">850</FONT>             * @return the option container index<a name="line.850"></a>
+<FONT color="green">851</FONT>             */<a name="line.851"></a>
+<FONT color="green">852</FONT>            public int getContainerIndex() {<a name="line.852"></a>
+<FONT color="green">853</FONT>                    return containerIndex;<a name="line.853"></a>
+<FONT color="green">854</FONT>            }<a name="line.854"></a>
+<FONT color="green">855</FONT>    <a name="line.855"></a>
+<FONT color="green">856</FONT>            /**<a name="line.856"></a>
+<FONT color="green">857</FONT>             * Sets the option container index<a name="line.857"></a>
+<FONT color="green">858</FONT>             * <a name="line.858"></a>
+<FONT color="green">859</FONT>             * @param containerIndex a option container index<a name="line.859"></a>
+<FONT color="green">860</FONT>             */<a name="line.860"></a>
+<FONT color="green">861</FONT>            public void setContainerIndex(int containerIndex) {<a name="line.861"></a>
+<FONT color="green">862</FONT>                    this.containerIndex = containerIndex;<a name="line.862"></a>
+<FONT color="green">863</FONT>            }<a name="line.863"></a>
+<FONT color="green">864</FONT>    <a name="line.864"></a>
+<FONT color="green">865</FONT>            /**<a name="line.865"></a>
+<FONT color="green">866</FONT>             * Returns the version number of MaltParser which created the malt configuration file (.mco)<a name="line.866"></a>
+<FONT color="green">867</FONT>             * <a name="line.867"></a>
+<FONT color="green">868</FONT>             * @return the version number of MaltParser which created the malt configuration file (.mco)<a name="line.868"></a>
+<FONT color="green">869</FONT>             */<a name="line.869"></a>
+<FONT color="green">870</FONT>            public String getCreatedByMaltParserVersion() {<a name="line.870"></a>
+<FONT color="green">871</FONT>                    return createdByMaltParserVersion;<a name="line.871"></a>
+<FONT color="green">872</FONT>            }<a name="line.872"></a>
+<FONT color="green">873</FONT>    <a name="line.873"></a>
+<FONT color="green">874</FONT>            /**<a name="line.874"></a>
+<FONT color="green">875</FONT>             * Sets the version number of MaltParser which created the malt configuration file (.mco)<a name="line.875"></a>
+<FONT color="green">876</FONT>             * <a name="line.876"></a>
+<FONT color="green">877</FONT>             * @param createdByMaltParserVersion a version number of MaltParser<a name="line.877"></a>
+<FONT color="green">878</FONT>             */<a name="line.878"></a>
+<FONT color="green">879</FONT>            public void setCreatedByMaltParserVersion(String createdByMaltParserVersion) {<a name="line.879"></a>
+<FONT color="green">880</FONT>                    this.createdByMaltParserVersion = createdByMaltParserVersion;<a name="line.880"></a>
+<FONT color="green">881</FONT>            }<a name="line.881"></a>
+<FONT color="green">882</FONT>            <a name="line.882"></a>
+<FONT color="green">883</FONT>            public void initCreatedByMaltParserVersionFromInfoFile() throws MaltChainedException {<a name="line.883"></a>
+<FONT color="green">884</FONT>                    try {<a name="line.884"></a>
+<FONT color="green">885</FONT>                            BufferedReader br = new BufferedReader(getInputStreamReaderFromConfigFileEntry(getName()+"_"+getType()+".info", "UTF-8"));<a name="line.885"></a>
+<FONT color="green">886</FONT>                            String line = null;<a name="line.886"></a>
+<FONT color="green">887</FONT>                            while ((line = br.readLine()) != null) {<a name="line.887"></a>
+<FONT color="green">888</FONT>                                    if (line.startsWith("Version:                       ")) {<a name="line.888"></a>
+<FONT color="green">889</FONT>                                            setCreatedByMaltParserVersion(line.substring(31));<a name="line.889"></a>
+<FONT color="green">890</FONT>                                            break;<a name="line.890"></a>
+<FONT color="green">891</FONT>                                    }<a name="line.891"></a>
+<FONT color="green">892</FONT>                            }<a name="line.892"></a>
+<FONT color="green">893</FONT>                            br.close();<a name="line.893"></a>
+<FONT color="green">894</FONT>                    } catch (FileNotFoundException e) {<a name="line.894"></a>
+<FONT color="green">895</FONT>                            throw new ConfigurationException("Could not retrieve the version number of the MaltParser configuration.", e);<a name="line.895"></a>
+<FONT color="green">896</FONT>                    } catch (IOException e) {<a name="line.896"></a>
+<FONT color="green">897</FONT>                            throw new ConfigurationException("Could not retrieve the version number of the MaltParser configuration.", e);<a name="line.897"></a>
+<FONT color="green">898</FONT>                    }<a name="line.898"></a>
+<FONT color="green">899</FONT>            }<a name="line.899"></a>
+<FONT color="green">900</FONT>            <a name="line.900"></a>
+<FONT color="green">901</FONT>            public void versioning() throws MaltChainedException {<a name="line.901"></a>
+<FONT color="green">902</FONT>                    initCreatedByMaltParserVersionFromInfoFile();<a name="line.902"></a>
+<FONT color="green">903</FONT>                    SystemLogger.logger().info("\nCurrent version      : " + SystemInfo.getVersion() + "\n");<a name="line.903"></a>
+<FONT color="green">904</FONT>                    SystemLogger.logger().info("Parser model version : " + createdByMaltParserVersion + "\n");<a name="line.904"></a>
+<FONT color="green">905</FONT>                    if (SystemInfo.getVersion() == null) {<a name="line.905"></a>
+<FONT color="green">906</FONT>                            throw new ConfigurationException("Couln't determine the version of MaltParser");<a name="line.906"></a>
+<FONT color="green">907</FONT>                    } else if (createdByMaltParserVersion == null) {<a name="line.907"></a>
+<FONT color="green">908</FONT>                            throw new ConfigurationException("Couln't determine the version of the parser model");<a name="line.908"></a>
+<FONT color="green">909</FONT>                    } else if (SystemInfo.getVersion().equals(createdByMaltParserVersion)) {<a name="line.909"></a>
+<FONT color="green">910</FONT>                            SystemLogger.logger().info("The parser model "+getName()+".mco has already the same version as the current version of MaltParser. \n");<a name="line.910"></a>
+<FONT color="green">911</FONT>                            return;<a name="line.911"></a>
+<FONT color="green">912</FONT>                    }<a name="line.912"></a>
+<FONT color="green">913</FONT>                    <a name="line.913"></a>
+<FONT color="green">914</FONT>                    File mcoPath = new File(workingDirectory.getPath()+File.separator+getName()+".mco");<a name="line.914"></a>
+<FONT color="green">915</FONT>                    File newMcoPath = new File(workingDirectory.getPath()+File.separator+getName()+"."+SystemInfo.getVersion().trim()+".mco");<a name="line.915"></a>
+<FONT color="green">916</FONT>                    Versioning versioning = new Versioning(name, type, mcoPath, createdByMaltParserVersion);<a name="line.916"></a>
+<FONT color="green">917</FONT>                    if (!versioning.support(createdByMaltParserVersion)) {<a name="line.917"></a>
+<FONT color="green">918</FONT>                            SystemLogger.logger().warn("The parser model '"+ name+ ".mco' is created by MaltParser "+getCreatedByMaltParserVersion()+", which cannot be converted to a MaltParser "+SystemInfo.getVersion()+" parser model.\n");<a name="line.918"></a>
+<FONT color="green">919</FONT>                            SystemLogger.logger().warn("Please retrain the parser model with MaltParser "+SystemInfo.getVersion() +" or download MaltParser "+getCreatedByMaltParserVersion()+" from http://maltparser.org/download.html\n");<a name="line.919"></a>
+<FONT color="green">920</FONT>                            return;<a name="line.920"></a>
+<FONT color="green">921</FONT>                    }<a name="line.921"></a>
+<FONT color="green">922</FONT>                    SystemLogger.logger().info("Converts the parser model '"+ mcoPath.getName()+ "' into '"+newMcoPath.getName()+"'....\n");<a name="line.922"></a>
+<FONT color="green">923</FONT>                    copyConfigFile(mcoPath, newMcoPath, versioning);<a name="line.923"></a>
+<FONT color="green">924</FONT>            }<a name="line.924"></a>
+<FONT color="green">925</FONT>            <a name="line.925"></a>
+<FONT color="green">926</FONT>            protected void checkNConvertConfigVersion() throws MaltChainedException {<a name="line.926"></a>
+<FONT color="green">927</FONT>                    if (createdByMaltParserVersion.startsWith("1.0")) {<a name="line.927"></a>
+<FONT color="green">928</FONT>                            SystemLogger.logger().info("  Converts the MaltParser configuration ");<a name="line.928"></a>
+<FONT color="green">929</FONT>                            SystemLogger.logger().info("1.0");<a name="line.929"></a>
+<FONT color="green">930</FONT>                            SystemLogger.logger().info(" to ");<a name="line.930"></a>
+<FONT color="green">931</FONT>                            SystemLogger.logger().info(SystemInfo.getVersion());<a name="line.931"></a>
+<FONT color="green">932</FONT>                            SystemLogger.logger().info("\n");<a name="line.932"></a>
+<FONT color="green">933</FONT>                            File[] configFiles = configDirectory.listFiles();<a name="line.933"></a>
+<FONT color="green">934</FONT>                            for (int i = 0, n = configFiles.length; i &lt; n; i++) {<a name="line.934"></a>
+<FONT color="green">935</FONT>                                    if (configFiles[i].getName().endsWith(".mod")) {<a name="line.935"></a>
+<FONT color="green">936</FONT>                                            configFiles[i].renameTo(new File(configDirectory.getPath()+File.separator+"odm0."+configFiles[i].getName()));<a name="line.936"></a>
+<FONT color="green">937</FONT>                                    }<a name="line.937"></a>
+<FONT color="green">938</FONT>                                    if (configFiles[i].getName().endsWith(getName()+".dsm")) {<a name="line.938"></a>
+<FONT color="green">939</FONT>                                            configFiles[i].renameTo(new File(configDirectory.getPath()+File.separator+"odm0.dsm"));<a name="line.939"></a>
+<FONT color="green">940</FONT>                                    }<a name="line.940"></a>
+<FONT color="green">941</FONT>                                    if (configFiles[i].getName().equals("savedoptions.sop")) {<a name="line.941"></a>
+<FONT color="green">942</FONT>                                            configFiles[i].renameTo(new File(configDirectory.getPath()+File.separator+"savedoptions.sop.old"));<a name="line.942"></a>
+<FONT color="green">943</FONT>                                    }<a name="line.943"></a>
+<FONT color="green">944</FONT>                                    if (configFiles[i].getName().equals("symboltables.sym")) {<a name="line.944"></a>
+<FONT color="green">945</FONT>                                            configFiles[i].renameTo(new File(configDirectory.getPath()+File.separator+"symboltables.sym.old"));<a name="line.945"></a>
+<FONT color="green">946</FONT>                                    }<a name="line.946"></a>
+<FONT color="green">947</FONT>                            }<a name="line.947"></a>
+<FONT color="green">948</FONT>                            try {<a name="line.948"></a>
+<FONT color="green">949</FONT>                                    BufferedReader br = new BufferedReader(new FileReader(configDirectory.getPath()+File.separator+"savedoptions.sop.old"));<a name="line.949"></a>
+<FONT color="green">950</FONT>                                    BufferedWriter bw = new BufferedWriter(new FileWriter(configDirectory.getPath()+File.separator+"savedoptions.sop"));<a name="line.950"></a>
+<FONT color="green">951</FONT>                                    String line;<a name="line.951"></a>
+<FONT color="green">952</FONT>                                    while ((line = br.readLine()) != null) {<a name="line.952"></a>
+<FONT color="green">953</FONT>                                            if (line.startsWith("0\tguide\tprediction_strategy")) {<a name="line.953"></a>
+<FONT color="green">954</FONT>                                                    bw.write("0\tguide\tdecision_settings\tT.TRANS+A.DEPREL\n");<a name="line.954"></a>
+<FONT color="green">955</FONT>                                            } else {<a name="line.955"></a>
+<FONT color="green">956</FONT>                                                    bw.write(line);<a name="line.956"></a>
+<FONT color="green">957</FONT>                                                    bw.write('\n');<a name="line.957"></a>
+<FONT color="green">958</FONT>                                            }<a name="line.958"></a>
+<FONT color="green">959</FONT>                                    }<a name="line.959"></a>
+<FONT color="green">960</FONT>                                    br.close();<a name="line.960"></a>
+<FONT color="green">961</FONT>                                    bw.flush();<a name="line.961"></a>
+<FONT color="green">962</FONT>                                    bw.close();<a name="line.962"></a>
+<FONT color="green">963</FONT>                                    new File(configDirectory.getPath()+File.separator+"savedoptions.sop.old").delete();<a name="line.963"></a>
+<FONT color="green">964</FONT>                            } catch (FileNotFoundException e) {<a name="line.964"></a>
+<FONT color="green">965</FONT>                                    throw new ConfigurationException("Could convert savedoptions.sop version 1.0.4 to version 1.1. ", e);<a name="line.965"></a>
+<FONT color="green">966</FONT>                            }  catch (IOException e) {<a name="line.966"></a>
+<FONT color="green">967</FONT>                                    throw new ConfigurationException("Could convert savedoptions.sop version 1.0.4 to version 1.1. ", e);<a name="line.967"></a>
+<FONT color="green">968</FONT>                            }               <a name="line.968"></a>
+<FONT color="green">969</FONT>                            try {<a name="line.969"></a>
+<FONT color="green">970</FONT>                                    BufferedReader br = new BufferedReader(new FileReader(configDirectory.getPath()+File.separator+"symboltables.sym.old"));<a name="line.970"></a>
+<FONT color="green">971</FONT>                                    BufferedWriter bw = new BufferedWriter(new FileWriter(configDirectory.getPath()+File.separator+"symboltables.sym"));<a name="line.971"></a>
+<FONT color="green">972</FONT>                                    String line;<a name="line.972"></a>
+<FONT color="green">973</FONT>                                    while ((line = br.readLine()) != null) {<a name="line.973"></a>
+<FONT color="green">974</FONT>                                            if (line.startsWith("AllCombinedClassTable")) {<a name="line.974"></a>
+<FONT color="green">975</FONT>                                                    bw.write("T.TRANS+A.DEPREL\n");<a name="line.975"></a>
+<FONT color="green">976</FONT>                                            } else {<a name="line.976"></a>
+<FONT color="green">977</FONT>                                                    bw.write(line);<a name="line.977"></a>
+<FONT color="green">978</FONT>                                                    bw.write('\n');<a name="line.978"></a>
+<FONT color="green">979</FONT>                                            }<a name="line.979"></a>
+<FONT color="green">980</FONT>                                    }<a name="line.980"></a>
+<FONT color="green">981</FONT>                                    br.close();<a name="line.981"></a>
+<FONT color="green">982</FONT>                                    bw.flush();<a name="line.982"></a>
+<FONT color="green">983</FONT>                                    bw.close();<a name="line.983"></a>
+<FONT color="green">984</FONT>                                    new File(configDirectory.getPath()+File.separator+"symboltables.sym.old").delete();<a name="line.984"></a>
+<FONT color="green">985</FONT>                            } catch (FileNotFoundException e) {<a name="line.985"></a>
+<FONT color="green">986</FONT>                                    throw new ConfigurationException("Could convert symboltables.sym version 1.0.4 to version 1.1. ", e);<a name="line.986"></a>
+<FONT color="green">987</FONT>                            }  catch (IOException e) {<a name="line.987"></a>
+<FONT color="green">988</FONT>                                    throw new ConfigurationException("Could convert symboltables.sym version 1.0.4 to version 1.1. ", e);<a name="line.988"></a>
+<FONT color="green">989</FONT>                            }<a name="line.989"></a>
+<FONT color="green">990</FONT>                    }<a name="line.990"></a>
+<FONT color="green">991</FONT>                    if (!createdByMaltParserVersion.startsWith("1.3")) {<a name="line.991"></a>
+<FONT color="green">992</FONT>                            SystemLogger.logger().info("  Converts the MaltParser configuration ");<a name="line.992"></a>
+<FONT color="green">993</FONT>                            SystemLogger.logger().info(createdByMaltParserVersion);<a name="line.993"></a>
+<FONT color="green">994</FONT>                            SystemLogger.logger().info(" to ");<a name="line.994"></a>
+<FONT color="green">995</FONT>                            SystemLogger.logger().info(SystemInfo.getVersion());<a name="line.995"></a>
+<FONT color="green">996</FONT>                            SystemLogger.logger().info("\n");<a name="line.996"></a>
+<FONT color="green">997</FONT>                            <a name="line.997"></a>
+<FONT color="green">998</FONT>    <a name="line.998"></a>
+<FONT color="green">999</FONT>                            new File(configDirectory.getPath()+File.separator+"savedoptions.sop").renameTo(new File(configDirectory.getPath()+File.separator+"savedoptions.sop.old"));<a name="line.999"></a>
+<FONT color="green">1000</FONT>                            try {<a name="line.1000"></a>
+<FONT color="green">1001</FONT>                                    BufferedReader br = new BufferedReader(new FileReader(configDirectory.getPath()+File.separator+"savedoptions.sop.old"));<a name="line.1001"></a>
+<FONT color="green">1002</FONT>                                    BufferedWriter bw = new BufferedWriter(new FileWriter(configDirectory.getPath()+File.separator+"savedoptions.sop"));<a name="line.1002"></a>
+<FONT color="green">1003</FONT>                                    String line;<a name="line.1003"></a>
+<FONT color="green">1004</FONT>                                    while ((line = br.readLine()) != null) {<a name="line.1004"></a>
+<FONT color="green">1005</FONT>                                            int index = line.indexOf('\t');<a name="line.1005"></a>
+<FONT color="green">1006</FONT>                                            int container = 0;<a name="line.1006"></a>
+<FONT color="green">1007</FONT>                                            if (index &gt; -1) {<a name="line.1007"></a>
+<FONT color="green">1008</FONT>                                                    container = Integer.parseInt(line.substring(0,index));<a name="line.1008"></a>
+<FONT color="green">1009</FONT>                                            }<a name="line.1009"></a>
+<FONT color="green">1010</FONT>                                            <a name="line.1010"></a>
+<FONT color="green">1011</FONT>                                            if (line.startsWith(container+"\tnivre\tpost_processing")) {<a name="line.1011"></a>
+<FONT color="green">1012</FONT>                                            } else if (line.startsWith(container+"\tmalt0.4\tbehavior")) {<a name="line.1012"></a>
+<FONT color="green">1013</FONT>                                                    if (line.endsWith("true")) {<a name="line.1013"></a>
+<FONT color="green">1014</FONT>                                                            SystemLogger.logger().info("MaltParser 1.3 doesn't support MaltParser 0.4 emulation.");<a name="line.1014"></a>
+<FONT color="green">1015</FONT>                                                            br.close();<a name="line.1015"></a>
+<FONT color="green">1016</FONT>                                                            bw.flush();<a name="line.1016"></a>
+<FONT color="green">1017</FONT>                                                            bw.close();<a name="line.1017"></a>
+<FONT color="green">1018</FONT>                                                            deleteConfigDirectory();<a name="line.1018"></a>
+<FONT color="green">1019</FONT>                                                            System.exit(0);<a name="line.1019"></a>
+<FONT color="green">1020</FONT>                                                    }<a name="line.1020"></a>
+<FONT color="green">1021</FONT>                                            } else if (line.startsWith(container+"\tsinglemalt\tparsing_algorithm")) {<a name="line.1021"></a>
+<FONT color="green">1022</FONT>                                                    bw.write(container);<a name="line.1022"></a>
+<FONT color="green">1023</FONT>                                                    bw.write("\tsinglemalt\tparsing_algorithm\t");<a name="line.1023"></a>
+<FONT color="green">1024</FONT>                                                    if (line.endsWith("NivreStandard")) {<a name="line.1024"></a>
+<FONT color="green">1025</FONT>                                                            bw.write("class org.maltparser.parser.algorithm.nivre.NivreArcStandardFactory");        <a name="line.1025"></a>
+<FONT color="green">1026</FONT>                                                    } else if (line.endsWith("NivreEager")) {<a name="line.1026"></a>
+<FONT color="green">1027</FONT>                                                            bw.write("class org.maltparser.parser.algorithm.nivre.NivreArcEagerFactory");<a name="line.1027"></a>
+<FONT color="green">1028</FONT>                                                    } else if (line.endsWith("CovingtonNonProjective")) {<a name="line.1028"></a>
+<FONT color="green">1029</FONT>                                                            bw.write("class org.maltparser.parser.algorithm.covington.CovingtonNonProjFactory");<a name="line.1029"></a>
+<FONT color="green">1030</FONT>                                                    } else if (line.endsWith("CovingtonProjective")) {<a name="line.1030"></a>
+<FONT color="green">1031</FONT>                                                            bw.write("class org.maltparser.parser.algorithm.covington.CovingtonProjFactory");<a name="line.1031"></a>
+<FONT color="green">1032</FONT>                                                    }<a name="line.1032"></a>
+<FONT color="green">1033</FONT>                                                    bw.write('\n');<a name="line.1033"></a>
+<FONT color="green">1034</FONT>                                            } else {<a name="line.1034"></a>
+<FONT color="green">1035</FONT>                                                    bw.write(line);<a name="line.1035"></a>
+<FONT color="green">1036</FONT>                                                    bw.write('\n');<a name="line.1036"></a>
+<FONT color="green">1037</FONT>                                            }<a name="line.1037"></a>
+<FONT color="green">1038</FONT>                                    }<a name="line.1038"></a>
+<FONT color="green">1039</FONT>                                    br.close();<a name="line.1039"></a>
+<FONT color="green">1040</FONT>                                    bw.flush();<a name="line.1040"></a>
+<FONT color="green">1041</FONT>                                    bw.close();<a name="line.1041"></a>
+<FONT color="green">1042</FONT>                                    new File(configDirectory.getPath()+File.separator+"savedoptions.sop.old").delete();<a name="line.1042"></a>
+<FONT color="green">1043</FONT>                            } catch (FileNotFoundException e) {<a name="line.1043"></a>
+<FONT color="green">1044</FONT>                                    throw new ConfigurationException("Could convert savedoptions.sop version 1.0.4 to version 1.1. ", e);<a name="line.1044"></a>
+<FONT color="green">1045</FONT>                            }  catch (IOException e) {<a name="line.1045"></a>
+<FONT color="green">1046</FONT>                                    throw new ConfigurationException("Could convert savedoptions.sop version 1.0.4 to version 1.1. ", e);<a name="line.1046"></a>
+<FONT color="green">1047</FONT>                            }<a name="line.1047"></a>
+<FONT color="green">1048</FONT>                    }<a name="line.1048"></a>
+<FONT color="green">1049</FONT>            }<a name="line.1049"></a>
+<FONT color="green">1050</FONT>            <a name="line.1050"></a>
+<FONT color="green">1051</FONT>            /**<a name="line.1051"></a>
+<FONT color="green">1052</FONT>             * Terminates the configuration directory<a name="line.1052"></a>
+<FONT color="green">1053</FONT>             * <a name="line.1053"></a>
+<FONT color="green">1054</FONT>             * @throws MaltChainedException<a name="line.1054"></a>
+<FONT color="green">1055</FONT>             */<a name="line.1055"></a>
+<FONT color="green">1056</FONT>            public void terminate() throws MaltChainedException {<a name="line.1056"></a>
+<FONT color="green">1057</FONT>                    if (infoFile != null) {<a name="line.1057"></a>
+<FONT color="green">1058</FONT>                            try {<a name="line.1058"></a>
+<FONT color="green">1059</FONT>                                    infoFile.flush();<a name="line.1059"></a>
+<FONT color="green">1060</FONT>                                    infoFile.close();<a name="line.1060"></a>
+<FONT color="green">1061</FONT>                            } catch (IOException e) {<a name="line.1061"></a>
+<FONT color="green">1062</FONT>                                    throw new ConfigurationException("Could not close configuration information file. ", e);<a name="line.1062"></a>
+<FONT color="green">1063</FONT>                            }<a name="line.1063"></a>
+<FONT color="green">1064</FONT>                    }<a name="line.1064"></a>
+<FONT color="green">1065</FONT>                    symbolTables = null;<a name="line.1065"></a>
+<FONT color="green">1066</FONT>    //              configuration = null;<a name="line.1066"></a>
+<FONT color="green">1067</FONT>            }<a name="line.1067"></a>
+<FONT color="green">1068</FONT>            <a name="line.1068"></a>
+<FONT color="green">1069</FONT>            /* (non-Javadoc)<a name="line.1069"></a>
+<FONT color="green">1070</FONT>             * @see java.lang.Object#finalize()<a name="line.1070"></a>
+<FONT color="green">1071</FONT>             */<a name="line.1071"></a>
+<FONT color="green">1072</FONT>            protected void finalize() throws Throwable {<a name="line.1072"></a>
+<FONT color="green">1073</FONT>                    try {<a name="line.1073"></a>
+<FONT color="green">1074</FONT>                            if (infoFile != null) {<a name="line.1074"></a>
+<FONT color="green">1075</FONT>                                    infoFile.flush();<a name="line.1075"></a>
+<FONT color="green">1076</FONT>                                    infoFile.close();<a name="line.1076"></a>
+<FONT color="green">1077</FONT>                            }<a name="line.1077"></a>
+<FONT color="green">1078</FONT>                    } finally {<a name="line.1078"></a>
+<FONT color="green">1079</FONT>                            super.finalize();<a name="line.1079"></a>
+<FONT color="green">1080</FONT>                    }<a name="line.1080"></a>
+<FONT color="green">1081</FONT>            }<a name="line.1081"></a>
+<FONT color="green">1082</FONT>            <a name="line.1082"></a>
+<FONT color="green">1083</FONT>            public SymbolTableHandler getSymbolTables() {<a name="line.1083"></a>
+<FONT color="green">1084</FONT>                    return symbolTables;<a name="line.1084"></a>
+<FONT color="green">1085</FONT>            }<a name="line.1085"></a>
+<FONT color="green">1086</FONT>    <a name="line.1086"></a>
+<FONT color="green">1087</FONT>            public void setSymbolTables(SymbolTableHandler symbolTables) {<a name="line.1087"></a>
+<FONT color="green">1088</FONT>                    this.symbolTables = symbolTables;<a name="line.1088"></a>
+<FONT color="green">1089</FONT>            }<a name="line.1089"></a>
+<FONT color="green">1090</FONT>    <a name="line.1090"></a>
+<FONT color="green">1091</FONT>            public DataFormatManager getDataFormatManager() {<a name="line.1091"></a>
+<FONT color="green">1092</FONT>                    return dataFormatManager;<a name="line.1092"></a>
+<FONT color="green">1093</FONT>            }<a name="line.1093"></a>
+<FONT color="green">1094</FONT>    <a name="line.1094"></a>
+<FONT color="green">1095</FONT>            public void setDataFormatManager(DataFormatManager dataFormatManager) {<a name="line.1095"></a>
+<FONT color="green">1096</FONT>                    this.dataFormatManager = dataFormatManager;<a name="line.1096"></a>
+<FONT color="green">1097</FONT>            }<a name="line.1097"></a>
+<FONT color="green">1098</FONT>            <a name="line.1098"></a>
+<FONT color="green">1099</FONT>            public HashMap&lt;String, DataFormatInstance&gt; getDataFormatInstances() {<a name="line.1099"></a>
+<FONT color="green">1100</FONT>                    return dataFormatInstances;<a name="line.1100"></a>
+<FONT color="green">1101</FONT>            }<a name="line.1101"></a>
+<FONT color="green">1102</FONT>    }<a name="line.1102"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

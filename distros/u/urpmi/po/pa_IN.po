@@ -1,0 +1,3888 @@
+# translation of urpmi.po to Panjabi
+# This file is distributed under the same license as the PACKAGE package.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Kanwaljeet Singh Brar <kanwaljeetbrar@yahoo.co.in>, 2005.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: urpmi\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-01 19:38+0200\n"
+"PO-Revision-Date: 2005-03-23 21:55+0530\n"
+"Last-Translator: Kanwaljeet Singh Brar <kanwaljeetbrar@yahoo.co.in>\n"
+"Language-Team: Panjabi <fedora-trans-pa@redhat.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.9.1\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: ../gurpmi:32
+#, c-format
+msgid "RPM installation"
+msgstr "RPM ਇੰਸਟਾਲੇਸ਼ਨ"
+
+#: ../gurpmi:46
+#, c-format
+msgid "Error: unable to find file %s, will cancel operation"
+msgstr ""
+
+#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#, c-format
+msgid "_Ok"
+msgstr "ਠੀਕ ਹੈ(_O)"
+
+#: ../gurpmi:67
+#, c-format
+msgid ""
+"You have selected a source package:\n"
+"\n"
+"%s\n"
+"\n"
+"You probably didn't want to install it on your computer (installing it would "
+"allow you to make modifications to its sourcecode then compile it).\n"
+"\n"
+"What would you like to do?"
+msgstr ""
+"ਤੁਸੀਂ ਇੱਕ ਸਰੋਤ ਪੈਕੇਜ ਚੁਣਿਆ ਹੈ:\n"
+"\n"
+"%s\n"
+"\n"
+"ਤੁਸੀਂ ਸੰਭਵ ਤੌਰ ਤੇ ਇਸ ਨੂੰ ਆਪਣੇ ਕੰਪਿਊਟਰ ਤੇ ਇੰਟਸਟਾਲ ਨਹੀਂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ (ਇਸ ਨਾਲ ਤੁਹਾਨੂੰ ਇਸ ਵਿੱਚ "
+"ਸੋਧਾਂ ਕਰਕੇ ਕੰਪਾਇਲ ਕਰਨਾ ਪਵੇਗਾ)।\n"
+"\n"
+"ਤੁਸੀਂ ਕੀ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
+
+#: ../gurpmi:75 ../gurpmi:86
+#, c-format
+msgid ""
+"You are about to install the following software packages on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"Proceed?"
+msgstr ""
+"ਤੁਸੀਂ ਆਪਣੇ ਕੰਪਿਊਟਰ ਤੇ ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਇੰਸਟਾਲ ਕਰਨ ਲਈ ਤਿਆਰ ਹੋ:\n"
+"\n"
+"%s\n"
+"\n"
+"ਜਾਰੀ ਰੱਖਣਾ ਹੈ?"
+
+#: ../gurpmi:81
+#, c-format
+msgid ""
+"You are about to install the following software package on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"You may prefer to just save it. What is your choice?"
+msgstr ""
+"ਤੁਸੀਂ ਆਪਣੇ ਕੰਪਿਊਟਰ ਤੇ ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਇੰਸਟਾਲ ਕਰਨ ਲਈ ਤਿਆਰ ਹੋ:\n"
+"\n"
+"%s\n"
+"\n"
+"ਤੁਸੀਂ ਇਸ ਨੂੰ ਸਿਰਫ਼ ਸੰਭਾਲ ਵੀ ਸਕਦੇ ਹੋ। ਤੁਹਾਡੀ ਚੋਣ ਕੀ ਹੈ?"
+
+#: ../gurpmi:99
+#, c-format
+msgid "_Install"
+msgstr "ਇੰਸਟਾਲ(_I)"
+
+#: ../gurpmi:100
+#, c-format
+msgid "_Save"
+msgstr "ਸੰਭਾਲੋ(_S)"
+
+#: ../gurpmi:101 ../gurpmi2:197
+#, c-format
+msgid "_Cancel"
+msgstr "ਰੱਦ(_C)"
+
+#: ../gurpmi:109
+#, c-format
+msgid "Choose location to save file"
+msgstr "ਫਾਇਲ਼ ਸੰਭਾਲਣ ਲਈ ਟਿਕਾਣਾ ਦਿਓ"
+
+#: ../gurpmi.pm:41
+#, c-format
+msgid "Options:"
+msgstr ""
+
+#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#, c-format
+msgid "  --help         - print this help message.\n"
+msgstr "  --help         - print this help message.\n"
+
+#: ../gurpmi.pm:43 ../urpmi:74
+#, c-format
+msgid ""
+"  --auto         - non-interactive mode, assume default answers to "
+"questions.\n"
+msgstr ""
+
+#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#, c-format
+msgid ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+msgstr ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+
+#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#, c-format
+msgid ""
+"  --force        - force invocation even if some packages do not exist.\n"
+msgstr ""
+"  --force        - force invocation even if some packages do not exist.\n"
+
+#: ../gurpmi.pm:46 ../urpmi:129
+#, fuzzy, c-format
+msgid ""
+"  --verify-rpm   - verify rpm signature before installation\n"
+"                   (--no-verify-rpm disables it, default is enabled).\n"
+msgstr ""
+"  --verify-rpm   - verify rpm signature before installation\n"
+"                   (--no-verify-rpm disable it, default is enabled).\n"
+
+#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#, c-format
+msgid "  --media        - use only the given media, separated by comma.\n"
+msgstr "  --media        - use only the given media, separated by comma.\n"
+
+#: ../gurpmi.pm:49 ../urpmi:146
+#, c-format
+msgid "  -p             - allow search in provides to find package.\n"
+msgstr "  -p             - allow search in provides to find package.\n"
+
+#: ../gurpmi.pm:50 ../urpmi:147
+#, c-format
+msgid "  -P             - do not search in provides to find package.\n"
+msgstr "  -P             - do not search in provides to find package.\n"
+
+#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#, c-format
+msgid "  --root         - use another root for rpm installation.\n"
+msgstr "  --root         - use another root for rpm installation.\n"
+
+#: ../gurpmi.pm:52 ../urpmi:131
+#, fuzzy, c-format
+msgid ""
+"  --test         - only verify if the installation can be achieved "
+"correctly.\n"
+msgstr ""
+"  --test         - verify if the installation can be achieved correctly.\n"
+
+#: ../gurpmi.pm:53 ../urpmi:71
+#, fuzzy, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested packages.\n"
+msgstr ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+
+#: ../gurpmi.pm:96
+#, fuzzy, c-format
+msgid "No packages specified"
+msgstr "ਕੋਈ ਪੈਕੇਜ %s ਨਾਂ ਨਾਲ ਨਹੀਂ"
+
+#: ../gurpmi2:55
+#, c-format
+msgid "Please wait..."
+msgstr "ਕਿਰਪਾ ਕਰਕੇ ਇੰਤਜ਼ਾਰ ਕਰੋ..."
+
+#: ../gurpmi2:64
+#, c-format
+msgid "Must be root"
+msgstr "ਪ੍ਰਬੰਧਕ (root) ਬਣਨਾ ਪਵੇਗਾ"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Distribution Upgrade"
+msgstr "%s ਵੰਡਿਆ ਜਾਦਾ ਹ"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Packages installation"
+msgstr "ਪੈਕੇਜ ਇੰਸਟਾਲੇਸ਼ਨ..."
+
+#: ../gurpmi2:98
+#, c-format
+msgid "Preparing packages installation..."
+msgstr "ਪੈਕੇਜ ਇੰਸਟਾਲੇਸ਼ਨ ਲਈ ਤਿਆਰੀ ਜਾਰੀ..."
+
+#: ../gurpmi2:113 ../urpmi:505
+#, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s"
+msgstr ""
+"ਮੰਗੇ ਕੁਝ ਪੈਕੇਜ ਇੰਸਟਾਲ ਨਹੀਂ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ:\n"
+"%s"
+
+#: ../gurpmi2:121
+#, fuzzy, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"ਲੋੜੀਦੇ ਕੁਝ ਪੈਕੇਜ ਇੰਸਟਾਲ ਨਹੀਂ ਹੋ ਸਕਦੇ:\n"
+"%s\n"
+"ਜਾਰੀ ਰੱਖਣਾ ਹੈ?"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Warning"
+msgstr "ਚੇਤਾਵਨੀ"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Ok"
+msgstr "ਠੀਕ ਹੈ"
+
+#: ../gurpmi2:193
+#, c-format
+msgid " (to upgrade)"
+msgstr " (ਨਵੀਨੀਕਰਨ ਕਰਨ ਲਈ)"
+
+#: ../gurpmi2:194
+#, c-format
+msgid " (to install)"
+msgstr " (ਇੰਸਟਾਲ ਕਰਨ ਲਈ)"
+
+#: ../gurpmi2:197
+#, c-format
+msgid "Package choice"
+msgstr ""
+
+#: ../gurpmi2:198
+#, c-format
+msgid "One of the following packages is needed:"
+msgstr "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਦੀ ਲੋੜ ਹੈ:"
+
+#: ../gurpmi2:223
+#, c-format
+msgid "_Abort"
+msgstr "ਛੱਡੋ(_A)"
+
+#: ../gurpmi2:258
+#, fuzzy, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਹੋਰਾਂ ਦਾ ਨਵੀਨੀਕਰਨ ਕਰਨ ਦੌਰਾਨ ਹਟਾ ਦਿੱਤੇ ਜਾਣਗੇ:\n"
+"%s\n"
+"ਕੀ ਜਾਰੀ ਰੱਖਣਾ ਹੈ?"
+
+#: ../gurpmi2:277 ../urpmi:605
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following package is going to be installed:"
+msgstr "ਨਿਰਭਰਤਾ ਹੱਲ ਕਰਨ ਲਈ, ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ (%d ਮੈਬਾ)"
+
+#: ../gurpmi2:278 ../urpmi:606
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following packages are going to be installed:"
+msgstr ""
+"ਨਿਰਭਰਤਾ ਸਮਾਪਤ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ:\n"
+"%s\n"
+
+#: ../gurpmi2:280
+#, c-format
+msgid "(%d package, %d MB)"
+msgid_plural "(%d packages, %d MB)"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#, c-format
+msgid "unable to get source packages, aborting"
+msgstr "ਸਰੋਤ ਪੈਕੇਜ ਪ੍ਰਾਪਤ ਕਰਨ ਤੋਂ ਅਸਫਲ, ਅਧੂਰਾ ਛੱਡਿਆ ਜਾਦਾ ਹੈ"
+
+#: ../gurpmi2:320 ../urpm/install.pm:104
+#, c-format
+msgid "Preparing..."
+msgstr "ਤਿਆਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...."
+
+#: ../gurpmi2:326
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "`%s' (%s/%s) ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
+
+#: ../gurpmi2:344 ../urpmi:633
+#, fuzzy, c-format
+msgid "Please insert the medium named \"%s\""
+msgstr "ਕਿਪਾ ਕਰਕੇ \"%s\" ਨਾਂ ਮਾਧਿਅਮ [%s] ਜੰਤਰ ਵਿੱਚ ਪਾਓ"
+
+#: ../gurpmi2:358
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "`%s' ਪੈਕੇਜ ਡਾਊਨਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
+
+#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
+#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
+#: ../urpm/media.pm:1657
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "...ਪ੍ਰਾਪਤੀ ਅਸਫਲ: %s"
+
+#: ../gurpmi2:387
+#, c-format
+msgid "_Done"
+msgstr "ਸਮਾਪਤ(_D)"
+
+#: ../gurpmi2:404 ../urpm/main_loop.pm:82
+#, fuzzy, c-format
+msgid ""
+"Installation failed, some files are missing:\n"
+"%s"
+msgstr "ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਹੋਈ"
+
+#: ../gurpmi2:407
+#, fuzzy, c-format
+msgid "You may want to update your urpmi database."
+msgstr ""
+"ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਰਹੀ ਹੈ, ਕੁਝ ਫਾਇਲਾਂ ਨਹੀਂ ਹਨ:\n"
+"%s\n"
+"ਤੁਸੀਂ ਆਪਣੇ urpmi ਡਾਟਾਬੇਸ ਦਾ ਨਵੀਨੀਕਰਨ ਕਰ ਸਕਦੇ ਹੋ"
+
+#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
+#, fuzzy, c-format
+msgid "Installation failed:"
+msgstr "ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਹੋਈ"
+
+#: ../gurpmi2:416
+#, c-format
+msgid "The package(s) are already installed"
+msgstr "ਪੈਕੇਜ ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹਨ"
+
+#: ../gurpmi2:418
+#, c-format
+msgid "Installation finished"
+msgstr "ਇੰਸਟਾਲੇਸ਼ ਸਮਾਪਤ"
+
+#: ../gurpmi2:419 ../urpme:165
+#, c-format
+msgid "removing %s"
+msgstr "%s ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../gurpmi2:430 ../urpmi:691
+#, c-format
+msgid "restarting urpmi"
+msgstr "urpmi ਮੁੜ ਚਾਲੂ"
+
+#: ../rpm-find-leaves:15
+#, c-format
+msgid ""
+"usage: %s [options]\n"
+"where [options] are from\n"
+msgstr ""
+"ਵਰਤੋਂ: %s [options]\n"
+"ਜਿੱਥੇ [options] ਹੈ\n"
+
+#: ../rpm-find-leaves:17
+#, c-format
+msgid "   -h|--help      - print this help message.\n"
+msgstr "   -h|--help      - print this help message.\n"
+
+#: ../rpm-find-leaves:18
+#, c-format
+msgid "   --root <path>  - use the given root instead of /\n"
+msgstr "   --root <path>  - use the given root instead of /\n"
+
+#: ../rpm-find-leaves:19
+#, c-format
+msgid "   -g [group]     - restrict results to specified group.\n"
+msgstr "   -g [group]     - restrict results to specified group.\n"
+
+#: ../rpm-find-leaves:20
+#, c-format
+msgid "                    defaults to %s.\n"
+msgstr "                    %s ਮੂਲ ਹੈ।\n"
+
+#: ../rpm-find-leaves:21
+#, fuzzy, c-format
+msgid "   -f             - output rpm full name (NVRA)\n"
+msgstr "  -g             - print groups with name also.\n"
+
+#: ../rurpmi:11 ../urpmi:265
+#, c-format
+msgid "Only superuser is allowed to install packages"
+msgstr "ਸਿਰਫ਼ ਪ੍ਰਬੰਧਕ ਨੂੰ ਪੈਕੇਜ ਇੰਸਟਾਲ ਕਰਨ ਦੀ ਇਜ਼ਾਜਤ ਹੈ"
+
+#: ../rurpmi:18
+#, c-format
+msgid "Running urpmi in restricted mode..."
+msgstr ""
+
+#: ../urpm.pm:23
+#, c-format
+msgid "While some packages may have been installed, there were failures.\n"
+msgstr ""
+
+#: ../urpm.pm:110
+#, fuzzy, c-format
+msgid "fail to create directory %s"
+msgstr "ਬੱਗ ਜਾਣਕਾਰੀ ਲਈ ਡਾਇਰੈਕਟਰੀ [%s] ਬਣਾਉਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm.pm:111
+#, c-format
+msgid "invalid owner for directory %s"
+msgstr ""
+
+#: ../urpm.pm:135
+#, fuzzy, c-format
+msgid "Can not download packages into %s"
+msgstr "`%s' ਪੈਕੇਜ ਡਾਊਨਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
+
+#: ../urpm.pm:150
+#, c-format
+msgid "Environment directory %s does not exist"
+msgstr ""
+
+#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#, c-format
+msgid "using specific environment on %s\n"
+msgstr "%s ਤੇ ਖਾਸ ਵਾਤਾਵਰਣ ਦੀ ਵਰਤੋਂ ਕਰਕੇ\n"
+
+#: ../urpm.pm:313
+#, c-format
+msgid "unable to open rpmdb"
+msgstr "rpmdb ਖੋਲਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm.pm:327
+#, c-format
+msgid "invalid rpm file name [%s]"
+msgstr "ਗਲਤ rpm ਫਾਇਲ ਨਾਂ [%s]"
+
+#: ../urpm.pm:333
+#, c-format
+msgid "retrieving rpm file [%s] ..."
+msgstr "rpm ਫਾਇਲ [%s] ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਅਸਫਲ..."
+
+#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#, c-format
+msgid "...retrieving done"
+msgstr "...ਪ੍ਰਾਪਤੀ ਹੋਈ"
+
+#: ../urpm.pm:343
+#, c-format
+msgid "unable to access rpm file [%s]"
+msgstr "rpm ਫਾਇਲ [%s] ਖੋਲਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm.pm:348
+#, fuzzy, c-format
+msgid "unable to parse spec file %s [%s]"
+msgstr "ਫਾਇਲ [%s] ਵਿੱਚ \"%s\" ਨੂੰ ਪਾਰਸ ਕਰਨ ਲਈ ਅਸਫਲ"
+
+#: ../urpm.pm:356
+#, c-format
+msgid "unable to register rpm file"
+msgstr "rpm ਫਾਇਲ ਰਜਿਸਟਰ ਕਰਨ ਲਈ ਅਸਫਲ"
+
+#: ../urpm.pm:358
+#, c-format
+msgid "Incompatible architecture for rpm [%s]"
+msgstr ""
+
+#: ../urpm.pm:362
+#, c-format
+msgid "error registering local packages"
+msgstr "ਸਥਾਨਕ ਪੈਕੇਜ ਰਜਿਸਟਰ ਕਰਨ ਦੌਰਾਨ ਗਲਤੀ"
+
+#: ../urpm.pm:450
+#, c-format
+msgid "This operation is forbidden while running in restricted mode"
+msgstr ""
+
+#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#, c-format
+msgid "bad proxy declaration on command line\n"
+msgstr "ਕਮਾਂਡ ਸਤਰ ਤੇ ਗਲਤ ਪਰਾਕਸੀ ਪ੍ਰਗਟਾ\n"
+
+#: ../urpm/args.pm:306
+#, c-format
+msgid "urpmq: cannot read rpm file \"%s\"\n"
+msgstr "urpmq: rpm ਫਾਇਲ \"%s\" ਪੜੀ ਨਹੀਂ ਜਾ ਸਕਦੀ\n"
+
+#: ../urpm/args.pm:384
+#, c-format
+msgid "unexpected expression %s"
+msgstr ""
+
+#: ../urpm/args.pm:385
+#, fuzzy, c-format
+msgid "missing expression before %s"
+msgstr "ਦਸਤਖਤ (%s) ਗੁੰਮ ਹਨ"
+
+#: ../urpm/args.pm:391
+#, c-format
+msgid "unexpected expression %s (suggestion: use -a or -o ?)"
+msgstr ""
+
+#: ../urpm/args.pm:395
+#, c-format
+msgid "no expression to close"
+msgstr ""
+
+#: ../urpm/args.pm:404
+#, c-format
+msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
+msgstr ""
+
+#: ../urpm/args.pm:478
+#, c-format
+msgid "chroot directory doesn't exist"
+msgstr ""
+
+#: ../urpm/args.pm:501
+#, c-format
+msgid "Can't use %s without %s"
+msgstr ""
+
+#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#, c-format
+msgid "Can't use %s with %s"
+msgstr ""
+
+#: ../urpm/args.pm:515
+#, c-format
+msgid "Too many arguments\n"
+msgstr ""
+
+#: ../urpm/args.pm:523
+#, c-format
+msgid ""
+"%s version %s\n"
+"%s\n"
+"This is free software and may be redistributed under the terms of the GNU "
+"GPL.\n"
+"\n"
+"usage:\n"
+msgstr ""
+"%s ਵਰਜਨ %s\n"
+"%s\n"
+"ਇਹ ਮੁਫਤ ਹੈ ਅਤੇ ਇਸ ਨੂੰ GNU GPL ਹੇਠ ਮੁੜ ਵੰਡਿਆ ਜਾ ਸਕਦਾ ਹੈ।\n"
+"\n"
+"ਵਰਤੋਂ:\n"
+
+#: ../urpm/args.pm:529
+#, c-format
+msgid "Copyright (C) %s by %s"
+msgstr ""
+
+#: ../urpm/bug_report.pm:67 ../urpmi:255
+#, c-format
+msgid "Copying failed"
+msgstr "ਨਕਲ ਕਰਨੀ ਅਸਫਲ"
+
+#: ../urpm/cdrom.pm:80
+#, c-format
+msgid ""
+"You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
+"automatically)"
+msgstr ""
+
+#: ../urpm/cdrom.pm:82
+#, c-format
+msgid "Udisks daemon (udisks-daemon) is not running or not ready"
+msgstr ""
+
+#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
+#, fuzzy, c-format
+msgid "medium \"%s\" is not available"
+msgstr "ਮਾਧਿਅਮ \"%s\" ਚੁਣਿਆ ਨਹੀਂ ਜਾ ਸਕਿਆ"
+
+#: ../urpm/cdrom.pm:218
+#, c-format
+msgid "unable to read rpm file [%s] from medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਤੋਂ rpm ਫਾਇਲ਼ [%s] ਪੜਨ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/cfg.pm:82
+#, fuzzy, c-format
+msgid "syntax error in config file at line %s"
+msgstr "ਸੰਰਚਨਾ ਫਾਇਲ [%s] ਲਿਖਣ ਤੋਂ ਅਸਫਲ"
+
+#: ../urpm/cfg.pm:115
+#, fuzzy, c-format
+msgid "unable to read config file [%s]"
+msgstr "ਸੰਰਚਨਾ ਫਾਇਲ [%s] ਲਿਖਣ ਤੋਂ ਅਸਫਲ"
+
+#: ../urpm/cfg.pm:141
+#, c-format
+msgid "medium `%s' is defined twice, aborting"
+msgstr ""
+
+#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#, c-format
+msgid "unable to write config file [%s]"
+msgstr "ਸੰਰਚਨਾ ਫਾਇਲ [%s] ਲਿਖਣ ਤੋਂ ਅਸਫਲ"
+
+#: ../urpm/download.pm:95
+#, c-format
+msgid "%s is not available, falling back on %s"
+msgstr ""
+
+#: ../urpm/download.pm:178
+#, c-format
+msgid "can not read proxy settings (not enough rights to read %s)"
+msgstr ""
+
+#: ../urpm/download.pm:208
+#, c-format
+msgid "Please enter your credentials for accessing proxy\n"
+msgstr ""
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "User name:"
+msgstr "ਉਪਭੋਗਤਾ ਨਾਂ:"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "Password:"
+msgstr "ਗੁਪਤ-ਕੋਡ:"
+
+#: ../urpm/download.pm:295
+#, c-format
+msgid "Unknown webfetch `%s' !!!\n"
+msgstr ""
+
+#: ../urpm/download.pm:303
+#, c-format
+msgid "%s failed: exited with signal %d"
+msgstr ""
+
+#: ../urpm/download.pm:304
+#, c-format
+msgid "%s failed: exited with %d"
+msgstr ""
+
+#: ../urpm/download.pm:338
+#, fuzzy, c-format
+msgid "copy failed"
+msgstr "ਨਕਲ ਕਰਨੀ ਅਸਫਲ"
+
+#: ../urpm/download.pm:344
+#, fuzzy, c-format
+msgid "wget is missing\n"
+msgstr "ਗੁੰਮ %s ਹੋਣ ਕਰਕੇ"
+
+#: ../urpm/download.pm:411
+#, fuzzy, c-format
+msgid "curl is missing\n"
+msgstr "ਗੁੰਮ %s ਹੋਣ ਕਰਕੇ"
+
+#: ../urpm/download.pm:547
+#, c-format
+msgid "curl failed: upload canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:548
+#, c-format
+msgid "curl failed: download canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:583
+#, c-format
+msgid "rsync is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:651
+#, c-format
+msgid "ssh is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:670
+#, c-format
+msgid "prozilla is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:686
+#, c-format
+msgid "Couldn't execute prozilla\n"
+msgstr ""
+
+#: ../urpm/download.pm:696
+#, fuzzy, c-format
+msgid "aria2 is missing\n"
+msgstr "ਗੁੰਮ %s ਹੋਣ ਕਰਕੇ"
+
+#: ../urpm/download.pm:740
+#, c-format
+msgid "Failed to download %s"
+msgstr ""
+
+#: ../urpm/download.pm:835
+#, c-format
+msgid "        %s%% of %s completed, ETA = %s, speed = %s"
+msgstr ""
+
+#: ../urpm/download.pm:836
+#, c-format
+msgid "        %s%% completed, speed = %s"
+msgstr ""
+
+#: ../urpm/download.pm:921
+#, fuzzy, c-format
+msgid "retrieving %s"
+msgstr "%s ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/download.pm:932
+#, fuzzy, c-format
+msgid "retrieved %s"
+msgstr "...ਪ੍ਰਾਪਤੀ ਅਸਫਲ: %s"
+
+#: ../urpm/download.pm:994
+#, c-format
+msgid "unknown protocol defined for %s"
+msgstr "%s ਲਈ ਅਣਜਾਣ ਪ੍ਰੋਟੋਕਾਲ"
+
+#: ../urpm/download.pm:1008
+#, c-format
+msgid "no webfetch found, supported webfetch are: %s\n"
+msgstr "ਕੋਈ webfetch ਨਹੀਂ ਲੱਭਿਆ ਹੈ, ਸਹਿਯੋਗ webfetch ਹਨ: %s\n"
+
+#: ../urpm/download.pm:1023
+#, c-format
+msgid "unable to handle protocol: %s"
+msgstr "ਪ੍ਰੋਟੋਕਾਲ ਹੈਂਡਲ ਕਰਨ ਲਈ ਅਸਫਲ: %s"
+
+#: ../urpm/get_pkgs.pm:29
+#, fuzzy, c-format
+msgid "cleaning %s and %s"
+msgstr "%s ਨੂੰ %s ਤੋਂ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/get_pkgs.pm:141
+#, c-format
+msgid "package %s is not found."
+msgstr "ਪੈਕੇਜ %s ਨਹੀਂ ਲੱਭਿਆ ਹੈ।"
+
+#: ../urpm/get_pkgs.pm:277
+#, c-format
+msgid "retrieving rpm files from medium \"%s\"..."
+msgstr "ਮਾਧਿਅ \"%s\" ਤੋਂ rpm ਫਾਇਲਾਂ ਪ੍ਰਾਪਤ ਕੀਤੀਆਂ ਜਾਦੀਆਂ ਹਨ..."
+
+#: ../urpm/install.pm:110
+#, c-format
+msgid "[repackaging]"
+msgstr ""
+
+#: ../urpm/install.pm:201
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr "%s ਤੇ ਇੰਸਟਾਲ ਕਰਨ ਲਈ ਸੰਚਾਰ ਬਣਾਇਆ (ਹਟਾਏ=%d, ਇੰਸਟਾਲ=%d, ਨਵੀਨੀਕਰਨ=%d)"
+
+#: ../urpm/install.pm:204
+#, c-format
+msgid "unable to create transaction"
+msgstr "ਸੰਚਾਰ ਕਰਨ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/install.pm:229
+#, fuzzy, c-format
+msgid "unable to extract rpm from delta-rpm package %s"
+msgstr "ਪੈਕੇਜ %s ਹਟਾਉਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/install.pm:242
+#, c-format
+msgid "unable to install package %s"
+msgstr "ਪੈਕੇਜ %s ਇੰਸਟਾਲ ਕਰਨ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/install.pm:245
+#, fuzzy, c-format
+msgid "removing bad rpm (%s) from %s"
+msgstr "%s ਨੂੰ %s ਤੋਂ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/install.pm:246 ../urpm/install.pm:311
+#, fuzzy, c-format
+msgid "removing %s failed: %s"
+msgstr "...ਪ੍ਰਾਪਤੀ ਅਸਫਲ: %s"
+
+#: ../urpm/install.pm:292
+#, fuzzy, c-format
+msgid "Removing package %s"
+msgstr "ਪੈਕੇਜ %s ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/install.pm:293
+#, c-format
+msgid "removing package %s"
+msgstr "ਪੈਕੇਜ %s ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/install.pm:309
+#, fuzzy, c-format
+msgid "removing installed rpms (%s) from %s"
+msgstr "%s ਨੂੰ %s ਤੋਂ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/install.pm:318
+#, c-format
+msgid "More information on package %s"
+msgstr "ਪੈਕੇਜ %s ਬਾਰੇ ਵਧੇਰੇ ਜਾਣਕਾਰੀ"
+
+#: ../urpm/ldap.pm:44
+#, c-format
+msgid "Cannot create ldap cache directory"
+msgstr ""
+
+#: ../urpm/ldap.pm:46
+#, c-format
+msgid "Cannot write cache file for ldap\n"
+msgstr ""
+
+#: ../urpm/ldap.pm:181
+#, c-format
+msgid "No server defined, missing uri or host"
+msgstr ""
+
+#: ../urpm/ldap.pm:182
+#, fuzzy, c-format
+msgid "No base defined"
+msgstr "ਕੋਈ ਪੈਕੇਜ %s ਨਾਂ ਨਾਲ ਨਹੀਂ"
+
+#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#, c-format
+msgid "Cannot connect to ldap uri:"
+msgstr ""
+
+#: ../urpm/lock.pm:99
+#, fuzzy, c-format
+msgid "%s database is locked, process %d is already using it"
+msgstr "urpmi ਡਾਟਾਬੇਸ ਤਾਲਾਬੰਦ ਹੈ"
+
+#: ../urpm/lock.pm:101
+#, c-format
+msgid "%s database is locked (another program is already using it)"
+msgstr ""
+
+#: ../urpm/lock.pm:115
+#, fuzzy, c-format
+msgid "%s database is locked. Waiting..."
+msgstr "urpmi ਡਾਟਾਬੇਸ ਤਾਲਾਬੰਦ ਹੈ"
+
+#: ../urpm/lock.pm:116
+#, fuzzy, c-format
+msgid "aborting"
+msgstr "ਚੇਤਾਵਨੀ"
+
+#: ../urpm/main_loop.pm:58
+#, c-format
+msgid "Retry?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:85
+#, fuzzy, c-format
+msgid "You may need to update your urpmi database."
+msgstr ""
+"ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਰਹੀ ਹੈ, ਕੁਝ ਫਾਇਲਾਂ ਨਹੀਂ ਹਨ:\n"
+"%s\n"
+"ਤੁਸੀਂ ਆਪਣੇ urpmi ਡਾਟਾਬੇਸ ਦਾ ਨਵੀਨੀਕਰਨ ਕਰ ਸਕਦੇ ਹੋ"
+
+#: ../urpm/main_loop.pm:89
+#, fuzzy, c-format
+msgid ""
+"Installation failed, bad rpms:\n"
+"%s"
+msgstr "ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਹੋਈ"
+
+#: ../urpm/main_loop.pm:108
+#, c-format
+msgid ""
+"There is not enough space on your filesystem to download all packages (%s "
+"needed, %s available).\n"
+"Are you sure you want to continue?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:138
+#, fuzzy, c-format
+msgid "The following package has bad signature"
+msgstr "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਤੇ ਗਲਤ ਦਸਤਖਤ ਹਨ"
+
+#: ../urpm/main_loop.pm:139
+#, c-format
+msgid "The following packages have bad signatures"
+msgstr "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਤੇ ਗਲਤ ਦਸਤਖਤ ਹਨ"
+
+#: ../urpm/main_loop.pm:140
+#, c-format
+msgid "Do you want to continue installation ?"
+msgstr "ਕੀ ਤੁਸੀਂ ਇੰਸਟਾਲੇਸ਼ਨ ਨਾਲ ਜਾਰੀ ਰਹਿਣਾ ਚਾਹੁੰਦੇ ਹੋ?"
+
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
+#: ../urpm/main_loop.pm:296
+#, c-format
+msgid "Installation failed"
+msgstr "ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਹੋਈ"
+
+#: ../urpm/main_loop.pm:159
+#, fuzzy, c-format
+msgid "removing installed rpms (%s)"
+msgstr "%s ਨੂੰ %s ਤੋਂ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/main_loop.pm:185
+#, c-format
+msgid "Try to continue anyway?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:234
+#, c-format
+msgid "installing %s from %s"
+msgstr "%s ਨੂੰ %s ਤੋਂ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/main_loop.pm:236
+#, c-format
+msgid "installing %s"
+msgstr "%s ਇੰਸਟਾਲੇਸ਼ਨ ਜਾਰੀ"
+
+#: ../urpm/main_loop.pm:243
+#, c-format
+msgid "distributing %s"
+msgstr "%s ਵੰਡਿਆ ਜਾਦਾ ਹ"
+
+#: ../urpm/main_loop.pm:289
+#, fuzzy, c-format
+msgid "Try installation without checking dependencies?"
+msgstr "ਬਿਨਾਂ ਨਿਰਭਰਤਾਂ ਦੇ ਇੰਸਟਾਲੇਸ਼ਨ ਲਈ ਕੋਸ਼ਿਸ ਕਰਨੀ ਹੈ? (y/N) "
+
+#: ../urpm/main_loop.pm:297
+#, fuzzy, c-format
+msgid "Try harder to install (--force)?"
+msgstr "ਇੰਸਟਾਲੇਸ਼ਨ ਨੂੰ ਧੱਕੇ ਨਾਲ ਵਰਤਣਾ ਹੈ (--force)? (y/N) "
+
+#: ../urpm/main_loop.pm:490
+#, c-format
+msgid "Packages are up to date"
+msgstr ""
+
+#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#, c-format
+msgid "Installation is possible"
+msgstr "ਇੰਸਟਾਲੇਸ਼ਨ ਸੰਭਵ ਹੈ"
+
+#: ../urpm/md5sum.pm:55
+#, c-format
+msgid "warning: md5sum for %s unavailable in MD5SUM file"
+msgstr "ਚੇਤਾਵਨੀ: %s ਲਈ md5sum MD5SUM ਫਾਇਲ ਉਪਲੱਬਧ ਨਹੀਂ ਹੈ"
+
+#: ../urpm/media.pm:270
+#, c-format
+msgid "virtual medium \"%s\" should have a clear url, medium ignored"
+msgstr "ਵੁਰਚੁਅਲ ਮਾਧਿਅਮ \"%s\" ਨੂੰ ਠੀਕ url ਚਾਹੀਦਾ ਹੈ, ਮਾਧਿਅਣ ਅਣਡਿੱਠਾ"
+
+#: ../urpm/media.pm:272
+#, c-format
+msgid "unable to access list file of \"%s\", medium ignored"
+msgstr "\"%s\" ਦੀ list ਫਾਇਲ ਲਈ ਪਹੁੰਚ ਤੋਂ ਅਸਫਲ ਹੈ, ਮਾਧਿਅਮ ਛੱਡਿਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/media.pm:275
+#, fuzzy, c-format
+msgid "unable to access synthesis file of \"%s\", medium ignored"
+msgstr "\"%s\" ਦੀ hdlist ਫਾਇਲ ਲਈ ਪਹੁੰਚ ਤੋਂ ਅਸਫਲ ਹੈ, ਮਾਧਿਅਮ ਛੱਡਿਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/media.pm:301
+#, fuzzy, c-format
+msgid "trying to override existing medium \"%s\", skipping"
+msgstr "ਮੌਜੂਦ ਮਾਧਿਅਮ \"%s\" ਤੋਂ ਬਚਣ ਦੀ ਕੋਸ਼ਿਸ ਕੀਤੀ ਜਾਦੀ ਹੈ, ਅਧੂਰਾ ਛੱਡਿਆ"
+
+#: ../urpm/media.pm:517
+#, c-format
+msgid "failed to migrate removable device, ignoring media"
+msgstr ""
+
+#: ../urpm/media.pm:555
+#, c-format
+msgid "wrote config file [%s]"
+msgstr "ਸੰਰਚਨਾ ਫਾਇਲ਼ [%s] ਲਿਖੋ"
+
+#: ../urpm/media.pm:598
+#, c-format
+msgid "Can't use parallel mode with use-distrib mode"
+msgstr "use-distrib ਢੰਗ ਨਾਲ ਸਮਾਂਤਰ ਢੰਗ ਨਹੀਂ ਵਰਤਿਆ ਜਾ ਸਕਦਾ ਹੈ"
+
+#: ../urpm/media.pm:606
+#, c-format
+msgid "using associated media for parallel mode: %s"
+msgstr "ਸਮਾਂਤਰ ਢੰਗ ਲਈ ਸਬੰਧਤ ਮਾਧਿਅਮ ਵਰਤ ਕੇ: %s"
+
+#: ../urpm/media.pm:622
+#, fuzzy, c-format
+msgid ""
+"--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
+"update, --use-distrib or --parallel"
+msgstr ""
+"--synthesis ਨੂੰ --media, --excludemedia, --sortmedia, --update ਜਾਂ --parallel "
+"ਨਹੀਂ ਵਰਤਿਆ ਜਾ ਸਕਦਾ"
+
+#: ../urpm/media.pm:731
+#, c-format
+msgid "Search start: %s end: %s"
+msgstr "ਖੋਜ ਸ਼ੁਰੂ: %s ਅੰਤ: %s"
+
+#: ../urpm/media.pm:748
+#, c-format
+msgid "skipping package %s"
+msgstr "ਪੈਕੇਜ %s ਛੱਡਿਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/media.pm:764
+#, c-format
+msgid "would install instead of upgrade package %s"
+msgstr "ਪੈਕੇਜ %s ਨਵੀਨੀਕਰਨ ਕਰਨ ਦੀ ਬਜਾਏ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਵੇਗਾ"
+
+#: ../urpm/media.pm:840
+#, c-format
+msgid "medium \"%s\" already exists"
+msgstr "ਮਾਧਿਅਮ \"%s\" ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ"
+
+#: ../urpm/media.pm:882
+#, c-format
+msgid "(ignored by default)"
+msgstr ""
+
+#: ../urpm/media.pm:888
+#, fuzzy, c-format
+msgid "adding medium \"%s\" before remote medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਤੋਂ ਸਿਰਲੇਖ ਵੇਖੇ ਜਾ ਰਹੇ ਹਨ"
+
+#: ../urpm/media.pm:894
+#, fuzzy, c-format
+msgid "adding medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/media.pm:918
+#, fuzzy, c-format
+msgid "failed to copy media.cfg to %s (%d)"
+msgstr "rpmdb ਖੋਲਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/media.pm:960
+#, c-format
+msgid "directory %s does not exist"
+msgstr ""
+
+#: ../urpm/media.pm:968
+#, c-format
+msgid "this location doesn't seem to contain any distribution"
+msgstr ""
+
+#: ../urpm/media.pm:992
+#, fuzzy, c-format
+msgid "unable to parse media.cfg"
+msgstr "rpmdb ਖੋਲਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/media.pm:995
+#, fuzzy, c-format
+msgid "unable to access the distribution medium (no media.cfg file found)"
+msgstr "ਪਹਿਲੇ ਇੰਸਟਾਲੇਸ਼ਨ ਮਾਧਿਅਮ ਨੂੰ ਕੋਲਣ ਲ਼ਈ ਅਸਫਲ (ਕੋਈ hdlists ਫਾਇਲ ਨਹੀਂ ਲੱਭੀ)"
+
+#: ../urpm/media.pm:1016
+#, c-format
+msgid "skipping non compatible media `%s' (for %s)"
+msgstr ""
+
+#: ../urpm/media.pm:1031
+#, fuzzy, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr "ਮਾਧਿਅਮ %s ਅਣਡਿੱਠਾ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ"
+
+#: ../urpm/media.pm:1074
+#, fuzzy, c-format
+msgid "retrieving media.cfg file..."
+msgstr "hdlists ਫਾਇਲ ਪ੍ਰਾਪਤ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
+
+#: ../urpm/media.pm:1117
+#, c-format
+msgid "trying to select nonexistent medium \"%s\""
+msgstr "ਨਾ-ਮੌਜੂਦ ਮਾਧਿਅਮ \"%s\" ਨੂੰ ਚੁਣਨ ਦੀ ਕੋਸ਼ਿਸ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ"
+
+#: ../urpm/media.pm:1120
+#, c-format
+msgid "selecting multiple media: %s"
+msgstr "ਕਈ ਮਾਧਿਅਮ ਚੁਣੇ ਜਾ ਰਹੇ ਹਨ: %s"
+
+#: ../urpm/media.pm:1179
+#, c-format
+msgid "removing medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/media.pm:1262
+#, c-format
+msgid "reconfiguring urpmi for media \"%s\""
+msgstr "\"%s\" ਮਾਧਿਅਮ ਲਈ urpmi ਮੁੜ-ਸੰਰਚਨਾ"
+
+#: ../urpm/media.pm:1296
+#, c-format
+msgid "...reconfiguration failed"
+msgstr "...ਮੁੜ-ਸੰਰਚਨਾ ਅਸਫਲ"
+
+#: ../urpm/media.pm:1302
+#, c-format
+msgid "reconfiguration done"
+msgstr "ਮੁੜ ਸੰਰਚਨਾ ਹੋਈ"
+
+#: ../urpm/media.pm:1318
+#, c-format
+msgid "Error generating names file: dependency %d not found"
+msgstr ""
+
+#: ../urpm/media.pm:1339
+#, fuzzy, c-format
+msgid "medium \"%s\" is up-to-date"
+msgstr "ਮਾਧਿਅਮ \"%s\" ਚੁਣਿਆ ਨਹੀਂ ਜਾ ਸਕਿਆ"
+
+#: ../urpm/media.pm:1350
+#, c-format
+msgid "examining synthesis file [%s]"
+msgstr "ਸ਼ੰਸਲੇਸ਼ਨ ਫਾਇਲ [%s] ਪੜਤਾਲ ਜਾਰੀ"
+
+#: ../urpm/media.pm:1370
+#, c-format
+msgid "problem reading synthesis file of medium \"%s\""
+msgstr "\"%s\" ਮਾਧਿਅਮ ਦੀ ਸੰਸਲੇਸ਼ਨ ਫਾਇਲ ਪੜਨ ਦੌਰਾਨ ਸਮੱਸਿਆ"
+
+#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
+#, fuzzy, c-format
+msgid "copying [%s] for medium \"%s\"..."
+msgstr "\"%s\" ਮਾਧਿਅਮ ਲਈ list ਫਾਇਲ ਲਿਖੀ ਜਾ ਰਹੀ ਹੈ"
+
+#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#, c-format
+msgid "...copying failed"
+msgstr "...ਨਕਲ ਅਸਫਲ"
+
+#: ../urpm/media.pm:1451
+#, c-format
+msgid "copying description file of \"%s\"..."
+msgstr "\"%s\" ਦੀ ਵੇਰਵਾ ਫਾਇਲ ਦੀ ਨਕਲ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
+
+#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#, c-format
+msgid "...copying done"
+msgstr "...ਨਕਲ ਹੋਈ"
+
+#: ../urpm/media.pm:1484
+#, c-format
+msgid "copy of [%s] failed (file is suspiciously small)"
+msgstr "[%s] ਦੀ ਨਕਲ ਅਸਫਲ (ਫਾਇਲ ਸ਼ੱਕੀ ਰੂਪ ਵਿੱਚ ਛੋਟੀ ਹੈ)"
+
+#: ../urpm/media.pm:1532
+#, fuzzy, c-format
+msgid "computing md5sum of retrieved source synthesis"
+msgstr "ਪ੍ਰਾਪਤ ਸਰੋਤ hdlist (ਜਾਂ ਸੰਸਲੇਸ਼ਣ) ਦਾ md5sum ਕੱਢਿਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
+#, fuzzy, c-format
+msgid "retrieval of [%s] failed (md5sum mismatch)"
+msgstr "[%s] ਦੀ ਨਕਲ ਅਸਫਲ (md5sum ਮੇਲ ਨਹੀਂ ਖਾਂਦਾ)"
+
+#: ../urpm/media.pm:1549
+#, fuzzy, c-format
+msgid "genhdlist2 failed on %s"
+msgstr "hdlist ਫਾਇਲ [%s] ਪੜਤਾਲ ਜਾਰੀ"
+
+#: ../urpm/media.pm:1559
+#, fuzzy, c-format
+msgid "comparing %s and %s"
+msgstr "%s ਨੂੰ %s ਤੋਂ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/media.pm:1589
+#, fuzzy, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ hdlist ਫਾਇਲ ਨਹੀਂ ਮਿਲੀ"
+
+#: ../urpm/media.pm:1615
+#, fuzzy, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr "\"%s\" ਦੀ ਵੇਰਵਾ ਫਾਇਲ ਦੀ ਨਕਲ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
+
+#: ../urpm/media.pm:1655
+#, fuzzy, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr "ਗਲਤ rpm ਫਾਇਲ ਨਾਂ [%s]"
+
+#: ../urpm/media.pm:1658
+#, fuzzy, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ hdlist ਫਾਇਲ ਨਹੀਂ ਮਿਲੀ"
+
+#: ../urpm/media.pm:1690
+#, fuzzy, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr "\"%s\" ਲਈ hdlist (ਜਾਂ ਸੰਸਲੇਸ਼ਨ) ਪ੍ਰਾਪਤ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
+
+#: ../urpm/media.pm:1756
+#, c-format
+msgid "examining pubkey file of \"%s\"..."
+msgstr "\"%s\" ਦੀ ਸਵਰਜਨਕ ਕੁੰਜੀ ਫਾਇਲ ਵੇਖੀ ਜਾਦੀ ਹੈ..."
+
+#: ../urpm/media.pm:1768
+#, c-format
+msgid "...imported key %s from pubkey file of \"%s\""
+msgstr "...\"%s\" ਦੀ ਸਰਵਜਨਕ ਕੁੰਜੀ ਤੋਂ %s ਕੁੰਜੀ ਆਯਾਤੀ ਕੀਤੀ"
+
+#: ../urpm/media.pm:1772
+#, c-format
+msgid "unable to import pubkey file of \"%s\""
+msgstr "\"%s\" ਦੀ ਸਵਰਜਨਕ ਕੁੰਜੀ ਆਯਾਤ ਕਰਨੀ ਅਸਫਲ"
+
+#: ../urpm/media.pm:1813
+#, fuzzy, c-format
+msgid "no synthesis file found for medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ hdlist ਫਾਇਲ ਨਹੀਂ ਮਿਲੀ"
+
+#: ../urpm/media.pm:1846
+#, fuzzy, c-format
+msgid "updated medium \"%s\""
+msgstr "ਮਾਧਿਅਮ %s ਸ਼ਾਮਲ"
+
+#: ../urpm/media.pm:1968
+#, c-format
+msgid "retrieval of [%s] failed"
+msgstr ""
+
+#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#, c-format
+msgid "trying again with mirror %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:112
+#, c-format
+msgid "Could not find a mirror from mirrorlist %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:260
+#, c-format
+msgid "found geolocalisation %s %.2f %.2f from timezone %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:305
+#, fuzzy, c-format
+msgid "getting mirror list from %s"
+msgstr "[%s] ਤੋਂ rpm ਫਾਇਲਾਂ ਪੜੀਆਂ ਜਾ ਰਹੀਆਂ ਹਨ"
+
+#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#, c-format
+msgid "Nn"
+msgstr "Nn"
+
+#. -PO: Add here the keys which might be pressed in the "Yes"-case.
+#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#, c-format
+msgid "Yy"
+msgstr "Yy"
+
+#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#, c-format
+msgid " (y/N) "
+msgstr " (y/N) "
+
+#: ../urpm/msg.pm:139
+#, c-format
+msgid "Sorry, bad choice, try again\n"
+msgstr "ਮੁਆਫੀ, ਗਲਤ ਚੋਣ, ਮੁੜ ਕੋਸ਼ਿਸ ਕਰੋ\n"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Package"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Version"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Release"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, fuzzy, c-format
+msgid "Arch"
+msgstr "ਖੋਜ"
+
+#: ../urpm/msg.pm:179
+#, c-format
+msgid "(suggested)"
+msgstr ""
+
+#: ../urpm/msg.pm:194
+#, fuzzy, c-format
+msgid "medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/msg.pm:194
+#, c-format
+msgid "command line"
+msgstr ""
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "B"
+msgstr ""
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "KB"
+msgstr "ਕਿਬਾ"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "MB"
+msgstr "ਮੈਬਾ"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "GB"
+msgstr "ਗੀਬਾ"
+
+#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#, c-format
+msgid "TB"
+msgstr "ਟੈਬਾ"
+
+#: ../urpm/orphans.pm:79
+#, c-format
+msgid "Marking %s as manually installed, it won't be auto-orphaned"
+msgstr ""
+
+#: ../urpm/orphans.pm:522
+#, fuzzy, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned."
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned."
+msgstr[0] "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਦੀ ਲੋੜ ਹੈ:"
+msgstr[1] "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਦੀ ਲੋੜ ਹੈ:"
+
+#: ../urpm/orphans.pm:525
+#, fuzzy, c-format
+msgid "You may wish to remove it."
+msgid_plural "You may wish to remove them."
+msgstr[0] "ਹਟਾਉਣ ਲਈ ਕੁਝ ਨਹੀਂ"
+msgstr[1] "ਹਟਾਉਣ ਲਈ ਕੁਝ ਨਹੀਂ"
+
+#: ../urpm/orphans.pm:542
+#, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans"
+"\""
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
+"orphans\""
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpm/parallel.pm:15
+#, c-format
+msgid "unable to parse \"%s\" in file [%s]"
+msgstr "ਫਾਇਲ [%s] ਵਿੱਚ \"%s\" ਨੂੰ ਪਾਰਸ ਕਰਨ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/parallel.pm:24
+#, c-format
+msgid "examining parallel handler in file [%s]"
+msgstr "ਫਾਇਲ [%s] ਵਿੱਚ ਸਮਾਂਤਰ ਹੈਂਡਲਰ ਦੀ ਖੋਜ ਜਾਰੀ"
+
+#: ../urpm/parallel.pm:35
+#, c-format
+msgid "found parallel handler for nodes: %s"
+msgstr "ਨੋਡਾਂ ਲਈ ਸਮਾਂਤਰ ਹੈਂਡਲਰ ਖੋਜੋ: %s"
+
+#: ../urpm/parallel.pm:39
+#, c-format
+msgid "unable to use parallel option \"%s\""
+msgstr "ਸਮਾਂਤਰ ਚੋਣ \"%s\" ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/parallel.pm:94
+#, c-format
+msgid "on node %s"
+msgstr ""
+
+#: ../urpm/parallel.pm:294
+#, fuzzy, c-format
+msgid "Installation failed on node %s"
+msgstr "ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਹੋਈ"
+
+#: ../urpm/parallel_ka_run.pm:58
+#, c-format
+msgid "rshp failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ka_run.pm:80
+#, c-format
+msgid "mput failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:27
+#, c-format
+msgid "scp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:39
+#, c-format
+msgid "cp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:86
+#, c-format
+msgid ""
+"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
+"code: %d)"
+msgstr ""
+
+#: ../urpm/removable.pm:46
+#, fuzzy, c-format
+msgid "unable to access medium \"%s\"."
+msgstr "ਮਾਧਿਅਮ \"%s\" ਨੂੰ ਵਰਤਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#, c-format
+msgid "mounting %s"
+msgstr "%s ਮਾਊਟ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/removable.pm:117
+#, c-format
+msgid "unmounting %s"
+msgstr "%s ਅਨਮਾਊਟ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpm/select.pm:45
+#, c-format
+msgid "urpmi was restarted, and the list of priority packages did not change"
+msgstr ""
+
+#: ../urpm/select.pm:47
+#, c-format
+msgid ""
+"urpmi was restarted, and the list of priority packages did change: %s vs %s"
+msgstr ""
+
+#: ../urpm/select.pm:217
+#, c-format
+msgid "No package named %s"
+msgstr "ਕੋਈ ਪੈਕੇਜ %s ਨਾਂ ਨਾਲ ਨਹੀਂ"
+
+#: ../urpm/select.pm:219 ../urpme:113
+#, c-format
+msgid "The following packages contain %s: %s"
+msgstr "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਵਿੱਚ %s: %s"
+
+#: ../urpm/select.pm:221
+#, c-format
+msgid "You should use \"-a\" to use all of them"
+msgstr ""
+
+#: ../urpm/select.pm:368
+#, fuzzy, c-format
+msgid "found package(s) %s in urpmi db, but none are installed"
+msgstr "ਪੈਕੇਜ ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹਨ"
+
+#: ../urpm/select.pm:600
+#, fuzzy, c-format
+msgid "Package %s is already installed"
+msgstr "ਪੈਕੇਜ ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹਨ"
+
+#: ../urpm/select.pm:601
+#, fuzzy, c-format
+msgid "Packages %s are already installed"
+msgstr "ਪੈਕੇਜ ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹਨ"
+
+#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#, c-format
+msgid "due to conflicts with %s"
+msgstr "%s ਨਾਲ ਅਪਵਾਦ ਕਰਕੇ"
+
+#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#, c-format
+msgid "due to unsatisfied %s"
+msgstr "ਨਾ-ਪੂਰਾ %s ਹੋਣ ਕਰਕੇ"
+
+#: ../urpm/select.pm:625
+#, c-format
+msgid "trying to promote %s"
+msgstr "%s ਨੂੰ ਵਧਾਉਣ ਦੀ ਕੋਸ਼ਿਸ ਦੌਰਾਨ"
+
+#: ../urpm/select.pm:626
+#, c-format
+msgid "in order to keep %s"
+msgstr "%s ਰੱਖਣ ਲਈ"
+
+#: ../urpm/select.pm:667
+#, fuzzy, c-format
+msgid ""
+"The following package has to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"ਹੋਰ ਪੈਕੇਜਾਂ ਦਾ ਨਵੀਨੀਕਰਨ ਕਰਨ ਦੌਰਾਨ ਇਹ ਪੈਕੇਜ ਹਟਾ ਦਿੱਤੇ ਜਾਣਗੇ:\n"
+"%s"
+
+#: ../urpm/select.pm:668
+#, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"ਹੋਰ ਪੈਕੇਜਾਂ ਦਾ ਨਵੀਨੀਕਰਨ ਕਰਨ ਦੌਰਾਨ ਇਹ ਪੈਕੇਜ ਹਟਾ ਦਿੱਤੇ ਜਾਣਗੇ:\n"
+"%s"
+
+#: ../urpm/select.pm:695
+#, c-format
+msgid "in order to install %s"
+msgstr "%s ਨੂੰ ਇੰਸਟਾਲ ਕਰਨ ਲਈ"
+
+#: ../urpm/select.pm:701
+#, c-format
+msgid "due to missing %s"
+msgstr "ਗੁੰਮ %s ਹੋਣ ਕਰਕੇ"
+
+#: ../urpm/signature.pm:62
+#, c-format
+msgid "Invalid signature (%s)"
+msgstr "ਗਲਤ ਦਸਤਖਤ (%s)"
+
+#: ../urpm/signature.pm:77
+#, fuzzy, c-format
+msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
+msgstr "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਵਿੱਚ %s: %s"
+
+#: ../urpm/signature.pm:83
+#, c-format
+msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
+msgstr ""
+
+#: ../urpm/signature.pm:102
+#, c-format
+msgid "Invalid Key ID (%s)"
+msgstr "ਗਲਤ ਕੁੰਜੀ ID (%s)"
+
+#: ../urpm/signature.pm:104
+#, c-format
+msgid "Missing signature (%s)"
+msgstr "ਦਸਤਖਤ (%s) ਗੁੰਮ ਹਨ"
+
+#: ../urpm/signature.pm:107
+#, c-format
+msgid "SECURITY: Medium \"%s\" has no key (%s)!"
+msgstr ""
+
+#: ../urpm/signature.pm:109
+#, c-format
+msgid "Medium without key (%s)"
+msgstr ""
+
+#: ../urpm/sys.pm:225
+#, c-format
+msgid "system"
+msgstr ""
+
+#: ../urpm/sys.pm:262
+#, c-format
+msgid "You should restart your computer for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:264
+#, c-format
+msgid "You should restart your session for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:266
+#, c-format
+msgid "You should restart %s for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't write file"
+msgstr "ਫਾਇਲ [%s] ਲਿਖਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't open file"
+msgstr "ਨਕਲ ਕਰਨੀ ਅਸਫਲ"
+
+#: ../urpm/sys.pm:417
+#, fuzzy, c-format
+msgid "Can't move file %s to %s"
+msgstr "ਨਕਲ ਕਰਨੀ ਅਸਫਲ"
+
+#: ../urpme:43
+#, c-format
+msgid "  --auto         - automatically select a package in choices.\n"
+msgstr "  --auto         - automatically select a package in choices.\n"
+
+#: ../urpme:44
+#, c-format
+msgid "  --auto-orphans - remove orphans\n"
+msgstr ""
+
+#: ../urpme:45
+#, c-format
+msgid "  --test         - verify if the removal can be achieved correctly.\n"
+msgstr "  --test         - verify if the removal can be achieved correctly.\n"
+
+#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#, c-format
+msgid "  --parallel     - distributed urpmi across machines of alias.\n"
+msgstr "  --parallel     - distributed urpmi across machines of alias.\n"
+
+#: ../urpme:48 ../urpmi:138
+#, fuzzy, c-format
+msgid "  --repackage    - Re-package the files before erasing\n"
+msgstr "  --packager     - print tag packager: packager.\n"
+
+#: ../urpme:49
+#, c-format
+msgid "  --root         - use another root for rpm removal.\n"
+msgstr "  --root         - use another root for rpm removal.\n"
+
+#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
+#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, fuzzy, c-format
+msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
+msgstr "  --root         - use another root for rpm installation.\n"
+
+#: ../urpme:51 ../urpmi:96
+#, fuzzy, c-format
+msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
+msgstr "  --update       - update only update media.\n"
+
+#: ../urpme:52
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr "  --description  - print tag description: description.\n"
+
+#: ../urpme:53
+#, fuzzy, c-format
+msgid ""
+"  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
+"                   to (un)install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to (un)install a chroot with --root option.\n"
+
+#: ../urpme:55 ../urpmi:149 ../urpmq:87
+#, fuzzy, c-format
+msgid "  --verbose, -v  - verbose mode.\n"
+msgstr "  --verbose      - verbose mode.\n"
+
+#: ../urpme:56
+#, c-format
+msgid "  -a             - select all packages matching expression.\n"
+msgstr "  -a             - select all packages matching expression.\n"
+
+#: ../urpme:71
+#, c-format
+msgid "Only superuser is allowed to remove packages"
+msgstr "ਸਿਰਫ਼ ਪ੍ਰਬੰਧਕ ਹੀ ਪੈਕੇਜ ਹਟਾ ਸਕਦੇ ਹਨ"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown packages"
+msgstr "ਅਣਜਾਣ ਪੈਕੇਜ"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown package"
+msgstr "ਅਣਜਾਣ ਪੈਕੇਜ"
+
+#: ../urpme:119
+#, fuzzy, c-format
+msgid "Removing the following package will break your system:"
+msgid_plural "Removing the following packages will break your system:"
+msgstr[0] "ਪੈਕੇਜ %s ਹਟਾਉਣ ਨਾਲ ਤੁਹਾਡਾ ਸਿਸਟਮ ਖਰਾਬ ਹੋ ਜਾਵੇਗਾ"
+msgstr[1] "ਪੈਕੇਜ %s ਹਟਾਉਣ ਨਾਲ ਤੁਹਾਡਾ ਸਿਸਟਮ ਖਰਾਬ ਹੋ ਜਾਵੇਗਾ"
+
+#: ../urpme:124
+#, c-format
+msgid "Nothing to remove"
+msgstr "ਹਟਾਉਣ ਲਈ ਕੁਝ ਨਹੀਂ"
+
+#: ../urpme:141
+#, fuzzy, c-format
+msgid "No orphans to remove"
+msgstr "ਹਟਾਉਣ ਲਈ ਕੁਝ ਨਹੀਂ"
+
+#: ../urpme:147
+#, fuzzy, c-format
+msgid "To satisfy dependencies, the following package will be removed"
+msgid_plural ""
+"To satisfy dependencies, the following %d packages will be removed"
+msgstr[0] "ਨਿਰਭਰਤਾ ਹੱਲ਼ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਹਟਾਏ ਜਾਣਗੇ (%d ਮੈਬਾ)"
+msgstr[1] "ਨਿਰਭਰਤਾ ਹੱਲ਼ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਹਟਾਏ ਜਾਣਗੇ (%d ਮੈਬਾ)"
+
+#: ../urpme:152
+#, fuzzy, c-format
+msgid "(orphan package)"
+msgid_plural "(orphan packages)"
+msgstr[0] "ਅਣਜਾਣ ਪੈਕੇਜ"
+msgstr[1] "ਅਣਜਾਣ ਪੈਕੇਜ"
+
+#: ../urpme:159
+#, fuzzy, c-format
+msgid "Remove %d package?"
+msgid_plural "Remove %d packages?"
+msgstr[0] "ਪੈਕੇਜ %s ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+msgstr[1] "ਪੈਕੇਜ %s ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#: ../urpme:164
+#, fuzzy, c-format
+msgid "testing removal of %s"
+msgstr "\"%s\" ਨੂੰ ਹਟਾਉਣਯੋਗ ਜੰਤਰ ਵਾਂਗ ਲਵੋ"
+
+#: ../urpme:181
+#, c-format
+msgid "Removal failed"
+msgstr "ਹਟਾਉਣਾ ਅਸਫਲ"
+
+#: ../urpme:183
+#, fuzzy, c-format
+msgid "Removal is possible"
+msgstr "ਹਟਾਉਣਾ ਅਸਫਲ"
+
+#: ../urpmf:31
+#, fuzzy, c-format
+msgid "  --version      - print this tool's version number.\n"
+msgstr "  --help         - print this help message.\n"
+
+#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#, fuzzy, c-format
+msgid "  --env          - use specific environment (typically a bug report).\n"
+msgstr ""
+"  --env          - use specific environment (typically a bug\n"
+"                   report).\n"
+
+#: ../urpmf:33 ../urpmi:69 ../urpmq:45
+#, c-format
+msgid "  --excludemedia - do not use the given media, separated by comma.\n"
+msgstr "  --excludemedia - do not use the given media, separated by comma.\n"
+
+#: ../urpmf:34
+#, c-format
+msgid ""
+"  --literal, -l  - don't match patterns, use argument as a literal string.\n"
+msgstr ""
+
+#: ../urpmf:37 ../urpmi:72 ../urpmq:46
+#, c-format
+msgid ""
+"  --sortmedia    - sort media according to substrings separated by comma.\n"
+msgstr ""
+"  --sortmedia    - sort media according to substrings separated by comma.\n"
+
+#: ../urpmf:38
+#, fuzzy, c-format
+msgid "  --use-distrib  - use the given path to access media\n"
+msgstr "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+
+#: ../urpmf:39 ../urpmi:73 ../urpmq:47
+#, c-format
+msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+msgstr "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+
+#: ../urpmf:40
+#, c-format
+msgid "  --uniq         - do not print identical lines twice.\n"
+msgstr "  --uniq         - do not print identical lines twice.\n"
+
+#: ../urpmf:41 ../urpmi:70 ../urpmq:42
+#, c-format
+msgid "  --update       - use only update media.\n"
+msgstr "  --update       - use only update media.\n"
+
+#: ../urpmf:42
+#, c-format
+msgid "  --verbose      - verbose mode.\n"
+msgstr "  --verbose      - verbose mode.\n"
+
+#: ../urpmf:43
+#, c-format
+msgid "  -i             - ignore case distinctions in patterns.\n"
+msgstr "  -i             - ignore case distinctions in patterns.\n"
+
+#: ../urpmf:44
+#, fuzzy, c-format
+msgid "  -I             - honor case distinctions in patterns (default).\n"
+msgstr "  -i             - ignore case distinctions in patterns.\n"
+
+#: ../urpmf:45
+#, c-format
+msgid "  -F<str>        - change field separator (defaults to ':').\n"
+msgstr ""
+
+#: ../urpmf:46
+#, c-format
+msgid "Pattern expressions:\n"
+msgstr ""
+
+#: ../urpmf:47
+#, c-format
+msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
+msgstr ""
+
+#: ../urpmf:48
+#, c-format
+msgid "  -e             - include perl code directly as perl -e.\n"
+msgstr "  -e             - include perl code directly as perl -e.\n"
+
+#: ../urpmf:49
+#, fuzzy, c-format
+msgid "  -a             - binary AND operator.\n"
+msgstr ""
+"  -a             - binary AND operator, true if both expression are true.\n"
+
+#: ../urpmf:50
+#, fuzzy, c-format
+msgid "  -o             - binary OR operator.\n"
+msgstr ""
+"  -o             - binary OR operator, true if one expression is true.\n"
+
+#: ../urpmf:51
+#, fuzzy, c-format
+msgid "  !              - unary NOT.\n"
+msgstr "  -q             - quiet mode.\n"
+
+#: ../urpmf:52
+#, fuzzy, c-format
+msgid "  ( )            - left and right parentheses.\n"
+msgstr "  )              - right parenthesis to close group expression.\n"
+
+#: ../urpmf:53
+#, fuzzy, c-format
+msgid "List of tags:\n"
+msgstr ""
+"ਮੁੜ ਸੰਭਾਲ ਵਾਲੇ ਡਾਟੇ ਦੀ ਸੂਚੀ:\n"
+"\n"
+
+#: ../urpmf:54
+#, fuzzy, c-format
+msgid "  --qf           - specify a printf-like output format\n"
+msgstr "  -g             - print groups with name also.\n"
+
+#: ../urpmf:55
+#, fuzzy, c-format
+msgid "                   example: '%%name:%%files'\n"
+msgstr "                    %s ਮੂਲ ਹੈ।\n"
+
+#: ../urpmf:56
+#, fuzzy, c-format
+msgid "  --arch         - architecture\n"
+msgstr "  --url          - print tag url: url.\n"
+
+#: ../urpmf:57
+#, fuzzy, c-format
+msgid "  --buildhost    - build host\n"
+msgstr "  --buildhost    - print tag buildhost: build host.\n"
+
+#: ../urpmf:58
+#, c-format
+msgid "  --buildtime    - build time\n"
+msgstr ""
+
+#: ../urpmf:59
+#, fuzzy, c-format
+msgid "  --conffiles    - configuration files\n"
+msgstr "ਕੇਸੋਲ ਸੰਰਚਨਾ ਮੈਡੀਊਲ"
+
+#: ../urpmf:60
+#, fuzzy, c-format
+msgid "  --conflicts    - conflict tags\n"
+msgstr "  --conflicts    - print tag conflicts: all conflicts.\n"
+
+#: ../urpmf:61
+#, fuzzy, c-format
+msgid "  --description  - package description\n"
+msgstr "  --description  - print tag description: description.\n"
+
+#: ../urpmf:62
+#, c-format
+msgid "  --distribution - distribution\n"
+msgstr ""
+
+#: ../urpmf:63
+#, fuzzy, c-format
+msgid "  --epoch        - epoch\n"
+msgstr "  --epoch        - print tag epoch: epoch.\n"
+
+#: ../urpmf:64
+#, fuzzy, c-format
+msgid "  --filename     - filename of the package\n"
+msgstr "  --name         - print only package names.\n"
+
+#: ../urpmf:65
+#, fuzzy, c-format
+msgid "  --files        - list of files contained in the package\n"
+msgstr "  -l             - list files in package.\n"
+
+#: ../urpmf:66
+#, fuzzy, c-format
+msgid "  --group        - group\n"
+msgstr "  --group        - print tag group: group.\n"
+
+#: ../urpmf:67
+#, fuzzy, c-format
+msgid "  --license      - license\n"
+msgstr "  --name         - print only package names.\n"
+
+#: ../urpmf:68
+#, fuzzy, c-format
+msgid "  --name         - package name\n"
+msgstr "  --name         - print only package names.\n"
+
+#: ../urpmf:69
+#, fuzzy, c-format
+msgid "  --obsoletes    - obsoletes tags\n"
+msgstr "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+
+#: ../urpmf:70
+#, fuzzy, c-format
+msgid "  --packager     - packager\n"
+msgstr "  --packager     - print tag packager: packager.\n"
+
+#: ../urpmf:71
+#, fuzzy, c-format
+msgid "  --provides     - provides tags\n"
+msgstr "  --provides     - print tag provides: all provides.\n"
+
+#: ../urpmf:72
+#, fuzzy, c-format
+msgid "  --requires     - requires tags\n"
+msgstr "  --requires     - print tag requires: all requires.\n"
+
+#: ../urpmf:73
+#, fuzzy, c-format
+msgid "  --size         - installed size\n"
+msgstr "  --size         - print tag size: size.\n"
+
+#: ../urpmf:74
+#, fuzzy, c-format
+msgid "  --sourcerpm    - source rpm name\n"
+msgstr "  --sourcerpm    - print tag sourcerpm: source rpm.\n"
+
+#: ../urpmf:75
+#, fuzzy, c-format
+msgid "  --suggests     - suggests tags\n"
+msgstr "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+
+#: ../urpmf:76
+#, fuzzy, c-format
+msgid "  --summary      - summary\n"
+msgstr "  --summary      - print tag summary: summary.\n"
+
+#: ../urpmf:77
+#, fuzzy, c-format
+msgid "  --url          - url\n"
+msgstr "  --url          - print tag url: url.\n"
+
+#: ../urpmf:78
+#, fuzzy, c-format
+msgid "  --vendor       - vendor\n"
+msgstr "  --verbose      - verbose mode.\n"
+
+#: ../urpmf:79
+#, fuzzy, c-format
+msgid "  -m             - the media in which the package was found\n"
+msgstr "  -l             - list files in package.\n"
+
+#: ../urpmf:80 ../urpmq:97
+#, c-format
+msgid "  -f             - print version, release and arch with name.\n"
+msgstr "  -f             - print version, release and arch with name.\n"
+
+#: ../urpmf:148
+#, c-format
+msgid "unterminated expression (%s)"
+msgstr ""
+
+#: ../urpmf:193
+#, c-format
+msgid "Incorrect format: you may use only one multi-valued tag"
+msgstr ""
+
+#: ../urpmf:286
+#, fuzzy, c-format
+msgid "no hdlist available for medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ hdlist ਫਾਇਲ ਨਹੀਂ ਮਿਲੀ"
+
+#: ../urpmf:293
+#, fuzzy, c-format
+msgid "no synthesis available for medium \"%s\""
+msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ hdlist ਸੰਸਲੇਸ਼ਕ ਫਾਇਲ ਬਣਾਈ"
+
+#: ../urpmf:302
+#, fuzzy, c-format
+msgid "no xml-info available for medium \"%s\""
+msgstr "\"%s\" ਮਾਧਿਅਮ ਲਈ list ਫਾਇਲ ਲਿਖੀ ਜਾ ਰਹੀ ਹੈ"
+
+#: ../urpmi:76
+#, fuzzy, c-format
+msgid "  --auto-update  - update media then upgrade the system.\n"
+msgstr ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+
+#: ../urpmi:77
+#, fuzzy, c-format
+msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - disable MD5SUM file checking.\n"
+
+#: ../urpmi:78
+#, fuzzy, c-format
+msgid "    --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - force update of gpg key.\n"
+
+#: ../urpmi:79
+#, c-format
+msgid "  --auto-orphans - remove orphans without asking\n"
+msgstr ""
+
+#: ../urpmi:80 ../urpmq:52
+#, fuzzy, c-format
+msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
+msgstr "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+
+#: ../urpmi:81
+#, c-format
+msgid ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+msgstr ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+
+#: ../urpmi:82
+#, fuzzy, c-format
+msgid "  --no-install   - don't install packages (only download)\n"
+msgstr "  --install-src  - install only source package (no binaries).\n"
+
+#: ../urpmi:83 ../urpmq:54
+#, c-format
+msgid ""
+"  --keep         - keep existing packages if possible, reject requested\n"
+"                   packages that lead to removals.\n"
+msgstr ""
+"  --keep         - keep existing packages if possible, reject requested\n"
+"                   packages that lead to removals.\n"
+
+#: ../urpmi:85
+#, c-format
+msgid ""
+"  --split-level  - split in small transaction if more than given packages\n"
+"                   are going to be installed or upgraded,\n"
+"                   default is %d.\n"
+msgstr ""
+"  --split-level  - split in small transaction if more than given packages\n"
+"                   are going to be installed or upgraded,\n"
+"                   default is %d.\n"
+
+#: ../urpmi:89
+#, c-format
+msgid "  --split-length - small transaction length, default is %d.\n"
+msgstr "  --split-length - small transaction length, default is %d.\n"
+
+#: ../urpmi:91
+#, fuzzy, c-format
+msgid "  --fuzzy, -y    - impose fuzzy search.\n"
+msgstr "  --fuzzy        - impose fuzzy search (same as -y).\n"
+
+#: ../urpmi:92
+#, fuzzy, c-format
+msgid "  --buildrequires - install the buildrequires of the packages\n"
+msgstr "  --requires     - print tag requires: all requires.\n"
+
+#: ../urpmi:93
+#, c-format
+msgid "  --install-src  - install only source package (no binaries).\n"
+msgstr "  --install-src  - install only source package (no binaries).\n"
+
+#: ../urpmi:94
+#, c-format
+msgid "  --clean        - remove rpm from cache before anything else.\n"
+msgstr "  --clean        - remove rpm from cache before anything else.\n"
+
+#: ../urpmi:95
+#, fuzzy, c-format
+msgid "  --noclean      - don't clean rpms from cache.\n"
+msgstr "  --noclean      - keep rpm not used in cache.\n"
+
+#: ../urpmi:97
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr ""
+
+#: ../urpmi:99
+#, c-format
+msgid ""
+"  --allow-nodeps - allow asking user to install packages without\n"
+"                   dependencies checking.\n"
+msgstr ""
+"  --allow-nodeps - allow asking user to install packages without\n"
+"                   dependencies checking.\n"
+
+#: ../urpmi:101
+#, c-format
+msgid ""
+"  --allow-force  - allow asking user to install packages without\n"
+"                   dependencies checking and integrity.\n"
+msgstr ""
+"  --allow-force  - allow asking user to install packages without\n"
+"                   dependencies checking and integrity.\n"
+
+#: ../urpmi:103
+#, fuzzy, c-format
+msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
+msgstr "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+
+#: ../urpmi:107
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to install a chroot with --root option.\n"
+
+#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#, c-format
+msgid "  --metalink     - generate and use a local metalink.\n"
+msgstr ""
+
+#: ../urpmi:110
+#, c-format
+msgid ""
+"  --download-all - download all needed packages before trying to install "
+"them\n"
+msgstr ""
+
+#: ../urpmi:111
+#, c-format
+msgid ""
+"  --downloader   - program to use to retrieve distant files. \n"
+"                   known programs: %s\n"
+msgstr ""
+
+#: ../urpmi:114
+#, c-format
+msgid "  --curl-options - additional options to pass to curl\n"
+msgstr ""
+
+#: ../urpmi:115
+#, c-format
+msgid "  --rsync-options- additional options to pass to rsync\n"
+msgstr ""
+
+#: ../urpmi:116
+#, c-format
+msgid "  --wget-options - additional options to pass to wget\n"
+msgstr ""
+
+#: ../urpmi:117
+#, c-format
+msgid "  --prozilla-options - additional options to pass to prozilla\n"
+msgstr ""
+
+#: ../urpmi:118
+#, c-format
+msgid "  --aria2-options - additional options to pass to aria2\n"
+msgstr ""
+
+#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#, c-format
+msgid "  --limit-rate   - limit the download speed.\n"
+msgstr "  --limit-rate   - limit the download speed.\n"
+
+#: ../urpmi:120
+#, c-format
+msgid ""
+"  --resume       - resume transfer of partially-downloaded files\n"
+"                   (--no-resume disables it, default is disabled).\n"
+msgstr ""
+"  --resume       - resume transfer of partially-downloaded files\n"
+"                   (--no-resume disables it, default is disabled).\n"
+
+#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#, c-format
+msgid ""
+"  --proxy        - use specified HTTP proxy, the port number is assumed\n"
+"                   to be 1080 by default (format is <proxyhost[:port]>).\n"
+msgstr ""
+"  --proxy        - use specified HTTP proxy, the port number is assumed\n"
+"                   to be 1080 by default (format is <proxyhost[:port]>).\n"
+
+#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#, c-format
+msgid ""
+"  --proxy-user   - specify user and password to use for proxy\n"
+"                   authentication (format is <user:password>).\n"
+msgstr ""
+"  --proxy-user   - specify user and password to use for proxy\n"
+"                   authentication (format is <user:password>).\n"
+
+#: ../urpmi:126
+#, c-format
+msgid ""
+"  --bug          - output a bug report in directory indicated by\n"
+"                   next arg.\n"
+msgstr ""
+"  --bug          - output a bug report in directory indicated by\n"
+"                   next arg.\n"
+
+#: ../urpmi:132
+#, c-format
+msgid "  --excludepath  - exclude path separated by comma.\n"
+msgstr "  --excludepath  - exclude path separated by comma.\n"
+
+#: ../urpmi:133
+#, c-format
+msgid "  --excludedocs  - exclude doc files.\n"
+msgstr "  --excludedocs  - exclude doc files.\n"
+
+#: ../urpmi:134
+#, fuzzy, c-format
+msgid "  --ignoresize   - don't verify disk space before installation.\n"
+msgstr ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+
+#: ../urpmi:135
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr "  --url          - print tag url: url.\n"
+
+#: ../urpmi:136
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr "  --description  - print tag description: description.\n"
+
+#: ../urpmi:137
+#, fuzzy, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr "  --conflicts    - print tag conflicts: all conflicts.\n"
+
+#: ../urpmi:139
+#, c-format
+msgid "  --skip         - packages which installation should be skipped\n"
+msgstr "  --skip         - packages which installation should be skipped\n"
+
+#: ../urpmi:140
+#, fuzzy, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr "  --skip         - packages which installation should be skipped\n"
+
+#: ../urpmi:141
+#, c-format
+msgid ""
+"  --more-choices - when several packages are found, propose more choices\n"
+"                   than the default.\n"
+msgstr ""
+"  --more-choices - when several packages are found, propose more choices\n"
+"                   than the default.\n"
+
+#: ../urpmi:143
+#, fuzzy, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr "  --noclean      - keep rpm not used in cache.\n"
+
+#: ../urpmi:144
+#, c-format
+msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
+msgstr "  --strict-arch  - upgrade only packages with the same architecture.\n"
+
+#: ../urpmi:145 ../urpmq:95
+#, c-format
+msgid "  -a             - select all matches on command line.\n"
+msgstr "  -a             - select all matches on command line.\n"
+
+#: ../urpmi:148
+#, fuzzy, c-format
+msgid "  --quiet, -q    - quiet mode.\n"
+msgstr "  -q             - quiet mode.\n"
+
+#: ../urpmi:150
+#, fuzzy, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr "  --verbose      - verbose mode.\n"
+
+#: ../urpmi:151
+#, c-format
+msgid "  names or rpm files given on command line will be installed.\n"
+msgstr "  ਕਮਾਂਡ ਸਤਰ ਤੇ ਦਿੱਤੇ ਨਾਂ ਜਾਂ rpm ਫਾਇਲਾਂ ਨੂੰ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾਵੇਗਾ।\n"
+
+#: ../urpmi:179
+#, c-format
+msgid "Error: can't use --auto-select along with package list.\n"
+msgstr ""
+
+#: ../urpmi:186
+#, c-format
+msgid ""
+"Error: To generate a bug report, specify the usual command-line arguments\n"
+"along with --bug.\n"
+msgstr ""
+
+#: ../urpmi:216
+#, fuzzy, c-format
+msgid "You can't install binary rpm files when using --install-src"
+msgstr "ਬਾਈਨਰੀ rpm ਫਾਇਲਾਂ ਨਾਲ ਕੀ ਕਰਨਾ ਹੈ, ਜਦੋਂ ਕਿ --install-src ਵਰਤੋਂ"
+
+#: ../urpmi:217
+#, c-format
+msgid "You can't install spec files"
+msgstr ""
+
+#: ../urpmi:224
+#, c-format
+msgid "defaulting to --buildrequires"
+msgstr ""
+
+#: ../urpmi:229
+#, c-format
+msgid ""
+"please use --buildrequires or --install-src, defaulting to --buildrequires"
+msgstr ""
+
+#: ../urpmi:249
+#, c-format
+msgid ""
+"Directory [%s] already exists, please use another directory for bug report "
+"or delete it"
+msgstr ""
+"ਡਾਇਰੈਕਟਰੀ [%s] ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ, ਕਿਰਪਾ ਕਰਕੇ ਬੱਗ ਰਿਪੋਰਟ ਲਈ ਹੋਰ ਡਾਇਰੈਕਟਰੀ ਬਣਾਉ ਜਾਂ ਇਸ ਨੂੰ "
+"ਹਟਾਓ"
+
+#: ../urpmi:250
+#, c-format
+msgid "Unable to create directory [%s] for bug report"
+msgstr "ਬੱਗ ਜਾਣਕਾਰੀ ਲਈ ਡਾਇਰੈਕਟਰੀ [%s] ਬਣਾਉਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpmi:271
+#, c-format
+msgid ""
+"Error: %s appears to be mounted read-only.\n"
+"Use --allow-force to force operation."
+msgstr ""
+"ਗਲਤੀ: %s ਸ਼ਾਇਦ ਪੜਨ ਲਈ ਹੀ ਮਾਊਟ ਕੀਤੀ ਗਈ ਹੈ।\n"
+"ਧੱਕੇ ਕਰਨ ਲਈ --allow-force ਵਰਤੋਂ।"
+
+#. -PO: here format is "<package_name>: <summary> (to upgrade)"
+#: ../urpmi:425
+#, fuzzy, c-format
+msgid "%s: %s (to upgrade)"
+msgstr " (ਨਵੀਨੀਕਰਨ ਕਰਨ ਲਈ)"
+
+#. -PO: here format is "<package_name> (to upgrade)"
+#: ../urpmi:427
+#, fuzzy, c-format
+msgid "%s (to upgrade)"
+msgstr " (ਨਵੀਨੀਕਰਨ ਕਰਨ ਲਈ)"
+
+#. -PO: here format is "<package_name>: <summary> (to install)"
+#: ../urpmi:431
+#, fuzzy, c-format
+msgid "%s: %s (to install)"
+msgstr " (ਇੰਸਟਾਲ ਕਰਨ ਲਈ)"
+
+#. -PO: here format is "<package_name> (to install)"
+#: ../urpmi:433
+#, fuzzy, c-format
+msgid "%s (to install)"
+msgstr " (ਇੰਸਟਾਲ ਕਰਨ ਲਈ)"
+
+#: ../urpmi:439
+#, fuzzy, c-format
+msgid ""
+"In order to satisfy the '%s' dependency, one of the following packages is "
+"needed:"
+msgstr "ਨਿਰਭਰਤਾ ਹੱਲ਼ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਹਟਾਏ ਜਾਣਗੇ (%d ਮੈਬਾ)"
+
+#: ../urpmi:442
+#, c-format
+msgid "What is your choice? (1-%d) "
+msgstr "ਤੁਹਾਡੀ ਚੋਣ ਕੀ ਹੈ? (1-%d) "
+
+#: ../urpmi:484
+#, fuzzy, c-format
+msgid ""
+"The following package cannot be installed because it depends on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਇੰਸਟਾਲ ਨਹੀਂ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ, ਕਿਉਕਿ ਇਹ ਪੈਕੇਜਾਂ ਤੇ ਨਿਰਭਰ ਹਨ, ਜੋ ਕਿ\n"
+"ਇੰਸਟਾਲ ਕੀਤਿਆਂ ਤੋਂ ਪੁਰਾਣੇ ਹਨ:\n"
+"%s"
+
+#: ../urpmi:486
+#, c-format
+msgid ""
+"The following packages can't be installed because they depend on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਇੰਸਟਾਲ ਨਹੀਂ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ, ਕਿਉਕਿ ਇਹ ਪੈਕੇਜਾਂ ਤੇ ਨਿਰਭਰ ਹਨ, ਜੋ ਕਿ\n"
+"ਇੰਸਟਾਲ ਕੀਤਿਆਂ ਤੋਂ ਪੁਰਾਣੇ ਹਨ:\n"
+"%s"
+
+#: ../urpmi:492 ../urpmi:510
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Continue installation anyway?"
+msgstr "ਕਿਸੇ ਤਰਾਂ ਜਾਰੀ ਰਹੋ?"
+
+#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#, c-format
+msgid " (Y/n) "
+msgstr " (Y/n) "
+
+#: ../urpmi:504
+#, fuzzy, c-format
+msgid ""
+"A requested package cannot be installed:\n"
+"%s"
+msgstr ""
+"ਮੰਗੇ ਕੁਝ ਪੈਕੇਜ ਇੰਸਟਾਲ ਨਹੀਂ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ:\n"
+"%s"
+
+#: ../urpmi:525
+#, c-format
+msgid "removing package %s will break your system"
+msgstr "ਪੈਕੇਜ %s ਹਟਾਉਣ ਨਾਲ ਤੁਹਾਡਾ ਸਿਸਟਮ ਖਰਾਬ ਹੋ ਜਾਵੇਗਾ"
+
+#: ../urpmi:533
+#, fuzzy, c-format
+msgid ""
+"The installation cannot continue because the following package\n"
+"has to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"ਇੰਸਟਾਲੇਸ਼ਨ ਜਾਰੀ ਨਹੀਂ ਰਹਿ ਸਕਦੀ ਹੈ, ਕਿਉਕਿ ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਨੂੰ\n"
+"ਹੋਰਾਂ ਦੇ ਨਵੀਨੀਕਰਨ ਲਈ ਹਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ:\n"
+"%s\n"
+
+#: ../urpmi:535
+#, c-format
+msgid ""
+"The installation cannot continue because the following packages\n"
+"have to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"ਇੰਸਟਾਲੇਸ਼ਨ ਜਾਰੀ ਨਹੀਂ ਰਹਿ ਸਕਦੀ ਹੈ, ਕਿਉਕਿ ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਨੂੰ\n"
+"ਹੋਰਾਂ ਦੇ ਨਵੀਨੀਕਰਨ ਲਈ ਹਟਾ ਦਿੱਤਾ ਗਿਆ ਹੈ:\n"
+"%s\n"
+
+#: ../urpmi:543
+#, c-format
+msgid "(test only, removal will not be actually done)"
+msgstr ""
+
+#: ../urpmi:562
+#, fuzzy, c-format
+msgid ""
+"You must first call urpmi with --buildrequires to install the following "
+"dependencies:\n"
+"%s\n"
+msgstr ""
+"ਤੁਹਾਨੂੰ ਇਹ ਨਿਰਭਰਤਾ ਹੱਲ਼ ਕਰਨ ਲਈ ਪ੍ਰਬੰਧਕ (root) ਹੋਣਾ ਲਾਜ਼ਮੀ ਹੈ:\n"
+"%s\n"
+
+#: ../urpmi:572
+#, fuzzy, c-format
+msgid "The following orphan package will be removed."
+msgid_plural "The following orphan packages will be removed."
+msgstr[0] "ਨਿਰਭਰਤਾ ਹੱਲ਼ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਹਟਾਏ ਜਾਣਗੇ (%d ਮੈਬਾ)"
+msgstr[1] "ਨਿਰਭਰਤਾ ਹੱਲ਼ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਹਟਾਏ ਜਾਣਗੇ (%d ਮੈਬਾ)"
+
+#: ../urpmi:596
+#, c-format
+msgid "WARNING: %s option is in use. Some strange problems may happen"
+msgstr ""
+
+#: ../urpmi:608
+#, c-format
+msgid "(test only, installation will not be actually done)"
+msgstr ""
+
+#: ../urpmi:614
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr ""
+
+#: ../urpmi:615
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr ""
+
+#: ../urpmi:616
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr ""
+
+#: ../urpmi:617
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpmi:639
+#, fuzzy, c-format
+msgid "Press Enter when mounted..."
+msgstr "ਕਿਰਪਾ ਕਰਕੇ ਤਿਆਰ ਹੋਣ ਤੇ Enter ਦਬਾਓ..."
+
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
+#: ../urpmi.addmedia:36
+#, fuzzy, c-format
+msgid ""
+"usage: urpmi.addmedia [options] <name> <url>\n"
+"where <url> is one of\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"usage: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"usage: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"examples:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"and [options] are from\n"
+msgstr ""
+"ਵਰਤੋਂ:\n"
+" urpmi.addmedia [options] <name> <url> [with <relative_path>]\n"
+"where <url> is one of\n"
+"       [file:/]/<path> with <relative filename of hdlist>\n"
+"       ftp://<login>:<password>@<host>/<path> with <relative filename of "
+"hdlist>\n"
+"       ftp://<host>/<path> with <relative filename of hdlist>\n"
+"       http://<host>/<path> with <relative filename of hdlist>\n"
+"       removable://<path> with <relative filename of hdlist>\n"
+"\n"
+"ਜਿੱਥੇ [options] ਹੈ\n"
+
+#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#, c-format
+msgid "  --wget         - use wget to retrieve distant files.\n"
+msgstr "  --wget         - use wget to retrieve distant files.\n"
+
+#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#, c-format
+msgid "  --curl         - use curl to retrieve distant files.\n"
+msgstr "  --curl         - use curl to retrieve distant files.\n"
+
+#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
+#, fuzzy, c-format
+msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
+msgstr "  --curl         - use curl to retrieve distant files.\n"
+
+#: ../urpmi.addmedia:59 ../urpmi.update:36
+#, fuzzy, c-format
+msgid "  --aria2        - use aria2 to retrieve distant files.\n"
+msgstr "  --curl         - use curl to retrieve distant files.\n"
+
+#: ../urpmi.addmedia:66
+#, c-format
+msgid ""
+"  --update       - create an update medium, \n"
+"                   or discard non-update media (when used with --distrib)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:68
+#, c-format
+msgid ""
+"  --xml-info     - use the specific policy for downloading xml info files\n"
+"                   one of: never, on-demand, update-only, always. cf urpmi."
+"cfg(5)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:70
+#, fuzzy, c-format
+msgid "  --probe-synthesis - use synthesis file.\n"
+msgstr "  --probe-synthesis - try to find and use synthesis file.\n"
+
+#: ../urpmi.addmedia:71
+#, c-format
+msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
+msgstr ""
+
+#: ../urpmi.addmedia:72
+#, fuzzy, c-format
+msgid "  --no-probe     - do not try to find any synthesis file.\n"
+msgstr ""
+"  --no-probe     - do not try to find any synthesis or\n"
+"                   hdlist file.\n"
+
+#: ../urpmi.addmedia:74
+#, c-format
+msgid ""
+"  --distrib      - automatically create all media from an installation\n"
+"                   medium.\n"
+msgstr ""
+"  --distrib      - automatically create all media from an installation\n"
+"                   medium.\n"
+
+#: ../urpmi.addmedia:76
+#, c-format
+msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
+msgstr ""
+
+#: ../urpmi.addmedia:77
+#, fuzzy, c-format
+msgid "  --all-media    - with --distrib, add every listed media\n"
+msgstr "  --list-media   - list available media.\n"
+
+#: ../urpmi.addmedia:78
+#, fuzzy, c-format
+msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
+msgstr ""
+"  --virtual      - create virtual media wich are always up-to-date,\n"
+"                   only file:// protocol is allowed.\n"
+
+#: ../urpmi.addmedia:79 ../urpmi.update:44
+#, c-format
+msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - disable MD5SUM file checking.\n"
+
+#: ../urpmi.addmedia:80
+#, c-format
+msgid "  --nopubkey     - don't import pubkey of added media\n"
+msgstr ""
+
+#: ../urpmi.addmedia:81
+#, c-format
+msgid "  --raw          - add the media in config, but don't update it.\n"
+msgstr ""
+
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#, c-format
+msgid "  -q             - quiet mode.\n"
+msgstr "  -q             - quiet mode.\n"
+
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#, c-format
+msgid "  -v             - verbose mode.\n"
+msgstr "  -v             - verbose mode.\n"
+
+#: ../urpmi.addmedia:96
+#, c-format
+msgid "known xml-info policies are %s"
+msgstr ""
+
+#: ../urpmi.addmedia:107
+#, c-format
+msgid "no argument needed for --distrib --mirrorlist <url>"
+msgstr ""
+
+#: ../urpmi.addmedia:112
+#, c-format
+msgid "bad <url> (for local directory, the path must be absolute)"
+msgstr ""
+
+#: ../urpmi.addmedia:116
+#, c-format
+msgid "Only superuser is allowed to add media"
+msgstr "ਸਿਰਫ਼ ਪ੍ਰਬੰਧਕਾਂ ਨੂੰ ਮਾਧਿਅਮ ਸ਼ਾਮਲ ਕਰਨ ਦੀ ਇਜ਼ਾਜਤ ਹੈ"
+
+#: ../urpmi.addmedia:119
+#, fuzzy, c-format
+msgid "creating config file [%s]"
+msgstr "ਸੰਰਚਨਾ ਫਾਇਲ [%s] ਲਿਖੀ ਜਾਵੇਗੀ"
+
+#: ../urpmi.addmedia:120
+#, c-format
+msgid "Can't create config file [%s]"
+msgstr "ਸੰਰਚਨਾ ਫਾਇਲ [%s] ਬਣਾਈ ਨਹੀਂ ਜਾ ਸਕੀ"
+
+#: ../urpmi.addmedia:128
+#, fuzzy, c-format
+msgid "no need to give <relative path of synthesis> with --distrib"
+msgstr "--distrib ਨਾਲ <relative path of hdlist> ਦੀ ਲੋੜ ਨਹੀ"
+
+#: ../urpmi.addmedia:136
+#, c-format
+msgid ""
+"\n"
+"Do you want to add media '%s'?"
+msgstr ""
+
+#: ../urpmi.addmedia:156 ../urpmi.addmedia:181
+#, fuzzy, c-format
+msgid "unable to add medium"
+msgstr "ਮਾਧਿਅਮ \"%s\" ਨੂੰ ਵਰਤਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpmi.addmedia:164
+#, fuzzy, c-format
+msgid "<relative path of synthesis> missing\n"
+msgstr "<hdlist ਲਈ ਅਨੁਸਾਰੀ ਮਾਰਗ> ਗੁੰਮ\n"
+
+#: ../urpmi.addmedia:167
+#, c-format
+msgid "Can't use %s with remote medium"
+msgstr ""
+
+#: ../urpmi.recover:30
+#, c-format
+msgid "  --checkpoint   - set repackaging start now\n"
+msgstr ""
+
+#: ../urpmi.recover:31
+#, fuzzy, c-format
+msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
+msgstr "  --noclean      - keep rpm not used in cache.\n"
+
+#: ../urpmi.recover:33
+#, fuzzy, c-format
+msgid ""
+"  --list         - list transactions since provided date/duration argument\n"
+msgstr "  --list-url     - list available media and their url.\n"
+
+#: ../urpmi.recover:34
+#, fuzzy, c-format
+msgid "  --list-all     - list all transactions in rpmdb (long)\n"
+msgstr "  --list-url     - list available media and their url.\n"
+
+#: ../urpmi.recover:35
+#, fuzzy, c-format
+msgid "  --list-safe    - list transactions since checkpoint\n"
+msgstr "  --list-url     - list available media and their url.\n"
+
+#: ../urpmi.recover:36
+#, c-format
+msgid ""
+"  --rollback     - rollback until specified date,\n"
+"                   or rollback the specified number of transactions\n"
+msgstr ""
+
+#: ../urpmi.recover:38
+#, fuzzy, c-format
+msgid "  --disable      - turn off repackaging\n"
+msgstr "  --name         - print only package names.\n"
+
+#: ../urpmi.recover:53
+#, c-format
+msgid "Invalid date or duration [%s]\n"
+msgstr ""
+
+#: ../urpmi.recover:61
+#, fuzzy, c-format
+msgid "Repackage directory not defined\n"
+msgstr "ਪੈਕੇਜ %s ਨਹੀਂ ਲੱਭਿਆ ਹੈ।"
+
+#: ../urpmi.recover:64
+#, fuzzy, c-format
+msgid "Can't write to repackage directory [%s]\n"
+msgstr "ਬੱਗ ਜਾਣਕਾਰੀ ਲਈ ਡਾਇਰੈਕਟਰੀ [%s] ਬਣਾਉਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpmi.recover:66
+#, fuzzy, c-format
+msgid "Cleaning up repackage directory [%s]...\n"
+msgstr "ਬੱਗ ਜਾਣਕਾਰੀ ਲਈ ਡਾਇਰੈਕਟਰੀ [%s] ਬਣਾਉਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpmi.recover:68
+#, c-format
+msgid "%d file removed\n"
+msgid_plural "%d files removed\n"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../urpmi.recover:78
+#, c-format
+msgid "Spurious command-line arguments [%s]\n"
+msgstr ""
+
+#: ../urpmi.recover:80
+#, c-format
+msgid "You can't specify --checkpoint and --rollback at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:82
+#, c-format
+msgid "You can't specify --checkpoint and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:84
+#, c-format
+msgid "You can't specify --rollback and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:86
+#, c-format
+msgid "You can't specify --disable along with another option"
+msgstr ""
+
+#: ../urpmi.recover:111
+#, c-format
+msgid "No transaction found since %s\n"
+msgstr ""
+
+#: ../urpmi.recover:126
+#, c-format
+msgid "You must be superuser to do this"
+msgstr ""
+
+#: ../urpmi.recover:139 ../urpmi.recover:205
+#, fuzzy, c-format
+msgid "Writing rpm macros file [%s]...\n"
+msgstr "rpm ਫਾਇਲ [%s] ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਅਸਫਲ..."
+
+#: ../urpmi.recover:181
+#, fuzzy, c-format
+msgid "No rollback date found\n"
+msgstr "ਕੋਈ filelist ਨਹੀਂ\n"
+
+#: ../urpmi.recover:184
+#, c-format
+msgid "Rollback until %s...\n"
+msgstr ""
+
+#: ../urpmi.recover:191
+#, fuzzy, c-format
+msgid "Disabling repackaging\n"
+msgstr "  --name         - print only package names.\n"
+
+#: ../urpmi.removemedia:38
+#, c-format
+msgid ""
+"usage: urpmi.removemedia (-a | <name> ...)\n"
+"where <name> is a medium name to remove.\n"
+msgstr ""
+"ਵਰਤੋਂ: urpmi.removemedia (-a | <name> ...)\n"
+"ਜਿੱਥੇ ਕਿ <name> ਮਾਧਿਅਮਾ ਦਾ ਨਾਂ ਹੈ।\n"
+
+#: ../urpmi.removemedia:41
+#, c-format
+msgid "  -a             - select all media.\n"
+msgstr "  -a             - select all media.\n"
+
+#: ../urpmi.removemedia:42
+#, c-format
+msgid "  -y             - fuzzy match on media names.\n"
+msgstr "  -y             - fuzzy match on media names.\n"
+
+#: ../urpmi.removemedia:59
+#, c-format
+msgid "Only superuser is allowed to remove media"
+msgstr "ਸਿਰਫ਼ ਪ੍ਰਬੰਧਕਾਂ ਨੂੰ ਹੀ ਮਾਧਿਅਮ ਹਟਾਉਣ ਦੀ ਇਜ਼ਾਜਤ ਹੈ"
+
+#: ../urpmi.removemedia:71
+#, c-format
+msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
+msgstr "ਹਟਾਉਣ ਲਈ ਕੁਝ ਨਹੀਂ (ਮਾਧਿਅਮ ਵਿੱਚ ਸ਼ਾਮਲ ਕਰਨ ਲਈ urpmi.addmedia ਵਰਤੋਂ)\n"
+
+#: ../urpmi.removemedia:77
+#, c-format
+msgid ""
+"the entry to remove is missing\n"
+"(one of %s)\n"
+msgstr ""
+"ਹਟਾਉਣ ਲਈ ਇੰਦਰਾਜ਼ ਗੁੰਮ ਹੈ\n"
+"(%s ਵਿੱਚੋਂ ਇੱਕ)\n"
+
+#: ../urpmi.update:30
+#, c-format
+msgid ""
+"usage: urpmi.update [options] <name> ...\n"
+"where <name> is a medium name to update.\n"
+msgstr ""
+"ਵਰਤੋਂ: urpmi.update [options] <name> ...\n"
+"ਜਿੱਥੇ ਕਿ <name> ਮਾਧਿਅਮ ਨਾਂ ਨਵੀਨੀਕਰਨ ਮਾਧਿਅਮ ਨਾਂ ਹੈ।\n"
+
+#: ../urpmi.update:43
+#, c-format
+msgid "  --update       - update only update media.\n"
+msgstr "  --update       - update only update media.\n"
+
+#: ../urpmi.update:45
+#, c-format
+msgid "  --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - force update of gpg key.\n"
+
+#: ../urpmi.update:46
+#, c-format
+msgid "  --ignore       - don't update, mark the media as ignored.\n"
+msgstr "  --ignore       - don't update, mark the media as ignored.\n"
+
+#: ../urpmi.update:47
+#, c-format
+msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
+msgstr "  --no-ignore    - don't update, mark the media as enabled.\n"
+
+#: ../urpmi.update:49
+#, fuzzy, c-format
+msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
+msgstr ""
+"  --no-probe     - do not try to find any synthesis or\n"
+"                   hdlist file.\n"
+
+#: ../urpmi.update:50
+#, fuzzy, c-format
+msgid "  -a             - select all enabled non-removable media.\n"
+msgstr "  -a             - select all non-removable media.\n"
+
+#: ../urpmi.update:51
+#, fuzzy, c-format
+msgid "  -f             - force updating synthesis\n"
+msgstr "  -f             - force generation of hdlist files.\n"
+
+#: ../urpmi.update:52
+#, fuzzy, c-format
+msgid "  -ff            - really force updating synthesis\n"
+msgstr "  -f             - force generation of hdlist files.\n"
+
+#: ../urpmi.update:69
+#, c-format
+msgid "Only superuser is allowed to update media"
+msgstr "ਸਿਰਫ਼ ਪ੍ਰਬੰਧਕਾਂ ਨੂੰ ਹੀ ਨਵੀਨੀਕਰਨ ਮਾਧਿਅਮ ਵਰਤਣ ਦੀ ਇਜ਼ਾਜਤ ਹੈ"
+
+#: ../urpmi.update:86
+#, c-format
+msgid "nothing to update (use urpmi.addmedia to add a media)\n"
+msgstr "ਕੁਝ ਵੀ ਨਵੀਨੀਕਰਨ ਨਹੀਂ (ਇੱਕ ਮਾਧਿਅਮ ਸ਼ਾਮਲ ਕਰਨ ਲਈ urpmi.addmedia ਵਰਤੋ)\n"
+
+#: ../urpmi.update:87
+#, c-format
+msgid ""
+"the entry to update is missing\n"
+"(one of %s)\n"
+msgstr ""
+"ਨਵੀਨੀਕਰਨ ਲਈ ਇੰਦਰਾਜ਼ ਗੁੰਮ ਹੈ\n"
+"(%s ਵਿੱਚੋਂ ਇੱਕ)\n"
+
+#: ../urpmi.update:98
+#, c-format
+msgid "\"%s\""
+msgstr "\"%s\""
+
+#: ../urpmi.update:99
+#, c-format
+msgid "ignoring media %s"
+msgstr "ਮਾਧਿਅਮ %s ਅਣਡਿੱਠਾ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ"
+
+#: ../urpmi.update:99
+#, c-format
+msgid "enabling media %s"
+msgstr "ਮਾਧਿਅਮ %s ਯੋਗ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#: ../urpmq:44
+#, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+msgstr ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+
+#: ../urpmq:49
+#, c-format
+msgid "  --auto-orphans - list orphans\n"
+msgstr ""
+
+#: ../urpmq:50
+#, c-format
+msgid ""
+"  --not-available\n"
+"                 - list installed packages not available on any media.\n"
+msgstr ""
+
+#: ../urpmq:53
+#, c-format
+msgid "  --fuzzy        - impose fuzzy search (same as -y).\n"
+msgstr "  --fuzzy        - impose fuzzy search (same as -y).\n"
+
+#: ../urpmq:56
+#, c-format
+msgid "  --list         - list available packages.\n"
+msgstr "  --list         - list available packages.\n"
+
+#: ../urpmq:57
+#, c-format
+msgid "  --list-media   - list available media.\n"
+msgstr "  --list-media   - list available media.\n"
+
+#: ../urpmq:58
+#, c-format
+msgid "  --list-url     - list available media and their url.\n"
+msgstr "  --list-url     - list available media and their url.\n"
+
+#: ../urpmq:59
+#, c-format
+msgid "  --list-nodes   - list available nodes when using --parallel.\n"
+msgstr "  --list-nodes   - list available nodes when using --parallel.\n"
+
+#: ../urpmq:60
+#, c-format
+msgid "  --list-aliases - list available parallel aliases.\n"
+msgstr "  --list-aliases - list available parallel aliases.\n"
+
+#: ../urpmq:61
+#, c-format
+msgid ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+msgstr ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+
+#: ../urpmq:62
+#, c-format
+msgid "  --src          - next package is a source package (same as -s).\n"
+msgstr "  --src          - next package is a source package (same as -s).\n"
+
+#: ../urpmq:63
+#, fuzzy, c-format
+msgid "  --sources      - print source URLs of selected packages\n"
+msgstr "  --src          - next package is a source package (same as -s).\n"
+
+#: ../urpmq:65
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
+msgstr "  --url          - print tag url: url.\n"
+
+#: ../urpmq:69
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
+"                   This permit to querying a distro.\n"
+msgstr ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
+"                   This permit to querying a distro.\n"
+
+#: ../urpmq:79
+#, c-format
+msgid "  --changelog    - print changelog.\n"
+msgstr "  --changelog    - print changelog.\n"
+
+#: ../urpmq:80
+#, fuzzy, c-format
+msgid "  --conflicts    - print conflicts.\n"
+msgstr "  --conflicts    - print tag conflicts: all conflicts.\n"
+
+#: ../urpmq:81
+#, fuzzy, c-format
+msgid "  --obsoletes    - print obsoletes.\n"
+msgstr "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+
+#: ../urpmq:82
+#, fuzzy, c-format
+msgid "  --provides     - print provides.\n"
+msgstr "  --provides     - print tag provides: all provides.\n"
+
+#: ../urpmq:83
+#, fuzzy, c-format
+msgid "  --requires     - print requires.\n"
+msgstr "  --requires     - print tag requires: all requires.\n"
+
+#: ../urpmq:84
+#, fuzzy, c-format
+msgid "  --suggests     - print suggests.\n"
+msgstr "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+
+#: ../urpmq:85
+#, fuzzy, c-format
+msgid "  --sourcerpm    - print sourcerpm.\n"
+msgstr "  --sourcerpm    - print tag sourcerpm: source rpm.\n"
+
+#: ../urpmq:86
+#, fuzzy, c-format
+msgid "  --summary, -S  - print summary.\n"
+msgstr "  --summary      - print tag summary: summary.\n"
+
+#: ../urpmq:88
+#, fuzzy, c-format
+msgid ""
+"  --requires-recursive, -d\n"
+"                   - query package dependencies.\n"
+msgstr "  -d             - extend query to package dependencies.\n"
+
+#: ../urpmq:90
+#, c-format
+msgid "  --whatrequires - reverse search to what requires package.\n"
+msgstr "  --whatrequires - reverse search to what requires package.\n"
+
+#: ../urpmq:91
+#, fuzzy, c-format
+msgid ""
+"  --whatrequires-recursive\n"
+"                   - extended reverse search (includes virtual packages).\n"
+msgstr "  -R             - reverse search to what requires package.\n"
+
+#: ../urpmq:93
+#, fuzzy, c-format
+msgid ""
+"  --whatprovides, -p\n"
+"                   - search in provides to find package.\n"
+msgstr "  -p             - search in provides to find package.\n"
+
+#: ../urpmq:96
+#, c-format
+msgid "  -c             - complete output with package to be removed.\n"
+msgstr "  -c             - complete output with package to be removed.\n"
+
+#: ../urpmq:98
+#, c-format
+msgid "  -g             - print groups with name also.\n"
+msgstr "  -g             - print groups with name also.\n"
+
+#: ../urpmq:99
+#, c-format
+msgid "  -i             - print useful information in human readable form.\n"
+msgstr "  -i             - print useful information in human readable form.\n"
+
+#: ../urpmq:100
+#, c-format
+msgid "  -l             - list files in package.\n"
+msgstr "  -l             - list files in package.\n"
+
+#: ../urpmq:101
+#, fuzzy, c-format
+msgid "  -m             - equivalent to -du\n"
+msgstr "  -q             - quiet mode.\n"
+
+#: ../urpmq:102
+#, c-format
+msgid "  -r             - print version and release with name also.\n"
+msgstr "  -r             - print version and release with name also.\n"
+
+#: ../urpmq:103
+#, c-format
+msgid "  -s             - next package is a source package (same as --src).\n"
+msgstr "  -s             - next package is a source package (same as --src).\n"
+
+#: ../urpmq:104
+#, c-format
+msgid ""
+"  -u             - remove package if a more recent version is already "
+"installed.\n"
+msgstr ""
+"  -u             - remove package if a more recent version is already "
+"installed.\n"
+
+#: ../urpmq:105
+#, c-format
+msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
+msgstr "  -y             - impose fuzzy search (same as --fuzzy).\n"
+
+#: ../urpmq:106
+#, c-format
+msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
+msgstr "  -Y             - like -y, but forces to match case-insensitively.\n"
+
+#: ../urpmq:107
+#, c-format
+msgid "  names or rpm files given on command line are queried.\n"
+msgstr "  ਕਮਾਂਡ ਸਤਰ ਤੇ ਦਿੱਤੇ ਨਾਂ ਜਾਂ rpm ਫਾਇਲਾਂ ਬਾਰੇ ਖੋਜ ਕੀਤੀ ਜਾਦੀ ਹੈ।\n"
+
+#: ../urpmq:154
+#, c-format
+msgid "usage: \"urpmq --auto-orphans\" with no argument"
+msgstr ""
+
+#: ../urpmq:207
+#, c-format
+msgid "--list-nodes can only be used with --parallel"
+msgstr "--list-nodes ਨੂੰ --parallel ਨਾਲ ਹੀ ਵਰਤਿਆ ਜਾ ਸਕਦਾ"
+
+#: ../urpmq:231
+#, fuzzy, c-format
+msgid "use -l to list files"
+msgstr "\"%s\" ਦੀ list ਫਾਇਲ ਲਿਖਣ ਲਈ ਅਸਫਲ"
+
+#: ../urpmq:416
+#, fuzzy, c-format
+msgid "no xml info for medium \"%s\", only partial result for package %s"
+msgstr ""
+"ਸੂਚਨਾ: ਕਿਉਕਿ hdlists ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਕੋਈ ਮਾਧਿਅਮ ਨਹੀਂ ਲੱਭਿਆ, ਇਸਕਰਕੇ urpmf ਵਲੋਂ ਕੋਈ ਨਤੀਜਾ "
+"ਨਹੀਂ\n"
+
+#: ../urpmq:417
+#, fuzzy, c-format
+msgid "no xml info for medium \"%s\", only partial result for packages %s"
+msgstr ""
+"ਸੂਚਨਾ: ਕਿਉਕਿ hdlists ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਕੋਈ ਮਾਧਿਅਮ ਨਹੀਂ ਲੱਭਿਆ, ਇਸਕਰਕੇ urpmf ਵਲੋਂ ਕੋਈ ਨਤੀਜਾ "
+"ਨਹੀਂ\n"
+
+#: ../urpmq:420
+#, fuzzy, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for package %s"
+msgstr ""
+"ਸੂਚਨਾ: ਕਿਉਕਿ hdlists ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਕੋਈ ਮਾਧਿਅਮ ਨਹੀਂ ਲੱਭਿਆ, ਇਸਕਰਕੇ urpmf ਵਲੋਂ ਕੋਈ ਨਤੀਜਾ "
+"ਨਹੀਂ\n"
+
+#: ../urpmq:421
+#, fuzzy, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for packages %s"
+msgstr ""
+"ਸੂਚਨਾ: ਕਿਉਕਿ hdlists ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਕੋਈ ਮਾਧਿਅਮ ਨਹੀਂ ਲੱਭਿਆ, ਇਸਕਰਕੇ urpmf ਵਲੋਂ ਕੋਈ ਨਤੀਜਾ "
+"ਨਹੀਂ\n"
+
+#: ../urpmq:488
+#, c-format
+msgid "No changelog found\n"
+msgstr "ਕੋਈ changelog ਨਹੀਂ\n"
+
+#: ../gurpmi.desktop.in.h:1
+msgid "Software Installer"
+msgstr ""
+
+#: ../gurpmi.desktop.in.h:2
+msgid "Graphical front end to install RPM files"
+msgstr ""
+
+#~ msgid ""
+#~ "urpme version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpme ਵਰਜਨ %s\n"
+#~ "%s\n"
+#~ "ਇਹ ਸਾਫਟਵੇਅਰ ਮੁਫਤ ਹੈ ਅਤੇ GNU GPL ਸ਼ਰਤਾਂ ਅਧੀਨ ਮੁਫਤ ਵੰਡਿਆ ਜਾ ਸਕਦਾ ਹੈ।\n"
+#~ "\n"
+#~ "ਵਰਤੋਂ:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage: urpmf [options] pattern-expression\n"
+#~ msgstr ""
+#~ "urpmf ਵਰਜਨ %s\n"
+#~ "%s\n"
+#~ "ਇਹ ਸਾਫਟਵੇਅਰ ਮੁਫਤ ਹੈ ਅਤੇ ਇਸ ਨੂੰ ਮੁੜ GNU GPL ਸ਼ਰਤਾਂ ਅਧੀਨ ਵੰਡਿਆ ਜਾ ਸਕਦਾ ਹੈ\n"
+#~ "\n"
+#~ "ਵਰਤੋਂ:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmi.recover version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmi.recover ਵਰਜਨ %s\n"
+#~ "%s\n"
+#~ "ਇਹ ਸਾਫਟਵੇਅਰ ਮੁਫਤ ਹੈ ਅਤੇ GNU GPL ਸ਼ਰਤਾਂ ਅਧੀਨ ਮੁਫਤ ਵੰਡਿਆ ਜਾ ਸਕਦਾ ਹੈ।\n"
+#~ "\n"
+#~ "ਵਰਤੋਂ:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmq version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmq ਵਰਜਨ %s\n"
+#~ "%s\n"
+#~ "ਇਹ ਮੁਫਤ ਸਾਫਟਵੇਅਰ ਹੈ, ਜੋ ਕਿ GNU GPL ਸ਼ਰਤਾਂ ਅਧੀਨ ਜਾਰੀ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ।\n"
+#~ "\n"
+#~ "ਵਰਤੋਂ:\n"
+
+#~ msgid ""
+#~ "Installation failed, some files are missing:\n"
+#~ "%s\n"
+#~ "You may want to update your urpmi database"
+#~ msgstr ""
+#~ "ਇੰਸਟਾਲੇਸ਼ਨ ਅਸਫਲ ਰਹੀ ਹੈ, ਕੁਝ ਫਾਇਲਾਂ ਨਹੀਂ ਹਨ:\n"
+#~ "%s\n"
+#~ "ਤੁਸੀਂ ਆਪਣੇ urpmi ਡਾਟਾਬੇਸ ਦਾ ਨਵੀਨੀਕਰਨ ਕਰ ਸਕਦੇ ਹੋ"
+
+#~ msgid "Cancel"
+#~ msgstr "ਰੱਦ ਕਰੋ"
+
+#, fuzzy
+#~ msgid "Cannot write DUDF file.\n"
+#~ msgstr "ਫਾਇਲ [%s] ਲਿਖਣ ਲਈ ਅਸਫਲ"
+
+#~ msgid ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+#~ msgstr ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+
+#, fuzzy
+#~ msgid "due to already installed %s"
+#~ msgstr "ਪੈਕੇਜ ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹਨ"
+
+#~ msgid ""
+#~ "  --from         - use specified url for list of mirrors, the default is\n"
+#~ "                   %s\n"
+#~ msgstr ""
+#~ "  --from         - use specified url for list of mirrors, the default is\n"
+#~ "                   %s\n"
+
+#, fuzzy
+#~ msgid "examining %s file"
+#~ msgstr "MD5SUM ਫਾਇਲ ਪੜਤਾਲ ਜਾਰੀ"
+
+#, fuzzy
+#~ msgid "found probed synthesis as %s"
+#~ msgstr "%s ਵਾਂਗ hdlist (ਜਾਂ ਸੰਸਲੇਸ਼ਨ) ਖੋਜੀ ਗਈ"
+
+#~ msgid "  --update       - create an update medium.\n"
+#~ msgstr "  --update       - create an update medium.\n"
+
+#, fuzzy
+#~ msgid "malformed URL: [%s]"
+#~ msgstr "ਗਲਤ ਇੰਪੁੱਟ: [%s]"
+
+#, fuzzy
+#~ msgid "%d installation transaction failed"
+#~ msgid_plural "%d installation transactions failed"
+#~ msgstr[0] "%d ਇੰਸਟਾਲੇਸ਼ਨ ਸੰਚਾਰ ਅਸਫਲ"
+#~ msgstr[1] "%d ਇੰਸਟਾਲੇਸ਼ਨ ਸੰਚਾਰ ਅਸਫਲ"
+
+#, fuzzy
+#~ msgid "Package %s can not be installed"
+#~ msgstr "ਪੈਕੇਜ ਪਹਿਲਾਂ ਹੀ ਇੰਸਟਾਲ ਹਨ"
+
+#~ msgid "Checking to remove the following packages"
+#~ msgstr "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਹਟਾਉਣ ਲਈ ਪੜਤਾਲ ਜਾਰੀ ਹੈ"
+
+#, fuzzy
+#~ msgid "%s database locked"
+#~ msgstr "urpmi ਡਾਟਾਬੇਸ ਤਾਲਾਬੰਦ ਹੈ"
+
+#, fuzzy
+#~ msgid "Unknown option %s"
+#~ msgstr ""
+#~ "\n"
+#~ "ਅਣਜਾਣ ਚੋਣ '%s' ਹੈ\n"
+
+#~ msgid "too many mount points for removable medium \"%s\""
+#~ msgstr "ਹਟਾਉਣਯੋਗ ਮਾਧਿਅਮ \"%s\" ਲਈ ਕਈ ਮਾਊਟ ਥਾਂਵਾਂ ਹਨ"
+
+#~ msgid "Medium \"%s\" is an ISO image, will be mounted on-the-fly"
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਇੱਕ ISO ਪ੍ਰਤੀਬਿੰਬ ਹੈ, ਮਾਊਟ on-the-fly ਦੇ ਤੌਰ ਤੇ ਕੀਤਾ ਜਾਵੇਗਾ"
+
+#~ msgid "using different removable device [%s] for \"%s\""
+#~ msgstr "\"%s\" ਲਈ ਵੱਖਰੇ ਹਟਾਉਣਯੋਗ ਜੰਤਰ [%s] ਵਰਤ ਕੇ"
+
+#~ msgid "unable to retrieve pathname for removable medium \"%s\""
+#~ msgstr "ਹਟਾਉਣਯੋਗ ਮਾਧਿਅਮ \"%s\" ਲਈ ਮਾਰਗ-ਨਾਂ ਪ੍ਰਾਪਤ ਕਰਨ ਤੋਂ ਅਸਫਲ"
+
+#, fuzzy
+#~ msgid "unable to mount the distribution medium"
+#~ msgstr "ਪਹਿਲੇ ਇੰਸਟਾਲੇਸ਼ਨ ਮਾਧਿਅਮ ਖੋਲਣ ਲ਼ਈ ਅਸਫਲੇ"
+
+#~ msgid ""
+#~ "unable to access medium \"%s\",\n"
+#~ "this could happen if you mounted manually the directory when creating the "
+#~ "medium."
+#~ msgstr ""
+#~ "ਮਾਧਿਅਮ \"%s\" ਲਈ ਪਹੁੰਚ ਆਯੋਗ,\n"
+#~ "ਇਹ ਤਾਂ ਹੋ ਸਕਦਾ ਹੈ, ਜੇਕਰ ਤੁਸੀਂ ਮਾਧਿਅਮ ਬਣਾਉਣ ਦੌਰਾਨ ਡਾਇਰੈਕਟਰੀ ਖੁਦ ਮਾਊਟ ਕੀਤੀ ਹੈ।"
+
+#~ msgid "inconsistent medium \"%s\" marked removable but not really"
+#~ msgstr "ਨਾ-ਠੀਕ ਮਾਧਿਅਮ \"%s\" ਨੂੰ ਹਟਾਉਣਯੋਗ ਕਿਹਾ, ਪਰ ਇਹ ਹੈ ਨਹੀਂ"
+
+#~ msgid "  -c             - clean headers cache directory.\n"
+#~ msgstr "  -c             - clean headers cache directory.\n"
+
+#~ msgid "virtual medium needs to be local"
+#~ msgstr "ਵੁਰਚੁਅਲ ਮਾਧਿਅਮ ਸਥਾਨਕ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ"
+
+#, fuzzy
+#~ msgid "unable to parse synthesis file of \"%s\""
+#~ msgstr "\"%s\" ਦੀ hdlist ਫਾਇਲ ਪਾਰਸ ਕਰਨ ਲਈ ਅਸਫਲ਼"
+
+#, fuzzy
+#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
+#~ msgstr "ਮੌਜੂਦਾ ਸਰੋਤ hdlist (ਜਾਂ ਸੰਸਲੇਸ਼ਣ) ਦਾ md5sum ਕੱਢਿਆ ਜਾ ਰਿਹਾ ਹੈ"
+
+#~ msgid ""
+#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
+#~ "ignored"
+#~ msgstr ""
+#~ "ਵੁਰਚੁਅਲ ਜੰਤਰ \"%s\" ਲਈ ਪ੍ਰਭਾਸ਼ਤ hdlist ਜਾਂ list ਫਾਇਲ ਨਹੀਂ ਹੋਣੀ ਚਾਹੀਦੀ, ਮਾਧਿਅਮ "
+#~ "ਅਣਡਿੱਠਾ"
+
+#, fuzzy
+#~ msgid "invalid hdlist name"
+#~ msgstr "ਗਲਤ rpm ਫਾਇਲ ਨਾਂ [%s]"
+
+#~ msgid "unable to find list file for \"%s\", medium ignored"
+#~ msgstr "\"%s\" ਲਈ ਫਾਇਲ ਸੂਚੀ ਲੱਭਣ ਤੋਂ ਅਸਫਲ ਹੈ, ਮਾਧਿਅਮ ਅਧੂਰਾ ਛੱਡਿਆ"
+
+#, fuzzy
+#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
+#~ msgstr "ਨਾ-ਮੌਜੂਦ ਮਾਧਿਅਮ \"%s\" ਨੂੰ ਚੁਣਨ ਦੀ ਕੋਸ਼ਿਸ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ"
+
+#, fuzzy
+#~ msgid "\"synthesis\" should be set (medium \"%s\")"
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ hdlist ਸੰਸਲੇਸ਼ਕ ਫਾਇਲ ਬਣਾਈ"
+
+#, fuzzy
+#~ msgid "unable to access list file of \"%s\""
+#~ msgstr "\"%s\" ਦੀ hdlist ਫਾਇਲ ਪਾਰਸ ਕਰਨ ਲਈ ਅਸਫਲ਼"
+
+#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
+#~ msgstr ""
+#~ "ਮਾਧਿਅਮ \"%s\" ਪਹਿਲਾਂ ਹੀ hdlist ਰਾਹੀਂ ਵਰਤੋਂ ਅਧੀਨ ਹੈ, ਮਾਧਿਅਮ ਛੱਡਿਆ ਜਾ ਰਿਹਾ ਹੈ"
+
+#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਪਹਿਲਾਂ ਹੀ list ਰਾਹੀਂ ਵਰਤੋਂ ਅਧੀਨ ਹੈ, ਮਾਧਿਅਮ ਛੱਡਿਆ ਜਾ ਰਿਹਾ ਹੈ"
+
+#, fuzzy
+#~ msgid ""
+#~ "Note: no hdlist for medium \"%s\", unable to return any result for it"
+#~ msgstr ""
+#~ "ਸੂਚਨਾ: ਕਿਉਕਿ hdlists ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਕੋਈ ਮਾਧਿਅਮ ਨਹੀਂ ਲੱਭਿਆ, ਇਸਕਰਕੇ urpmf ਵਲੋਂ ਕੋਈ "
+#~ "ਨਤੀਜਾ ਨਹੀਂ\n"
+
+#~ msgid "performing second pass to compute dependencies\n"
+#~ msgstr "ਨਿਰਭਰਤਾ ਦੇ ਦੂਜੇ ਪੜਾ ਲਈ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ\n"
+
+#~ msgid "building hdlist [%s]"
+#~ msgstr "hdlist [%s] ਨਿਰਮਾਣ ਜਾਰੀ"
+
+#~ msgid ""
+#~ "Unable to build synthesis file for medium \"%s\". Your hdlist file may be "
+#~ "corrupted."
+#~ msgstr ""
+#~ "ਮਾਧਿਅਮ \"%s\" ਲਈ ਸੰਸਲੇਸ਼ਣ ਫਾਇਲ ਬਣਾਉਣ ਲਈ ਅਸਫਲ ਹੈ। ਤੁਹਾਡੀ hdlist ਫਾਇਲ ਨਿਕਾਰਾ ਹੋ "
+#~ "ਸਕਦੀ ਹੈ।"
+
+#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ hdlist ਜਾਂ ਸੰਸਲੇਸ਼ਣ ਫਾਇਲ ਪੜਨ ਦੌਰਾਨ ਸਮੱਸਿਆ"
+
+#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
+#~ msgstr "ਸਰੋਤ hdlist (ਜਾਂ ਸੰਸਲੇਸ਼ਣ) ਨਕਲਾਂ ਦੇ md5sum ਕੱਢਿਆ ਜਾਦਾ ਹੈ"
+
+#~ msgid "...retrieving failed: md5sum mismatch"
+#~ msgstr "...ਪ੍ਰਾਪਤੀ ਅਸਫਲ: md5sum ਮੇਲ ਨਹੀਂ ਖਾਂਦਾ"
+
+#~ msgid "no rpm files found from [%s]"
+#~ msgstr "[%s] ਤੇ ਕੋਈ rpm ਫਾਇਲਾਂ ਨਹੀਂ ਲੱਭੀਆਂ ਹਨ"
+
+#~ msgid "unable to read rpm files from [%s]: %s"
+#~ msgstr "[%s] ਲਈ rpm ਫਾਇਲਾਂ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਅਸਫਲ: %s"
+
+#~ msgid "no rpms read"
+#~ msgstr "ਕੋਈ rpm ਨਹੀਂ ਪੜਿਆ"
+
+#~ msgid "reading headers from medium \"%s\""
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਤੋਂ ਸਿਰਲੇਖ ਵੇਖੇ ਜਾ ਰਹੇ ਹਨ"
+
+#, fuzzy
+#~ msgid "    --probe-synthesis - use synthesis file.\n"
+#~ msgstr "  --probe-synthesis - try to find and use synthesis file.\n"
+
+#, fuzzy
+#~ msgid "    --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - try to find and use hdlist file.\n"
+
+#~ msgid ""
+#~ "Note: since no media searched uses hdlists, urpmf was unable to return "
+#~ "any result\n"
+#~ msgstr ""
+#~ "ਸੂਚਨਾ: ਕਿਉਕਿ hdlists ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਕੋਈ ਮਾਧਿਅਮ ਨਹੀਂ ਲੱਭਿਆ, ਇਸਕਰਕੇ urpmf ਵਲੋਂ ਕੋਈ "
+#~ "ਨਤੀਜਾ ਨਹੀਂ\n"
+
+#~ msgid "You may want to use --name to search for package names.\n"
+#~ msgstr "ਤੁਸੀਂ ਪੈਕੇਜ ਨਾਂ ਖੋਜਣ ਲਈ --name ਵਰਤ ਸਕਦੇ ਹੋ।\n"
+
+#, fuzzy
+#~ msgid "  --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - try to find and use hdlist file.\n"
+
+#~ msgid "unable to update medium \"%s\"\n"
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਨਵੀਨੀਕਰਨ ਲਈ ਅਸਫਲ਼\n"
+
+#~ msgid "unable to create medium \"%s\"\n"
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਬਣਾਉਣ ਲਈ ਅਸਫਲ\n"
+
+#~ msgid "there are multiple packages with the same rpm filename \"%s\""
+#~ msgstr "ਇੱਕੋ rpm ਫਾਇਲ ਨਾਂ \"%s\" ਨਾਲ ਕਈ ਪੈਕੇਜ ਹਨ"
+
+#~ msgid "unable to correctly parse [%s] on value \"%s\""
+#~ msgstr "ਮੁੱਲ \"%s\" ਤੇ [%s] ਪਾਰਸ ਕਰਨ ਲਈ ਅਸਫਲ"
+
+#~ msgid ""
+#~ "medium \"%s\" uses an invalid list file:\n"
+#~ "  mirror is probably not up-to-date, trying to use alternate method"
+#~ msgstr ""
+#~ "ਮਾਧਿਅਮ \"%s\" ਗਲਤ list ਫਾਇਲ ਵਰਤਦਾ ਹੈ:\n"
+#~ "  ਪ੍ਰਤੀਬਿੰਬ ਨਵੀਨ ਨਹੀਂ ਹੈ, ਹੋਰ ਢੰਗ ਵਰਤਣ ਦੀ ਕੋਸ਼ਿਸ ਕਰੋ"
+
+#~ msgid "medium \"%s\" does not define any location for rpm files"
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਲਈ rpm ਫਾਇਲਾਂ ਲਈ ਕੋਈ ਟਿਕਾਣਾ ਨਹੀਂ ਹੈ"
+
+#~ msgid "unrequested"
+#~ msgstr "ਨਾ-ਮੰਗੇ"
+
+#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
+#~ msgstr "%s ਪੈਕੇਜ ਸ਼ਾਮਲ ਕਰਨ ਲਈ (id=%d, eid=%d, update=%d, file=%s)"
+
+#~ msgid ""
+#~ "The following packages have bad signatures:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "Do you want to continue installation ?"
+#~ msgstr ""
+#~ "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਤੇ ਗਲਤ ਦਸਤਖਤ ਹਨ:\n"
+#~ "%s\n"
+#~ "ਕੀ ਤੁਸੀਂ ਇੰਸਟਾਲੇਸ਼ਨ ਜਾਰੀ ਰੱਖਣੀ ਚਾਹੁੰਦੇ ਹੋ?"
+
+#, fuzzy
+#~ msgid "You need to be root to use --use-distrib"
+#~ msgstr "ਤੁਹਾਨੂੰ ਇਸ ਕਮਾਂਡ ਚਲਾਉਣ ਲਈ ਰੂਟ(root) ਬਣਨਾ ਪਵੇਗਾ !\n"
+
+#~ msgid "unable to remove package %s"
+#~ msgstr "ਪੈਕੇਜ %s ਹਟਾਉਣ ਲਈ ਅਸਫਲ"
+
+#~ msgid "No filelist found\n"
+#~ msgstr "ਕੋਈ filelist ਨਹੀਂ\n"
+
+#~ msgid "medium \"%s\" is not selected"
+#~ msgstr "ਮਾਧਿਅਮ \"%s\" ਚੁਣਿਆ ਨਹੀਂ ਜਾ ਸਕਿਆ"
+
+#, fuzzy
+#~ msgid "Remove %d packages?"
+#~ msgstr "ਪੈਕੇਜ %s ਹਟਾਇਆ ਜਾਦਾ ਹੈ"
+
+#~ msgid "  -f             - force generation of hdlist files.\n"
+#~ msgstr "  -f             - force generation of hdlist files.\n"
+
+#~ msgid ""
+#~ "  -P             - do not search in provides to find package (default).\n"
+#~ msgstr ""
+#~ "  -P             - do not search in provides to find package (default).\n"
+
+#~ msgid "  -R             - reverse search to what requires package.\n"
+#~ msgstr "  -R             - reverse search to what requires package.\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "  -RR            - extended reverse search (includes virtual packages).\n"
+#~ msgstr "  -R             - reverse search to what requires package.\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "To satisfy dependencies, the following package is going to be installed"
+#~ msgid_plural ""
+#~ "To satisfy dependencies, the following packages are going to be installed"
+#~ msgstr[0] "ਨਿਰਭਰਤਾ ਹੱਲ ਕਰਨ ਲਈ, ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ (%d ਮੈਬਾ)"
+#~ msgstr[1] "ਨਿਰਭਰਤਾ ਹੱਲ ਕਰਨ ਲਈ, ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ (%d ਮੈਬਾ)"
+
+#~ msgid ""
+#~ "To satisfy dependencies, the following %d packages are going to be "
+#~ "installed:\n"
+#~ "%s\n"
+#~ msgstr ""
+#~ "ਨਿਰਭਰਤਾ ਸਮਾਪਤ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ:\n"
+#~ "%s\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "To satisfy dependencies, the following packages are going to be installed"
+#~ msgid_plural ""
+#~ "To satisfy dependencies, the following package is going to be installed"
+#~ msgstr[0] ""
+#~ "ਨਿਰਭਰਤਾ ਸਮਾਪਤ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ:\n"
+#~ "%s\n"
+#~ msgstr[1] ""
+#~ "ਨਿਰਭਰਤਾ ਸਮਾਪਤ ਕਰਨ ਲਈ, %d ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ:\n"
+#~ "%s\n"
+
+#, fuzzy
+#~ msgid "skipping media %s: no hdlist"
+#~ msgstr "ਮਾਧਿਅਮ %s ਛੱਡਿਆ: ਕੋਈ hdlist ਨਹੀਂ\n"
+
+#, fuzzy
+#~ msgid "Installing packages on nodes..."
+#~ msgstr "`%s' (%s/%s) ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ..."
+
+#, fuzzy
+#~ msgid "Propagating synthesis to %s..."
+#~ msgstr "ਸ਼ੰਸਲੇਸ਼ਨ ਫਾਇਲ [%s] ਪੜਤਾਲ ਜਾਰੀ"
+
+#, fuzzy
+#~ msgid "Distributing files to %s..."
+#~ msgstr "%s ਵੰਡਿਆ ਜਾਦਾ ਹ"
+
+#, fuzzy
+#~ msgid "Performing install on %s..."
+#~ msgstr "ਪੈਕੇਜ ਇੰਸਟਾਲੇਸ਼ਨ..."
+
+#, fuzzy
+#~ msgid "Preparing install on %s..."
+#~ msgstr "ਪੈਕੇਜ ਇੰਸਟਾਲੇਸ਼ਨ..."
+
+#~ msgid "  --probe-synthesis - try to find and use synthesis file.\n"
+#~ msgstr "  --probe-synthesis - try to find and use synthesis file.\n"
+
+#~ msgid "  --probe-hdlist - try to find and use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - try to find and use hdlist file.\n"
+
+#~ msgid "`with' missing for network media\n"
+#~ msgstr "ਨੈਟਵਰਕ ਮਾਧਿਅਮ ਵਿੱਚ `with' ਗੁੰਮ ਹੈ\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "unknown options '%s'\n"
+#~ msgstr ""
+#~ "\n"
+#~ "ਅਣਜਾਣ ਚੋਣ '%s' ਹੈ\n"
+
+#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
+#~ msgstr "\"%s\" ਲਈ hdlist ਫਾਇਲ ਨਹੀਂ ਲੱਭੀ ਹੈ, ਮਾਧਿਅਮ ਅਧੂਰਾ ਛੱਡਿਆ"
+
+#~ msgid "inconsistent list file for \"%s\", medium ignored"
+#~ msgstr "\"%s\" ਲਈ ਸੂਚੀ ਫਾਇਲ ਗਲਤ ਹੈ, ਮਾਧਿਅਮ ਅਧੂਰਾ ਛੱਡਿਆ"
+
+#~ msgid "unable to inspect list file for \"%s\", medium ignored"
+#~ msgstr "\"%s\" ਲਈ ਸੂਚੀ ਫਾਇਲ ਪੜਤਾਲ ਤੋਂ ਅਸਫਲ, ਮਾਧਿਅਮ ਅਧੂਰਾ ਛੱਡਿਆ"
+
+#~ msgid "virtual medium \"%s\" is not local, medium ignored"
+#~ msgstr "ਵੁਰਚੁਅਲ ਮਾਧਿਅਮ \"%s\" ਸਥਾਨਕ ਨਹੀਂ ਹੈ, ਮਾਧਿਅਮ ਅਣਡਿੱਠਾ ਕੀਤਾ ਗਿਆ"
+
+#~ msgid ""
+#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
+#~ "medium ignored"
+#~ msgstr ""
+#~ "ਵੁਰਚੁਅਲ ਮਾਧਿਅਮ \"%s\" ਲਈ ਠੀਕ ਸਰੋਤ hdlist ਜਾਂ ਸੰਸਲੇਸ਼ਣ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ, ਮਾਧਿਅਮ "
+#~ "ਅਣਡਿੱਠਾ ਕੀਤਾ ਜਾਦਾ ਹੈ"
+
+#~ msgid "copying source hdlist (or synthesis) of \"%s\"..."
+#~ msgstr "\"%s\" ਦਾ ਸਰੋਤ hdlist (ਜਾਂ ਸੰਸਲੇਸ਼ਣ) ਦੀ ਨਕਲ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
+
+#~ msgid "retrieval of source hdlist (or synthesis) failed"
+#~ msgstr "ਸਰੋਤ hdlist (ਜਾਂ ਸੰਸਲੇਸ਼ਕ) ਪ੍ਰਾਪਤੀ ਅਸਫਲ"
+
+#~ msgid "file [%s] already used in the same medium \"%s\""
+#~ msgstr "ਇਸੇ ਮਾਧਿਅਣ \"%s\" ਵਿੱਚ ਫਾਇਲ [%s] ਪਹਿਲਾਂ ਵੀ ਵਰਤੀ ਗਈ"
+
+#~ msgid "nothing written in list file for \"%s\""
+#~ msgstr "\"%s\" ਲਈ ਸੂਚੀ ਫਾਇਲ ਵਿੱਚ ਲਿਖਣ ਲਈ ਕੁਝ ਨਹੀਂ"
+
+#~ msgid "found %d headers in cache"
+#~ msgstr "ਕੈਂਚੇ ਵਿੱਚ %d ਸਿਰਲੇਖ ਮਿਲੇ"
+
+#~ msgid "removing %d obsolete headers in cache"
+#~ msgstr "ਕੈਂਚੇ ਵਿੱਚ %d ਸਿਰਲੇਖ ਹਟਾਏ ਜਾ ਰਹੇ ਹਨ"
+
+#~ msgid "using process %d for executing transaction"
+#~ msgstr "ਸੰਚਾਰ ਕਰਨ ਲਈ ਕਾਰਜ %d ਵਰਤ ਕੇ"
+
+#~ msgid "  --norebuild    - don't try to rebuild hdlist if not readable.\n"
+#~ msgstr "  --norebuild    - don't try to rebuild hdlist if not readable.\n"
+
+#, fuzzy
+#~ msgid "The following package names were assumed: %s"
+#~ msgstr "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜਾਂ ਵਿੱਚ %s: %s"
+
+#~ msgid "copying hdlists file..."
+#~ msgstr "hdlists ਫਾਇਲ ਨਕਲ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
+
+#~ msgid "invalid hdlist description \"%s\" in hdlists file"
+#~ msgstr "hdlists ਫਾਇਲ ਵਿੱਚ ਗਲਤ hdlists ਵੇਰਵਾ \"%s\""
+
+#~ msgid "Is this OK?"
+#~ msgstr "ਕੀ ਇਹ ਠੀਕ ਹੈ?"
+
+#~ msgid ""
+#~ "  --version      - use specified distribution version, the default is "
+#~ "taken\n"
+#~ "                   from the version of the distribution told by the\n"
+#~ "                   installed mandriva-release package.\n"
+#~ msgstr ""
+#~ "  --version      - use specified distribution version, the default is "
+#~ "taken\n"
+#~ "                   from the version of the distribution told by the\n"
+#~ "                   installed mandriva-release package.\n"
+
+#~ msgid ""
+#~ "  --arch         - use specified architecture, the default is arch of\n"
+#~ "                   mandriva-release package installed.\n"
+#~ msgstr ""
+#~ "  --arch         - use specified architecture, the default is arch of\n"
+#~ "                   mandriva-release package installed.\n"
+
+#~ msgid ""
+#~ "  --headers      - extract headers for package listed from urpmi db to\n"
+#~ "                   stdout (root only).\n"
+#~ msgstr ""
+#~ "  --headers      - extract headers for package listed from urpmi db to\n"
+#~ "                   stdout (root only).\n"
+
+#~ msgid ""
+#~ "To satisfy dependencies, the following %d packages are going to be "
+#~ "installed (%d MB)"
+#~ msgstr "ਨਿਰਭਰਤਾ ਹੱਲ਼ ਕਰਨ ਲਈ, ਹੇਠ ਦਿੱਤੇ %d ਪੈਕੇਜ ਇੰਸਟਾਲ ਕੀਤੇ ਜਾ ਰਹੇ ਹਨ (%d ਮੈਬਾ)"
+
+#~ msgid "installing %s\n"
+#~ msgstr "%s ਇੰਸਟਾਲ ਜਾਰੀ ਹੈ\n"
+
+#~ msgid ""
+#~ "Automatic installation of packages...\n"
+#~ "You requested installation of package %s\n"
+#~ msgstr ""
+#~ "ਪੈਕੇਜਾਂ ਦੀ ਸਵੈ-ਚਾਲਤ ਇੰਸਟਾਲੇਸ਼ਨ...\n"
+#~ "ਤੁਸੀਂ %s ਪੈਕੇਜ ਇੰਸਟਾਲ ਕਰਨ ਦੀ ਮੰਗ ਕੀਤੀ ਹੈ\n"
+
+#~ msgid "%s: command not found\n"
+#~ msgstr "%s: ਕਮਾਂਡ ਨਹੀਂ ਲੱਭੀ\n"
+
+#~ msgid ""
+#~ "Some package requested cannot be installed:\n"
+#~ "%s\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "ਲੋੜੀਦੇ ਕੁਝ ਪੈਕੇਜ ਇੰਸਟਾਲ ਨਹੀਂ ਹੋ ਸਕਦੇ:\n"
+#~ "%s\n"
+#~ "ਜਾਰੀ ਰੱਖਣਾ ਹੈ?"
+
+#~ msgid ""
+#~ "The following packages have to be removed for others to be upgraded:\n"
+#~ "%s\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "ਹੇਠ ਦਿੱਤੇ ਪੈਕੇਜ ਹੋਰਾਂ ਦਾ ਨਵੀਨੀਕਰਨ ਕਰਨ ਦੌਰਾਨ ਹਟਾ ਦਿੱਤੇ ਜਾਣਗੇ:\n"
+#~ "%s\n"
+#~ "ਕੀ ਜਾਰੀ ਰੱਖਣਾ ਹੈ?"
+
+#~ msgid "md5sum mismatch"
+#~ msgstr "md5sum ਮੇਲ ਨਹੀਂ ਖਾਂਦਾ"
+
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmf ਵਰਜਨ %s\n"
+#~ "%s\n"
+#~ "ਇਹ ਸਾਫਟਵੇਅਰ ਮੁਫਤ ਹੈ ਅਤੇ ਇਸ ਨੂੰ ਮੁੜ GNU GPL ਸ਼ਰਤਾਂ ਅਧੀਨ ਵੰਡਿਆ ਜਾ ਸਕਦਾ ਹੈ\n"
+#~ "\n"
+#~ "ਵਰਤੋਂ:\n"
+
+#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
+#~ msgstr "  --synthesis    - use the synthesis given instead of urpmi db.\n"
+
+#~ msgid ""
+#~ "  --quiet        - do not print tag name (default if no tag given on "
+#~ "command\n"
+#~ "                   line, incompatible with interactive mode).\n"
+#~ msgstr ""
+#~ "  --quiet        - do not print tag name (default if no tag given on "
+#~ "command\n"
+#~ "                   line, incompatible with interactive mode).\n"
+
+#~ msgid "  --uniq         - do not print identical lines.\n"
+#~ msgstr "  --uniq         - do not print identical lines.\n"
+
+#~ msgid "  --all          - print all tags.\n"
+#~ msgstr "  --all          - print all tags.\n"
+
+#~ msgid "  --summary      - print tag summary: summary.\n"
+#~ msgstr "  --summary      - print tag summary: summary.\n"
+
+#~ msgid "  --description  - print tag description: description.\n"
+#~ msgstr "  --description  - print tag description: description.\n"
+
+#~ msgid "  --buildhost    - print tag buildhost: build host.\n"
+#~ msgstr "  --buildhost    - print tag buildhost: build host.\n"
+
+#~ msgid "  --provides     - print tag provides: all provides.\n"
+#~ msgstr "  --provides     - print tag provides: all provides.\n"
+
+#~ msgid "  --requires     - print tag requires: all requires.\n"
+#~ msgstr "  --requires     - print tag requires: all requires.\n"
+
+#~ msgid "  --files        - print tag files: all files.\n"
+#~ msgstr "  --files        - print tag files: all files.\n"
+
+#~ msgid "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+#~ msgstr "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+
+#~ msgid "  -i             - ignore case distinctions in every pattern.\n"
+#~ msgstr "  -i             - ignore case distinctions in every pattern.\n"
+
+#~ msgid ""
+#~ "  -a             - binary AND operator, true if both expression are "
+#~ "true.\n"
+#~ msgstr ""
+#~ "  -a             - binary AND operator, true if both expression are "
+#~ "true.\n"
+
+#~ msgid "  !              - unary NOT, true if expression is false.\n"
+#~ msgstr "  !              - unary NOT, true if expression is false.\n"
+
+#~ msgid "  (              - left parenthesis to open group expression.\n"
+#~ msgstr "  (              - left parenthesis to open group expression.\n"
+
+#~ msgid "  )              - right parenthesis to close group expression.\n"
+#~ msgstr "  )              - right parenthesis to close group expression.\n"
+
+#~ msgid ""
+#~ "callback is:\n"
+#~ "%s\n"
+#~ msgstr ""
+#~ "callback ਹੈ :\n"
+#~ "%s\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "\n"
+#~ "ਕੀ ਜਾਰੀ ਰੱਖਣਾ ਹੈ?"
+
+#~ msgid ""
+#~ "Some package requested cannot be installed:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "ਮੰਗੇ ਕੁਝ ਪੈਕੇਜ ਇੰਸਟਾਲ ਨਹੀਂ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ:\n"
+#~ "%s"
+
+#, fuzzy
+#~ msgid ""
+#~ "  --keep         - keep existing packages if possible, reject requested\n"
+#~ "                   packages that leads to remove.\n"
+#~ msgstr ""
+#~ "  --keep         - keep existing packages if possible, reject requested\n"
+#~ "                   packages that lead to removals.\n"
+
+#~ msgid ""
+#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
+#~ "                   distribution, XXX may be main, contrib, updates or\n"
+#~ "                   anything else that has been configured ;-)\n"
+#~ msgstr ""
+#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
+#~ "                   distribution, XXX may be main, contrib, updates or\n"
+#~ "                   anything else that has been configured ;-)\n"
+
+#~ msgid "found version %s and arch %s ..."
+#~ msgstr "ਵਰਜਨ %s ਅਤੇ ਮਾਧਿਅਮ %s ਲੱਭਿਆ..."
+
+#~ msgid "cannot add updates of a cooker distribution\n"
+#~ msgstr "ਕੁੱਕਰ ਵੰਡ ਲਈ ਨਵੀਨੀਕਰਨ ਸ਼ਾਮਲ ਨਹੀਂ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ\n"
+
+#~ msgid "retrieving mirrors at %s ..."
+#~ msgstr "%s ਤੇ ਪ੍ਰਤੀਬਿੰਬ ਪ੍ਰਾਪਤ ਕੀਤੇ ਜਾਦੇ ਹਨ..."

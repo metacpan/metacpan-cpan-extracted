@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+#
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: giza_inv2clue,v 1.1.1.1 2004/05/03 15:39:55 joerg72 Exp $
+#
+# this is nothing else than a call to declclue 
+# with specific arguments for converting GIZA word alignments to uplug clues!
+#
+# usage: giza2clue giza.actual
+#
+# this OVERWRITES 'giza.dbm' and 'giza.dbm.head' in the current directory!!!!
+#
+#
+
+
+use strict;
+use FindBin qw($Bin);
+
+my $convert="$Bin/declclue -p -o giza.dbm -d ' ' -c 'source,target,value'";
+my $input=$ARGV[0];
+
+print "$convert <$input";

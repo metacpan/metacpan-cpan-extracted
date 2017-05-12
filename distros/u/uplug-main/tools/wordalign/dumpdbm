@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+#
+#--------------------------------------------------------------------------
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id: dumpdbm,v 1.3 2006/10/13 13:06:25 joerg72 Exp $
+#--------------------------------------------------------------------------
+
+BEGIN {@AnyDBM_File::ISA=qw(DB_File GDBM_File SDBM_File NDBM_File ODBM_File) }
+#BEGIN { @AnyDBM_File::ISA=qw(GDBM_File SDBM_File NDBM_File ODBM_File) }
+use AnyDBM_File;
+use POSIX;
+
+use vars qw($opt_d);
+use Getopt::Std;
+
+getopts('d:');
+my $dbmfile=shift @ARGV;
+
+
+if ($opt_d=~/gdbm/i){
+    require('GDBM_File.pm');
+    tie %dbm, 'GDBM_File',$dbmfile,O_RDONLY,0440;
+}
+else{
+    tie %dbm, 'AnyDBM_File',$dbmfile,O_RDONLY,0440;
+}
+
+my ($key,$val);
+while (($key,$val)=each %dbm){
+    print "$key => $val\n";
+}
+
+untie %dbm;
+
+

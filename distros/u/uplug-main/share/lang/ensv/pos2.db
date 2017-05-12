@@ -1,0 +1,13 @@
+# features (source): { 'pos' => '^(..).*$/$1' }
+# features (target): { 'pos' => '^(([^N].).*\Z|(N).*\@(.).*\Z)/$2$3$4' }
+TO VB	V@	0.9	# 'to attend'
+DT NN	ND	0.9			# DT + NOUN -> DEFINITE NOUN
+DT NN NN	ND	0.9		# 
+DT JJ NN	DF AF ND	0.9	# EMBEDDED ADJECTIVE
+DT JJ NN	DF AQ ND	0.9	# 
+DT JJ NN NN	DF AF ND	0.9	# 
+DT JJ NN NN	DF AQ ND	0.9	# 
+DT JJ JJ NN	DF AQ AQ ND	0.9	# 
+DT JJ JJ NN	DF AQ ND	0.9	# 
+DT JJ JJ NN	DF AF AF ND	0.9	# 
+DT JJ JJ NN	DF AF ND	0.9	# 

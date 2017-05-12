@@ -1,0 +1,8 @@
+$Id$
+
+ETAP/		scripts for ETAP-corpora (http://stp.ling.uu.se/etap/)
+
+etap2gold		convert gold-standard-files from the ETAP project
+etap2koma		convert ETAP-corpora to XCES
+etap2unicode		convert ETAP character encoding to Unicode
+

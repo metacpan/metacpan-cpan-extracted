@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+#----------------------------------------------------------------------------
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id$
+#----------------------------------------------------------------------------
+# usage: etap2koma etap-xml-file etap-gold-file
+#
+# convert ETAP PLUG XML files into tokenized, tagged, parsed SCES XML files
+#         and ETAP gold standards into XCES gold standards
+#
+
+use strict;
+use FindBin qw($Bin);
+
+if (@ARGV<2){die "usage: etap2koma etap-xml-file etap-gold-file\n";}
+
+my $XML=$ARGV[0];
+my $GOLD=$ARGV[1];
+my $SRC='xx';
+my $TRG='xx';
+if ($XML=~/([a-z]{2,5})\-([a-z]{2,5})/){
+    $SRC=$1;
+    $TRG=$2;
+}
+
+if (not -f $XML){die "cannot open file $XML!"}
+if (not -f $GOLD){die "cannot open file $GOLD!"}
+
+my $BASE=$XML;
+if ($BASE=~/^(.*)\.gz/){$BASE=$1;}
+if ($BASE=~/^(.*)\./){$BASE=$1;}
+my $ALIGN="$BASE.ces";
+my $SRCTXT="$ALIGN.src";
+my $TRGTXT="$ALIGN.trg";
+
+my $UPLUGHOME="$Bin/../..";
+my $TOOLS="$UPLUGHOME/tools";
+
+my $PLUG2KOMA="$TOOLS/KOMA/plug2koma";
+my $ETAP2GOLD="$TOOLS/ETAP/etap2gold";
+my $GOLD2KOMA="$TOOLS/KOMA/gold2koma";
+
+## 1) convert PLUG XML to XCES
+
+system ("$PLUG2KOMA $TRG $SRC $XML");
+system ("mv $SRCTXT $SRCTXT.tmp");    # reverse alignment!
+system ("mv $TRGTXT $SRCTXT");        # --> swap source and target files!
+system ("mv $SRCTXT.tmp $TRGTXT");    # (this is ok because all links are 1:1)
+
+
+## 2) convert ETAP gold standards to KOMA gold standards
+
+system ("$ETAP2GOLD $XML $GOLD > $BASE.uwa");        # etap gold -> uwa gold
+system ("$GOLD2KOMA $ALIGN $BASE.uwa > $BASE.gold"); # uwa gold -> koma gold
+
+## ready!
+
+

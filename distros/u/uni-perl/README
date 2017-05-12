@@ -1,0 +1,42 @@
+NAME
+    uni::perl - all modern features + unicode support in one pragma
+
+SYNOPSIS
+    There is most commonly used pragmas, such as strict, feature, warnings,
+    utf8, open, mro. Also almost every modern program uses Encode and Carp
+
+        use uni::perl;
+
+        # is the same as
+
+        use strict;
+        use feature qw(say state switch);
+        no warnings;
+        use warnings qw(FATAL closed threads internal debugging pack substr malloc
+                unopened portable prototype inplace io pipe unpack regexp
+                deprecated exiting glob digit printf utf8 layer
+                reserved parenthesis taint closure semicolon);
+        no warnings qw(exec newline);
+        use utf8;
+        use open (:utf8 :std);
+        use mro 'c3';
+        use Carp qw(carp croak confess);
+
+        # With ':dumper' you got dumper() function, that similar to Data::Dumper::Dumper()
+        use uni::perl ':dumper';
+
+        # With ':xd' you got xd() function from Devel::Hexdump (if installed)
+        use uni::perl ':xd';
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+THANKS
+    Thanks to Marc Lehmann for useful hints, found in common::sense
+
+COPYRIGHT & LICENSE
+    Copyright 2009-2012 Mons Anderson
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

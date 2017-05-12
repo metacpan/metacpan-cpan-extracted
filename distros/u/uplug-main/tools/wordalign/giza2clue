@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+#----------------------------------------------------------------------------
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: giza2clue,v 1.3 2005/02/15 14:30:44 joerg72 Exp $
+#
+#
+
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/..";
+use Uplug::Align::Word::Giza;
+
+my $inverse=0;
+my $output='giza.dbm';
+my $threshold;
+
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift(@ARGV);
+    if ($opt eq '-t'){
+	$threshold=shift(@ARGV);
+    }
+    elsif ($opt eq '-i'){
+	$inverse=not $inverse;
+    }
+}
+
+my $dir=shift(@ARGV);
+if (@ARGV){$output=shift(@ARGV);}
+
+
+&Giza2Clue($dir,
+	   {},
+	   $inverse,
+	   {format=>'dbm',
+	    file=>$output,
+	    'key' => ['source','target'],
+	    write_mode=>'overwrite'},
+	   $threshold);
+
+
+
+#my $convert="$Bin/declclue -p -o giza.dbm -d ' ' -c 'target,source,value'";
+#my $input=$ARGV[0];
+#
+#system "$convert <$input";

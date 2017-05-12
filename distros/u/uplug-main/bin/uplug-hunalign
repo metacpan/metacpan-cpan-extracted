@@ -1,0 +1,386 @@
+#!/usr/bin/env perl
+# -*-perl-*-
+#
+# hunalign.pl:
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+#
+# $Id: hunalign.pl,v 1.8 2008/04/15 10:20:46 joerg72 Exp $
+#
+# usage: hunalign.pl <infile >outfile
+#        hunalign.pl [-i config] [-src file1] [-trg file2] [-out out] [-s sys]
+#
+# config      : configuration file
+# file1       : input file (source language)
+# file2       : input file (target language)
+# out         : output file
+# system      : Uplug system (subdirectory of UPLUGSYSTEM)
+# 
+# 
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Uplug::Data;
+use Uplug::IO::Any;
+use Uplug::Config;
+use Uplug::PreProcess::Tokenizer;
+
+use IPC::Run qw( run timeout );
+
+my $UplugHome="$Bin/../";
+
+my %IniData=&GetDefaultIni;
+my $IniFile='hunalign.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+my $SrcStream=$IniData{input}{'source text'};
+my $TrgStream=$IniData{input}{'target text'};
+my ($OutputStreamName,$OutputStream)=         # take only
+    each %{$IniData{'output'}};               # the first output stream
+
+my $source=Uplug::IO::Any->new($SrcStream);
+my $target=Uplug::IO::Any->new($TrgStream);
+my $output=Uplug::IO::Any->new($OutputStream);
+
+if (not -e $SrcStream->{file}){
+    die "# sentalign.pl: need a source language file!";
+}
+if (not -e $TrgStream->{file}){
+    die "# sentalign.pl: need a target language file!";
+}
+
+#---------------------------------------------------------------------------
+
+my $ParBreak      = $IniData{parameter}{'paragraph boundary'};
+my $DicFile       = $IniData{parameter}{'dictionary'};
+my $BisentMode    = $IniData{parameter}{'bisent mode'};
+my $SrcLang       = $IniData{parameter}{'source language'};
+my $TrgLang       = $IniData{parameter}{'target language'};
+
+# tokenize source/target language before aligning (good for -realign and dic-matching)?
+my $Tokenize      = $IniData{parameter}{'tokenize'};
+my $TokenizeSrc   = $IniData{parameter}{'tokenize source'} || $Tokenize;
+my $TokenizeTrg   = $IniData{parameter}{'tokenize target'} || $Tokenize;
+
+# lowercase source/target language before aligning (good for -realign and dic-matching)?
+my $Lowercase     = $IniData{parameter}{'lowercase'};
+my $LowercaseSrc  = $IniData{parameter}{'lowercase source'} || $Lowercase;
+my $LowercaseTrg  = $IniData{parameter}{'lowercase target'} || $Lowercase;
+
+# skip dictionary matches (even thoug there is a doctionary for the given language pair)
+my $SkipDictionary = $IniData{parameter}{'skip dictionary'};
+my $SkipRealign    = $IniData{parameter}{'skip realign'};
+
+# set a timeout for hunalign (unless used with NullDic)
+my $TimeOut        = $IniData{parameter}{'timeout'};
+
+
+my %Tokenizer=();
+
+my $AlignPrg = &find_executable('hunalign');
+my $AlignDir = &shared_home().'/ext/hunalign';
+my $TmpSrc   = Uplug::IO::Any::GetTempFileName;
+my $TmpTrg   = Uplug::IO::Any::GetTempFileName;
+
+my $NullDic  = $AlignDir.'/data/null.dic';
+
+if (not -e $DicFile){                            # if there is no dictionary:
+    unless ($SkipDictionary){
+	my $SharedLangDir = &shared_lang().'/hunalign';
+	if (-e "$SharedLangDir/$SrcLang-$TrgLang.dic"){
+	    $DicFile="$SharedLangDir/$SrcLang-$TrgLang.dic";
+	}
+    }
+}
+if (not -e $DicFile){                            # if there is no dictionary:
+    $DicFile=$NullDic;                           # - use an empty file
+}
+
+$AlignPrg.=' -realign' unless ($SkipRealign);
+$AlignPrg.=' -bisent' if ($BisentMode);
+
+
+#---------------------------------------------------------------------------
+# open data streams!
+#
+
+if (not $source->open('read',$SrcStream)){exit;}
+if (not $target->open('read',$TrgStream)){exit;}
+$OutputStream->{DocRoot}->{version}='1.0';
+$OutputStream->{DocRoot}->{fromDoc}=$SrcStream->{file},;
+$OutputStream->{DocRoot}->{toDoc}=$TrgStream->{file},;
+
+if (not $output->open('write',$OutputStream)){exit;}
+#---------------------------------------------------------------------------
+
+my @SrcSent=();
+my @TrgSent=();
+
+#---------------------------------------------------------------------------
+
+my $data=Uplug::Data->new;
+open F,">$TmpSrc";
+binmode(F,':encoding(utf-8)') if ($]>=5.008);
+
+while ($source->read($data)){
+    my $id=$data->attribute('id');
+    if (defined $id){
+	my @tok=$data->content;
+	map(s/^\s*//,@tok);                    # remove initial white-spaces
+	map(s/\s*$//,@tok);                    # remove final white-spaces
+	@tok=grep(/\S/,@tok);                  # take only non-empty tokens
+	if (@tok){                             # print them if any left
+
+	    my $before=$data->header;
+	    if ($before=~/\<$ParBreak[\s\/\>]/s){
+		print F '<p>'."\n";
+		push(@SrcSent,'p');
+	    }
+	    push (@SrcSent,$id);
+	    # print F join " ",@tok;
+	    # print F "\n";
+	    my $string = join(' ',@tok);
+	    $string = tokenize($string,$SrcLang) if ($TokenizeSrc);
+	    $string = lc($string)                if ($LowercaseSrc);
+	    print F $string,"\n";
+	}
+    }
+}
+close F;
+$source->close;
+
+#---------------------------------------------------------------------------
+
+my $data=Uplug::Data->new;    # use a new data-object (new XML parser!)
+open F,">$TmpTrg";
+binmode(F,':encoding(utf-8)') if ($]>=5.008);
+
+while ($target->read($data)){
+    my $id=$data->attribute('id');
+    if (defined $id){
+	my @tok=$data->content;
+	map(s/^\s*//,@tok);                    # remove initial white-spaces
+	map(s/\s*$//,@tok);                    # remove final white-spaces
+	map(s/\n//g,@tok);                     # remove all line-breaks
+	@tok=grep(/\S/,@tok);                  # take only non-empty tokens
+	if (@tok){                             # print them if any left
+
+	    my $before=$data->header;
+	    if ($before=~/\<$ParBreak[\s\/\>]/s){
+		print F '<p>'."\n";
+		push(@TrgSent,'p');
+	    }
+	    push (@TrgSent,$id);
+	    # print F join " ",@tok;
+	    # print F "\n";
+	    my $string = join(' ',@tok);
+	    $string = tokenize($string,$TrgLang) if ($TokenizeTrg);
+	    $string = lc($string)                if ($LowercaseTrg);
+	    print F $string,"\n";
+	}
+    }
+}
+close F;
+$target->close;
+
+
+#---------------------------------------------------------------------------
+my @cmd = split(/\s+/,$AlignPrg);
+my ($in,$out,$err) = ('',undef,undef);
+
+# run without timeout if a dictionary is specified
+# and a timeout value is set
+if ($TimeOut && $DicFile ne $NullDic){
+    print STDERR "$AlignPrg $DicFile $TmpSrc $TmpTrg (timeout = $TimeOut)\n";
+    my $t = timeout( $TimeOut );
+    eval {
+	run [@cmd,$DicFile,$TmpSrc,$TmpTrg], \$in, \$out, \$err, $t
+    };
+    if ( $t->is_expired ){
+	print STDERR "$AlignPrg $NullDic $TmpSrc $TmpTrg\n";
+	run [@cmd,$NullDic,$TmpSrc,$TmpTrg], \$in, \$out, \$err
+	    or die "cat $?";
+    }
+}
+
+# otherwise: run as usual
+else{
+    print STDERR "$AlignPrg $DicFile $TmpSrc $TmpTrg\n";
+    run [@cmd,$DicFile,$TmpSrc,$TmpTrg], \$in, \$out, \$err
+	or die "cat $?";
+}
+
+# get alignments from the output
+my @alignments = split(/\n/,$out);
+#---------------------------------------------------------------------------
+
+
+my ($prevSrc,$prevTrg,$prevScore)=(0,0,0);
+
+# add the final point of bitext space                                       
+my $lastSrc = $#SrcSent;
+my $lastTrg = $#TrgSent;
+push( @alignments, join(' ',$lastSrc,$lastTrg,0) );
+
+
+my $id=0;
+foreach (@alignments){
+    chomp;
+    my ($sid,$tid,$score)=split(/\s+/);
+
+    ## skip lines that do not start with a digit
+    next if ( !/^[0-9]/ );
+
+    ## split the line
+    my ( $sid, $tid, $score ) = split(/\s+/);
+
+    ## add links
+    my @LinkSrc=();
+    my @LinkTrg=();
+
+    # bisent mode: only allow 1:1 alignments!
+    if ($BisentMode){
+	next unless ($score);                # skip score == 0
+	next if ( $SrcSent[$sid] eq 'p' );   # skip par boundaries
+	next if ( $TrgSent[$tid] eq 'p' );
+        # TODO: why can this happen ....?
+        next if ($sid > $#SrcSent);
+        next if ($tid > $#TrgSent);
+	push( @LinkSrc, $SrcSent[$sid] );    # add link
+	push( @LinkTrg, $TrgSent[$tid] );
+	$prevScore=$score;
+    }
+
+    # otherwise: include previous sentences
+    else{
+	if ($sid > $prevSrc){
+	    foreach ( $prevSrc .. $sid - 1 ) {
+		next if ( $SrcSent[$_] eq 'p' );
+		push( @LinkSrc, $SrcSent[$_] );
+	    }
+	}
+	if ($tid > $prevTrg){
+	    foreach ( $prevTrg .. $tid - 1 ) {
+		next if ( $TrgSent[$_] eq 'p' );
+		push( @LinkTrg, $TrgSent[$_] );
+	    }
+	}
+    }
+
+    ## if there is at least one sentence in the link
+    if (@LinkSrc || @LinkTrg){
+	$id++;
+	my $link = join(' ',@LinkSrc);
+	$link .= ';';
+	$link .= join(' ',@LinkTrg);
+
+	my $out=Uplug::Data->new;
+	$out->setContent(undef,$output->option('root'));
+	$out->setAttribute('id','SL'.$id);
+	$out->setAttribute('xtargets',$link);
+	$out->setAttribute('certainty',$prevScore);
+	$output->write($out);
+    }
+
+    $prevSrc=$sid;
+    $prevTrg=$tid;
+    $prevScore=$score;
+
+}
+
+#---------------------------------------------------------------------------
+
+$output->close;
+
+unlink $TmpSrc;
+unlink $TmpTrg;
+
+
+
+
+sub tokenize{
+    # for Japanese and Chinese: split string into space-separated characters
+    if ($_[1]=~/^(ja|zh)/i){
+	my @chars = split(//,$_[0]);
+	return join(' ',@chars);
+    }
+    unless (exists $Tokenizer{$_[1]}){
+	$Tokenizer{$_[1]} = new Uplug::PreProcess::Tokenizer( lang => $_[1] );
+    }
+    my @tok = $Tokenizer{$_[1]}->tokenize($_[0]);
+    return join(' ',@tok);
+}
+
+
+
+
+############################################################################
+
+
+sub GetDefaultIni{
+
+    my $DefaultIni = {
+  'input' => {
+    'source text' => {
+      'format' => 'XML',
+      'file' => 'data/source.xml',
+      'root' => 's',
+    },
+    'target text' => {
+      'format' => 'XML',
+      'file' => 'data/target.xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'bitext' => {
+      'format' => 'xces align',
+      'write_mode' => 'overwrite',
+    }
+  },
+  'parameter' => {
+      'paragraph boundary' => '(p|head)',
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source text:file',
+       'trg' => 'input:target text:file',
+       'out' => 'output:bitext:file',
+       'b'   => 'parameter:bisent mode',
+       'd'   => 'parameter:dictionary',
+       's'     => 'parameter:source language',
+       't'     => 'parameter:target language',
+       'tok'   => 'parameter:tokenize',
+       'tok-s' => 'parameter:tokenize source',
+       'tok-t' => 'parameter:tokenize target',
+       'l'     => 'parameter:lowercase',
+       'ls'    => 'parameter:lowercase source',
+       'lt'    => 'parameter:lowercase target',
+       'no-dic'     => 'parameter:skip dictionary',
+       'no-realign' => 'parameter:skip realign',
+       'time'  => 'parameter:timeout',
+    }
+  },
+};
+    return %{$DefaultIni};
+}

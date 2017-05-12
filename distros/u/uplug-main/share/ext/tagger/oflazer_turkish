@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+
+my $OflazerHome = $Bin.'/../Oflazer';
+my $Tagger = $OflazerHome.'/prepareconllfromsentence.pl';
+
+system ($Tagger,$ARGV[0],$OflazerHome);
+#system "cut -f2 -d ' ' sample-output.txt | sed 's/\+/ /'";
+system "cut -f2 -d ' ' sample-output.txt";
+system "rm temp.dat temp.txt notf.dat output.txt sample-output.txt";
+

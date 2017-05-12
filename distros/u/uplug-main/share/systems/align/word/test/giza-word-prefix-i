@@ -1,0 +1,67 @@
+{
+  'module' => {
+    'name' => 'GIZA++ word alignment',
+    'program' => 'uplug-giza',
+    'location' => '$UplugBin',
+    'stdout' => 'bitext',
+  },
+  'description' => 'This module runs GIZA++ with basic settings and
+  converts its alignment to the Uplug format. For more information on
+  GIZA++ check this <a href="http:/www-i6.informatik.rwth-aachen.de/web/Software/GIZA++.html">link</a>.',
+  'input' => {
+    'bitext' => {
+      'format' => 'xces align',
+    },
+  },
+  'output' => {
+    'bitext' => {
+      'format' => 'xces align',
+      'status' => 'word',
+    },
+    'clue' => {
+        'format' => 'dbm',
+        'write_mode' => 'overwrite',
+        'key' => ['source','target'],
+        'file' => 'data/runtime/giza-word-prefix-i.dbm',
+    }
+  },
+  'parameter' => {
+     'alignment direction' => 'trg-src',
+#     'alignment direction' => 'both',
+     'make clue' => '1',
+    'token' => {
+
+    #------------------------------------------------------------------
+    # token pair features
+    #     define contextual features for counting
+    #     for example:
+    #
+     'features (source)' => {       # source language features:
+       '#text' => '^(...).*$$1',
+     },
+     'features (target)' => {       # target language features:
+       '#text' => '^(...).*$$1',
+     },
+      'lower case (source)' => 0,            # =1 --> lower case
+      'lower case (target)' => 0,            # =1 --> lower case
+      'token label' => 'w',                  # xml-tag for (single) tokens
+    },
+    #
+    #------------------------------------------------------------------
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:bitext:file',
+       'out' => 'output:bitext:file',
+       'd' => 'parameter:alignment direction',
+       'c' => 'parameter:symmetric alignment'
+    }
+  },
+  'widgets' => {
+       'input' => {
+            'bitext' => {
+               'stream name' => 'stream (format=xces align,status=sent)',
+            },
+        },
+  }
+}

@@ -1,0 +1,79 @@
+{
+  'module' => {
+    'name' => 'GIZA++ word alignment',
+    'program' => 'uplug-giza',
+    'location' => '$UplugBin',
+    'stdout' => 'bitext links',
+  },
+  'description' => 'This module runs GIZA++ with basic settings and
+  converts its alignment to the Uplug format. For more information on
+  GIZA++ check this <a href="http:/www-i6.informatik.rwth-aachen.de/web/Software/GIZA++.html">link</a>.',
+  'input' => {
+    'bitext' => {
+      'format' => 'xces align',
+    },
+  },
+  'output' => {
+    'bitext links' => {
+      'format' => 'xces align',
+      'status' => 'word',
+      'SkipSrcFile' => 1,
+      'SkipTrgFile' => 1,
+      'write_mode' => 'overwrite',
+    },
+    'clue' => {
+	'format' => 'dbm',
+	'write_mode' => 'overwrite',
+	'key' => ['source','target'],
+	'file' => 'data/runtime/giza-word.dbm',
+    },
+    'clue_inv' => {
+	'format' => 'dbm',
+	'write_mode' => 'overwrite',
+	'key' => ['source','target'],
+	'file' => 'data/runtime/giza-word-i.dbm',
+    }
+  },
+  'parameter' => {
+    'alignment direction' => 'both',
+    'make clue' => 0,
+    'symmetric alignment' => 'refined',
+    'token' => {
+
+    #------------------------------------------------------------------
+    # token pair features
+    #     define contextual features for counting
+    #     for example:
+    #
+#     'features (source)' => {       # source language features:
+#       'pos' => undef,
+#     },
+#     'features (target)' => {       # target language features:
+#       'pos' => undef,              # POS-attribute of the current token
+#     },
+#      'lower case (source)' => 0,            # =1 --> lower case
+#      'lower case (target)' => 0,            # =1 --> lower case
+#      'token label' => 'w',                  # xml-tag for (single) tokens
+    },
+    #
+    #------------------------------------------------------------------
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:bitext:file',
+       'out' => 'output:bitext links:file',
+       'd' => 'parameter:alignment direction',
+       'c' => 'parameter:make clue',
+       's' => 'parameter:symmetric alignment',
+       'clue' => 'output:clue:file',
+       'clue_inv' => 'output:clue_inv:file',
+    }
+  },
+  'widgets' => {
+       'input' => {
+            'bitext' => {
+               'stream name' => 'stream (format=xces align,status=sent)',
+            },
+        },
+  }
+}

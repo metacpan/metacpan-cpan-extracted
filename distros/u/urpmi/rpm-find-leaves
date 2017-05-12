@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+use strict;
+
+use urpm;
+use urpm::msg;
+use urpm::orphans;
+
+my %options = (
+    restrict_group => 0,
+    group => 'System/Libraries',
+    root => '',
+);
+
+my $usage = N("usage: %s [options]
+where [options] are from
+", $0) . N("   -h|--help      - print this help message.
+") . N("   --root <path>  - use the given root instead of /
+") . N("   -g [group]     - restrict results to specified group.
+") . N("                    defaults to %s.
+", $options{group}) . N("   -f             - output rpm full name (NVRA)
+");
+
+my $urpm = urpm->new;
+
+while (my $_ = shift) {
+    $_ eq '--root' and do {
+	my $root = shift;
+	$root and urpm::set_files($urpm, $root);
+	next;
+
+    };
+    $_ eq '-g' and do {
+	$options{restrict_group} = 1;
+	next if !@ARGV || $ARGV[0] =~ /^-/;
+	my $group = shift;
+	$options{group} = $group;
+	next;
+    };
+    $_ eq '-f' and do { $options{fullname} = 1; next };
+    print $usage; exit 1;
+}
+
+my $discard = $options{restrict_group} && sub { $_[0]->group !~ /\Q$options{group}/oi };
+my $leaves = urpm::orphans::installed_leaves($urpm, $discard);
+
+my @l = map { $options{fullname} ? scalar $_->fullname : $_->name } @$leaves;
+print "$_\n" foreach sort @l;

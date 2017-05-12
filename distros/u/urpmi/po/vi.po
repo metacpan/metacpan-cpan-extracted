@@ -1,0 +1,3903 @@
+# Vietnamese Translation for URPMI.
+# Copyright (C) 2000 - 2003, 2004 Free Software Foundation, Inc.
+# Trinh Minh Thanh <tmthanh@yahoo.com>, 2001 - 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: urpmi-vi\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-01 19:38+0200\n"
+"PO-Revision-Date: 2005-06-08 15:13+0700\n"
+"Last-Translator: Trinh Minh Thanh <tmthanh@yahoo.com>\n"
+"Language-Team: Vietnamese <gnomevi-list@lists.sourceforge.net>\n"
+"Language: vi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../gurpmi:32
+#, c-format
+msgid "RPM installation"
+msgstr "Cài đặt RPM"
+
+#: ../gurpmi:46
+#, c-format
+msgid "Error: unable to find file %s, will cancel operation"
+msgstr ""
+
+#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#, c-format
+msgid "_Ok"
+msgstr "_OK"
+
+#: ../gurpmi:67
+#, c-format
+msgid ""
+"You have selected a source package:\n"
+"\n"
+"%s\n"
+"\n"
+"You probably didn't want to install it on your computer (installing it would "
+"allow you to make modifications to its sourcecode then compile it).\n"
+"\n"
+"What would you like to do?"
+msgstr ""
+"Bạn đã chọn gói nguồn:\n"
+"\n"
+"%s\n"
+"\n"
+"Có thể bạn đã không muốn cài đặt nó lên hệ thống (cài đặt nó sẽ cho phép bạn "
+"thay đổi mã nguồn rồi biên dịch lại).\n"
+"\n"
+"Bạn muốn làm gì?"
+
+#: ../gurpmi:75 ../gurpmi:86
+#, c-format
+msgid ""
+"You are about to install the following software packages on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"Proceed?"
+msgstr ""
+"Bạn sắp cài đặt các gói phần mềm sau đây vào hệ thống:\n"
+"\n"
+"%s\n"
+"\n"
+"Thực hiện cài đặt?"
+
+#: ../gurpmi:81
+#, c-format
+msgid ""
+"You are about to install the following software package on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"You may prefer to just save it. What is your choice?"
+msgstr ""
+"Bạn sắp cài đặt các gói phần mềm sau đây vào hệ thống:\n"
+"\n"
+"%s\n"
+"\n"
+"Bạn có thể chỉ muốn lưu nó. Bạn chọn làm việc gì?"
+
+#: ../gurpmi:99
+#, c-format
+msgid "_Install"
+msgstr "_Cài đặt"
+
+#: ../gurpmi:100
+#, c-format
+msgid "_Save"
+msgstr "_Lưu"
+
+#: ../gurpmi:101 ../gurpmi2:197
+#, c-format
+msgid "_Cancel"
+msgstr "Bỏ _qua"
+
+#: ../gurpmi:109
+#, c-format
+msgid "Choose location to save file"
+msgstr "Chọn nơi lưu tập tin"
+
+#: ../gurpmi.pm:41
+#, c-format
+msgid "Options:"
+msgstr ""
+
+#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#, c-format
+msgid "  --help         - print this help message.\n"
+msgstr "  --help         - in thông tin trợ giúp này.\n"
+
+#: ../gurpmi.pm:43 ../urpmi:74
+#, c-format
+msgid ""
+"  --auto         - non-interactive mode, assume default answers to "
+"questions.\n"
+msgstr ""
+
+#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#, c-format
+msgid ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+msgstr "  --auto-select  - tự động chọn các gói tin để nâng cấp hệ thống.\n"
+
+#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#, c-format
+msgid ""
+"  --force        - force invocation even if some packages do not exist.\n"
+msgstr ""
+"  --force        - ép buộc cầu viện ngay cả khi một số gói tin không tồn "
+"tại.\n"
+
+#: ../gurpmi.pm:46 ../urpmi:129
+#, fuzzy, c-format
+msgid ""
+"  --verify-rpm   - verify rpm signature before installation\n"
+"                   (--no-verify-rpm disables it, default is enabled).\n"
+msgstr ""
+"  --verify-rpm   - xác minh chữ ký rpm trước khi cài đặt.\n"
+"                   (--no-verify-rpm để tắt nó, mặc định là bật).\n"
+
+#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#, c-format
+msgid "  --media        - use only the given media, separated by comma.\n"
+msgstr ""
+"  --media         - chỉ dùng phương tiện được trao, ngăn cách bởi dấu phẩy.\n"
+
+#: ../gurpmi.pm:49 ../urpmi:146
+#, c-format
+msgid "  -p             - allow search in provides to find package.\n"
+msgstr "  -p             - cho phép tìm gói tin trong số các nhà cung cấp.\n"
+
+#: ../gurpmi.pm:50 ../urpmi:147
+#, c-format
+msgid "  -P             - do not search in provides to find package.\n"
+msgstr "  -P             - không tìm các nhà cung cấp để kiếm gói tin.\n"
+
+#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#, c-format
+msgid "  --root         - use another root for rpm installation.\n"
+msgstr "  --root         - dùng root khác để thực hiện cài đặt rpm.\n"
+
+#: ../gurpmi.pm:52 ../urpmi:131
+#, fuzzy, c-format
+msgid ""
+"  --test         - only verify if the installation can be achieved "
+"correctly.\n"
+msgstr "  --test         - xác minh nếu việc cài đặt đạt kết quả tốt.\n"
+
+#: ../gurpmi.pm:53 ../urpmi:71
+#, fuzzy, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested packages.\n"
+msgstr ""
+"  --searchmedia  - chỉ dùng phương tiện được cho để tìm kiếm hay nâng cấp "
+"các gói.\n"
+
+#: ../gurpmi.pm:96
+#, fuzzy, c-format
+msgid "No packages specified"
+msgstr "không có gói tin với tên %s"
+
+#: ../gurpmi2:55
+#, c-format
+msgid "Please wait..."
+msgstr "Hãy chờ..."
+
+#: ../gurpmi2:64
+#, c-format
+msgid "Must be root"
+msgstr "Phải là root"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Distribution Upgrade"
+msgstr "phân phối %s"
+
+#: ../gurpmi2:71
+#, fuzzy, c-format
+msgid "Packages installation"
+msgstr "Cài đặt gói..."
+
+#: ../gurpmi2:98
+#, c-format
+msgid "Preparing packages installation..."
+msgstr "Đang chuẩn bị cài đặt các gói tin..."
+
+#: ../gurpmi2:113 ../urpmi:505
+#, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s"
+msgstr ""
+"Không thể cài đặt một số gói tin được yêu cầu:\n"
+"%s"
+
+#: ../gurpmi2:121
+#, fuzzy, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Không thể cài đặt một số gói tin đã yêu cầu:\n"
+"%s\n"
+"Tiếp tục?"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Warning"
+msgstr "Cảnh báo"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Ok"
+msgstr "OK"
+
+#: ../gurpmi2:193
+#, c-format
+msgid " (to upgrade)"
+msgstr "(để nâng cấp)"
+
+#: ../gurpmi2:194
+#, c-format
+msgid " (to install)"
+msgstr "(để cài đặt)"
+
+#: ../gurpmi2:197
+#, c-format
+msgid "Package choice"
+msgstr ""
+
+#: ../gurpmi2:198
+#, c-format
+msgid "One of the following packages is needed:"
+msgstr "Cần một gói trong các gói tin sau đây:"
+
+#: ../gurpmi2:223
+#, c-format
+msgid "_Abort"
+msgstr "Hủy _bỏ"
+
+#: ../gurpmi2:258
+#, fuzzy, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Các gói sau đây phải được gỡ bỏ để nâng cấp các gói khác:\n"
+"%s\n"
+"Tiếp tục?"
+
+#: ../gurpmi2:277 ../urpmi:605
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following package is going to be installed:"
+msgstr "Để thỏa mãn phụ thuộc, gói tin sau đây sẽ được cài đặt (%d MB)"
+
+#: ../gurpmi2:278 ../urpmi:606
+#, fuzzy, c-format
+msgid ""
+"To satisfy dependencies, the following packages are going to be installed:"
+msgstr "Để thỏa mãn phụ thuộc, gói tin sau đây sẽ được cài đặt (%d MB)"
+
+#: ../gurpmi2:280
+#, c-format
+msgid "(%d package, %d MB)"
+msgid_plural "(%d packages, %d MB)"
+msgstr[0] "(%d các gói, %d MB)"
+
+#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#, c-format
+msgid "unable to get source packages, aborting"
+msgstr "không thể lấy các gói nguồn, hủy bỏ"
+
+#: ../gurpmi2:320 ../urpm/install.pm:104
+#, c-format
+msgid "Preparing..."
+msgstr "Đang chuẩn bị..."
+
+#: ../gurpmi2:326
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Đang cài đặt gói `%s' (%s/%s)..."
+
+#: ../gurpmi2:344 ../urpmi:633
+#, fuzzy, c-format
+msgid "Please insert the medium named \"%s\""
+msgstr "Hãy nạp phương tiện có tên \"%s\" trên thiết bị [%s]"
+
+#: ../gurpmi2:358
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Đang tải về gói `%s'..."
+
+#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
+#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
+#: ../urpm/media.pm:1657
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "...không thu thập được: %s"
+
+#: ../gurpmi2:387
+#, c-format
+msgid "_Done"
+msgstr "H_oàn thành"
+
+#: ../gurpmi2:404 ../urpm/main_loop.pm:82
+#, fuzzy, c-format
+msgid ""
+"Installation failed, some files are missing:\n"
+"%s"
+msgstr "Cài đặt không được"
+
+#: ../gurpmi2:407
+#, fuzzy, c-format
+msgid "You may want to update your urpmi database."
+msgstr ""
+"Cài đặt lỗi, thiếu một số tập tin:\n"
+"%s\n"
+"Có thể bạn nên cập nhật cơ sở dữ liệu của urpmi."
+
+#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
+#, fuzzy, c-format
+msgid "Installation failed:"
+msgstr "Cài đặt không được"
+
+#: ../gurpmi2:416
+#, c-format
+msgid "The package(s) are already installed"
+msgstr "Mọi thứ đã được cài đặt rồi"
+
+#: ../gurpmi2:418
+#, c-format
+msgid "Installation finished"
+msgstr "Kết thúc cài đặt"
+
+#: ../gurpmi2:419 ../urpme:165
+#, c-format
+msgid "removing %s"
+msgstr "gỡ bỏ %s"
+
+#: ../gurpmi2:430 ../urpmi:691
+#, c-format
+msgid "restarting urpmi"
+msgstr "khởi chạy lại urpmi"
+
+#: ../rpm-find-leaves:15
+#, c-format
+msgid ""
+"usage: %s [options]\n"
+"where [options] are from\n"
+msgstr ""
+"cách dùng: %s [options]\n"
+"nơi có [options]\n"
+
+#: ../rpm-find-leaves:17
+#, c-format
+msgid "   -h|--help      - print this help message.\n"
+msgstr "   -h|--help      - in thông tin trợ giúp này.\n"
+
+#: ../rpm-find-leaves:18
+#, c-format
+msgid "   --root <path>  - use the given root instead of /\n"
+msgstr "   --root <path>  - dùng root chỉ định thay cho /\n"
+
+#: ../rpm-find-leaves:19
+#, c-format
+msgid "   -g [group]     - restrict results to specified group.\n"
+msgstr "   -g [group]     - hạn chế kết quả cho nhóm.\n"
+
+#: ../rpm-find-leaves:20
+#, c-format
+msgid "                    defaults to %s.\n"
+msgstr "                    mặc định là %s.\n"
+
+#: ../rpm-find-leaves:21
+#, fuzzy, c-format
+msgid "   -f             - output rpm full name (NVRA)\n"
+msgstr "  -g             - in ra các nhóm với tên.\n"
+
+#: ../rurpmi:11 ../urpmi:265
+#, c-format
+msgid "Only superuser is allowed to install packages"
+msgstr "Chỉ cho phép người dùng cao cấp được cài đặt các gói"
+
+#: ../rurpmi:18
+#, c-format
+msgid "Running urpmi in restricted mode..."
+msgstr ""
+
+#: ../urpm.pm:23
+#, c-format
+msgid "While some packages may have been installed, there were failures.\n"
+msgstr ""
+
+#: ../urpm.pm:110
+#, fuzzy, c-format
+msgid "fail to create directory %s"
+msgstr "Không thể tạo thư mục [%s] cho báo cáo lỗi"
+
+#: ../urpm.pm:111
+#, c-format
+msgid "invalid owner for directory %s"
+msgstr ""
+
+#: ../urpm.pm:135
+#, fuzzy, c-format
+msgid "Can not download packages into %s"
+msgstr "Đang tải về gói `%s'..."
+
+#: ../urpm.pm:150
+#, c-format
+msgid "Environment directory %s does not exist"
+msgstr ""
+
+#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#, c-format
+msgid "using specific environment on %s\n"
+msgstr "đang dùng môi trường đặc hiệu trên %s\n"
+
+#: ../urpm.pm:313
+#, c-format
+msgid "unable to open rpmdb"
+msgstr "không thể mở rpmdb"
+
+#: ../urpm.pm:327
+#, c-format
+msgid "invalid rpm file name [%s]"
+msgstr "tên tập tin rpm [%s] không hợp lệ"
+
+#: ../urpm.pm:333
+#, c-format
+msgid "retrieving rpm file [%s] ..."
+msgstr "đang thu thập tập tin rpm [%s] ..."
+
+#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#, c-format
+msgid "...retrieving done"
+msgstr "...hoàn thành việc thu thập"
+
+#: ../urpm.pm:343
+#, c-format
+msgid "unable to access rpm file [%s]"
+msgstr "không thể truy cập tập tin rpm [%s]"
+
+#: ../urpm.pm:348
+#, fuzzy, c-format
+msgid "unable to parse spec file %s [%s]"
+msgstr "không thể phân tích cú pháp \"%s\" trong tập tin [%s]"
+
+#: ../urpm.pm:356
+#, c-format
+msgid "unable to register rpm file"
+msgstr "không thể đăng ký tập tin rpm"
+
+#: ../urpm.pm:358
+#, c-format
+msgid "Incompatible architecture for rpm [%s]"
+msgstr ""
+
+#: ../urpm.pm:362
+#, c-format
+msgid "error registering local packages"
+msgstr "lỗi đăng ký các gói tin cục bộ"
+
+#: ../urpm.pm:450
+#, c-format
+msgid "This operation is forbidden while running in restricted mode"
+msgstr ""
+
+#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#, c-format
+msgid "bad proxy declaration on command line\n"
+msgstr "khai báo proxy sai trong dòng lệnh\n"
+
+#: ../urpm/args.pm:306
+#, c-format
+msgid "urpmq: cannot read rpm file \"%s\"\n"
+msgstr "urpmq: không thể đọc tập tin rpm \"%s\"\n"
+
+#: ../urpm/args.pm:384
+#, c-format
+msgid "unexpected expression %s"
+msgstr ""
+
+#: ../urpm/args.pm:385
+#, fuzzy, c-format
+msgid "missing expression before %s"
+msgstr "Thiếu chữ ký (%s)"
+
+#: ../urpm/args.pm:391
+#, c-format
+msgid "unexpected expression %s (suggestion: use -a or -o ?)"
+msgstr ""
+
+#: ../urpm/args.pm:395
+#, c-format
+msgid "no expression to close"
+msgstr ""
+
+#: ../urpm/args.pm:404
+#, c-format
+msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
+msgstr ""
+
+#: ../urpm/args.pm:478
+#, c-format
+msgid "chroot directory doesn't exist"
+msgstr ""
+
+#: ../urpm/args.pm:501
+#, c-format
+msgid "Can't use %s without %s"
+msgstr ""
+
+#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#, c-format
+msgid "Can't use %s with %s"
+msgstr ""
+
+#: ../urpm/args.pm:515
+#, c-format
+msgid "Too many arguments\n"
+msgstr ""
+
+#: ../urpm/args.pm:523
+#, c-format
+msgid ""
+"%s version %s\n"
+"%s\n"
+"This is free software and may be redistributed under the terms of the GNU "
+"GPL.\n"
+"\n"
+"usage:\n"
+msgstr ""
+"Phiên bản %s %s\n"
+"%s\n"
+"Đây là phần mềm miễn phí và có thể phân phối lại theo các điều khoản của GNU "
+"GPL.\n"
+"\n"
+"Cách dùng:\n"
+
+#: ../urpm/args.pm:529
+#, c-format
+msgid "Copyright (C) %s by %s"
+msgstr "Bản quyền (C) %s %s"
+
+#: ../urpm/bug_report.pm:67 ../urpmi:255
+#, c-format
+msgid "Copying failed"
+msgstr "Sao chép không được"
+
+#: ../urpm/cdrom.pm:80
+#, c-format
+msgid ""
+"You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
+"automatically)"
+msgstr ""
+
+#: ../urpm/cdrom.pm:82
+#, c-format
+msgid "Udisks daemon (udisks-daemon) is not running or not ready"
+msgstr ""
+
+#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
+#, fuzzy, c-format
+msgid "medium \"%s\" is not available"
+msgstr "phương tiện \"%s\" không được chọn"
+
+#: ../urpm/cdrom.pm:218
+#, c-format
+msgid "unable to read rpm file [%s] from medium \"%s\""
+msgstr "không thể đọc tập tin rpm [%s] từ phương tiện \"%s\""
+
+#: ../urpm/cfg.pm:82
+#, fuzzy, c-format
+msgid "syntax error in config file at line %s"
+msgstr "Không thể ghi tập tin cấu hình [%s]"
+
+#: ../urpm/cfg.pm:115
+#, fuzzy, c-format
+msgid "unable to read config file [%s]"
+msgstr "Không thể ghi tập tin cấu hình [%s]"
+
+#: ../urpm/cfg.pm:141
+#, c-format
+msgid "medium `%s' is defined twice, aborting"
+msgstr ""
+
+#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#, c-format
+msgid "unable to write config file [%s]"
+msgstr "Không thể ghi tập tin cấu hình [%s]"
+
+#: ../urpm/download.pm:95
+#, c-format
+msgid "%s is not available, falling back on %s"
+msgstr ""
+
+#: ../urpm/download.pm:178
+#, c-format
+msgid "can not read proxy settings (not enough rights to read %s)"
+msgstr ""
+
+#: ../urpm/download.pm:208
+#, c-format
+msgid "Please enter your credentials for accessing proxy\n"
+msgstr "Hãy nhập các yêu cầu để truy cập proxy\n"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "User name:"
+msgstr "Ngươì dùng:"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "Password:"
+msgstr "Mật khẩu:"
+
+#: ../urpm/download.pm:295
+#, c-format
+msgid "Unknown webfetch `%s' !!!\n"
+msgstr ""
+
+#: ../urpm/download.pm:303
+#, c-format
+msgid "%s failed: exited with signal %d"
+msgstr ""
+
+#: ../urpm/download.pm:304
+#, c-format
+msgid "%s failed: exited with %d"
+msgstr ""
+
+#: ../urpm/download.pm:338
+#, fuzzy, c-format
+msgid "copy failed"
+msgstr "Sao chép không được"
+
+#: ../urpm/download.pm:344
+#, fuzzy, c-format
+msgid "wget is missing\n"
+msgstr "do thiếu %s"
+
+#: ../urpm/download.pm:411
+#, fuzzy, c-format
+msgid "curl is missing\n"
+msgstr "do thiếu %s"
+
+#: ../urpm/download.pm:547
+#, c-format
+msgid "curl failed: upload canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:548
+#, c-format
+msgid "curl failed: download canceled\n"
+msgstr ""
+
+#: ../urpm/download.pm:583
+#, c-format
+msgid "rsync is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:651
+#, c-format
+msgid "ssh is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:670
+#, c-format
+msgid "prozilla is missing\n"
+msgstr ""
+
+#: ../urpm/download.pm:686
+#, c-format
+msgid "Couldn't execute prozilla\n"
+msgstr ""
+
+#: ../urpm/download.pm:696
+#, fuzzy, c-format
+msgid "aria2 is missing\n"
+msgstr "do thiếu %s"
+
+#: ../urpm/download.pm:740
+#, c-format
+msgid "Failed to download %s"
+msgstr ""
+
+#: ../urpm/download.pm:835
+#, c-format
+msgid "        %s%% of %s completed, ETA = %s, speed = %s"
+msgstr ""
+
+#: ../urpm/download.pm:836
+#, c-format
+msgid "        %s%% completed, speed = %s"
+msgstr ""
+
+#: ../urpm/download.pm:921
+#, fuzzy, c-format
+msgid "retrieving %s"
+msgstr "gỡ bỏ %s"
+
+#: ../urpm/download.pm:932
+#, fuzzy, c-format
+msgid "retrieved %s"
+msgstr "...không thu thập được: %s"
+
+#: ../urpm/download.pm:994
+#, c-format
+msgid "unknown protocol defined for %s"
+msgstr "chỉ định giao thức không xác định cho %s"
+
+#: ../urpm/download.pm:1008
+#, c-format
+msgid "no webfetch found, supported webfetch are: %s\n"
+msgstr "không thấy webfetch nào, webfetch được hỗ trợ là: %s\n"
+
+#: ../urpm/download.pm:1023
+#, c-format
+msgid "unable to handle protocol: %s"
+msgstr "không thể quản lý giao thức: %s"
+
+#: ../urpm/get_pkgs.pm:29
+#, fuzzy, c-format
+msgid "cleaning %s and %s"
+msgstr "cài đặt %s từ %s"
+
+#: ../urpm/get_pkgs.pm:141
+#, c-format
+msgid "package %s is not found."
+msgstr "Không tìm thấy gói tin %s."
+
+#: ../urpm/get_pkgs.pm:277
+#, c-format
+msgid "retrieving rpm files from medium \"%s\"..."
+msgstr "đang thu thập các tập tin rpm từ phương tiện \"%s\"..."
+
+#: ../urpm/install.pm:110
+#, c-format
+msgid "[repackaging]"
+msgstr ""
+
+#: ../urpm/install.pm:201
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+"đã tạo phiên giao dịch cho việc cài đặt trên %s (gỡ bỏ=%d, cài đặt=%d, nâng "
+"cấp=%d)"
+
+#: ../urpm/install.pm:204
+#, c-format
+msgid "unable to create transaction"
+msgstr "không thể tạo phiên giao dịch"
+
+#: ../urpm/install.pm:229
+#, c-format
+msgid "unable to extract rpm from delta-rpm package %s"
+msgstr "không thể lấy rpm ra từ gói tin delta-rpm %s"
+
+#: ../urpm/install.pm:242
+#, c-format
+msgid "unable to install package %s"
+msgstr "không thể cài đặt gói %s"
+
+#: ../urpm/install.pm:245
+#, fuzzy, c-format
+msgid "removing bad rpm (%s) from %s"
+msgstr "cài đặt %s từ %s"
+
+#: ../urpm/install.pm:246 ../urpm/install.pm:311
+#, fuzzy, c-format
+msgid "removing %s failed: %s"
+msgstr "...không thu thập được: %s"
+
+#: ../urpm/install.pm:292
+#, fuzzy, c-format
+msgid "Removing package %s"
+msgstr "gỡ bỏ gói %s"
+
+#: ../urpm/install.pm:293
+#, c-format
+msgid "removing package %s"
+msgstr "gỡ bỏ gói %s"
+
+#: ../urpm/install.pm:309
+#, fuzzy, c-format
+msgid "removing installed rpms (%s) from %s"
+msgstr "cài đặt %s từ %s"
+
+#: ../urpm/install.pm:318
+#, c-format
+msgid "More information on package %s"
+msgstr "Thêm thông tin cho gói %s"
+
+#: ../urpm/ldap.pm:44
+#, c-format
+msgid "Cannot create ldap cache directory"
+msgstr ""
+
+#: ../urpm/ldap.pm:46
+#, c-format
+msgid "Cannot write cache file for ldap\n"
+msgstr ""
+
+#: ../urpm/ldap.pm:181
+#, c-format
+msgid "No server defined, missing uri or host"
+msgstr ""
+
+#: ../urpm/ldap.pm:182
+#, fuzzy, c-format
+msgid "No base defined"
+msgstr "không có gói tin với tên %s"
+
+#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#, c-format
+msgid "Cannot connect to ldap uri:"
+msgstr ""
+
+#: ../urpm/lock.pm:99
+#, fuzzy, c-format
+msgid "%s database is locked, process %d is already using it"
+msgstr "cơ sở dữ liệu urpmi bị khóa"
+
+#: ../urpm/lock.pm:101
+#, c-format
+msgid "%s database is locked (another program is already using it)"
+msgstr ""
+
+#: ../urpm/lock.pm:115
+#, fuzzy, c-format
+msgid "%s database is locked. Waiting..."
+msgstr "cơ sở dữ liệu urpmi bị khóa"
+
+#: ../urpm/lock.pm:116
+#, fuzzy, c-format
+msgid "aborting"
+msgstr "Cảnh báo"
+
+#: ../urpm/main_loop.pm:58
+#, c-format
+msgid "Retry?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:85
+#, fuzzy, c-format
+msgid "You may need to update your urpmi database."
+msgstr ""
+"Cài đặt lỗi, thiếu một số tập tin:\n"
+"%s\n"
+"Có thể bạn nên cập nhật cơ sở dữ liệu của urpmi."
+
+#: ../urpm/main_loop.pm:89
+#, fuzzy, c-format
+msgid ""
+"Installation failed, bad rpms:\n"
+"%s"
+msgstr "Cài đặt không được"
+
+#: ../urpm/main_loop.pm:108
+#, c-format
+msgid ""
+"There is not enough space on your filesystem to download all packages (%s "
+"needed, %s available).\n"
+"Are you sure you want to continue?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:138
+#, fuzzy, c-format
+msgid "The following package has bad signature"
+msgstr "Các gói tin sau đây có các chữ ký tồi"
+
+#: ../urpm/main_loop.pm:139
+#, c-format
+msgid "The following packages have bad signatures"
+msgstr "Các gói tin sau đây có các chữ ký tồi"
+
+#: ../urpm/main_loop.pm:140
+#, c-format
+msgid "Do you want to continue installation ?"
+msgstr "Bạn muốn tiếp tục cài đặt không ?"
+
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
+#: ../urpm/main_loop.pm:296
+#, c-format
+msgid "Installation failed"
+msgstr "Cài đặt không được"
+
+#: ../urpm/main_loop.pm:159
+#, fuzzy, c-format
+msgid "removing installed rpms (%s)"
+msgstr "cài đặt %s từ %s"
+
+#: ../urpm/main_loop.pm:185
+#, c-format
+msgid "Try to continue anyway?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:234
+#, c-format
+msgid "installing %s from %s"
+msgstr "cài đặt %s từ %s"
+
+#: ../urpm/main_loop.pm:236
+#, c-format
+msgid "installing %s"
+msgstr "đang cài đặt %s"
+
+#: ../urpm/main_loop.pm:243
+#, c-format
+msgid "distributing %s"
+msgstr "phân phối %s"
+
+#: ../urpm/main_loop.pm:289
+#, fuzzy, c-format
+msgid "Try installation without checking dependencies?"
+msgstr "Thử cài đặt mà không cần kiểm tra các phụ thuộc? (Có/Không)"
+
+#: ../urpm/main_loop.pm:297
+#, fuzzy, c-format
+msgid "Try harder to install (--force)?"
+msgstr "Thử cố gắng cài đặt (--force)? (Có/[Không])"
+
+#: ../urpm/main_loop.pm:490
+#, c-format
+msgid "Packages are up to date"
+msgstr ""
+
+#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#, c-format
+msgid "Installation is possible"
+msgstr "Có khả năng cài đặt"
+
+#: ../urpm/md5sum.pm:55
+#, c-format
+msgid "warning: md5sum for %s unavailable in MD5SUM file"
+msgstr "cảnh báo: không có md5sum của %s trong tập tin MD5SUM"
+
+#: ../urpm/media.pm:270
+#, c-format
+msgid "virtual medium \"%s\" should have a clear url, medium ignored"
+msgstr "phương tiện ảo \"%s\" nên có URL rõ ràng, phương tiện bị bỏ qua"
+
+#: ../urpm/media.pm:272
+#, c-format
+msgid "unable to access list file of \"%s\", medium ignored"
+msgstr "không thể truy cập tập tin danh sách của \"%s\", phương tiện bị bỏ qua"
+
+#: ../urpm/media.pm:275
+#, fuzzy, c-format
+msgid "unable to access synthesis file of \"%s\", medium ignored"
+msgstr "không thể truy cập tập tin hdlist của \"%s\", phương tiện bị bỏ qua"
+
+#: ../urpm/media.pm:301
+#, fuzzy, c-format
+msgid "trying to override existing medium \"%s\", skipping"
+msgstr "đang cố bỏ qua phương tiện đang tồn tại \"%s\", tránh"
+
+#: ../urpm/media.pm:517
+#, c-format
+msgid "failed to migrate removable device, ignoring media"
+msgstr ""
+
+#: ../urpm/media.pm:555
+#, c-format
+msgid "wrote config file [%s]"
+msgstr "ghi tập tin cấu hình [%s]"
+
+#: ../urpm/media.pm:598
+#, c-format
+msgid "Can't use parallel mode with use-distrib mode"
+msgstr "Không thể dùng parallel mode với use-distrib mode"
+
+#: ../urpm/media.pm:606
+#, c-format
+msgid "using associated media for parallel mode: %s"
+msgstr "đang dùng phương tiện liên quan cho chế độ song song: %s"
+
+#: ../urpm/media.pm:622
+#, fuzzy, c-format
+msgid ""
+"--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
+"update, --use-distrib or --parallel"
+msgstr ""
+"--synthesis không thể dùng với  --media, --excludemedia, --sortmedia, --"
+"update hoặc --parallel"
+
+#: ../urpm/media.pm:731
+#, c-format
+msgid "Search start: %s end: %s"
+msgstr "Tìm kiếm bắt đầu: %s kết thúc: %s "
+
+#: ../urpm/media.pm:748
+#, c-format
+msgid "skipping package %s"
+msgstr "bỏ qua gói tin %s"
+
+#: ../urpm/media.pm:764
+#, c-format
+msgid "would install instead of upgrade package %s"
+msgstr "nên cài đặt thay vì nâng cấp gói %s"
+
+#: ../urpm/media.pm:840
+#, c-format
+msgid "medium \"%s\" already exists"
+msgstr "phương tiện \"%s\" đã tồn tại rồi"
+
+#: ../urpm/media.pm:882
+#, c-format
+msgid "(ignored by default)"
+msgstr ""
+
+#: ../urpm/media.pm:888
+#, fuzzy, c-format
+msgid "adding medium \"%s\" before remote medium \"%s\""
+msgstr "đang đọc các header từ phương tiện \"%s\""
+
+#: ../urpm/media.pm:894
+#, fuzzy, c-format
+msgid "adding medium \"%s\""
+msgstr "gỡ bỏ phương tiện \"%s\""
+
+#: ../urpm/media.pm:918
+#, fuzzy, c-format
+msgid "failed to copy media.cfg to %s (%d)"
+msgstr "không thể mở rpmdb"
+
+#: ../urpm/media.pm:960
+#, c-format
+msgid "directory %s does not exist"
+msgstr ""
+
+#: ../urpm/media.pm:968
+#, c-format
+msgid "this location doesn't seem to contain any distribution"
+msgstr ""
+
+#: ../urpm/media.pm:992
+#, fuzzy, c-format
+msgid "unable to parse media.cfg"
+msgstr "không thể mở rpmdb"
+
+#: ../urpm/media.pm:995
+#, fuzzy, c-format
+msgid "unable to access the distribution medium (no media.cfg file found)"
+msgstr ""
+"không thể truy cập phương tiện cài đặt thứ nhất (không thấy tập tin hdlists)"
+
+#: ../urpm/media.pm:1016
+#, c-format
+msgid "skipping non compatible media `%s' (for %s)"
+msgstr ""
+
+#: ../urpm/media.pm:1031
+#, fuzzy, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr "bỏ qua phương tiện %s"
+
+#: ../urpm/media.pm:1074
+#, fuzzy, c-format
+msgid "retrieving media.cfg file..."
+msgstr "đang lấy về tập tin hdlists..."
+
+#: ../urpm/media.pm:1117
+#, c-format
+msgid "trying to select nonexistent medium \"%s\""
+msgstr "đang thử chọn phương tiện không tồn tại \"%s\""
+
+#: ../urpm/media.pm:1120
+#, c-format
+msgid "selecting multiple media: %s"
+msgstr "đang chọn đa phương tiện: %s"
+
+#: ../urpm/media.pm:1179
+#, c-format
+msgid "removing medium \"%s\""
+msgstr "gỡ bỏ phương tiện \"%s\""
+
+#: ../urpm/media.pm:1262
+#, c-format
+msgid "reconfiguring urpmi for media \"%s\""
+msgstr "đang cấu hình lại urpmi cho phương tiện \"%s\""
+
+#: ../urpm/media.pm:1296
+#, c-format
+msgid "...reconfiguration failed"
+msgstr "...không cấu hình lại được"
+
+#: ../urpm/media.pm:1302
+#, c-format
+msgid "reconfiguration done"
+msgstr "hoàn thành việc cấu hình lại"
+
+#: ../urpm/media.pm:1318
+#, c-format
+msgid "Error generating names file: dependency %d not found"
+msgstr ""
+
+#: ../urpm/media.pm:1339
+#, fuzzy, c-format
+msgid "medium \"%s\" is up-to-date"
+msgstr "phương tiện \"%s\" không được chọn"
+
+#: ../urpm/media.pm:1350
+#, c-format
+msgid "examining synthesis file [%s]"
+msgstr "đang kiểm tra tập tin tổng hợp [%s]"
+
+#: ../urpm/media.pm:1370
+#, c-format
+msgid "problem reading synthesis file of medium \"%s\""
+msgstr "trục trặc khi đọc tập tin tổng hợp của phương tiện \"%s\""
+
+#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
+#, fuzzy, c-format
+msgid "copying [%s] for medium \"%s\"..."
+msgstr "đang ghi tập tin danh sách cho phương tiện \"%s\""
+
+#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#, c-format
+msgid "...copying failed"
+msgstr "...sao chép không được"
+
+#: ../urpm/media.pm:1451
+#, c-format
+msgid "copying description file of \"%s\"..."
+msgstr "đang sao chép tập tin mô tả của \"%s\"..."
+
+#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#, c-format
+msgid "...copying done"
+msgstr "...sao chép hoàn thành"
+
+#: ../urpm/media.pm:1484
+#, c-format
+msgid "copy of [%s] failed (file is suspiciously small)"
+msgstr "lỗi sao chép [%s] (có lẽ tập tin nhỏ)"
+
+#: ../urpm/media.pm:1532
+#, fuzzy, c-format
+msgid "computing md5sum of retrieved source synthesis"
+msgstr "tính toán md5sum của hdlist (hoặc synthesis) nguồn thu thập được"
+
+#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
+#, fuzzy, c-format
+msgid "retrieval of [%s] failed (md5sum mismatch)"
+msgstr "Lỗi bản sao của [%s] (md5sum không so khớp)"
+
+#: ../urpm/media.pm:1549
+#, fuzzy, c-format
+msgid "genhdlist2 failed on %s"
+msgstr "đang kiểm tra tập tin hdlist [%s]"
+
+#: ../urpm/media.pm:1559
+#, fuzzy, c-format
+msgid "comparing %s and %s"
+msgstr "cài đặt %s từ %s"
+
+#: ../urpm/media.pm:1589
+#, fuzzy, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr "không tìm thấy tập tin hdlist cho phương tiện \"%s\""
+
+#: ../urpm/media.pm:1615
+#, fuzzy, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr "đang sao chép tập tin mô tả của \"%s\"..."
+
+#: ../urpm/media.pm:1655
+#, fuzzy, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr "tên tập tin rpm [%s] không hợp lệ"
+
+#: ../urpm/media.pm:1658
+#, fuzzy, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr "không tìm thấy tập tin hdlist cho phương tiện \"%s\""
+
+#: ../urpm/media.pm:1690
+#, fuzzy, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr "đang thu thập hdlist (hoặc synthesis) nguồn của \"%s\"..."
+
+#: ../urpm/media.pm:1756
+#, c-format
+msgid "examining pubkey file of \"%s\"..."
+msgstr "đang kiểm tra tập tin pubkey của \"%s\"..."
+
+#: ../urpm/media.pm:1768
+#, c-format
+msgid "...imported key %s from pubkey file of \"%s\""
+msgstr "...đã nhập key %s từ tập tin pubkey của \"%s\""
+
+#: ../urpm/media.pm:1772
+#, c-format
+msgid "unable to import pubkey file of \"%s\""
+msgstr "không thể nhập tập tin pubkey của \"%s\""
+
+#: ../urpm/media.pm:1813
+#, fuzzy, c-format
+msgid "no synthesis file found for medium \"%s\""
+msgstr "không tìm thấy tập tin hdlist cho phương tiện \"%s\""
+
+#: ../urpm/media.pm:1846
+#, fuzzy, c-format
+msgid "updated medium \"%s\""
+msgstr "đã thêm phương tiện %s"
+
+#: ../urpm/media.pm:1968
+#, c-format
+msgid "retrieval of [%s] failed"
+msgstr ""
+
+#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#, c-format
+msgid "trying again with mirror %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:112
+#, c-format
+msgid "Could not find a mirror from mirrorlist %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:260
+#, c-format
+msgid "found geolocalisation %s %.2f %.2f from timezone %s"
+msgstr ""
+
+#: ../urpm/mirrors.pm:305
+#, fuzzy, c-format
+msgid "getting mirror list from %s"
+msgstr "đang đọc các tập tin rpm từ [%s]"
+
+#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#, c-format
+msgid "Nn"
+msgstr "NnKk"
+
+#  This is a list of chars acceptable as a 'yes' answer to a Yes/No question;
+#  you can put here the letters for 'yes' for your language, so people
+#  can hit those keys in their keyboard to reply.
+#  please keep the 'Yy' for compatibility reasons
+#. -PO: Add here the keys which might be pressed in the "Yes"-case.
+#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#, c-format
+msgid "Yy"
+msgstr "YyVvDdCc"
+
+#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#, c-format
+msgid " (y/N) "
+msgstr " (Có/Không) "
+
+#: ../urpm/msg.pm:139
+#, c-format
+msgid "Sorry, bad choice, try again\n"
+msgstr "Xin lỗi, lựa chọn sai, hãy thử lại\n"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Package"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Version"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Release"
+msgstr ""
+
+#: ../urpm/msg.pm:170
+#, fuzzy, c-format
+msgid "Arch"
+msgstr "Tìm kiếm"
+
+#: ../urpm/msg.pm:179
+#, c-format
+msgid "(suggested)"
+msgstr ""
+
+#: ../urpm/msg.pm:194
+#, fuzzy, c-format
+msgid "medium \"%s\""
+msgstr "gỡ bỏ phương tiện \"%s\""
+
+#: ../urpm/msg.pm:194
+#, c-format
+msgid "command line"
+msgstr ""
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "B"
+msgstr ""
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "KB"
+msgstr "KB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "MB"
+msgstr "MB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "GB"
+msgstr "GB"
+
+#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#, c-format
+msgid "TB"
+msgstr "TB"
+
+#: ../urpm/orphans.pm:79
+#, c-format
+msgid "Marking %s as manually installed, it won't be auto-orphaned"
+msgstr ""
+
+#: ../urpm/orphans.pm:522
+#, fuzzy, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned."
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned."
+msgstr[0] "Cần một gói trong các gói tin sau đây:"
+
+#: ../urpm/orphans.pm:525
+#, fuzzy, c-format
+msgid "You may wish to remove it."
+msgid_plural "You may wish to remove them."
+msgstr[0] "Không có gì để gỡ bỏ"
+
+#: ../urpm/orphans.pm:542
+#, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans"
+"\""
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
+"orphans\""
+msgstr[0] ""
+
+#: ../urpm/parallel.pm:15
+#, c-format
+msgid "unable to parse \"%s\" in file [%s]"
+msgstr "không thể phân tích cú pháp \"%s\" trong tập tin [%s]"
+
+#: ../urpm/parallel.pm:24
+#, c-format
+msgid "examining parallel handler in file [%s]"
+msgstr "đang kiểm tra trình quản lý song song (parallel) trong tập tin [%s]"
+
+#: ../urpm/parallel.pm:35
+#, c-format
+msgid "found parallel handler for nodes: %s"
+msgstr "tìm thấy trình quản lý song song (parallel) cho các node: %s"
+
+#: ../urpm/parallel.pm:39
+#, c-format
+msgid "unable to use parallel option \"%s\""
+msgstr "không thể sử dụng tùy chọn song song (parallel) \"%s\""
+
+#: ../urpm/parallel.pm:94
+#, c-format
+msgid "on node %s"
+msgstr ""
+
+#: ../urpm/parallel.pm:294
+#, fuzzy, c-format
+msgid "Installation failed on node %s"
+msgstr "Cài đặt không được"
+
+#: ../urpm/parallel_ka_run.pm:58
+#, c-format
+msgid "rshp failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ka_run.pm:80
+#, c-format
+msgid "mput failed, maybe a node is unreacheable"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:27
+#, c-format
+msgid "scp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:39
+#, c-format
+msgid "cp failed on host %s (%d)"
+msgstr ""
+
+#: ../urpm/parallel_ssh.pm:86
+#, c-format
+msgid ""
+"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
+"code: %d)"
+msgstr ""
+
+#: ../urpm/removable.pm:46
+#, fuzzy, c-format
+msgid "unable to access medium \"%s\"."
+msgstr "không thể truy cập phương tiện \"%s\""
+
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#, c-format
+msgid "mounting %s"
+msgstr "gắn kết %s"
+
+#: ../urpm/removable.pm:117
+#, c-format
+msgid "unmounting %s"
+msgstr "thôi gắn kết %s"
+
+#: ../urpm/select.pm:45
+#, c-format
+msgid "urpmi was restarted, and the list of priority packages did not change"
+msgstr ""
+
+#: ../urpm/select.pm:47
+#, c-format
+msgid ""
+"urpmi was restarted, and the list of priority packages did change: %s vs %s"
+msgstr ""
+
+#: ../urpm/select.pm:217
+#, c-format
+msgid "No package named %s"
+msgstr "Không có gói tin với tên %s"
+
+#: ../urpm/select.pm:219 ../urpme:113
+#, c-format
+msgid "The following packages contain %s: %s"
+msgstr "Các gói tin sau đây chứa %s: %s"
+
+#: ../urpm/select.pm:221
+#, c-format
+msgid "You should use \"-a\" to use all of them"
+msgstr ""
+
+#: ../urpm/select.pm:368
+#, fuzzy, c-format
+msgid "found package(s) %s in urpmi db, but none are installed"
+msgstr "Mọi thứ đã được cài đặt rồi"
+
+#: ../urpm/select.pm:600
+#, fuzzy, c-format
+msgid "Package %s is already installed"
+msgstr "Mọi thứ đã được cài đặt rồi"
+
+#: ../urpm/select.pm:601
+#, fuzzy, c-format
+msgid "Packages %s are already installed"
+msgstr "Mọi thứ đã được cài đặt rồi"
+
+#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#, c-format
+msgid "due to conflicts with %s"
+msgstr "vì xung đột với %s"
+
+#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#, c-format
+msgid "due to unsatisfied %s"
+msgstr "vì không thỏa mãn %s"
+
+#: ../urpm/select.pm:625
+#, c-format
+msgid "trying to promote %s"
+msgstr "thử xúc tiến %s"
+
+#: ../urpm/select.pm:626
+#, c-format
+msgid "in order to keep %s"
+msgstr "để giữ %s"
+
+#: ../urpm/select.pm:667
+#, fuzzy, c-format
+msgid ""
+"The following package has to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Các gói sau đây phải được gỡ bỏ để nâng cấp các gói khác:\n"
+"%s"
+
+#: ../urpm/select.pm:668
+#, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Các gói sau đây phải được gỡ bỏ để nâng cấp các gói khác:\n"
+"%s"
+
+#: ../urpm/select.pm:695
+#, c-format
+msgid "in order to install %s"
+msgstr "để cài đặt %s"
+
+#: ../urpm/select.pm:701
+#, c-format
+msgid "due to missing %s"
+msgstr "do thiếu %s"
+
+#: ../urpm/signature.pm:62
+#, c-format
+msgid "Invalid signature (%s)"
+msgstr "Chữ ký không hợp lệ (%s)"
+
+#: ../urpm/signature.pm:77
+#, fuzzy, c-format
+msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
+msgstr "Các gói tin sau đây chứa %s: %s"
+
+#: ../urpm/signature.pm:83
+#, c-format
+msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
+msgstr ""
+
+#: ../urpm/signature.pm:102
+#, c-format
+msgid "Invalid Key ID (%s)"
+msgstr "Key ID không hợp lệ (%s)"
+
+#: ../urpm/signature.pm:104
+#, c-format
+msgid "Missing signature (%s)"
+msgstr "Thiếu chữ ký (%s)"
+
+#: ../urpm/signature.pm:107
+#, c-format
+msgid "SECURITY: Medium \"%s\" has no key (%s)!"
+msgstr ""
+
+#: ../urpm/signature.pm:109
+#, c-format
+msgid "Medium without key (%s)"
+msgstr ""
+
+#: ../urpm/sys.pm:225
+#, c-format
+msgid "system"
+msgstr ""
+
+#: ../urpm/sys.pm:262
+#, c-format
+msgid "You should restart your computer for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:264
+#, c-format
+msgid "You should restart your session for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:266
+#, c-format
+msgid "You should restart %s for %s"
+msgstr ""
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't write file"
+msgstr "không thể ghi tập tin [%s]"
+
+#: ../urpm/sys.pm:404
+#, fuzzy, c-format
+msgid "Can't open file"
+msgstr "Sao chép không được"
+
+#: ../urpm/sys.pm:417
+#, fuzzy, c-format
+msgid "Can't move file %s to %s"
+msgstr "Sao chép không được"
+
+#: ../urpme:43
+#, c-format
+msgid "  --auto         - automatically select a package in choices.\n"
+msgstr "  --auto         - tự động chọn một gói tin trong các gói.\n"
+
+#: ../urpme:44
+#, c-format
+msgid "  --auto-orphans - remove orphans\n"
+msgstr ""
+
+#: ../urpme:45
+#, c-format
+msgid "  --test         - verify if the removal can be achieved correctly.\n"
+msgstr ""
+"  --test         - xác minh nếu việc gỡ bỏ có thể được lưu trữ chính xác.\n"
+
+#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#, c-format
+msgid "  --parallel     - distributed urpmi across machines of alias.\n"
+msgstr "  --parallel     - phân phối urpmi qua các máy của alias.\n"
+
+#: ../urpme:48 ../urpmi:138
+#, fuzzy, c-format
+msgid "  --repackage    - Re-package the files before erasing\n"
+msgstr "  --packager     - in ra tag packager: packager.\n"
+
+#: ../urpme:49
+#, c-format
+msgid "  --root         - use another root for rpm removal.\n"
+msgstr "  --root         - dùng root khác để thực hiện gỡ bỏ rpm.\n"
+
+#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
+#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, fuzzy, c-format
+msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
+msgstr "  --root         - dùng root khác để thực hiện cài đặt rpm.\n"
+
+#: ../urpme:51 ../urpmi:96
+#, fuzzy, c-format
+msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
+msgstr "  --update       - chỉ cập nhật phương tiện cập nhật.\n"
+
+#: ../urpme:52
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr "  --description   - in ra mô tả tag: mô tả.\n"
+
+#: ../urpme:53
+#, fuzzy, c-format
+msgid ""
+"  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
+"                   to (un)install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - cấu hình nhanh chóng urpmi từ một distrib tree, giúp\n"
+"                   cài đặt/bỏ cài đặt một chroot bằng tùy chọn --root.\n"
+
+#: ../urpme:55 ../urpmi:149 ../urpmq:87
+#, fuzzy, c-format
+msgid "  --verbose, -v  - verbose mode.\n"
+msgstr "  --verbose      - phương thức verbose.\n"
+
+#: ../urpme:56
+#, c-format
+msgid "  -a             - select all packages matching expression.\n"
+msgstr "  -a             - chọn toàn bộ các gói tin khớp với sự diễn đạt.\n"
+
+#: ../urpme:71
+#, c-format
+msgid "Only superuser is allowed to remove packages"
+msgstr "Chỉ có superuser mới được phép gỡ bỏ các gói"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown packages"
+msgstr "các gói tin không xác định "
+
+#: ../urpme:104
+#, c-format
+msgid "unknown package"
+msgstr "gói tin không xác định"
+
+#: ../urpme:119
+#, fuzzy, c-format
+msgid "Removing the following package will break your system:"
+msgid_plural "Removing the following packages will break your system:"
+msgstr[0] "việc gỡ bỏ gói tin %s sẽ phá vỡ hệ thống"
+
+#: ../urpme:124
+#, c-format
+msgid "Nothing to remove"
+msgstr "Không có gì để gỡ bỏ"
+
+#: ../urpme:141
+#, fuzzy, c-format
+msgid "No orphans to remove"
+msgstr "Không có gì để gỡ bỏ"
+
+#: ../urpme:147
+#, fuzzy, c-format
+msgid "To satisfy dependencies, the following package will be removed"
+msgid_plural ""
+"To satisfy dependencies, the following %d packages will be removed"
+msgstr[0] "Để thỏa mãn các phụ thuộc, %d gói sau đây sẽ được gỡ bỏ (%d MB)"
+
+#: ../urpme:152
+#, fuzzy, c-format
+msgid "(orphan package)"
+msgid_plural "(orphan packages)"
+msgstr[0] "gói tin không xác định"
+
+#: ../urpme:159
+#, fuzzy, c-format
+msgid "Remove %d package?"
+msgid_plural "Remove %d packages?"
+msgstr[0] "gỡ bỏ gói %s"
+
+#: ../urpme:164
+#, fuzzy, c-format
+msgid "testing removal of %s"
+msgstr "coi phương tiện tháo lắp là \"%s\""
+
+#: ../urpme:181
+#, c-format
+msgid "Removal failed"
+msgstr "Gỡ bỏ không được"
+
+#: ../urpme:183
+#, fuzzy, c-format
+msgid "Removal is possible"
+msgstr "Gỡ bỏ không được"
+
+#: ../urpmf:31
+#, fuzzy, c-format
+msgid "  --version      - print this tool's version number.\n"
+msgstr "  --help         - in thông tin trợ giúp này.\n"
+
+#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#, c-format
+msgid "  --env          - use specific environment (typically a bug report).\n"
+msgstr "  --env          - dùng môi trường riêng (điển hình là báo cáo lỗi).\n"
+
+#: ../urpmf:33 ../urpmi:69 ../urpmq:45
+#, c-format
+msgid "  --excludemedia - do not use the given media, separated by comma.\n"
+msgstr ""
+"  --excludemedia - không dùng phương tiện được trao, ngăn cách bởi dấu "
+"phẩy.\n"
+
+#: ../urpmf:34
+#, c-format
+msgid ""
+"  --literal, -l  - don't match patterns, use argument as a literal string.\n"
+msgstr ""
+
+#: ../urpmf:37 ../urpmi:72 ../urpmq:46
+#, c-format
+msgid ""
+"  --sortmedia    - sort media according to substrings separated by comma.\n"
+msgstr ""
+"  --sortmedia         - xếp loại phương tiện theo các chuỗi con được ngăn "
+"cách bởi dấu phẩy.\n"
+
+#: ../urpmf:38
+#, fuzzy, c-format
+msgid "  --use-distrib  - use the given path to access media\n"
+msgstr "  --synthesis    - dùng synthesis nhận được thay cho urpmi db.\n"
+
+#: ../urpmf:39 ../urpmi:73 ../urpmq:47
+#, c-format
+msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+msgstr "  --synthesis    - dùng synthesis nhận được thay cho urpmi db.\n"
+
+#: ../urpmf:40
+#, c-format
+msgid "  --uniq         - do not print identical lines twice.\n"
+msgstr "  --uniq         - không in ra các dòng giống nhau.\n"
+
+#: ../urpmf:41 ../urpmi:70 ../urpmq:42
+#, c-format
+msgid "  --update       - use only update media.\n"
+msgstr "  --update       - chỉ dùng phương tiện cập nhật.\n"
+
+#: ../urpmf:42
+#, c-format
+msgid "  --verbose      - verbose mode.\n"
+msgstr "  --verbose      - phương thức verbose.\n"
+
+#: ../urpmf:43
+#, c-format
+msgid "  -i             - ignore case distinctions in patterns.\n"
+msgstr "  -i             - bỏ qua các dấu hiệu phân biệt trong mọi mẫu.\n"
+
+#: ../urpmf:44
+#, fuzzy, c-format
+msgid "  -I             - honor case distinctions in patterns (default).\n"
+msgstr "  -i             - bỏ qua các dấu hiệu phân biệt trong mọi mẫu.\n"
+
+#: ../urpmf:45
+#, c-format
+msgid "  -F<str>        - change field separator (defaults to ':').\n"
+msgstr ""
+
+#: ../urpmf:46
+#, c-format
+msgid "Pattern expressions:\n"
+msgstr ""
+
+#: ../urpmf:47
+#, c-format
+msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
+msgstr ""
+
+#: ../urpmf:48
+#, c-format
+msgid "  -e             - include perl code directly as perl -e.\n"
+msgstr "  -e             - bao gồm mã perl trực tiếp như perl -e.\n"
+
+#: ../urpmf:49
+#, fuzzy, c-format
+msgid "  -a             - binary AND operator.\n"
+msgstr ""
+"  -a             - binary AND operator, đúng nếu cả hai expression là đúng.\n"
+
+#: ../urpmf:50
+#, fuzzy, c-format
+msgid "  -o             - binary OR operator.\n"
+msgstr ""
+"  -o             - binary OR operator, đúng nếu một expression là đúng.\n"
+
+#: ../urpmf:51
+#, fuzzy, c-format
+msgid "  !              - unary NOT.\n"
+msgstr "  -q             - chế độ yên lặng.\n"
+
+#: ../urpmf:52
+#, fuzzy, c-format
+msgid "  ( )            - left and right parentheses.\n"
+msgstr "  )              - dấu ngoặc phải để đóng group expression.\n"
+
+#: ../urpmf:53
+#, fuzzy, c-format
+msgid "List of tags:\n"
+msgstr ""
+"Danh sách dữ liệu để khôi phục:\n"
+"\n"
+
+#: ../urpmf:54
+#, fuzzy, c-format
+msgid "  --qf           - specify a printf-like output format\n"
+msgstr "  --X            - dùng giao diện X.\n"
+
+#: ../urpmf:55
+#, fuzzy, c-format
+msgid "                   example: '%%name:%%files'\n"
+msgstr "                    mặc định là %s.\n"
+
+#: ../urpmf:56
+#, fuzzy, c-format
+msgid "  --arch         - architecture\n"
+msgstr "  --url          - in ra tag url: url.\n"
+
+#: ../urpmf:57
+#, fuzzy, c-format
+msgid "  --buildhost    - build host\n"
+msgstr "  --buildhost    - in ra tag buildhost: build host.\n"
+
+#: ../urpmf:58
+#, c-format
+msgid "  --buildtime    - build time\n"
+msgstr ""
+
+#: ../urpmf:59
+#, fuzzy, c-format
+msgid "  --conffiles    - configuration files\n"
+msgstr "Module cấu hình Konsole "
+
+#: ../urpmf:60
+#, fuzzy, c-format
+msgid "  --conflicts    - conflict tags\n"
+msgstr "  --conflicts     - in ra xung đột tag: toàn bộ các xung đột.\n"
+
+#: ../urpmf:61
+#, fuzzy, c-format
+msgid "  --description  - package description\n"
+msgstr "  --description   - in ra mô tả tag: mô tả.\n"
+
+#: ../urpmf:62
+#, c-format
+msgid "  --distribution - distribution\n"
+msgstr ""
+
+#: ../urpmf:63
+#, fuzzy, c-format
+msgid "  --epoch        - epoch\n"
+msgstr "  --epoch        - in ra tag epoch: epoch.\n"
+
+#: ../urpmf:64
+#, fuzzy, c-format
+msgid "  --filename     - filename of the package\n"
+msgstr "  --name         - chỉ in ra tên gói.\n"
+
+#: ../urpmf:65
+#, fuzzy, c-format
+msgid "  --files        - list of files contained in the package\n"
+msgstr "  -l             - liệt kê các tập tin trong gói tin.\n"
+
+#: ../urpmf:66
+#, fuzzy, c-format
+msgid "  --group        - group\n"
+msgstr "  --group         - in ra nhóm tag: nhóm.\n"
+
+#: ../urpmf:67
+#, fuzzy, c-format
+msgid "  --license      - license\n"
+msgstr "  --name         - chỉ in ra tên gói.\n"
+
+#: ../urpmf:68
+#, fuzzy, c-format
+msgid "  --name         - package name\n"
+msgstr "  --name         - chỉ in ra tên gói.\n"
+
+#: ../urpmf:69
+#, fuzzy, c-format
+msgid "  --obsoletes    - obsoletes tags\n"
+msgstr "  --obsoletes     - in ra các dòng tag: toàn bộ dòng.\n"
+
+#: ../urpmf:70
+#, fuzzy, c-format
+msgid "  --packager     - packager\n"
+msgstr "  --packager     - in ra tag packager: packager.\n"
+
+#: ../urpmf:71
+#, fuzzy, c-format
+msgid "  --provides     - provides tags\n"
+msgstr "  --provides      - in ra cung cấp tag: toàn bộ các cung cấp.\n"
+
+#: ../urpmf:72
+#, fuzzy, c-format
+msgid "  --requires     - requires tags\n"
+msgstr "  --requires      - in ra yêu cầu tag: toàn bộ các yêu cầu.\n"
+
+#: ../urpmf:73
+#, fuzzy, c-format
+msgid "  --size         - installed size\n"
+msgstr "  --size          - in ra kích thước tag: kích thước.\n"
+
+#: ../urpmf:74
+#, fuzzy, c-format
+msgid "  --sourcerpm    - source rpm name\n"
+msgstr "  --sourcerpm    - in ra tag sourcerpm: source rpm.\n"
+
+#: ../urpmf:75
+#, fuzzy, c-format
+msgid "  --suggests     - suggests tags\n"
+msgstr "  --obsoletes     - in ra các dòng tag: toàn bộ dòng.\n"
+
+#: ../urpmf:76
+#, fuzzy, c-format
+msgid "  --summary      - summary\n"
+msgstr "  --summary       - in ra tóm tắt tag: tóm tắt.\n"
+
+#: ../urpmf:77
+#, fuzzy, c-format
+msgid "  --url          - url\n"
+msgstr "  --url          - in ra tag url: url.\n"
+
+#: ../urpmf:78
+#, fuzzy, c-format
+msgid "  --vendor       - vendor\n"
+msgstr "  --verbose      - phương thức verbose.\n"
+
+#: ../urpmf:79
+#, fuzzy, c-format
+msgid "  -m             - the media in which the package was found\n"
+msgstr "  -l             - liệt kê các tập tin trong gói tin.\n"
+
+#: ../urpmf:80 ../urpmq:97
+#, c-format
+msgid "  -f             - print version, release and arch with name.\n"
+msgstr "  -f             - in phiên bản, phát hành và arch với tên.\n"
+
+#: ../urpmf:148
+#, c-format
+msgid "unterminated expression (%s)"
+msgstr ""
+
+#: ../urpmf:193
+#, c-format
+msgid "Incorrect format: you may use only one multi-valued tag"
+msgstr ""
+
+#: ../urpmf:286
+#, fuzzy, c-format
+msgid "no hdlist available for medium \"%s\""
+msgstr "không tìm thấy tập tin hdlist cho phương tiện \"%s\""
+
+#: ../urpmf:293
+#, fuzzy, c-format
+msgid "no synthesis available for medium \"%s\""
+msgstr "build tập tin tổng hợp hdlist cho phương tiện \"%s\""
+
+#: ../urpmf:302
+#, fuzzy, c-format
+msgid "no xml-info available for medium \"%s\""
+msgstr "đang ghi tập tin danh sách cho phương tiện \"%s\""
+
+#: ../urpmi:76
+#, fuzzy, c-format
+msgid "  --auto-update  - update media then upgrade the system.\n"
+msgstr "  --auto-select  - tự động chọn các gói tin để nâng cấp hệ thống.\n"
+
+#: ../urpmi:77
+#, fuzzy, c-format
+msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - không thực hiện kiểm tra tập tin MD5SUM.\n"
+
+#: ../urpmi:78
+#, fuzzy, c-format
+msgid "    --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - ép buộc cập nhật cho gpg key.\n"
+
+#: ../urpmi:79
+#, c-format
+msgid "  --auto-orphans - remove orphans without asking\n"
+msgstr ""
+
+#: ../urpmi:80 ../urpmq:52
+#, fuzzy, c-format
+msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
+msgstr "  --obsoletes     - in ra các dòng tag: toàn bộ dòng.\n"
+
+#: ../urpmi:81
+#, c-format
+msgid ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+msgstr ""
+"  --no-uninstall - không bao giờ đề nghị gỡ cài đặt một gói, huỷ bỏ việc cài "
+"đặt.\n"
+
+#: ../urpmi:82
+#, c-format
+msgid "  --no-install   - don't install packages (only download)\n"
+msgstr "  --no-install   - không cài đặt, chỉ tải về các gói\n"
+
+#: ../urpmi:83 ../urpmq:54
+#, c-format
+msgid ""
+"  --keep         - keep existing packages if possible, reject requested\n"
+"                   packages that lead to removals.\n"
+msgstr ""
+"  --keep         - giữ gói đang tồn tại nếu có thể, bỏ các gói yêu cầu\n"
+"                   dẫn đến việc gỡ bỏ.\n"
+
+#: ../urpmi:85
+#, c-format
+msgid ""
+"  --split-level  - split in small transaction if more than given packages\n"
+"                   are going to be installed or upgraded,\n"
+"                   default is %d.\n"
+msgstr ""
+"  --split-level  - tách làm phiên giao dịch nhỏ nếu có nhiều hơn các gói "
+"được\n"
+"                   có sẽ được cài đặt hay nâng cấp,\n"
+"                   mặc định là %d.\n"
+
+#: ../urpmi:89
+#, c-format
+msgid "  --split-length - small transaction length, default is %d.\n"
+msgstr "  --split-length - độ dài phiên giao dịch nhỏ, mặc định là %d.\n"
+
+#: ../urpmi:91
+#, fuzzy, c-format
+msgid "  --fuzzy, -y    - impose fuzzy search.\n"
+msgstr "  --fuzzy         - tác động tìm kiếm fuzzy (giống như -y).\n"
+
+#: ../urpmi:92
+#, fuzzy, c-format
+msgid "  --buildrequires - install the buildrequires of the packages\n"
+msgstr "  --requires      - in ra yêu cầu tag: toàn bộ các yêu cầu.\n"
+
+#: ../urpmi:93
+#, c-format
+msgid "  --install-src  - install only source package (no binaries).\n"
+msgstr "  --install-src  - chỉ cài đặt gói nguồn (không cài gói nhị phân).\n"
+
+#: ../urpmi:94
+#, c-format
+msgid "  --clean        - remove rpm from cache before anything else.\n"
+msgstr "  --clean          - gỡ bỏ rpm khỏi cache trước tiên.\n"
+
+#: ../urpmi:95
+#, c-format
+msgid "  --noclean      - don't clean rpms from cache.\n"
+msgstr "  --noclean      - không xóa rpms khỏi cache.\n"
+
+#: ../urpmi:97
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr ""
+
+#: ../urpmi:99
+#, c-format
+msgid ""
+"  --allow-nodeps - allow asking user to install packages without\n"
+"                   dependencies checking.\n"
+msgstr ""
+"  --allow-nodeps - cho phép hỏi người dùng cài đặt các gói tin\n"
+"                   mà không kiểm tra các phụ thuộc.\n"
+
+#: ../urpmi:101
+#, c-format
+msgid ""
+"  --allow-force  - allow asking user to install packages without\n"
+"                   dependencies checking and integrity.\n"
+msgstr ""
+"  --allow-force  - cho phép hỏi người dùng cài đặt các gói tin mà\n"
+"                   không kiểm tra các phụ thuộc và tính toàn vẹn.\n"
+
+#: ../urpmi:103
+#, fuzzy, c-format
+msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
+msgstr "  --obsoletes     - in ra các dòng tag: toàn bộ dòng.\n"
+
+#: ../urpmi:107
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - cấu hình nhanh chóng urpmi từ một distrib tree, giúp\n"
+"                   cài đặt chroot bằng tùy chọn --root.\n"
+
+#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#, c-format
+msgid "  --metalink     - generate and use a local metalink.\n"
+msgstr ""
+
+#: ../urpmi:110
+#, c-format
+msgid ""
+"  --download-all - download all needed packages before trying to install "
+"them\n"
+msgstr ""
+
+#: ../urpmi:111
+#, c-format
+msgid ""
+"  --downloader   - program to use to retrieve distant files. \n"
+"                   known programs: %s\n"
+msgstr ""
+
+#: ../urpmi:114
+#, c-format
+msgid "  --curl-options - additional options to pass to curl\n"
+msgstr ""
+
+#: ../urpmi:115
+#, c-format
+msgid "  --rsync-options- additional options to pass to rsync\n"
+msgstr ""
+
+#: ../urpmi:116
+#, c-format
+msgid "  --wget-options - additional options to pass to wget\n"
+msgstr ""
+
+#: ../urpmi:117
+#, c-format
+msgid "  --prozilla-options - additional options to pass to prozilla\n"
+msgstr ""
+
+#: ../urpmi:118
+#, c-format
+msgid "  --aria2-options - additional options to pass to aria2\n"
+msgstr ""
+
+#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#, c-format
+msgid "  --limit-rate   - limit the download speed.\n"
+msgstr "  --limit-rate   - giới hạn tốc độ tải xuống.\n"
+
+#: ../urpmi:120
+#, c-format
+msgid ""
+"  --resume       - resume transfer of partially-downloaded files\n"
+"                   (--no-resume disables it, default is disabled).\n"
+msgstr ""
+"  --resume       - tiếp tục truyền tải lại các tập tin đang tải về dở dang\n"
+"                   (--no-resume lài không tiếp tục lại, mặc định là không).\n"
+
+#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#, c-format
+msgid ""
+"  --proxy        - use specified HTTP proxy, the port number is assumed\n"
+"                   to be 1080 by default (format is <proxyhost[:port]>).\n"
+msgstr ""
+"  --proxy        - dùng chỉ định HTTP proxy, số hiệu port được gán\n"
+"                    là 1080 theo mặc định (định dạng là <proxyhost[:port]"
+">).\n"
+
+#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#, c-format
+msgid ""
+"  --proxy-user   - specify user and password to use for proxy\n"
+"                   authentication (format is <user:password>).\n"
+msgstr ""
+"  --proxy-user   - chỉ định người dùng và mật khẩu cho proxy\n"
+"                   xác thực (khuôn dạng là <user:password>).\n"
+
+#: ../urpmi:126
+#, c-format
+msgid ""
+"  --bug          - output a bug report in directory indicated by\n"
+"                   next arg.\n"
+msgstr ""
+"  --bug          - xuất ra báo cáo lỗi trong thư mục được chỉ định\n"
+"                    bởi đối số (arg) tiếp theo.\n"
+
+#: ../urpmi:132
+#, c-format
+msgid "  --excludepath  - exclude path separated by comma.\n"
+msgstr "  --excludepath  - gồm đường dẫn được tách biệt bằng dấu phẩy.\n"
+
+#: ../urpmi:133
+#, c-format
+msgid "  --excludedocs  - exclude doc files.\n"
+msgstr "  --excludedocs  - trừ các tập tin tài liệu.\n"
+
+#: ../urpmi:134
+#, fuzzy, c-format
+msgid "  --ignoresize   - don't verify disk space before installation.\n"
+msgstr ""
+"  --no-uninstall - không bao giờ đề nghị gỡ cài đặt một gói, huỷ bỏ việc cài "
+"đặt.\n"
+
+#: ../urpmi:135
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr "  --url          - in ra tag url: url.\n"
+
+#: ../urpmi:136
+#, fuzzy, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr "  --description   - in ra mô tả tag: mô tả.\n"
+
+#: ../urpmi:137
+#, fuzzy, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr "  --conflicts     - in ra xung đột tag: toàn bộ các xung đột.\n"
+
+#: ../urpmi:139
+#, c-format
+msgid "  --skip         - packages which installation should be skipped\n"
+msgstr "  --skip         - các gói tin cài đặt nên được bỏ qua\n"
+
+#: ../urpmi:140
+#, fuzzy, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr "  --skip         - các gói tin cài đặt nên được bỏ qua\n"
+
+#: ../urpmi:141
+#, c-format
+msgid ""
+"  --more-choices - when several packages are found, propose more choices\n"
+"                   than the default.\n"
+msgstr ""
+"  --more-choices - khi tìm thấy vài gói tin, đề xuất thêm lựa chọn so với\n"
+"                   mặc định.\n"
+
+#: ../urpmi:143
+#, fuzzy, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr "  --noclean      - không xóa rpms khỏi cache.\n"
+
+#: ../urpmi:144
+#, c-format
+msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
+msgstr ""
+"  --strict-arch  - chỉ nâng cấp các gói có cùng cấu trúc (architecture).\n"
+
+#: ../urpmi:145 ../urpmq:95
+#, c-format
+msgid "  -a             - select all matches on command line.\n"
+msgstr "  -a             - chọn toàn bộ các tương hợp trong dòng lệnh.\n"
+
+#: ../urpmi:148
+#, fuzzy, c-format
+msgid "  --quiet, -q    - quiet mode.\n"
+msgstr "  -q             - chế độ yên lặng.\n"
+
+#: ../urpmi:150
+#, fuzzy, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr "  --verbose      - phương thức verbose.\n"
+
+#: ../urpmi:151
+#, c-format
+msgid "  names or rpm files given on command line will be installed.\n"
+msgstr "  tên hay tập tin rpm có trong dòng lệnh sẽ được cài đặt.\n"
+
+#: ../urpmi:179
+#, c-format
+msgid "Error: can't use --auto-select along with package list.\n"
+msgstr ""
+
+#: ../urpmi:186
+#, c-format
+msgid ""
+"Error: To generate a bug report, specify the usual command-line arguments\n"
+"along with --bug.\n"
+msgstr ""
+
+#: ../urpmi:216
+#, fuzzy, c-format
+msgid "You can't install binary rpm files when using --install-src"
+msgstr "Cái có thể được làm bằng các tập tin nhị phân khi dùng --install-src"
+
+#: ../urpmi:217
+#, c-format
+msgid "You can't install spec files"
+msgstr ""
+
+#: ../urpmi:224
+#, c-format
+msgid "defaulting to --buildrequires"
+msgstr ""
+
+#: ../urpmi:229
+#, c-format
+msgid ""
+"please use --buildrequires or --install-src, defaulting to --buildrequires"
+msgstr ""
+
+#: ../urpmi:249
+#, c-format
+msgid ""
+"Directory [%s] already exists, please use another directory for bug report "
+"or delete it"
+msgstr ""
+"Thư mục [%s] đã tồn tại rồi, hãy dùng thư mục khác để ghi báo cáo lỗi hoặc "
+"xóa thư mục đó đi"
+
+#: ../urpmi:250
+#, c-format
+msgid "Unable to create directory [%s] for bug report"
+msgstr "Không thể tạo thư mục [%s] cho báo cáo lỗi"
+
+#: ../urpmi:271
+#, c-format
+msgid ""
+"Error: %s appears to be mounted read-only.\n"
+"Use --allow-force to force operation."
+msgstr ""
+"Lỗi: %s được mount là read-only.\n"
+"Dùng --allow-force để ép hoạt động."
+
+#. -PO: here format is "<package_name>: <summary> (to upgrade)"
+#: ../urpmi:425
+#, fuzzy, c-format
+msgid "%s: %s (to upgrade)"
+msgstr "(để nâng cấp)"
+
+#. -PO: here format is "<package_name> (to upgrade)"
+#: ../urpmi:427
+#, fuzzy, c-format
+msgid "%s (to upgrade)"
+msgstr "(để nâng cấp)"
+
+#. -PO: here format is "<package_name>: <summary> (to install)"
+#: ../urpmi:431
+#, fuzzy, c-format
+msgid "%s: %s (to install)"
+msgstr "(để cài đặt)"
+
+#. -PO: here format is "<package_name> (to install)"
+#: ../urpmi:433
+#, fuzzy, c-format
+msgid "%s (to install)"
+msgstr "(để cài đặt)"
+
+#: ../urpmi:439
+#, fuzzy, c-format
+msgid ""
+"In order to satisfy the '%s' dependency, one of the following packages is "
+"needed:"
+msgstr "Để thỏa mãn các phụ thuộc, %d gói sau đây sẽ được gỡ bỏ (%d MB)"
+
+#: ../urpmi:442
+#, c-format
+msgid "What is your choice? (1-%d) "
+msgstr "Bạn lựa chọn gì? (1-%d) "
+
+#: ../urpmi:484
+#, fuzzy, c-format
+msgid ""
+"The following package cannot be installed because it depends on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Có thể không cài đặt được những gói sau đây  vì chúng phụ thuộc vào các\n"
+"gói cũ hơn các gói đã cài đặt:\n"
+"%s"
+
+#: ../urpmi:486
+#, c-format
+msgid ""
+"The following packages can't be installed because they depend on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Có thể không cài đặt được những gói sau đây  vì chúng phụ thuộc vào các\n"
+"gói cũ hơn các gói đã cài đặt:\n"
+"%s"
+
+#: ../urpmi:492 ../urpmi:510
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Continue installation anyway?"
+msgstr "Vẫn tiếp tục bằng bất cứ giá nào?"
+
+#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#, c-format
+msgid " (Y/n) "
+msgstr " (Có/Không) "
+
+#: ../urpmi:504
+#, fuzzy, c-format
+msgid ""
+"A requested package cannot be installed:\n"
+"%s"
+msgstr ""
+"Không thể cài đặt một số gói tin được yêu cầu:\n"
+"%s"
+
+#: ../urpmi:525
+#, c-format
+msgid "removing package %s will break your system"
+msgstr "việc gỡ bỏ gói tin %s sẽ phá vỡ hệ thống"
+
+#: ../urpmi:533
+#, fuzzy, c-format
+msgid ""
+"The installation cannot continue because the following package\n"
+"has to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Không thể tiếp tục việc cài đặt vì các gói sau đây phải được gỡ bỏ\n"
+"để nâng cấp các gói khác:\n"
+"%s\n"
+
+#: ../urpmi:535
+#, c-format
+msgid ""
+"The installation cannot continue because the following packages\n"
+"have to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Không thể tiếp tục việc cài đặt vì các gói sau đây phải được gỡ bỏ\n"
+"để nâng cấp các gói khác:\n"
+"%s\n"
+
+#: ../urpmi:543
+#, c-format
+msgid "(test only, removal will not be actually done)"
+msgstr ""
+
+#: ../urpmi:562
+#, fuzzy, c-format
+msgid ""
+"You must first call urpmi with --buildrequires to install the following "
+"dependencies:\n"
+"%s\n"
+msgstr ""
+"Bạn phải là root để cài đặt các phụ thuộc sau đây:\n"
+"%s\n"
+
+#: ../urpmi:572
+#, fuzzy, c-format
+msgid "The following orphan package will be removed."
+msgid_plural "The following orphan packages will be removed."
+msgstr[0] "Để thỏa mãn các phụ thuộc, %d gói sau đây sẽ được gỡ bỏ (%d MB)"
+
+#: ../urpmi:596
+#, c-format
+msgid "WARNING: %s option is in use. Some strange problems may happen"
+msgstr ""
+
+#: ../urpmi:608
+#, c-format
+msgid "(test only, installation will not be actually done)"
+msgstr ""
+
+#: ../urpmi:614
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr ""
+
+#: ../urpmi:615
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr ""
+
+#: ../urpmi:616
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr ""
+
+#: ../urpmi:617
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] ""
+
+#: ../urpmi:639
+#, fuzzy, c-format
+msgid "Press Enter when mounted..."
+msgstr "Nhấn Enter khi sẵn sàng ..."
+
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
+#: ../urpmi.addmedia:36
+#, fuzzy, c-format
+msgid ""
+"usage: urpmi.addmedia [options] <name> <url>\n"
+"where <url> is one of\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"usage: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"usage: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"examples:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"and [options] are from\n"
+msgstr ""
+"cách dùng:  urpmi.addmedia [tùy chọn] <tên> <url> [with <đường dẫn_liên "
+"quan>]\n"
+"nơi mà <url> là một trong\n"
+"       [file:/]/<đường dẫn> with <tên tập tin liên quan của hdlist>\n"
+"       ftp://<đăng nhập>:<mật khẩu>@<máy chủ>/<đường dẫn> with <tên tập tin "
+"của hdlist>\n"
+"       ftp://<máy chủ>/<đường dẫn> with <tên tập tin liên quan của hdlist>\n"
+"       http://<máy chủ/<đường dẫn> with <tên tập tin liên quan của hdlist>\n"
+"       removable://<đường dẫn> with <tên tập tin liên quan của hdlist>\n"
+"\n"
+"và [tùy chọn] là từ\n"
+
+#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#, c-format
+msgid "  --wget         - use wget to retrieve distant files.\n"
+msgstr "  --wget         - dùng wget để thu thập các tập tin ở xa.\n"
+
+#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#, c-format
+msgid "  --curl         - use curl to retrieve distant files.\n"
+msgstr "  --curl         - dùng curl để thu thập các tập tin ở xa.\n"
+
+#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
+#, fuzzy, c-format
+msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
+msgstr "  --curl         - dùng curl để thu thập các tập tin ở xa.\n"
+
+#: ../urpmi.addmedia:59 ../urpmi.update:36
+#, fuzzy, c-format
+msgid "  --aria2        - use aria2 to retrieve distant files.\n"
+msgstr "  --curl         - dùng curl để thu thập các tập tin ở xa.\n"
+
+#: ../urpmi.addmedia:66
+#, c-format
+msgid ""
+"  --update       - create an update medium, \n"
+"                   or discard non-update media (when used with --distrib)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:68
+#, c-format
+msgid ""
+"  --xml-info     - use the specific policy for downloading xml info files\n"
+"                   one of: never, on-demand, update-only, always. cf urpmi."
+"cfg(5)\n"
+msgstr ""
+
+#: ../urpmi.addmedia:70
+#, fuzzy, c-format
+msgid "  --probe-synthesis - use synthesis file.\n"
+msgstr "  --probe-synthesis - thử tìm và sử dụng tập tin synthesis.\n"
+
+#: ../urpmi.addmedia:71
+#, c-format
+msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
+msgstr ""
+
+#: ../urpmi.addmedia:72
+#, fuzzy, c-format
+msgid "  --no-probe     - do not try to find any synthesis file.\n"
+msgstr ""
+"  --no-probe      - không thử tìm bất kỳ tập tin hdlist hoặc\n"
+"                   synthesis.\n"
+
+#: ../urpmi.addmedia:74
+#, c-format
+msgid ""
+"  --distrib      - automatically create all media from an installation\n"
+"                   medium.\n"
+msgstr ""
+"  --distrib      - tự động tạo mọi phương tiện từ một phương tiện cài\n"
+"                     đặt.\n"
+
+#: ../urpmi.addmedia:76
+#, c-format
+msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
+msgstr ""
+
+#: ../urpmi.addmedia:77
+#, fuzzy, c-format
+msgid "  --all-media    - with --distrib, add every listed media\n"
+msgstr "  --list-media   - liệt kê phương tiện hiệc có.\n"
+
+#: ../urpmi.addmedia:78
+#, fuzzy, c-format
+msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
+msgstr ""
+"  --virtual      - tạo phương tiện ảo luôn được cập nhật,\n"
+"                   chỉ cho phép tập file:// protocol.\n"
+
+#: ../urpmi.addmedia:79 ../urpmi.update:44
+#, c-format
+msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - không thực hiện kiểm tra tập tin MD5SUM.\n"
+
+#: ../urpmi.addmedia:80
+#, c-format
+msgid "  --nopubkey     - don't import pubkey of added media\n"
+msgstr "  --nopubkey     - không nhập pubkey của phương tiện được thêm\n"
+
+#: ../urpmi.addmedia:81
+#, c-format
+msgid "  --raw          - add the media in config, but don't update it.\n"
+msgstr ""
+"  --raw          - thêm phương tiện vào cấu hình, nhưng không cập nhật nó.\n"
+
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#, c-format
+msgid "  -q             - quiet mode.\n"
+msgstr "  -q             - chế độ yên lặng.\n"
+
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#, c-format
+msgid "  -v             - verbose mode.\n"
+msgstr "  -v             - chế độ verbose.\n"
+
+#: ../urpmi.addmedia:96
+#, c-format
+msgid "known xml-info policies are %s"
+msgstr ""
+
+#: ../urpmi.addmedia:107
+#, c-format
+msgid "no argument needed for --distrib --mirrorlist <url>"
+msgstr ""
+
+#: ../urpmi.addmedia:112
+#, c-format
+msgid "bad <url> (for local directory, the path must be absolute)"
+msgstr ""
+
+#: ../urpmi.addmedia:116
+#, c-format
+msgid "Only superuser is allowed to add media"
+msgstr "Chỉ có người dùng cao cấp được phép thêm phương tiện"
+
+#: ../urpmi.addmedia:119
+#, fuzzy, c-format
+msgid "creating config file [%s]"
+msgstr "Sẽ tạo tập tin cấu hình [%s]"
+
+#: ../urpmi.addmedia:120
+#, c-format
+msgid "Can't create config file [%s]"
+msgstr "Không thể tạo tập tin cấu hình [%s]"
+
+#: ../urpmi.addmedia:128
+#, fuzzy, c-format
+msgid "no need to give <relative path of synthesis> with --distrib"
+msgstr "không cần cho <đường dẫn liên quan của hdlist> với --distrib"
+
+#: ../urpmi.addmedia:136
+#, c-format
+msgid ""
+"\n"
+"Do you want to add media '%s'?"
+msgstr ""
+
+#: ../urpmi.addmedia:156 ../urpmi.addmedia:181
+#, fuzzy, c-format
+msgid "unable to add medium"
+msgstr "không thể truy cập phương tiện \"%s\""
+
+#: ../urpmi.addmedia:164
+#, fuzzy, c-format
+msgid "<relative path of synthesis> missing\n"
+msgstr "thiếu <đường dẫn liên quan của hdlist> \n"
+
+#: ../urpmi.addmedia:167
+#, c-format
+msgid "Can't use %s with remote medium"
+msgstr ""
+
+#: ../urpmi.recover:30
+#, c-format
+msgid "  --checkpoint   - set repackaging start now\n"
+msgstr ""
+
+#: ../urpmi.recover:31
+#, fuzzy, c-format
+msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
+msgstr "  --noclean      - không xóa rpms khỏi cache.\n"
+
+#: ../urpmi.recover:33
+#, fuzzy, c-format
+msgid ""
+"  --list         - list transactions since provided date/duration argument\n"
+msgstr "  --list-url     - liệt kê các phương tiện hiện có và url của chúng.\n"
+
+#: ../urpmi.recover:34
+#, fuzzy, c-format
+msgid "  --list-all     - list all transactions in rpmdb (long)\n"
+msgstr "  --list-url     - liệt kê các phương tiện hiện có và url của chúng.\n"
+
+#: ../urpmi.recover:35
+#, fuzzy, c-format
+msgid "  --list-safe    - list transactions since checkpoint\n"
+msgstr "  --list-url     - liệt kê các phương tiện hiện có và url của chúng.\n"
+
+#: ../urpmi.recover:36
+#, c-format
+msgid ""
+"  --rollback     - rollback until specified date,\n"
+"                   or rollback the specified number of transactions\n"
+msgstr ""
+
+#: ../urpmi.recover:38
+#, fuzzy, c-format
+msgid "  --disable      - turn off repackaging\n"
+msgstr "  --name         - chỉ in ra tên gói.\n"
+
+#: ../urpmi.recover:53
+#, c-format
+msgid "Invalid date or duration [%s]\n"
+msgstr ""
+
+#: ../urpmi.recover:61
+#, fuzzy, c-format
+msgid "Repackage directory not defined\n"
+msgstr "Không tìm thấy gói tin %s."
+
+#: ../urpmi.recover:64
+#, fuzzy, c-format
+msgid "Can't write to repackage directory [%s]\n"
+msgstr "Không thể tạo thư mục [%s] cho báo cáo lỗi"
+
+#: ../urpmi.recover:66
+#, fuzzy, c-format
+msgid "Cleaning up repackage directory [%s]...\n"
+msgstr "Không thể tạo thư mục [%s] cho báo cáo lỗi"
+
+#: ../urpmi.recover:68
+#, c-format
+msgid "%d file removed\n"
+msgid_plural "%d files removed\n"
+msgstr[0] ""
+
+#: ../urpmi.recover:78
+#, c-format
+msgid "Spurious command-line arguments [%s]\n"
+msgstr ""
+
+#: ../urpmi.recover:80
+#, c-format
+msgid "You can't specify --checkpoint and --rollback at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:82
+#, c-format
+msgid "You can't specify --checkpoint and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:84
+#, c-format
+msgid "You can't specify --rollback and --list at the same time\n"
+msgstr ""
+
+#: ../urpmi.recover:86
+#, c-format
+msgid "You can't specify --disable along with another option"
+msgstr ""
+
+#: ../urpmi.recover:111
+#, c-format
+msgid "No transaction found since %s\n"
+msgstr ""
+
+#: ../urpmi.recover:126
+#, c-format
+msgid "You must be superuser to do this"
+msgstr ""
+
+#: ../urpmi.recover:139 ../urpmi.recover:205
+#, fuzzy, c-format
+msgid "Writing rpm macros file [%s]...\n"
+msgstr "đang thu thập tập tin rpm [%s] ..."
+
+#: ../urpmi.recover:181
+#, fuzzy, c-format
+msgid "No rollback date found\n"
+msgstr "Không thấy filelist\n"
+
+#: ../urpmi.recover:184
+#, fuzzy, c-format
+msgid "Rollback until %s...\n"
+msgstr ""
+"callback là :\n"
+"%s\n"
+
+#: ../urpmi.recover:191
+#, fuzzy, c-format
+msgid "Disabling repackaging\n"
+msgstr "  --name         - chỉ in ra tên gói.\n"
+
+#: ../urpmi.removemedia:38
+#, c-format
+msgid ""
+"usage: urpmi.removemedia (-a | <name> ...)\n"
+"where <name> is a medium name to remove.\n"
+msgstr ""
+"cách dùng: urpmi.removemedia (-a | <tên> ...)\n"
+"nơi mà <tên> là tên phương tiện muốn gỡ bỏ.\n"
+
+#: ../urpmi.removemedia:41
+#, c-format
+msgid "  -a             - select all media.\n"
+msgstr "  -a             - chọn toàn bộ các phương tiện.\n"
+
+#: ../urpmi.removemedia:42
+#, c-format
+msgid "  -y             - fuzzy match on media names.\n"
+msgstr "  -y             - so khớp mơ hồ ở tên phương tiện.\n"
+
+#: ../urpmi.removemedia:59
+#, c-format
+msgid "Only superuser is allowed to remove media"
+msgstr "Chỉ có người dùng cao cấp được phép gỡ bỏ phương tiện"
+
+#: ../urpmi.removemedia:71
+#, c-format
+msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
+msgstr "Không có gì để gỡ bỏ (dùng urpmi.addmedia để thêm phương tiện)\n"
+
+#: ../urpmi.removemedia:77
+#, c-format
+msgid ""
+"the entry to remove is missing\n"
+"(one of %s)\n"
+msgstr ""
+"mục nhập để gỡ bỏ đang thiếu\n"
+"(một mục cho %s)\n"
+
+#: ../urpmi.update:30
+#, c-format
+msgid ""
+"usage: urpmi.update [options] <name> ...\n"
+"where <name> is a medium name to update.\n"
+msgstr ""
+"cách dùng: urpmi.update [tùy chọn] <tên> ...\n"
+"nơi mà <tên> là tên phương tiện để cập nhật.\n"
+
+#: ../urpmi.update:43
+#, c-format
+msgid "  --update       - update only update media.\n"
+msgstr "  --update       - chỉ cập nhật phương tiện cập nhật.\n"
+
+#: ../urpmi.update:45
+#, c-format
+msgid "  --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - ép buộc cập nhật cho gpg key.\n"
+
+#: ../urpmi.update:46
+#, c-format
+msgid "  --ignore       - don't update, mark the media as ignored.\n"
+msgstr ""
+"  --ignore       - không cập nhật, đánh dấu phương tiện là bị bỏ qua.\n"
+
+#: ../urpmi.update:47
+#, c-format
+msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
+msgstr ""
+"  --no-ignore    - không cập nhật, đánh dấu phương tiện là được bật chạy.\n"
+
+#: ../urpmi.update:49
+#, fuzzy, c-format
+msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
+msgstr ""
+"  --no-probe      - không thử tìm bất kỳ tập tin hdlist hoặc\n"
+"                   synthesis.\n"
+
+#: ../urpmi.update:50
+#, fuzzy, c-format
+msgid "  -a             - select all enabled non-removable media.\n"
+msgstr "  -a             - chọn toàn bộ các phương tiện lắp trong.\n"
+
+#: ../urpmi.update:51
+#, fuzzy, c-format
+msgid "  -f             - force updating synthesis\n"
+msgstr "  -f             - cố tạo các tập tin hdlist.\n"
+
+#: ../urpmi.update:52
+#, fuzzy, c-format
+msgid "  -ff            - really force updating synthesis\n"
+msgstr "  -f             - cố tạo các tập tin hdlist.\n"
+
+#: ../urpmi.update:69
+#, c-format
+msgid "Only superuser is allowed to update media"
+msgstr "Chỉ có người dùng cao cấp được phép cập nhật phương tiện"
+
+#: ../urpmi.update:86
+#, c-format
+msgid "nothing to update (use urpmi.addmedia to add a media)\n"
+msgstr "Không có gì để cập nhật (dùng urpmi.addmedia để thêm phương tiện)\n"
+
+#: ../urpmi.update:87
+#, c-format
+msgid ""
+"the entry to update is missing\n"
+"(one of %s)\n"
+msgstr ""
+"thiếu mục cập nhật\n"
+"(một mục của %s)\n"
+
+#: ../urpmi.update:98
+#, c-format
+msgid "\"%s\""
+msgstr "\"%s\""
+
+#: ../urpmi.update:99
+#, c-format
+msgid "ignoring media %s"
+msgstr "bỏ qua phương tiện %s"
+
+#: ../urpmi.update:99
+#, c-format
+msgid "enabling media %s"
+msgstr "bật chạy phương tiện %s"
+
+#: ../urpmq:44
+#, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+msgstr ""
+"  --searchmedia  - chỉ dùng phương tiện được cho để tìm kiếm hay nâng cấp "
+"các gói.\n"
+
+#: ../urpmq:49
+#, c-format
+msgid "  --auto-orphans - list orphans\n"
+msgstr ""
+
+#: ../urpmq:50
+#, c-format
+msgid ""
+"  --not-available\n"
+"                 - list installed packages not available on any media.\n"
+msgstr ""
+
+#: ../urpmq:53
+#, c-format
+msgid "  --fuzzy        - impose fuzzy search (same as -y).\n"
+msgstr "  --fuzzy         - tác động tìm kiếm fuzzy (giống như -y).\n"
+
+#: ../urpmq:56
+#, c-format
+msgid "  --list         - list available packages.\n"
+msgstr "  --list         - liệt kê các gói tin hiện có.\n"
+
+#: ../urpmq:57
+#, c-format
+msgid "  --list-media   - list available media.\n"
+msgstr "  --list-media   - liệt kê phương tiện hiệc có.\n"
+
+#: ../urpmq:58
+#, c-format
+msgid "  --list-url     - list available media and their url.\n"
+msgstr "  --list-url     - liệt kê các phương tiện hiện có và url của chúng.\n"
+
+#: ../urpmq:59
+#, c-format
+msgid "  --list-nodes   - list available nodes when using --parallel.\n"
+msgstr "  --list-nodes   - liệt kê các node hiện có khi dùng --parallel.\n"
+
+#: ../urpmq:60
+#, c-format
+msgid "  --list-aliases - list available parallel aliases.\n"
+msgstr "  --list-aliases - liệt kê các alias song song hiện có.\n"
+
+#: ../urpmq:61
+#, c-format
+msgid ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+msgstr ""
+"  --dump-config  - dump cấu hình theo dạng của đối số urpmi.addmedia.\n"
+
+#: ../urpmq:62
+#, c-format
+msgid "  --src          - next package is a source package (same as -s).\n"
+msgstr "  --src          - gói tin tiếp theo là gói nguồn (giống như -s).\n"
+
+#: ../urpmq:63
+#, fuzzy, c-format
+msgid "  --sources      - print source URLs of selected packages\n"
+msgstr "  --src          - gói tin tiếp theo là gói nguồn (giống như -s).\n"
+
+#: ../urpmq:65
+#, fuzzy, c-format
+msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
+msgstr "  --url          - in ra tag url: url.\n"
+
+#: ../urpmq:69
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
+"                   This permit to querying a distro.\n"
+msgstr ""
+"  --use-distrib  - cấu hình nhanh urpmi từ một distrib tree.\n"
+"                   Việc này cho phép tra vấn một distro.\n"
+
+#: ../urpmq:79
+#, c-format
+msgid "  --changelog    - print changelog.\n"
+msgstr "  --changelog    - in ra changelog.\n"
+
+#: ../urpmq:80
+#, fuzzy, c-format
+msgid "  --conflicts    - print conflicts.\n"
+msgstr "  --conflicts     - in ra xung đột tag: toàn bộ các xung đột.\n"
+
+#: ../urpmq:81
+#, fuzzy, c-format
+msgid "  --obsoletes    - print obsoletes.\n"
+msgstr "  --obsoletes     - in ra các dòng tag: toàn bộ dòng.\n"
+
+#: ../urpmq:82
+#, fuzzy, c-format
+msgid "  --provides     - print provides.\n"
+msgstr "  --provides      - in ra cung cấp tag: toàn bộ các cung cấp.\n"
+
+#: ../urpmq:83
+#, fuzzy, c-format
+msgid "  --requires     - print requires.\n"
+msgstr "  --requires      - in ra yêu cầu tag: toàn bộ các yêu cầu.\n"
+
+#: ../urpmq:84
+#, fuzzy, c-format
+msgid "  --suggests     - print suggests.\n"
+msgstr "  --obsoletes     - in ra các dòng tag: toàn bộ dòng.\n"
+
+#: ../urpmq:85
+#, fuzzy, c-format
+msgid "  --sourcerpm    - print sourcerpm.\n"
+msgstr "  --sourcerpm    - in ra tag sourcerpm: source rpm.\n"
+
+#: ../urpmq:86
+#, fuzzy, c-format
+msgid "  --summary, -S  - print summary.\n"
+msgstr "  --summary       - in ra tóm tắt tag: tóm tắt.\n"
+
+#: ../urpmq:88
+#, fuzzy, c-format
+msgid ""
+"  --requires-recursive, -d\n"
+"                   - query package dependencies.\n"
+msgstr "  -d             - tra vấn mở rộng tới các phụ thuộc của gói tin.\n"
+
+#: ../urpmq:90
+#, c-format
+msgid "  --whatrequires - reverse search to what requires package.\n"
+msgstr "  --whatrequires - đảo ngược tìm kiếm cho cái yêu cầu gói.\n"
+
+#: ../urpmq:91
+#, c-format
+msgid ""
+"  --whatrequires-recursive\n"
+"                   - extended reverse search (includes virtual packages).\n"
+msgstr ""
+"  --whatrequires-recursive\n"
+"                   - tìm kiếm đỏa ngược mở rộng (gồm cả các gói ảo).\n"
+
+#: ../urpmq:93
+#, fuzzy, c-format
+msgid ""
+"  --whatprovides, -p\n"
+"                   - search in provides to find package.\n"
+msgstr "  -p             - tìm gói tin từ các nhà cung cấp.\n"
+
+#: ../urpmq:96
+#, c-format
+msgid "  -c             - complete output with package to be removed.\n"
+msgstr "  -c             - hoàn thành output với gói sẽ được gỡ bỏ.\n"
+
+#: ../urpmq:98
+#, c-format
+msgid "  -g             - print groups with name also.\n"
+msgstr "  -g             - in ra các nhóm với tên.\n"
+
+#: ../urpmq:99
+#, c-format
+msgid "  -i             - print useful information in human readable form.\n"
+msgstr "  -i             - in ra thông tin có ích mà người dùng đọc được.\n"
+
+#: ../urpmq:100
+#, c-format
+msgid "  -l             - list files in package.\n"
+msgstr "  -l             - liệt kê các tập tin trong gói tin.\n"
+
+#: ../urpmq:101
+#, fuzzy, c-format
+msgid "  -m             - equivalent to -du\n"
+msgstr "  -q             - chế độ yên lặng.\n"
+
+#: ../urpmq:102
+#, c-format
+msgid "  -r             - print version and release with name also.\n"
+msgstr "  -r             - in ra phiên bản và phát hành với tên.\n"
+
+#: ../urpmq:103
+#, c-format
+msgid "  -s             - next package is a source package (same as --src).\n"
+msgstr "  -s             - gói tin tiếp theo kà gói nguồn (giống như --src).\n"
+
+#: ../urpmq:104
+#, c-format
+msgid ""
+"  -u             - remove package if a more recent version is already "
+"installed.\n"
+msgstr ""
+"  -u              - bỏ gói tin nếu có phiên bản mới hơn đã được cài đặt "
+"rồi.\n"
+
+#: ../urpmq:105
+#, c-format
+msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
+msgstr "  -y             - tác động tìm kiếm fuzzy (giống như --fuzzy.\n"
+
+#: ../urpmq:106
+#, c-format
+msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
+msgstr "  -Y             - giống -y, nhưng ép buộc phải khớp chứ hoa thường.\n"
+
+#: ../urpmq:107
+#, c-format
+msgid "  names or rpm files given on command line are queried.\n"
+msgstr "  tên hay tập tin rpm có trong dòng lệnh được yêu cầu.\n"
+
+#: ../urpmq:154
+#, c-format
+msgid "usage: \"urpmq --auto-orphans\" with no argument"
+msgstr ""
+
+#: ../urpmq:207
+#, c-format
+msgid "--list-nodes can only be used with --parallel"
+msgstr "--list-nodes chỉ được dùng với --parallel"
+
+#: ../urpmq:231
+#, fuzzy, c-format
+msgid "use -l to list files"
+msgstr "không thể ghi tập danh sách của \"%s\""
+
+#: ../urpmq:416
+#, fuzzy, c-format
+msgid "no xml info for medium \"%s\", only partial result for package %s"
+msgstr ""
+"Lưu ý: vì không có phương tiện được tìm kiếm dùng hdlists, urpmf không thể "
+"trả lại kết quả\n"
+
+#: ../urpmq:417
+#, fuzzy, c-format
+msgid "no xml info for medium \"%s\", only partial result for packages %s"
+msgstr ""
+"Lưu ý: vì không có phương tiện được tìm kiếm dùng hdlists, urpmf không thể "
+"trả lại kết quả\n"
+
+#: ../urpmq:420
+#, fuzzy, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for package %s"
+msgstr ""
+"Lưu ý: vì không có phương tiện được tìm kiếm dùng hdlists, urpmf không thể "
+"trả lại kết quả\n"
+
+#: ../urpmq:421
+#, fuzzy, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for packages %s"
+msgstr ""
+"Lưu ý: vì không có phương tiện được tìm kiếm dùng hdlists, urpmf không thể "
+"trả lại kết quả\n"
+
+#: ../urpmq:488
+#, c-format
+msgid "No changelog found\n"
+msgstr "Không thấy changelog\n"
+
+#: ../gurpmi.desktop.in.h:1
+msgid "Software Installer"
+msgstr "Trình cài đặt phần mềm"
+
+#: ../gurpmi.desktop.in.h:2
+msgid "Graphical front end to install RPM files"
+msgstr "Một Frontend đồ họa để cài đặt các tập tin RPM"
+
+#~ msgid ""
+#~ "urpme version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "Phiên bản urpme %s\n"
+#~ "%s\n"
+#~ "Đây là phần mềm miễn phí và có thể phân phối lại theo các điều khoản của "
+#~ "GNU GPL.\n"
+#~ "\n"
+#~ "Cách dùng:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage: urpmf [options] pattern-expression\n"
+#~ msgstr ""
+#~ "Phiên bản urpmf %s\n"
+#~ "Bản quyền (C) 2002-2006 Mandriva.\n"
+#~ "Đây là phần mềm miễn phí và có thể phân phối lại theo các điều khoản của "
+#~ "GNU GPL.\n"
+#~ "\n"
+#~ "Cách dùng:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmi.recover version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "Phiên bản urpmi.recover %s\n"
+#~ "Bản quyền (C) 2006 Mandriva.\n"
+#~ "Đây là phần mềm miễn phí và có thể phân phối lại theo các điều khoản của "
+#~ "GNU GPL.\n"
+#~ "\n"
+#~ "Cách dùng:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmq version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "Phiên bản urpmq %s\n"
+#~ "Bản quyền (C) 2000-2006 Mandriva.\n"
+#~ "Đây là phần mềm miễn phí và có thể phân phối lại theo các điều khoản của "
+#~ "GNU GPL.\n"
+#~ "\n"
+#~ "Cách dùng:\n"
+
+#~ msgid ""
+#~ "Installation failed, some files are missing:\n"
+#~ "%s\n"
+#~ "You may want to update your urpmi database"
+#~ msgstr ""
+#~ "Cài đặt lỗi, thiếu một số tập tin:\n"
+#~ "%s\n"
+#~ "Có thể bạn nên cập nhật cơ sở dữ liệu của urpmi."
+
+#~ msgid "Cancel"
+#~ msgstr "Bỏ qua"
+
+#, fuzzy
+#~ msgid "Cannot write DUDF file.\n"
+#~ msgstr "không thể ghi tập tin [%s]"
+
+#~ msgid ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+#~ msgstr ""
+#~ "  --sources      - đưa toàn bộ các gói nguồn trước khi tải xuống (chỉ cho "
+#~ "phép root).\n"
+
+#, fuzzy
+#~ msgid "due to already installed %s"
+#~ msgstr "Mọi thứ đã được cài đặt rồi"
+
+#~ msgid ""
+#~ "  --from         - use specified url for list of mirrors, the default is\n"
+#~ "                   %s\n"
+#~ msgstr ""
+#~ "  --from         - dùng url chỉ định cho danh sách các mirror, mặc định "
+#~ "là\n"
+#~ "                   %s\n"
+
+#, fuzzy
+#~ msgid "examining %s file"
+#~ msgstr "đang kiểm tra tập tin MD5SUM"
+
+#, fuzzy
+#~ msgid "found probed synthesis as %s"
+#~ msgstr "đã tìm thấy hdlist (hoặc synthesis) nguồn được dò là %s"
+
+#~ msgid "  --update       - create an update medium.\n"
+#~ msgstr "  --update       - tạo phương tiện cập nhật.\n"
+
+#, fuzzy
+#~ msgid "malformed URL: [%s]"
+#~ msgstr "input bất thường: [%s]"
+
+#, fuzzy
+#~ msgid "%d installation transaction failed"
+#~ msgid_plural "%d installation transactions failed"
+#~ msgstr[0] "%d phiên giao dịch cài đặt lỗi"
+
+#, fuzzy
+#~ msgid "Package %s can not be installed"
+#~ msgstr "Mọi thứ đã được cài đặt rồi"
+
+#~ msgid "Checking to remove the following packages"
+#~ msgstr "Đang kiểm tra để gỡ bỏ các gói tin sau đây"
+
+#, fuzzy
+#~ msgid "%s database locked"
+#~ msgstr "cơ sở dữ liệu urpmi bị khóa"
+
+#, fuzzy
+#~ msgid "Unknown option %s"
+#~ msgstr ""
+#~ "\n"
+#~ "tùy chọn không xác định '%s'\n"
+
+#~ msgid "too many mount points for removable medium \"%s\""
+#~ msgstr "có quá nhiều điểm gắn kết cho phương tiện tháo lắp \"%s\""
+
+#~ msgid "Medium \"%s\" is an ISO image, will be mounted on-the-fly"
+#~ msgstr "Phương tiện \"%s\" là ISO image, sẽ được mount nhanh (on-the-fly)"
+
+#~ msgid "using different removable device [%s] for \"%s\""
+#~ msgstr "sử dụng thiết bị tháo lắp khác [%s] cho \"%s\""
+
+#~ msgid "unable to retrieve pathname for removable medium \"%s\""
+#~ msgstr "không thể thu thập tên đường dẫn cho phương tiện tháo lắp \"%s\""
+
+#, fuzzy
+#~ msgid "unable to mount the distribution medium"
+#~ msgstr "không thể truy cập phương tiện cài đặt đầu tiên"
+
+#~ msgid ""
+#~ "unable to access medium \"%s\",\n"
+#~ "this could happen if you mounted manually the directory when creating the "
+#~ "medium."
+#~ msgstr ""
+#~ "không thể truy cập phương tiện \"%s\",\n"
+#~ "Truy cập được nếu bạn tự gắn kết thư mục khi tạo phương tiện."
+
+#~ msgid "inconsistent medium \"%s\" marked removable but not really"
+#~ msgstr ""
+#~ "phương tiện không rõ ràng \"%s\" được đánh dấu là tháo lắp nhưng không "
+#~ "phải vậy"
+
+#~ msgid "  -c             - clean headers cache directory.\n"
+#~ msgstr "  -c             - xoá thư mục cache headers.\n"
+
+#~ msgid "virtual medium needs to be local"
+#~ msgstr "phương tiện ảo phải là cục bộ"
+
+#, fuzzy
+#~ msgid "unable to parse synthesis file of \"%s\""
+#~ msgstr "không thể phân tích tập tin hdlist của \"%s\""
+
+#, fuzzy
+#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
+#~ msgstr "tính toán md5sum của hdlist (hoặc synthesis) của nguồn hiện có"
+
+#~ msgid ""
+#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
+#~ "ignored"
+#~ msgstr ""
+#~ "phương tiện ảo \"%s\" đáng ra không nên định nghĩa tập tin hdlist hay "
+#~ "list, phương tiện bị bỏ qua"
+
+#, fuzzy
+#~ msgid "invalid hdlist name"
+#~ msgstr "tên tập tin rpm [%s] không hợp lệ"
+
+#~ msgid "unable to find list file for \"%s\", medium ignored"
+#~ msgstr ""
+#~ "không thể tìm thấy tập tin danh sách cho \"%s\", phương tiện bị bỏ qua"
+
+#, fuzzy
+#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
+#~ msgstr "đang thử chọn phương tiện không tồn tại \"%s\""
+
+#, fuzzy
+#~ msgid "\"synthesis\" should be set (medium \"%s\")"
+#~ msgstr "build tập tin tổng hợp hdlist cho phương tiện \"%s\""
+
+#, fuzzy
+#~ msgid "unable to access list file of \"%s\""
+#~ msgstr "không thể phân tích tập tin hdlist của \"%s\""
+
+#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
+#~ msgstr ""
+#~ "phương tiện \"%s\" cố sử dụng hdlist đã được dùng rồi, phương tiện bị bỏ "
+#~ "qua"
+
+#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
+#~ msgstr ""
+#~ "phương tiện \"%s\" cố sử dụng một danh sách đang dùng, phương tiện bị bỏ "
+#~ "qua"
+
+#, fuzzy
+#~ msgid ""
+#~ "Note: no hdlist for medium \"%s\", unable to return any result for it"
+#~ msgstr ""
+#~ "Lưu ý: vì không có phương tiện được tìm kiếm dùng hdlists, urpmf không "
+#~ "thể trả lại kết quả\n"
+
+#~ msgid "performing second pass to compute dependencies\n"
+#~ msgstr "thực hiện pass thứ hai để tính toán các phụ thuộc\n"
+
+#~ msgid "building hdlist [%s]"
+#~ msgstr "building hdlist [%s]"
+
+#~ msgid ""
+#~ "Unable to build synthesis file for medium \"%s\". Your hdlist file may be "
+#~ "corrupted."
+#~ msgstr ""
+#~ "Không thể build tập tin synthesis cho phương tiện \"%s\". Tập tin hdlist "
+#~ "có thể bị hỏng."
+
+#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
+#~ msgstr ""
+#~ "trục trặc khi đọc tập tin synthesis hay hdlist của phương tiện \"%s\""
+
+#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
+#~ msgstr "tính toán md5sum của hdlist (hoặc synthesis) nguồn được sao chép"
+
+#~ msgid "...retrieving failed: md5sum mismatch"
+#~ msgstr "...không thu thập được: md5sum không khớp"
+
+#~ msgid "no rpm files found from [%s]"
+#~ msgstr "không tìm thấy các tập tin rpm từ [%s]"
+
+#~ msgid "unable to read rpm files from [%s]: %s"
+#~ msgstr "không thể đọc các tập tin rpm từ [%s]: %s"
+
+#~ msgid "no rpms read"
+#~ msgstr "không có đọc rpms"
+
+#~ msgid "reading headers from medium \"%s\""
+#~ msgstr "đang đọc các header từ phương tiện \"%s\""
+
+#, fuzzy
+#~ msgid "    --probe-synthesis - use synthesis file.\n"
+#~ msgstr "  --probe-synthesis - thử tìm và sử dụng tập tin synthesis.\n"
+
+#, fuzzy
+#~ msgid "    --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - thử tìm và sử dụng tập tin hdlist.\n"
+
+#~ msgid ""
+#~ "Note: since no media searched uses hdlists, urpmf was unable to return "
+#~ "any result\n"
+#~ msgstr ""
+#~ "Lưu ý: vì không có phương tiện được tìm kiếm dùng hdlists, urpmf không "
+#~ "thể trả lại kết quả\n"
+
+#~ msgid "You may want to use --name to search for package names.\n"
+#~ msgstr "Bạn có thể muốn dùng --name để tìm tên gói tin.\n"
+
+#, fuzzy
+#~ msgid "  --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - thử tìm và sử dụng tập tin hdlist.\n"
+
+#~ msgid "unable to update medium \"%s\"\n"
+#~ msgstr "không thể cập nhật phương tiện \"%s\"\n"
+
+#~ msgid "unable to create medium \"%s\"\n"
+#~ msgstr "không thể tạo phương tiện \"%s\"\n"
+
+#~ msgid "there are multiple packages with the same rpm filename \"%s\""
+#~ msgstr "có nhiều gói với cùng tên tập tin rpm \"%s\""
+
+#~ msgid "unable to correctly parse [%s] on value \"%s\""
+#~ msgstr "không thể phân tích đúng [%s] trên giá trị \"%s\""
+
+#~ msgid ""
+#~ "medium \"%s\" uses an invalid list file:\n"
+#~ "  mirror is probably not up-to-date, trying to use alternate method"
+#~ msgstr ""
+#~ "phương tiện \"%s\" dùng tập tin danh sách không hợp lệ:\n"
+#~ "  có thể mirror không được cập nhật, đang thử dùng phương pháp thay thế "
+#~ "khác"
+
+#~ msgid "medium \"%s\" does not define any location for rpm files"
+#~ msgstr ""
+#~ "phương tiện \"%s\" không chỉ ra bất kỳ vị trí nào cho các tập tin rpm"
+
+#~ msgid "unrequested"
+#~ msgstr "thôi yêu cầu"
+
+#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
+#~ msgstr "thêm gói %s (id=%d, eid=%d, cập nhật=%d, tập tin=%s)"
+
+#~ msgid ""
+#~ "The following packages have bad signatures:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "Do you want to continue installation ?"
+#~ msgstr ""
+#~ "Các gói sau đây có chữ ký sai:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "Bạn muốn tiếp tục cài đặt không?"
+
+#, fuzzy
+#~ msgid "You need to be root to use --use-distrib"
+#~ msgstr "Bạn phải là root để dùng lệnh này !\n"
+
+#~ msgid "unable to remove package %s"
+#~ msgstr "không thể gỡ bỏ gói %s"
+
+#~ msgid "No filelist found\n"
+#~ msgstr "Không thấy filelist\n"
+
+#~ msgid "medium \"%s\" is not selected"
+#~ msgstr "phương tiện \"%s\" không được chọn"
+
+#, fuzzy
+#~ msgid "Remove %d packages?"
+#~ msgstr "gỡ bỏ gói %s"
+
+#~ msgid "  -f             - force generation of hdlist files.\n"
+#~ msgstr "  -f             - cố tạo các tập tin hdlist.\n"
+
+#~ msgid ""
+#~ "  -P             - do not search in provides to find package (default).\n"
+#~ msgstr ""
+#~ "  -P             - không tìm gói tin từ các nhà cung cấp (mặc định).\n"
+
+#~ msgid "  -R             - reverse search to what requires package.\n"
+#~ msgstr "  -R             - đảo ngược tìm kiếm cho cái yêu cầu gói.\n"
+
+#~ msgid ""
+#~ "  -RR            - extended reverse search (includes virtual packages).\n"
+#~ msgstr ""
+#~ "  -RR            - tìm kiếm đỏa ngược mở rộng (gồm cả các gói ảo).\n"
+
+#~ msgid ""
+#~ "To satisfy dependencies, the following %d packages are going to be "
+#~ "installed:\n"
+#~ "%s\n"
+#~ msgstr ""
+#~ "Để thỏa mãn các phụ thuộc, %d gói sau đây sẽ được cài đặt:\n"
+#~ "%s\n"
+
+#, fuzzy
+#~ msgid "skipping media %s: no hdlist"
+#~ msgstr "bỏ qua phương tiện %s: không có hdlist\n"
+
+#, fuzzy
+#~ msgid "Installing packages on nodes..."
+#~ msgstr "Đang cài đặt gói `%s' (%s/%s)..."
+
+#, fuzzy
+#~ msgid "Propagating synthesis to %s..."
+#~ msgstr "đang kiểm tra tập tin tổng hợp [%s]"
+
+#, fuzzy
+#~ msgid "Distributing files to %s..."
+#~ msgstr "phân phối %s"
+
+#, fuzzy
+#~ msgid "Performing install on %s..."
+#~ msgstr "Cài đặt gói..."
+
+#, fuzzy
+#~ msgid "Preparing install on %s..."
+#~ msgstr "Cài đặt gói..."
+
+#~ msgid "  --probe-synthesis - try to find and use synthesis file.\n"
+#~ msgstr "  --probe-synthesis - thử tìm và sử dụng tập tin synthesis.\n"
+
+#~ msgid "  --probe-hdlist - try to find and use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - thử tìm và sử dụng tập tin hdlist.\n"
+
+#~ msgid "`with' missing for network media\n"
+#~ msgstr "thiếu `with' cho phương tiện mạng\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "unknown options '%s'\n"
+#~ msgstr ""
+#~ "\n"
+#~ "tùy chọn không xác định '%s'\n"
+
+#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
+#~ msgstr "không thể tìm được tập tin hdlist cho \"%s\", phương tiện bị bỏ qua"
+
+#~ msgid "inconsistent list file for \"%s\", medium ignored"
+#~ msgstr "tập tin danh sách không rõ ràng cho \"%s\", phương tiện bị bỏ qua"
+
+#~ msgid "unable to inspect list file for \"%s\", medium ignored"
+#~ msgstr ""
+#~ "không thể xem xét tập tin danh sách cho \"%s\", phương tiện bị bỏ qua"
+
+#~ msgid "there doesn't seem to be devices in the chroot in \"%s\""
+#~ msgstr "Có vẻ như không phải các thiết bị trong chroot ở trong \"%s\""
+
+#~ msgid "virtual medium \"%s\" is not local, medium ignored"
+#~ msgstr "phương tiện ảo \"%s\" không phải cục bộ, phương tiện bị bỏ qua"
+
+#~ msgid ""
+#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
+#~ "medium ignored"
+#~ msgstr ""
+#~ "phương tiện ảo \"%s\" nên có nguồn hdlist hoặc synthesis hợp lệ, phương "
+#~ "tiện bị bỏ qua"
+
+#~ msgid "copying source hdlist (or synthesis) of \"%s\"..."
+#~ msgstr "đang sao chép hdlist (hoặc synthesis) nguồn của \"%s\"..."
+
+#~ msgid "retrieval of source hdlist (or synthesis) failed"
+#~ msgstr "không lấy được hdlist (hoặc synthesis) nguồn"
+
+#~ msgid "file [%s] already used in the same medium \"%s\""
+#~ msgstr "tập tin [%s] đang được dùng trong cùng phương tiện \"%s\" rồi"
+
+#~ msgid "nothing written in list file for \"%s\""
+#~ msgstr "không có gì được ghi trong tập tin danh sách cho \"%s\""
+
+#~ msgid "found %d headers in cache"
+#~ msgstr "tìm thấy các header %d trong cache"
+
+#~ msgid "removing %d obsolete headers in cache"
+#~ msgstr "đang gỡ bỏ các header cũ %d trong cache"
+
+#~ msgid "using process %d for executing transaction"
+#~ msgstr "dùng tiến trình %d để thực thi phiên giao dịch"
+
+#~ msgid "  --norebuild    - don't try to rebuild hdlist if not readable.\n"
+#~ msgstr "  --norebuild    - đừng cố rebuild hdlist nếu không đọc được.\n"
+
+#, fuzzy
+#~ msgid "The following package names were assumed: %s"
+#~ msgstr "Các gói tin sau đây chứa %s: %s"
+
+#~ msgid "copying hdlists file..."
+#~ msgstr "đang sao chép tập tin hdlist..."
+
+#~ msgid "invalid hdlist description \"%s\" in hdlists file"
+#~ msgstr "mô tả hdlist không hợp lệ \"%s\" trong tập tin hdlists"
+
+#~ msgid "Is this OK?"
+#~ msgstr "Đồng ý không?"
+
+#~ msgid ""
+#~ "  --version      - use specified distribution version, the default is "
+#~ "taken\n"
+#~ "                   from the version of the distribution told by the\n"
+#~ "                   installed mandriva-release package.\n"
+#~ msgstr ""
+#~ "  --version      - dùng phiên bản được chỉ định, mặc định được lấy từ\n"
+#~ "                   phiên bản của phân phối được nói bởi gói phát hành\n"
+#~ "                   Mandriva Linux đã cài đặt.\n"
+
+#~ msgid ""
+#~ "  --arch         - use specified architecture, the default is arch of\n"
+#~ "                   mandriva-release package installed.\n"
+#~ msgstr ""
+#~ "  --arch         - dùng kiến trúc được chỉ định, mặc định là kiến trúc "
+#~ "của\n"
+#~ "                   gói phát hành mandrakelinux đã cài đặt.\n"
+
+#~ msgid ""
+#~ "  --headers      - extract headers for package listed from urpmi db to\n"
+#~ "                   stdout (root only).\n"
+#~ msgstr ""
+#~ "  --headers      - bật ra các header cho gói được liệt kê từ urpmi db\n"
+#~ "                   đến stdout (chỉ cho phép root).\n"
+
+#~ msgid ""
+#~ "To satisfy dependencies, the following %d packages are going to be "
+#~ "installed (%d MB)"
+#~ msgstr "Để thỏa mãn các phụ thuộc, %d gói sau đây sẽ được cài đặt (%d MB)"
+
+#~ msgid "installing %s\n"
+#~ msgstr "đang cài đặt %s\n"
+
+#~ msgid ""
+#~ "Automatic installation of packages...\n"
+#~ "You requested installation of package %s\n"
+#~ msgstr ""
+#~ "Tự động cài đặt các gói...\n"
+#~ "Bạn yêu cầu cài đặt gói %s\n"
+
+#~ msgid "%s: command not found\n"
+#~ msgstr "%s: không thấy lệnh\n"
+
+#~ msgid ""
+#~ "Some package requested cannot be installed:\n"
+#~ "%s\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "Không thể cài đặt một số gói tin đã yêu cầu:\n"
+#~ "%s\n"
+#~ "Tiếp tục?"
+
+#~ msgid ""
+#~ "The following packages have to be removed for others to be upgraded:\n"
+#~ "%s\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "Các gói sau đây phải được gỡ bỏ để nâng cấp các gói khác:\n"
+#~ "%s\n"
+#~ "Tiếp tục?"
+
+#~ msgid "md5sum mismatch"
+#~ msgstr "md5sum không khớp"
+
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "Phiên bản urpmf %s\n"
+#~ "Bản quyền (C) 2002-2004 Mandriva.\n"
+#~ "Đây là phần mềm miễn phí và có thể phân phối lại theo các điều khoản của "
+#~ "GNU GPL.\n"
+#~ "\n"
+#~ "Cách dùng:\n"
+
+#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
+#~ msgstr ""
+#~ "  --synthesis    - dùng tổng hợp (synthesis) nhận được để thay cho urpmi "
+#~ "db.\n"
+
+#~ msgid ""
+#~ "  --quiet        - do not print tag name (default if no tag given on "
+#~ "command\n"
+#~ "                   line, incompatible with interactive mode).\n"
+#~ msgstr ""
+#~ "  --quiet         - không in ra tên tag (mặc định nếu không đưa tag vào\n"
+#~ "                   dòng lệnh, không tương thích với chế độ tương tác).\n"
+
+#~ msgid "  --uniq         - do not print identical lines.\n"
+#~ msgstr "  --uniq         - không in ra các dòng giống nhau.\n"
+
+#~ msgid "  --all          - print all tags.\n"
+#~ msgstr "  --all           - in ra toàn bộ tag.\n"
+
+#~ msgid "  --summary      - print tag summary: summary.\n"
+#~ msgstr "  --summary       - in ra tóm tắt tag: tóm tắt.\n"
+
+#~ msgid "  --description  - print tag description: description.\n"
+#~ msgstr "  --description   - in ra mô tả tag: mô tả.\n"
+
+#~ msgid "  --buildhost    - print tag buildhost: build host.\n"
+#~ msgstr "  --buildhost    - in ra tag buildhost: build host.\n"
+
+#~ msgid "  --provides     - print tag provides: all provides.\n"
+#~ msgstr "  --provides      - in ra cung cấp tag: toàn bộ các cung cấp.\n"
+
+#~ msgid "  --requires     - print tag requires: all requires.\n"
+#~ msgstr "  --requires      - in ra yêu cầu tag: toàn bộ các yêu cầu.\n"
+
+#~ msgid "  --files        - print tag files: all files.\n"
+#~ msgstr "  --files         - in ra tập tin tag: toàn bộ các tập tin.\n"
+
+#~ msgid "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
+#~ msgstr "  --obsoletes     - in ra các dòng tag: toàn bộ dòng.\n"
+
+#~ msgid ""
+#~ "  --env          - use specific environment (typically a bug\n"
+#~ "                   report).\n"
+#~ msgstr ""
+#~ "  --env          - dùng môi trường riêng (điển hình là báo cáo\n"
+#~ "                    lỗi).\n"
+
+#~ msgid "  -i             - ignore case distinctions in every pattern.\n"
+#~ msgstr "  -i             - bỏ qua các dấu hiệu phân biệt trong mọi mẫu.\n"
+
+#~ msgid ""
+#~ "  -a             - binary AND operator, true if both expression are "
+#~ "true.\n"
+#~ msgstr ""
+#~ "  -a             - binary AND operator, đúng nếu cả hai expression là "
+#~ "đúng.\n"
+
+#~ msgid "  !              - unary NOT, true if expression is false.\n"
+#~ msgstr "  !              - unary NOT, đúng nếu expression là sai.\n"
+
+#~ msgid "  (              - left parenthesis to open group expression.\n"
+#~ msgstr "  (              - dấu ngoặc trái để mở group expression.\n"
+
+#~ msgid "  )              - right parenthesis to close group expression.\n"
+#~ msgstr "  )              - dấu ngoặc phải để đóng group expression.\n"
+
+#~ msgid ""
+#~ "callback is:\n"
+#~ "%s\n"
+#~ msgstr ""
+#~ "callback là :\n"
+#~ "%s\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "Continue?"
+#~ msgstr ""
+#~ "\n"
+#~ "Tiếp tục?"
+
+#~ msgid ""
+#~ "Some package requested cannot be installed:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Không thể cài đặt một số gói tin được yêu cầu:\n"
+#~ "%s"
+
+#~ msgid "skipping media %s: no hdlist\n"
+#~ msgstr "bỏ qua phương tiện %s: không có hdlist\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "  --keep         - keep existing packages if possible, reject requested\n"
+#~ "                   packages that leads to remove.\n"
+#~ msgstr ""
+#~ "  --keep         - giữ gói đang tồn tại nếu có thể, bỏ các gói yêu cầu\n"
+#~ "                   dẫn đến việc gỡ bỏ.\n"
+
+#~ msgid ""
+#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
+#~ "                   distribution, XXX may be main, contrib, updates or\n"
+#~ "                   anything else that has been configured ;-)\n"
+#~ msgstr ""
+#~ "  --distrib-XXX  - tự động tạo phương tiện cho phần XXX của phân\n"
+#~ "                   phối, XXX có thể là chính, phân phối, cập nhật haybất "
+#~ "kỳ\n"
+#~ "                   cái gì khác đã được cấu hình  ;-)\n"
+
+#~ msgid "found version %s and arch %s ..."
+#~ msgstr "tìm thấy phiên bản %s và arch %s ..."
+
+#~ msgid "cannot add updates of a cooker distribution\n"
+#~ msgstr "không thể thêm các cập nhật của phiên bản cooker\n"
+
+#~ msgid "retrieving mirrors at %s ..."
+#~ msgstr "đang thu thập các mirror tại %s ..."

@@ -1,0 +1,17 @@
+bin/umlmgr
+bin/umltty
+Changes
+etc/umlmgr.cfg
+etc/umlmgr.init
+lib/Umlmgr.pm
+lib/Umlmgr/Uml.pm
+lib/Umlmgr/Utils.pm
+Makefile.PL
+MANIFEST
+README
+tdata/test.uml
+tdata/umlmgr.cfg
+t/Umlmgr.t
+t/Umlmgr_Uml.t
+ChangeLog
+META.yml                                 Module meta-data (added by MakeMaker)

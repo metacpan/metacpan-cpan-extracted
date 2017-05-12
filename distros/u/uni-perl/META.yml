@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               uni-perl
+version:            0.92
+abstract:           all modern features + unicode support in one pragma
+author:
+    - Mons Anderson <mons@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:  5.10.0
+provides:
+    uni::perl:
+        file:     lib/uni/perl.pm
+        version:  0.91
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

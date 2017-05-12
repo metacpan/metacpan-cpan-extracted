@@ -1,0 +1,3641 @@
+# translation of urpmi-el.po to Greek
+#
+# Latest versions of po files are at http://www.mandrivalinux.com/l10n/el.php3
+#
+# translation of urpmi-el.po to Greek
+# Greek Traslation of urpmi.
+# Copyright (C) 2001,2003, 2005, 2006 Free Software Foundation, Inc.
+#
+# Thanos Kyritsis <djart@hellug.gr>, 2001.
+#  Νίκος Νύκταρης (Nick Niktaris) <niktarin@yahoo.com>, 2003.
+# Balaskas Euaggelos <ebalaskas@ebalaskas.gr>, 2005.
+# Theophanis Mastakas <mastakas@otenet.gr>, 2006.
+# Glentadakis Dimitrios <dglent@gmail.com>, 2008, 2009.
+# Nikos Papadopoulos <231036448@freemail.gr>, 2008.
+# Dimitrios Glentadakis <dglent@gmail.com>, 2010, 2011, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: urpmi-el\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-01 19:38+0200\n"
+"PO-Revision-Date: 2012-09-01 16:53+0200\n"
+"Last-Translator: Dimitrios Glentadakis <dglent@gmail.com>\n"
+"Language-Team: Greek <i18n-el@ml.mageia.org>\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Greek\n"
+"X-Poedit-Country: GREECE\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: ../gurpmi:32
+#, c-format
+msgid "RPM installation"
+msgstr "Εγκατάσταση των RPM"
+
+#: ../gurpmi:46
+#, c-format
+msgid "Error: unable to find file %s, will cancel operation"
+msgstr "Σφάλμα: αδυναμία εύρεσης του αρχείου %s, η διαδικασία θα ακυρωθεί"
+
+#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#, c-format
+msgid "_Ok"
+msgstr "_Εντάξει"
+
+#: ../gurpmi:67
+#, c-format
+msgid ""
+"You have selected a source package:\n"
+"\n"
+"%s\n"
+"\n"
+"You probably didn't want to install it on your computer (installing it would "
+"allow you to make modifications to its sourcecode then compile it).\n"
+"\n"
+"What would you like to do?"
+msgstr ""
+"Επιλέξατε ένα πακέτο πηγαίου κώδικα:\n"
+"\n"
+"%s\n"
+"\n"
+"Πιθανόν δεν θέλατε να το εγκαταστήσετε στον υπολογιστή σας (η εγκατάστασή "
+"του θα σας επιτρέψει να κάνετε τροποποιήσεις στον πηγαίου του κώδικα και "
+"μετά να το μεταγλωττίσετε).\n"
+"\n"
+"Τι θέλετε να κάνετε;"
+
+#: ../gurpmi:75 ../gurpmi:86
+#, c-format
+msgid ""
+"You are about to install the following software packages on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"Proceed?"
+msgstr ""
+"Πρόκειται να εγκαταστήσετε τα ακόλουθα πακέτα λογισμικού στον υπολογιστή "
+"σας:\n"
+"\n"
+"%s\n"
+" \n"
+"Να συνεχίσω;"
+
+#: ../gurpmi:81
+#, c-format
+msgid ""
+"You are about to install the following software package on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"You may prefer to just save it. What is your choice?"
+msgstr ""
+"Πρόκειται να εγκαταστήσετε το ακόλουθο πακέτο λογισμικού στον υπολογιστή "
+"σας:\n"
+"\n"
+"%s\n"
+"\n"
+"Μπορεί να προτιμάτε απλά να το αποθηκεύσετε. Ποια είναι η επιλογή σας;"
+
+#: ../gurpmi:99
+#, c-format
+msgid "_Install"
+msgstr "_Εγκατάσταση"
+
+#: ../gurpmi:100
+#, c-format
+msgid "_Save"
+msgstr "_Αποθήκευση"
+
+#: ../gurpmi:101 ../gurpmi2:197
+#, c-format
+msgid "_Cancel"
+msgstr "_Ακύρωση"
+
+#: ../gurpmi:109
+#, c-format
+msgid "Choose location to save file"
+msgstr "Επιλέξτε μια τοποθεσία για την αποθήκευση του αρχείου"
+
+#: ../gurpmi.pm:41
+#, c-format
+msgid "Options:"
+msgstr "Επιλογές:"
+
+#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#, c-format
+msgid "  --help         - print this help message.\n"
+msgstr "  --help         - εμφανίζει αυτό το μήνυμα βοήθειας.\n"
+
+#: ../gurpmi.pm:43 ../urpmi:74
+#, c-format
+msgid ""
+"  --auto         - non-interactive mode, assume default answers to "
+"questions.\n"
+msgstr ""
+"  --auto         - μη αλληλεπιδραστική λειτουργία, χρήση των προεπιλεγμένων "
+"παραμέτρων.\n"
+
+#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#, c-format
+msgid ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+msgstr ""
+"  --auto-select  - αυτόματη επιλογή των πακέτων για την αναβάθμιση του "
+"συστήματος.\n"
+
+#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#, c-format
+msgid ""
+"  --force        - force invocation even if some packages do not exist.\n"
+msgstr ""
+"  --force        - εξαναγκασμός επίκλησης ακόμα και εάν μερικά πακέτα δεν "
+"υπάρχουν.\n"
+
+#: ../gurpmi.pm:46 ../urpmi:129
+#, c-format
+msgid ""
+"  --verify-rpm   - verify rpm signature before installation\n"
+"                   (--no-verify-rpm disables it, default is enabled).\n"
+msgstr ""
+"  --verify-rpm   - έλεγχος της υπογραφής του rpm πριν την εγκατάσταση\n"
+"                   (--no-verify-rpm για απενεργοποίηση, ενεργοποιημένο από "
+"προεπιλογή).\n"
+
+#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#, c-format
+msgid "  --media        - use only the given media, separated by comma.\n"
+msgstr ""
+"  --media        - χρήση μόνο των μέσων που δόθηκαν, διαχωρισμένα με το "
+"κόμμα.\n"
+
+#: ../gurpmi.pm:49 ../urpmi:146
+#, c-format
+msgid "  -p             - allow search in provides to find package.\n"
+msgstr ""
+"  -p             - να επιτρέπεται η αναζήτηση εντός των πακέτων, για να "
+"βρεθεί το κατάλληλο πακέτο.\n"
+
+#: ../gurpmi.pm:50 ../urpmi:147
+#, c-format
+msgid "  -P             - do not search in provides to find package.\n"
+msgstr ""
+"  -P             - να μην επιτρέπεται η αναζήτηση εντός των πακέτων, για να "
+"βρεθεί το κατάλληλο πακέτο.\n"
+
+#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#, c-format
+msgid "  --root         - use another root for rpm installation.\n"
+msgstr ""
+"  --root         - χρησιμοποίησε μία άλλη διαδρομή root για την εγκατάσταση "
+"του rpm.\n"
+
+#: ../gurpmi.pm:52 ../urpmi:131
+#, c-format
+msgid ""
+"  --test         - only verify if the installation can be achieved "
+"correctly.\n"
+msgstr ""
+"  --test         - έλεγξε μόνο αν η εγκατάσταση μπορεί να γίνει σωστά.\n"
+
+#: ../gurpmi.pm:53 ../urpmi:71
+#, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested packages.\n"
+msgstr ""
+"  --searchmedia  - χρήση μόνο των δοσμένων μέσων για την αναζήτηση των "
+"ζητούμενων πακέτων.\n"
+
+#: ../gurpmi.pm:96
+#, c-format
+msgid "No packages specified"
+msgstr "Δεν ορίστηκαν πακέτα"
+
+#: ../gurpmi2:55
+#, c-format
+msgid "Please wait..."
+msgstr "Παρακαλώ περιμένετε..."
+
+#: ../gurpmi2:64
+#, c-format
+msgid "Must be root"
+msgstr "Πρέπει να είστε διαχειριστής"
+
+#: ../gurpmi2:71
+#, c-format
+msgid "Distribution Upgrade"
+msgstr "Αναβάθμιση της διανομής"
+
+#: ../gurpmi2:71
+#, c-format
+msgid "Packages installation"
+msgstr "Εγκατάσταση πακέτων"
+
+#: ../gurpmi2:98
+#, c-format
+msgid "Preparing packages installation..."
+msgstr "Προετοιμασία των πακέτων για την εγκατάσταση..."
+
+#: ../gurpmi2:113 ../urpmi:505
+#, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s"
+msgstr ""
+"Ορισμένα πακέτα που ζητήθηκαν δεν μπορούν να εγκατασταθούν:\n"
+"%s"
+
+#: ../gurpmi2:121
+#, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Ορισμένα από τα πακέτα που ζητήθηκαν δεν μπορούν να εγκατασταθούν:\n"
+"%s\n"
+"Συνέχιση της εγκατάστασης ;"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Warning"
+msgstr "Προσοχή"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Ok"
+msgstr "Εντάξει"
+
+#: ../gurpmi2:193
+#, c-format
+msgid " (to upgrade)"
+msgstr " (προς αναβάθμιση)"
+
+#: ../gurpmi2:194
+#, c-format
+msgid " (to install)"
+msgstr " (προς εγκατάσταση)"
+
+#: ../gurpmi2:197
+#, c-format
+msgid "Package choice"
+msgstr "Επιλογή πακέτων"
+
+#: ../gurpmi2:198
+#, c-format
+msgid "One of the following packages is needed:"
+msgstr "Ένα εκ των παρακάτω πακέτων απαιτείται:"
+
+#: ../gurpmi2:223
+#, c-format
+msgid "_Abort"
+msgstr "_Ματαίωση"
+
+#: ../gurpmi2:258
+#, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Τα παρακάτω πακέτα πρέπει να αφαιρεθούν για να αναβαθμιστούν κάποια άλλα:\n"
+"%s\n"
+"Συνέχεια εγκατάστασης;"
+
+#: ../gurpmi2:277 ../urpmi:605
+#, c-format
+msgid ""
+"To satisfy dependencies, the following package is going to be installed:"
+msgstr ""
+"Για να ικανοποιηθούν οι εξαρτήσεις, θα εγκατασταθεί το παρακάτω πακέτο:"
+
+#: ../gurpmi2:278 ../urpmi:606
+#, c-format
+msgid ""
+"To satisfy dependencies, the following packages are going to be installed:"
+msgstr ""
+"Για να ικανοποιηθούν οι εξαρτήσεις, θα εγκατασταθούν τα ακόλουθα πακέτα:"
+
+#: ../gurpmi2:280
+#, c-format
+msgid "(%d package, %d MB)"
+msgid_plural "(%d packages, %d MB)"
+msgstr[0] "(%d πακέτο, %d MB)"
+msgstr[1] "(%d πακέτα, %d MB)"
+
+#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#, c-format
+msgid "unable to get source packages, aborting"
+msgstr "αδυναμία λήψης των πακέτων πηγαίου κώδικα, ματαίωση"
+
+#: ../gurpmi2:320 ../urpm/install.pm:104
+#, c-format
+msgid "Preparing..."
+msgstr "Προετοιμασία..."
+
+#: ../gurpmi2:326
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Εγκατάσταση του πακέτου `%s' (%s/%s)..."
+
+#: ../gurpmi2:344 ../urpmi:633
+#, c-format
+msgid "Please insert the medium named \"%s\""
+msgstr "Παρακαλώ εισήγαγε το μέσο με το όνομα «%s»"
+
+#: ../gurpmi2:358
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Λήψη του πακέτου `%s'..."
+
+#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
+#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
+#: ../urpm/media.pm:1657
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "... η ανάκτηση απέτυχε: %s"
+
+#: ../gurpmi2:387
+#, c-format
+msgid "_Done"
+msgstr "_Ολοκληρώθηκε"
+
+#: ../gurpmi2:404 ../urpm/main_loop.pm:82
+#, c-format
+msgid ""
+"Installation failed, some files are missing:\n"
+"%s"
+msgstr ""
+"Η εγκατάσταση απέτυχε, λείπουν μερικά αρχεία : \n"
+" %s"
+
+#: ../gurpmi2:407
+#, c-format
+msgid "You may want to update your urpmi database."
+msgstr "Μπορείτε να ενημερώσετε τη βάση δεδομένων urpmi."
+
+#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
+#, c-format
+msgid "Installation failed:"
+msgstr "Η εγκατάσταση απέτυχε:"
+
+#: ../gurpmi2:416
+#, c-format
+msgid "The package(s) are already installed"
+msgstr "Το(α) πακέτο(α) είναι ήδη εγκατεστημένα"
+
+#: ../gurpmi2:418
+#, c-format
+msgid "Installation finished"
+msgstr "Η εγκατάσταση τελείωσε"
+
+#: ../gurpmi2:419 ../urpme:165
+#, c-format
+msgid "removing %s"
+msgstr "αφαίρεση του %s"
+
+#: ../gurpmi2:430 ../urpmi:691
+#, c-format
+msgid "restarting urpmi"
+msgstr "Επανεκκίνηση urpmi"
+
+#: ../rpm-find-leaves:15
+#, c-format
+msgid ""
+"usage: %s [options]\n"
+"where [options] are from\n"
+msgstr ""
+"χρήση: %s [επιλογές]\n"
+"όπου [επιλογές] είναι από\n"
+
+#: ../rpm-find-leaves:17
+#, c-format
+msgid "   -h|--help      - print this help message.\n"
+msgstr "   -h|--help      - εμφανίζει αυτο το μήνυμα βοήθειας.\n"
+
+#: ../rpm-find-leaves:18
+#, c-format
+msgid "   --root <path>  - use the given root instead of /\n"
+msgstr ""
+"   --root <path>  - χρήση της root διαδρομής που δόθηκε αντί για την /\n"
+
+#: ../rpm-find-leaves:19
+#, c-format
+msgid "   -g [group]     - restrict results to specified group.\n"
+msgstr "   -g [group]     - περιορισμένα αποτελέσματα στην ομάδα που δόθηκε.\n"
+
+#: ../rpm-find-leaves:20
+#, c-format
+msgid "                    defaults to %s.\n"
+msgstr "                    προκαθορισμένο είναι το %s.\n"
+
+#: ../rpm-find-leaves:21
+#, c-format
+msgid "   -f             - output rpm full name (NVRA)\n"
+msgstr "   -f             - εμφανίζει το πλήρες όνομα του πακέτου (NVRA)\n"
+
+#: ../rurpmi:11 ../urpmi:265
+#, c-format
+msgid "Only superuser is allowed to install packages"
+msgstr "Μόνο ο διαχειριστής επιτρέπεται να εγκαταστήσει πακέτα"
+
+#: ../rurpmi:18
+#, c-format
+msgid "Running urpmi in restricted mode..."
+msgstr "Εκτέλεση του urpmi σε περιορισμένη λειτουργία..."
+
+#: ../urpm.pm:23
+#, c-format
+msgid "While some packages may have been installed, there were failures.\n"
+msgstr "Μερικά πακέτα εγκαταστάθηκαν, αλλά κάποια απέτυχαν.\n"
+
+#: ../urpm.pm:110
+#, c-format
+msgid "fail to create directory %s"
+msgstr "αδυναμία δημιουργίας του καταλόγου %s"
+
+#: ../urpm.pm:111
+#, c-format
+msgid "invalid owner for directory %s"
+msgstr "άκυρος ιδιοκτήτης του καταλόγου %s"
+
+#: ../urpm.pm:135
+#, c-format
+msgid "Can not download packages into %s"
+msgstr "Αδυναμία λήψης του πακέτου, στο %s"
+
+#: ../urpm.pm:150
+#, c-format
+msgid "Environment directory %s does not exist"
+msgstr "Ο κατάλογος του περιβάλλοντος %s δεν υπάρχει"
+
+#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#, c-format
+msgid "using specific environment on %s\n"
+msgstr "χρήση συγκεκριμένου περιβάλλοντος στο %s\n"
+
+#: ../urpm.pm:313
+#, c-format
+msgid "unable to open rpmdb"
+msgstr "αδυναμία ανοίγματος του rpmdb"
+
+#: ../urpm.pm:327
+#, c-format
+msgid "invalid rpm file name [%s]"
+msgstr "μη έγκυρο όνομα αρχείου rpm [%s]"
+
+#: ../urpm.pm:333
+#, c-format
+msgid "retrieving rpm file [%s] ..."
+msgstr "ανάκτηση αρχείου rpm [%s] ..."
+
+#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#, c-format
+msgid "...retrieving done"
+msgstr "...η ανάκτηση ολοκληρώθηκε"
+
+#: ../urpm.pm:343
+#, c-format
+msgid "unable to access rpm file [%s]"
+msgstr "αδυναμία πρόσβασης στο αρχείο rpm [%s]"
+
+#: ../urpm.pm:348
+#, c-format
+msgid "unable to parse spec file %s [%s]"
+msgstr "αδυναμία ανάλυσης του αρχείου spec %s [%s]"
+
+#: ../urpm.pm:356
+#, c-format
+msgid "unable to register rpm file"
+msgstr "αδυναμία δήλωσης του αρχείου rpm"
+
+#: ../urpm.pm:358
+#, c-format
+msgid "Incompatible architecture for rpm [%s]"
+msgstr "Ασύμβατη αρχιτεκτονική για τα rpm [%s]"
+
+#: ../urpm.pm:362
+#, c-format
+msgid "error registering local packages"
+msgstr "σφάλμα κατά την δήλωση των τοπικών πακέτων"
+
+#: ../urpm.pm:450
+#, c-format
+msgid "This operation is forbidden while running in restricted mode"
+msgstr ""
+"Αυτή η λειτουργία απαγορεύεται να εκτελεστεί, όταν ισχύει κατάσταση "
+"περιορισμένης λειτουργίας"
+
+#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#, c-format
+msgid "bad proxy declaration on command line\n"
+msgstr "μη ορθή διακήρυξη proxy στην γραμμή εντολών\n"
+
+#: ../urpm/args.pm:306
+#, c-format
+msgid "urpmq: cannot read rpm file \"%s\"\n"
+msgstr "urpmq: αδυναμία ανάγνωσης αρχείου rpm \"%s\"\n"
+
+#: ../urpm/args.pm:384
+#, c-format
+msgid "unexpected expression %s"
+msgstr "απρόσμενη έκφραση %s"
+
+#: ../urpm/args.pm:385
+#, c-format
+msgid "missing expression before %s"
+msgstr "απουσία έκφρασης πριν το %s"
+
+#: ../urpm/args.pm:391
+#, c-format
+msgid "unexpected expression %s (suggestion: use -a or -o ?)"
+msgstr "απρόσμενη έκφραση %s (πρόταση: να χρησιμοποιήσεις -a ή -o ; )"
+
+#: ../urpm/args.pm:395
+#, c-format
+msgid "no expression to close"
+msgstr "δεν υπάρχει έκφραση για να τερματιστεί"
+
+#: ../urpm/args.pm:404
+#, c-format
+msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
+msgstr ""
+"από προεπιλογή η urpmf αναμένει μια regexp. Θα πρέπει να χρησιμοποιήσετε την "
+"επιλογή \"--literal\""
+
+#: ../urpm/args.pm:478
+#, c-format
+msgid "chroot directory doesn't exist"
+msgstr "ο κατάλογος chroot δεν υπάρχει"
+
+#: ../urpm/args.pm:501
+#, c-format
+msgid "Can't use %s without %s"
+msgstr "Αδύνατη η χρήση του %s χωρίς το %s"
+
+#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#, c-format
+msgid "Can't use %s with %s"
+msgstr "Αδύνατη η χρήση του %s με το %s"
+
+#: ../urpm/args.pm:515
+#, c-format
+msgid "Too many arguments\n"
+msgstr "Πάρα πολλά ορίσματα\n"
+
+#: ../urpm/args.pm:523
+#, c-format
+msgid ""
+"%s version %s\n"
+"%s\n"
+"This is free software and may be redistributed under the terms of the GNU "
+"GPL.\n"
+"\n"
+"usage:\n"
+msgstr ""
+"%s έκδοση %s\n"
+"%s\n"
+"Αυτό είναι ελεύθερο λογισμικό και μπορεί να αναδιανεμηθεί υπό τους όρους της "
+"GNU GPL.\n"
+"\n"
+"χρήση :\n"
+
+#: ../urpm/args.pm:529
+#, c-format
+msgid "Copyright (C) %s by %s"
+msgstr "Πνευματικά δικαιώματα %s από τη %s"
+
+#: ../urpm/bug_report.pm:67 ../urpmi:255
+#, c-format
+msgid "Copying failed"
+msgstr "Η αντιγραφή απέτυχε"
+
+#: ../urpm/cdrom.pm:80
+#, c-format
+msgid ""
+"You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
+"automatically)"
+msgstr ""
+"Πρέπει να προσαρτήσεις το CD-ROM από μόνος σου (ή να εγκαταστήσεις το perl-"
+"Hal-Cdroms ώστε αυτό να γίνεται αυτόματα)"
+
+#: ../urpm/cdrom.pm:82
+#, c-format
+msgid "Udisks daemon (udisks-daemon) is not running or not ready"
+msgstr "Ο δαίμονας Udisks (udisks-daemon) δεν εκτελείται ή δεν είναι έτοιμος"
+
+#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
+#, c-format
+msgid "medium \"%s\" is not available"
+msgstr "το μέσο \"%s\" δεν είναι διαθέσιμο"
+
+#: ../urpm/cdrom.pm:218
+#, c-format
+msgid "unable to read rpm file [%s] from medium \"%s\""
+msgstr "αδυναμία ανάγνωσης του αρχείου rpm [%s] από το μέσο \"%s\""
+
+#: ../urpm/cfg.pm:82
+#, c-format
+msgid "syntax error in config file at line %s"
+msgstr "σφάλμα σύνταξης στο αρχείο ρυθμίσεων, στη γραμμή %s"
+
+#: ../urpm/cfg.pm:115
+#, c-format
+msgid "unable to read config file [%s]"
+msgstr "αδυναμία ανάγνωσης του αρχείου ρυθμίσεων (config) [%s]"
+
+#: ../urpm/cfg.pm:141
+#, c-format
+msgid "medium `%s' is defined twice, aborting"
+msgstr "το μέσο `%s' προσδιορίστηκε δύο φορές, γίνεται εγκατάλειψη"
+
+#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#, c-format
+msgid "unable to write config file [%s]"
+msgstr "αδυναμία εγγραφής του αρχείου ρυθμίσεων [%s]"
+
+#: ../urpm/download.pm:95
+#, c-format
+msgid "%s is not available, falling back on %s"
+msgstr "το %s δεν είναι διαθέσιμο, επιστροφή στη χρήση του %s"
+
+#: ../urpm/download.pm:178
+#, c-format
+msgid "can not read proxy settings (not enough rights to read %s)"
+msgstr ""
+"αδυναμία ανάγνωσης των ρυθμίσεων του proxy (διαμεσολαβητής) (τα δικαιώματα "
+"δεν είναι επαρκή για την ανάγνωση του %s)"
+
+#: ../urpm/download.pm:208
+#, c-format
+msgid "Please enter your credentials for accessing proxy\n"
+msgstr "Παρακαλώ εισάγετε  πιστοποίηση για πρόσβαση διαμεσολαβητή\n"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "User name:"
+msgstr "Όνομα χρήστη:"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "Password:"
+msgstr "Κωδικός πρόσβασης:"
+
+#: ../urpm/download.pm:295
+#, c-format
+msgid "Unknown webfetch `%s' !!!\n"
+msgstr "Άγνωστο webfetch `%s' !!!\n"
+
+#: ../urpm/download.pm:303
+#, c-format
+msgid "%s failed: exited with signal %d"
+msgstr "το %s απέτυχε: έγινε έξοδος με το σήμα %d"
+
+#: ../urpm/download.pm:304
+#, c-format
+msgid "%s failed: exited with %d"
+msgstr "το %s απέτυχε: έγινε έξοδος με %d"
+
+#: ../urpm/download.pm:338
+#, c-format
+msgid "copy failed"
+msgstr "αποτυχία αντιγραφής"
+
+#: ../urpm/download.pm:344
+#, c-format
+msgid "wget is missing\n"
+msgstr "λείπει το wget\n"
+
+#: ../urpm/download.pm:411
+#, c-format
+msgid "curl is missing\n"
+msgstr "λείπει το curl\n"
+
+#: ../urpm/download.pm:547
+#, c-format
+msgid "curl failed: upload canceled\n"
+msgstr "το curl απέτυχε: ακύρωση αποστολής\n"
+
+#: ../urpm/download.pm:548
+#, c-format
+msgid "curl failed: download canceled\n"
+msgstr "το curl απέτυχε: ακύρωση της λήψης\n"
+
+#: ../urpm/download.pm:583
+#, c-format
+msgid "rsync is missing\n"
+msgstr "λείπει το rsync\n"
+
+#: ../urpm/download.pm:651
+#, c-format
+msgid "ssh is missing\n"
+msgstr "λείπει το ssh\n"
+
+#: ../urpm/download.pm:670
+#, c-format
+msgid "prozilla is missing\n"
+msgstr "λείπει το prozilla\n"
+
+#: ../urpm/download.pm:686
+#, c-format
+msgid "Couldn't execute prozilla\n"
+msgstr "Αδυναμία εκτέλεσης του prozilla\n"
+
+#: ../urpm/download.pm:696
+#, c-format
+msgid "aria2 is missing\n"
+msgstr "λείπει το aria2\n"
+
+#: ../urpm/download.pm:740
+#, c-format
+msgid "Failed to download %s"
+msgstr "Αποτυχία λήψης του %s"
+
+#: ../urpm/download.pm:835
+#, c-format
+msgid "        %s%% of %s completed, ETA = %s, speed = %s"
+msgstr "        ολοκληρώθηκε το %s%% από τα %s, εκτίμηση = %s, ταχύτητα = %s"
+
+#: ../urpm/download.pm:836
+#, c-format
+msgid "        %s%% completed, speed = %s"
+msgstr "        ολοκληρώθηκε το %s%%, ταχύτητα = %s"
+
+#: ../urpm/download.pm:921
+#, c-format
+msgid "retrieving %s"
+msgstr "ανάκτηση %s"
+
+#: ../urpm/download.pm:932
+#, c-format
+msgid "retrieved %s"
+msgstr "ανακτήθηκε %s"
+
+#: ../urpm/download.pm:994
+#, c-format
+msgid "unknown protocol defined for %s"
+msgstr "καθορίστηκε άγνωστο πρωτόκολλο για το %s"
+
+#: ../urpm/download.pm:1008
+#, c-format
+msgid "no webfetch found, supported webfetch are: %s\n"
+msgstr "δεν βρέθηκε το webfetch, υποστηριζόμενα webfetch είναι: %s\n"
+
+#: ../urpm/download.pm:1023
+#, c-format
+msgid "unable to handle protocol: %s"
+msgstr "αδυναμία χειρισμού πρωτοκόλλου: %s"
+
+#: ../urpm/get_pkgs.pm:29
+#, c-format
+msgid "cleaning %s and %s"
+msgstr "καθαρισμός του %s και του %s"
+
+#: ../urpm/get_pkgs.pm:141
+#, c-format
+msgid "package %s is not found."
+msgstr "το πακέτο %s δεν βρέθηκε."
+
+#: ../urpm/get_pkgs.pm:277
+#, c-format
+msgid "retrieving rpm files from medium \"%s\"..."
+msgstr "ανάκτηση αρχείων rpm από το μέσο \"%s\"..."
+
+#: ../urpm/install.pm:110
+#, c-format
+msgid "[repackaging]"
+msgstr "[επαναπακετάρισμα]"
+
+#: ../urpm/install.pm:201
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+"δημιουργήθηκε transaction για εγκατάσταση στο %s (αφαίρεση=%d, εγκατάσταση="
+"%d, αναβάθμιση=%d)"
+
+#: ../urpm/install.pm:204
+#, c-format
+msgid "unable to create transaction"
+msgstr "Αδυναμία δημιουργίας transaction"
+
+#: ../urpm/install.pm:229
+#, c-format
+msgid "unable to extract rpm from delta-rpm package %s"
+msgstr "αδυναμία εξαγωγής rpm από το πακέτο delta-rpm %s"
+
+#: ../urpm/install.pm:242
+#, c-format
+msgid "unable to install package %s"
+msgstr "αδυναμία εγκατάστασης του πακέτου %s"
+
+#: ../urpm/install.pm:245
+#, c-format
+msgid "removing bad rpm (%s) from %s"
+msgstr "αφαίρεση του κακοδιατυπομένου rpm (%s) από το %s"
+
+#: ../urpm/install.pm:246 ../urpm/install.pm:311
+#, c-format
+msgid "removing %s failed: %s"
+msgstr "η αφαίρεση του %s απέτυχε: %s"
+
+#: ../urpm/install.pm:292
+#, c-format
+msgid "Removing package %s"
+msgstr "Αφαίρεση του πακέτου %s"
+
+#: ../urpm/install.pm:293
+#, c-format
+msgid "removing package %s"
+msgstr "αφαίρεση του πακέτου %s"
+
+#: ../urpm/install.pm:309
+#, c-format
+msgid "removing installed rpms (%s) from %s"
+msgstr "αφαίρεση των εγκατεστημένων rpm (%s) από το %s"
+
+#: ../urpm/install.pm:318
+#, c-format
+msgid "More information on package %s"
+msgstr "Περισσότερες πληροφορίες στο πακέτο %s"
+
+#: ../urpm/ldap.pm:44
+#, c-format
+msgid "Cannot create ldap cache directory"
+msgstr "Αδυναμία δημιουργίας του καταλόγου ldap cache"
+
+#: ../urpm/ldap.pm:46
+#, c-format
+msgid "Cannot write cache file for ldap\n"
+msgstr "Αδυναμία εγγραφής του αρχείου προσωρινής μνήμης για το ldap\n"
+
+#: ../urpm/ldap.pm:181
+#, c-format
+msgid "No server defined, missing uri or host"
+msgstr "Δεν προσδιορίστηκε εξυπηρετητής, δεν βρέθηκε το uri ή ο υπολογιστής"
+
+#: ../urpm/ldap.pm:182
+#, c-format
+msgid "No base defined"
+msgstr "Δεν ορίστηκε βάση"
+
+#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#, c-format
+msgid "Cannot connect to ldap uri:"
+msgstr "Αδυναμία σύνδεσης στο ldap uri:"
+
+#: ../urpm/lock.pm:99
+#, c-format
+msgid "%s database is locked, process %d is already using it"
+msgstr ""
+"η βάση δεδομένων %s είναι κλειδωμένη, χρησιμοποιείται από την διεργασία %d."
+
+#: ../urpm/lock.pm:101
+#, c-format
+msgid "%s database is locked (another program is already using it)"
+msgstr ""
+"η βάση δεδομένων %s είναι κλειδωμένη (ένα άλλο πρόγραμμα τη χρησιμοποιεί ήδη)"
+
+#: ../urpm/lock.pm:115
+#, c-format
+msgid "%s database is locked. Waiting..."
+msgstr "Η βάση δεδομένων %s είναι κλειδωμένη. Αναμονή..."
+
+#: ../urpm/lock.pm:116
+#, c-format
+msgid "aborting"
+msgstr "εγκατάλειψη"
+
+#: ../urpm/main_loop.pm:58
+#, c-format
+msgid "Retry?"
+msgstr "Νέα προσπάθεια ;"
+
+#: ../urpm/main_loop.pm:85
+#, c-format
+msgid "You may need to update your urpmi database."
+msgstr "Θα πρέπει να ενημερώσετε τη βάση δεδομένων urpmi."
+
+#: ../urpm/main_loop.pm:89
+#, c-format
+msgid ""
+"Installation failed, bad rpms:\n"
+"%s"
+msgstr ""
+"Η εγκατάσταση απέτυχε. Εσφαλμένα rpm:\n"
+"%s"
+
+#: ../urpm/main_loop.pm:108
+#, c-format
+msgid ""
+"There is not enough space on your filesystem to download all packages (%s "
+"needed, %s available).\n"
+"Are you sure you want to continue?"
+msgstr ""
+"Δεν υπάρχει αρκετός ελεύθερος χώρος στο σύστημά αρχείων σας για την λήψη "
+"όλων των πακέτων (%s χρειάζονται, %s διαθέσιμα).\n"
+"Είστε σίγουροι ότι θέλετε να συνεχίσετε;"
+
+#: ../urpm/main_loop.pm:138
+#, c-format
+msgid "The following package has bad signature"
+msgstr "Το παρακάτω πακέτο έχει λανθασμένη υπογραφή"
+
+#: ../urpm/main_loop.pm:139
+#, c-format
+msgid "The following packages have bad signatures"
+msgstr "Τα παρακάτω πακέτα έχουν λανθασμένες υπογραφές"
+
+#: ../urpm/main_loop.pm:140
+#, c-format
+msgid "Do you want to continue installation ?"
+msgstr "Θέλετε να συνεχίσετε την εγκατάσταση ;"
+
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
+#: ../urpm/main_loop.pm:296
+#, c-format
+msgid "Installation failed"
+msgstr "Η εγκατάσταση απέτυχε"
+
+#: ../urpm/main_loop.pm:159
+#, c-format
+msgid "removing installed rpms (%s)"
+msgstr "αφαίρεση των εγκατεστημένων rpm (%s)"
+
+#: ../urpm/main_loop.pm:185
+#, c-format
+msgid "Try to continue anyway?"
+msgstr "Να προσπαθήσω να συνεχίσω ;"
+
+#: ../urpm/main_loop.pm:234
+#, c-format
+msgid "installing %s from %s"
+msgstr "εγκατάσταση %s από %s"
+
+#: ../urpm/main_loop.pm:236
+#, c-format
+msgid "installing %s"
+msgstr "εγκατάσταση %s"
+
+#: ../urpm/main_loop.pm:243
+#, c-format
+msgid "distributing %s"
+msgstr "κατανομή %s"
+
+#: ../urpm/main_loop.pm:289
+#, c-format
+msgid "Try installation without checking dependencies?"
+msgstr "Προσπάθεια για εγκατάσταση χωρίς έλεγχο των εξαρτήσεων ;"
+
+#: ../urpm/main_loop.pm:297
+#, c-format
+msgid "Try harder to install (--force)?"
+msgstr "Προσπάθεια για εξαναγκαστική εγκατάσταση (--force); "
+
+#: ../urpm/main_loop.pm:490
+#, c-format
+msgid "Packages are up to date"
+msgstr "Τα πακέτα είναι ενημερωμένα"
+
+#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#, c-format
+msgid "Installation is possible"
+msgstr "Η εγκατάσταση είναι δυνατή"
+
+#: ../urpm/md5sum.pm:55
+#, c-format
+msgid "warning: md5sum for %s unavailable in MD5SUM file"
+msgstr "προειδοποίηση: μη διαθέσιμο md5sum για %s στο αρχείο MD5SUM"
+
+#: ../urpm/media.pm:270
+#, c-format
+msgid "virtual medium \"%s\" should have a clear url, medium ignored"
+msgstr ""
+"το εικονικό μέσο \"%s\" πρέπει να έχει ένα καθαρό σύνδεσμο url, το μέσο "
+"αγνοείται"
+
+#: ../urpm/media.pm:272
+#, c-format
+msgid "unable to access list file of \"%s\", medium ignored"
+msgstr "αδυναμία πρόσβασης στο αρχείο λίστας του \"%s\", το μέσο αγνοείται"
+
+#: ../urpm/media.pm:275
+#, c-format
+msgid "unable to access synthesis file of \"%s\", medium ignored"
+msgstr "αδυναμία πρόσβασης στο αρχείο synthesis του \"%s\", το μέσο αγνοείται"
+
+#: ../urpm/media.pm:301
+#, c-format
+msgid "trying to override existing medium \"%s\", skipping"
+msgstr "προσπάθεια παράκαμψης του υπάρχοντος μέσου \"%s\", παράβλεψη"
+
+#: ../urpm/media.pm:517
+#, c-format
+msgid "failed to migrate removable device, ignoring media"
+msgstr "σφάλμα στην εισαγωγή της αφαιρούμενης συσκευής, το μέσο θα αγνοηθεί"
+
+#: ../urpm/media.pm:555
+#, c-format
+msgid "wrote config file [%s]"
+msgstr "εγγραφή αρχείου ρυθμίσεων [%s]"
+
+#: ../urpm/media.pm:598
+#, c-format
+msgid "Can't use parallel mode with use-distrib mode"
+msgstr ""
+"Δεν μπορεί να χρησιμοποιηθεί παράλληλη κατάσταση με use-distrib κατάσταση"
+
+#: ../urpm/media.pm:606
+#, c-format
+msgid "using associated media for parallel mode: %s"
+msgstr "χρήση του συσχετισμένου μέσου για παράλληλη κατάσταση λειτουργίας: %s"
+
+#: ../urpm/media.pm:622
+#, c-format
+msgid ""
+"--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
+"update, --use-distrib or --parallel"
+msgstr ""
+"--synthesis δεν μπορεί να χρησιμοποιηθεί με --media, --excludemedia, --"
+"sortmedia, --update, --use-distrib ή --parallel"
+
+#: ../urpm/media.pm:731
+#, c-format
+msgid "Search start: %s end: %s"
+msgstr "Έναρξη αναζήτησης: %s τέλος: %s"
+
+#: ../urpm/media.pm:748
+#, c-format
+msgid "skipping package %s"
+msgstr "παράλειψη του πακέτου %s"
+
+#: ../urpm/media.pm:764
+#, c-format
+msgid "would install instead of upgrade package %s"
+msgstr "θα εγκαταστήσει αντί για να αναβαθμίσει το πακέτο %s"
+
+#: ../urpm/media.pm:840
+#, c-format
+msgid "medium \"%s\" already exists"
+msgstr "το μέσο \"%s\" υπάρχει ήδη"
+
+#: ../urpm/media.pm:882
+#, c-format
+msgid "(ignored by default)"
+msgstr "(αγνοήθηκε από προεπιλογή)"
+
+#: ../urpm/media.pm:888
+#, c-format
+msgid "adding medium \"%s\" before remote medium \"%s\""
+msgstr "προσθήκη του μέσου \"%s\" πριν από το απομακρυσμένο μέσο \"%s\""
+
+#: ../urpm/media.pm:894
+#, c-format
+msgid "adding medium \"%s\""
+msgstr "προσθήκη του μέσου \"%s\""
+
+#: ../urpm/media.pm:918
+#, c-format
+msgid "failed to copy media.cfg to %s (%d)"
+msgstr "απέτυχε η αντιγραφή του media.cfg στο %s (%d)"
+
+#: ../urpm/media.pm:960
+#, c-format
+msgid "directory %s does not exist"
+msgstr "ο κατάλογος %s δεν υπάρχει"
+
+#: ../urpm/media.pm:968
+#, c-format
+msgid "this location doesn't seem to contain any distribution"
+msgstr "αυτή η τοποθεσία δεν φαίνεται να περιέχει καμία διανομή"
+
+#: ../urpm/media.pm:992
+#, c-format
+msgid "unable to parse media.cfg"
+msgstr "αδυναμία ανάλυσης του media.cfg"
+
+#: ../urpm/media.pm:995
+#, c-format
+msgid "unable to access the distribution medium (no media.cfg file found)"
+msgstr "αδυναμία πρόσβασης στο μέσο διανομής (δεν βρέθηκε αρχείο media.cfg)"
+
+#: ../urpm/media.pm:1016
+#, c-format
+msgid "skipping non compatible media `%s' (for %s)"
+msgstr "παράληψη του μη συμβατού μέσου `%s' (για %s)"
+
+#: ../urpm/media.pm:1031
+#, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr "παράβλεψη του non-free μέσου «%s»"
+
+#: ../urpm/media.pm:1074
+#, c-format
+msgid "retrieving media.cfg file..."
+msgstr "ανάκτηση του αρχείου media.cfg..."
+
+#: ../urpm/media.pm:1117
+#, c-format
+msgid "trying to select nonexistent medium \"%s\""
+msgstr "προσπάθεια επιλογής του ανύπαρκτου μέσου \"%s\""
+
+#: ../urpm/media.pm:1120
+#, c-format
+msgid "selecting multiple media: %s"
+msgstr "επιλογή πολλαπλών μέσων: %s"
+
+#: ../urpm/media.pm:1179
+#, c-format
+msgid "removing medium \"%s\""
+msgstr "αφαίρεση του μέσου «%s»"
+
+#: ../urpm/media.pm:1262
+#, c-format
+msgid "reconfiguring urpmi for media \"%s\""
+msgstr "επαναρύθμιση της urpmi για το μέσο «%s»"
+
+#: ../urpm/media.pm:1296
+#, c-format
+msgid "...reconfiguration failed"
+msgstr "...η επαναρρύθμιση απέτυχε"
+
+#: ../urpm/media.pm:1302
+#, c-format
+msgid "reconfiguration done"
+msgstr "η επαναρρύθμιση πέτυχε"
+
+#: ../urpm/media.pm:1318
+#, c-format
+msgid "Error generating names file: dependency %d not found"
+msgstr "Σφάλμα στη δημιουργία του αρχείου ονομάτων: η εξάρτηση %d δεν βρέθηκε"
+
+#: ../urpm/media.pm:1339
+#, c-format
+msgid "medium \"%s\" is up-to-date"
+msgstr "το μέσο \"%s\" είναι ενημερωμένο"
+
+#: ../urpm/media.pm:1350
+#, c-format
+msgid "examining synthesis file [%s]"
+msgstr "εξέταση του αρχείου σύνθεσης [%s]"
+
+#: ../urpm/media.pm:1370
+#, c-format
+msgid "problem reading synthesis file of medium \"%s\""
+msgstr "πρόβλημα ανάγνωσης του αρχείου σύνθεσης από το μέσο \"%s\""
+
+#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
+#, c-format
+msgid "copying [%s] for medium \"%s\"..."
+msgstr "αντιγραφή [%s] για το μέσο \"%s\"..."
+
+#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#, c-format
+msgid "...copying failed"
+msgstr "...η αντιγραφή απέτυχε"
+
+#: ../urpm/media.pm:1451
+#, c-format
+msgid "copying description file of \"%s\"..."
+msgstr "αντιγραφή του αρχείου περιγραφής του \"%s\"..."
+
+#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#, c-format
+msgid "...copying done"
+msgstr "...η αντιγραφή ολοκληρώθηκε"
+
+#: ../urpm/media.pm:1484
+#, c-format
+msgid "copy of [%s] failed (file is suspiciously small)"
+msgstr "η αντιγραφή του [%s] απέτυχε (το αρχείο είναι ύποπτα μικρό)"
+
+#: ../urpm/media.pm:1532
+#, c-format
+msgid "computing md5sum of retrieved source synthesis"
+msgstr "υπολογισμός του md5sum του ανακτημένου πηγαίου synthesis"
+
+#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
+#, c-format
+msgid "retrieval of [%s] failed (md5sum mismatch)"
+msgstr "η ανάκτηση του [%s] απέτυχε (τα md5sum δεν ταιριάζουν)"
+
+#: ../urpm/media.pm:1549
+#, c-format
+msgid "genhdlist2 failed on %s"
+msgstr "αποτυχία του genhdlist2 στο %s"
+
+#: ../urpm/media.pm:1559
+#, c-format
+msgid "comparing %s and %s"
+msgstr "σύγκριση του %s και του %s"
+
+#: ../urpm/media.pm:1589
+#, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr "άκυρο αρχείο hdlist %s για το μέσο \"%s\""
+
+#: ../urpm/media.pm:1615
+#, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr "αντιγραφή του αρχείου MD5SUM από το \"%s\"..."
+
+#: ../urpm/media.pm:1655
+#, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr "μη έγκυρο αρχείο MD5SUM (έγινε λήψη από το %s)"
+
+#: ../urpm/media.pm:1658
+#, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr "δεν βρέθηκαν μεταδεδομένα για το μέσο \"%s\""
+
+#: ../urpm/media.pm:1690
+#, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr "ανάκτηση της πηγαίας synthesis από το \"%s\"..."
+
+#: ../urpm/media.pm:1756
+#, c-format
+msgid "examining pubkey file of \"%s\"..."
+msgstr "Εξέταση του αρχείου δημοσίου κλειδιού από το \"%s\"..."
+
+#: ../urpm/media.pm:1768
+#, c-format
+msgid "...imported key %s from pubkey file of \"%s\""
+msgstr "...εισαγωγή του κλειδιού %s από το αρχείο δημοσίου κλειδιού του \"%s\""
+
+#: ../urpm/media.pm:1772
+#, c-format
+msgid "unable to import pubkey file of \"%s\""
+msgstr "αδυναμία εισαγωγής του αρχείου δημοσίου κλειδιού του \"%s\""
+
+#: ../urpm/media.pm:1813
+#, c-format
+msgid "no synthesis file found for medium \"%s\""
+msgstr "δεν βρέθηκε αρχείο synthesis για το μέσο \"%s\""
+
+#: ../urpm/media.pm:1846
+#, c-format
+msgid "updated medium \"%s\""
+msgstr "ενημερώθηκε το μέσο \"%s\""
+
+#: ../urpm/media.pm:1968
+#, c-format
+msgid "retrieval of [%s] failed"
+msgstr "αποτυχία ανάκτησης του [%s]"
+
+#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#, c-format
+msgid "trying again with mirror %s"
+msgstr "γίνεται προσπάθεια ξανά με την εναλλακτική διεύθυνση %s"
+
+#: ../urpm/mirrors.pm:112
+#, c-format
+msgid "Could not find a mirror from mirrorlist %s"
+msgstr ""
+"Αδυναμία εύρεσης μιας εναλλακτικής διεύθυνσης από τη λίστα των εναλλακτικών "
+"διευθύνσεων %s"
+
+#: ../urpm/mirrors.pm:260
+#, c-format
+msgid "found geolocalisation %s %.2f %.2f from timezone %s"
+msgstr "βρέθηκε η γεωτοποθεσία %s %.2f %.2f από την ζώνη ώρας %s"
+
+#: ../urpm/mirrors.pm:305
+#, c-format
+msgid "getting mirror list from %s"
+msgstr "λήψη της λίστας των εναλλακτικών διευθύνσεων από το %s"
+
+#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#, c-format
+msgid "Nn"
+msgstr "ΟοNn"
+
+#. -PO: Add here the keys which might be pressed in the "Yes"-case.
+#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#, c-format
+msgid "Yy"
+msgstr "ΝνYy"
+
+#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#, c-format
+msgid " (y/N) "
+msgstr " (y/N) "
+
+#: ../urpm/msg.pm:139
+#, c-format
+msgid "Sorry, bad choice, try again\n"
+msgstr "Λυπάμαι, κακή επιλογή, προσπαθήστε ξανά\n"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Package"
+msgstr "Πακέτο"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Version"
+msgstr "Έκδοση"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Release"
+msgstr "Κυκλοφορία"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Arch"
+msgstr "Αρχιτεκ."
+
+#: ../urpm/msg.pm:179
+#, c-format
+msgid "(suggested)"
+msgstr "(προτεινόμενα)"
+
+#: ../urpm/msg.pm:194
+#, c-format
+msgid "medium \"%s\""
+msgstr "μέσο \"%s\""
+
+#: ../urpm/msg.pm:194
+#, c-format
+msgid "command line"
+msgstr "γραμμή εντολών"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "B"
+msgstr "B"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "KB"
+msgstr "KB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "MB"
+msgstr "MB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "GB"
+msgstr "GB"
+
+#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#, c-format
+msgid "TB"
+msgstr "TB"
+
+#: ../urpm/orphans.pm:79
+#, c-format
+msgid "Marking %s as manually installed, it won't be auto-orphaned"
+msgstr ""
+"Σημείωση του %s ως εγκατεστημένο χειροκίνητα, δεν θα θεωρείται ορφανό πακέτο"
+
+#: ../urpm/orphans.pm:522
+#, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned."
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned."
+msgstr[0] ""
+"Το ακόλουθο πακέτο:\n"
+"%s\n"
+"είναι στο εξής ορφανό."
+msgstr[1] ""
+"Τα ακόλουθα πακέτα:\n"
+"%s\n"
+"είναι στο εξής ορφανά."
+
+#: ../urpm/orphans.pm:525
+#, c-format
+msgid "You may wish to remove it."
+msgid_plural "You may wish to remove them."
+msgstr[0] "Ίσως επιθυμείτε την αφαίρεσή του."
+msgstr[1] "Ίσως επιθυμείτε την αφαίρεσή τους."
+
+#: ../urpm/orphans.pm:542
+#, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans"
+"\""
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
+"orphans\""
+msgstr[0] ""
+"Το παρακάτω πακέτο :\n"
+"%s\n"
+"είναι πλέον ορφανό, αν επιθυμείτε να το αφαιρέσετε, μπορείτε να "
+"χρησιμοποιήσετε \"urpme --auto-orphans\""
+msgstr[1] ""
+"Τα παρακάτω πακέτα :\n"
+"%s\n"
+"είναι πλέον ορφανά, αν επιθυμείτε να τα αφαιρέσετε, μπορείτε να "
+"χρησιμοποιήσετε \"urpme --auto-orphans\""
+
+#: ../urpm/parallel.pm:15
+#, c-format
+msgid "unable to parse \"%s\" in file [%s]"
+msgstr "αδυναμία ανάλυσης του \"%s\" στο αρχείο [%s]"
+
+#: ../urpm/parallel.pm:24
+#, c-format
+msgid "examining parallel handler in file [%s]"
+msgstr "εξέταση παράλληλου χειριστή στο αρχείο [%s]"
+
+#: ../urpm/parallel.pm:35
+#, c-format
+msgid "found parallel handler for nodes: %s"
+msgstr "βρέθηκε παράλληλος χειριστής για του κόμβους: %s"
+
+#: ../urpm/parallel.pm:39
+#, c-format
+msgid "unable to use parallel option \"%s\""
+msgstr "αδυναμία χρήσης της επιλογής parallel \"%s\""
+
+#: ../urpm/parallel.pm:94
+#, c-format
+msgid "on node %s"
+msgstr "στον κόμβο %s"
+
+#: ../urpm/parallel.pm:294
+#, c-format
+msgid "Installation failed on node %s"
+msgstr "Η εγκατάσταση απέτυχε στον κόμβο %s"
+
+#: ../urpm/parallel_ka_run.pm:58
+#, c-format
+msgid "rshp failed, maybe a node is unreacheable"
+msgstr "το rshp απέτυχε, ίσως ο κόμβος να μην είναι προσβάσιμος"
+
+#: ../urpm/parallel_ka_run.pm:80
+#, c-format
+msgid "mput failed, maybe a node is unreacheable"
+msgstr "το mput απέτυχε, ίσως ο κόμβος να μην είναι προσβάσιμος"
+
+#: ../urpm/parallel_ssh.pm:27
+#, c-format
+msgid "scp failed on host %s (%d)"
+msgstr "απέτυχε το scp, στον υπολογιστή %s (%d)"
+
+#: ../urpm/parallel_ssh.pm:39
+#, c-format
+msgid "cp failed on host %s (%d)"
+msgstr "απέτυχε το cp, στον υπολογιστή %s (%d)"
+
+#: ../urpm/parallel_ssh.pm:86
+#, c-format
+msgid ""
+"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
+"code: %d)"
+msgstr ""
+"απέτυχε το %s, στον υπολογιστή %s (μήπως δεν διαθέτει μια καλή έκδοση του "
+"urpmi;) (το αποτέλεσμα εξαγωγής του κώδικα: %d)"
+
+#: ../urpm/removable.pm:46
+#, c-format
+msgid "unable to access medium \"%s\"."
+msgstr "αδυναμία πρόσβασης στο μέσο \"%s\"."
+
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#, c-format
+msgid "mounting %s"
+msgstr "προσάρτηση του %s"
+
+#: ../urpm/removable.pm:117
+#, c-format
+msgid "unmounting %s"
+msgstr "αποπροσάρτηση του %s"
+
+#: ../urpm/select.pm:45
+#, c-format
+msgid "urpmi was restarted, and the list of priority packages did not change"
+msgstr ""
+"το urpmi επανανακινήθηκε, και η λίστα με τα πακέτα προτεραιότητας δεν έχει "
+"αλλάξει"
+
+#: ../urpm/select.pm:47
+#, c-format
+msgid ""
+"urpmi was restarted, and the list of priority packages did change: %s vs %s"
+msgstr ""
+"το urpmi επανανακινήθηκε, και η λίστα με τα πακέτα προτεραιότητας έχει "
+"αλλάξει: %s vs %s"
+
+#: ../urpm/select.pm:217
+#, c-format
+msgid "No package named %s"
+msgstr "Κανένα πακέτο με το όνομα %s"
+
+#: ../urpm/select.pm:219 ../urpme:113
+#, c-format
+msgid "The following packages contain %s: %s"
+msgstr "Τα παρακάτω πακέτα περιέχουν %s: %s"
+
+#: ../urpm/select.pm:221
+#, c-format
+msgid "You should use \"-a\" to use all of them"
+msgstr "Θα πρέπει να χρησιμοποιήσεις \"-a\" για την επιλογή όλων"
+
+#: ../urpm/select.pm:368
+#, c-format
+msgid "found package(s) %s in urpmi db, but none are installed"
+msgstr ""
+"τα πακέτα %s βρέθηκαν στην βάση δεδομένων του urpmi, αλλά κανένα τους δεν "
+"είναι εγκατεστημένο"
+
+#: ../urpm/select.pm:600
+#, c-format
+msgid "Package %s is already installed"
+msgstr "Το πακέτο %s είναι ήδη εγκατεστημένο"
+
+#: ../urpm/select.pm:601
+#, c-format
+msgid "Packages %s are already installed"
+msgstr "Τα πακέτα %s είναι ήδη εγκατεστημένα"
+
+#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#, c-format
+msgid "due to conflicts with %s"
+msgstr "λόγω συγκρούσεων με το %s"
+
+#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#, c-format
+msgid "due to unsatisfied %s"
+msgstr "λόγω μη ικανοποίησης του %s"
+
+#: ../urpm/select.pm:625
+#, c-format
+msgid "trying to promote %s"
+msgstr "προσπάθεια ενίσχυσης του %s"
+
+#: ../urpm/select.pm:626
+#, c-format
+msgid "in order to keep %s"
+msgstr "για να κρατηθεί το %s"
+
+#: ../urpm/select.pm:667
+#, c-format
+msgid ""
+"The following package has to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Το παρακάτω πακέτο πρέπει να αφαιρεθεί για να αναβαθμιστούν κάποια άλλα:\n"
+"%s"
+
+#: ../urpm/select.pm:668
+#, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Τα παρακάτω πακέτα πρέπει να αφαιρεθούν για να αναβαθμιστούν κάποια άλλα:\n"
+"%s"
+
+#: ../urpm/select.pm:695
+#, c-format
+msgid "in order to install %s"
+msgstr "για να εγκατασταθεί το %s"
+
+#: ../urpm/select.pm:701
+#, c-format
+msgid "due to missing %s"
+msgstr "λόγω έλλειψης του %s"
+
+#: ../urpm/signature.pm:62
+#, c-format
+msgid "Invalid signature (%s)"
+msgstr "Μη έγκυρη υπογραφή (%s)"
+
+#: ../urpm/signature.pm:77
+#, c-format
+msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
+msgstr "ΑΣΦΑΛΕΙΑ: Το παρακάτω πακέτο _ΔΕΝ_ είναι υπογεγραμμένο (%s): %s"
+
+#: ../urpm/signature.pm:83
+#, c-format
+msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
+msgstr "ΑΣΦΑΛΕΙΑ: ΧΩΡΙΣ έλεγχο του πακέτου «%s» (λόγω της διαμόρφωσης)"
+
+#: ../urpm/signature.pm:102
+#, c-format
+msgid "Invalid Key ID (%s)"
+msgstr "Μη έγκυρο ID Κλειδιού (%s)"
+
+#: ../urpm/signature.pm:104
+#, c-format
+msgid "Missing signature (%s)"
+msgstr "Απουσία υπογραφής (%s)"
+
+#: ../urpm/signature.pm:107
+#, c-format
+msgid "SECURITY: Medium \"%s\" has no key (%s)!"
+msgstr "ΑΣΦΑΛΕΙΑ: Το μέσο «%s» δεν διαθέτει κλειδί (%s) !"
+
+#: ../urpm/signature.pm:109
+#, c-format
+msgid "Medium without key (%s)"
+msgstr "Μέσο χωρίς κλειδί (%s)"
+
+#: ../urpm/sys.pm:225
+#, c-format
+msgid "system"
+msgstr "σύστημα"
+
+#: ../urpm/sys.pm:262
+#, c-format
+msgid "You should restart your computer for %s"
+msgstr "Θα πρέπει να κάνετε επανεκκίνηση για το %s"
+
+#: ../urpm/sys.pm:264
+#, c-format
+msgid "You should restart your session for %s"
+msgstr "Θα πρέπει να κάνετε επανασύνδεση για το %s"
+
+#: ../urpm/sys.pm:266
+#, c-format
+msgid "You should restart %s for %s"
+msgstr "Θα πρέπει να κάνετε επανεκκίνηση στο %s για το %s"
+
+#: ../urpm/sys.pm:404
+#, c-format
+msgid "Can't write file"
+msgstr "Αδυναμία εγγραφής του αρχείου"
+
+#: ../urpm/sys.pm:404
+#, c-format
+msgid "Can't open file"
+msgstr "Αδυναμία ανοίγματος του αρχείου"
+
+#: ../urpm/sys.pm:417
+#, c-format
+msgid "Can't move file %s to %s"
+msgstr "Αδυναμία μετακίνησης του αρχείου %s στο %s"
+
+#: ../urpme:43
+#, c-format
+msgid "  --auto         - automatically select a package in choices.\n"
+msgstr "  --auto         - αυτόματη επιλογή πακέτου κατ' επιλογήν.\n"
+
+#: ../urpme:44
+#, c-format
+msgid "  --auto-orphans - remove orphans\n"
+msgstr "  --auto-orphans - απομάκρυνση των ορφανών πακέτων\n"
+
+#: ../urpme:45
+#, c-format
+msgid "  --test         - verify if the removal can be achieved correctly.\n"
+msgstr ""
+"  --test         - επαλήθευση ότι η αφαίρεση μπορεί να επιτευχθεί σωστά.\n"
+
+#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#, c-format
+msgid "  --parallel     - distributed urpmi across machines of alias.\n"
+msgstr ""
+"  --parallel     - διανεμημένα urpmi κατά μήκος των μηχανών με ψευδώνυμα.\n"
+
+#: ../urpme:48 ../urpmi:138
+#, c-format
+msgid "  --repackage    - Re-package the files before erasing\n"
+msgstr "  --repackage    - Ξανά-πακετάρισμα των αρχείων πριν την διαγραφή\n"
+
+#: ../urpme:49
+#, c-format
+msgid "  --root         - use another root for rpm removal.\n"
+msgstr ""
+"  --root         - χρήση διαφορετικής διαδρομής root για την αφαίρεση rpm.\n"
+
+#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
+#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, c-format
+msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
+msgstr ""
+"  --urpmi-root   - χρήση μίας άλλης διαδρομής root για την βάση δεδομένων "
+"urpmi κ' την εγκατάσταση του rpm.\n"
+
+#: ../urpme:51 ../urpmi:96
+#, c-format
+msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
+msgstr ""
+"  --justdb       - ενημέρωση της βάσης rpm αλλά όχι το σύστημα αρχείων.\n"
+
+#: ../urpme:52
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr "  --noscripts    - να μην εκτελεστούν τα scripts απεγκατάστασης.\n"
+
+#: ../urpme:53
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
+"                   to (un)install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - ρύθμιση urpme απευθείας από ένα δέντρο διανομής, χρήσιμο\n"
+"                   για την (απ)εγκατάσταση ενός chroot με την --root "
+"επιλογή.\n"
+
+#: ../urpme:55 ../urpmi:149 ../urpmq:87
+#, c-format
+msgid "  --verbose, -v  - verbose mode.\n"
+msgstr "  --verbose, -v  - αναλυτική λειτουργία.\n"
+
+#: ../urpme:56
+#, c-format
+msgid "  -a             - select all packages matching expression.\n"
+msgstr ""
+"  -a             - επιλογή όλων των πακέτων που ταιριάζουν με την έκφραση.\n"
+
+#: ../urpme:71
+#, c-format
+msgid "Only superuser is allowed to remove packages"
+msgstr "Μόνο ο διαχειριστής επιτρέπεται να αφαιρέσει πακέτα"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown packages"
+msgstr "άγνωστα πακέτα"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown package"
+msgstr "άγνωστο πακέτο"
+
+#: ../urpme:119
+#, c-format
+msgid "Removing the following package will break your system:"
+msgid_plural "Removing the following packages will break your system:"
+msgstr[0] "Η αφαίρεση του παρακάτω πακέτου θα καταστρέψει το σύστημά σου:"
+msgstr[1] "Η αφαίρεση των παρακάτω πακέτων θα καταστρέψει το σύστημά σου:"
+
+#: ../urpme:124
+#, c-format
+msgid "Nothing to remove"
+msgstr "Τίποτα προς αφαίρεση"
+
+#: ../urpme:141
+#, c-format
+msgid "No orphans to remove"
+msgstr "Δεν υπάρχουν ορφανά προς αφαίρεση"
+
+#: ../urpme:147
+#, c-format
+msgid "To satisfy dependencies, the following package will be removed"
+msgid_plural ""
+"To satisfy dependencies, the following %d packages will be removed"
+msgstr[0] "Για να ικανοποιηθούν οι εξαρτήσεις, θα αφαιρεθεί το παρακάτω πακέτο"
+msgstr[1] ""
+"Για να ικανοποιηθούν οι εξαρτήσεις, θα αφαιρεθούν τα παρακάτω %d πακέτα"
+
+#: ../urpme:152
+#, c-format
+msgid "(orphan package)"
+msgid_plural "(orphan packages)"
+msgstr[0] "(ορφανό πακέτο)"
+msgstr[1] "(ορφανά πακέτα)"
+
+#: ../urpme:159
+#, c-format
+msgid "Remove %d package?"
+msgid_plural "Remove %d packages?"
+msgstr[0] "Αφαίρεση %d πακέτου;"
+msgstr[1] "Αφαίρεση %d πακέτων;"
+
+#: ../urpme:164
+#, c-format
+msgid "testing removal of %s"
+msgstr "δοκιμαστική αφαίρεση του %s"
+
+#: ../urpme:181
+#, c-format
+msgid "Removal failed"
+msgstr "Η αφαίρεση απέτυχε"
+
+#: ../urpme:183
+#, c-format
+msgid "Removal is possible"
+msgstr "Η αφαίρεση είναι δυνατή"
+
+#: ../urpmf:31
+#, c-format
+msgid "  --version      - print this tool's version number.\n"
+msgstr "  --version      - εμφανίζει τον αριθμό έκδοσης αυτού του εργαλείου\n"
+
+#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#, c-format
+msgid "  --env          - use specific environment (typically a bug report).\n"
+msgstr ""
+"  --env          - χρήση συγκεκριμένου περιβάλλοντος (τυπικά μία αναφορά\n"
+"                   σφάλματος).\n"
+
+#: ../urpmf:33 ../urpmi:69 ../urpmq:45
+#, c-format
+msgid "  --excludemedia - do not use the given media, separated by comma.\n"
+msgstr ""
+"  --excludemedia - μην χρήση των μέσων που δόθηκαν, διαχωρισμένα με το "
+"κόμμα.\n"
+
+#: ../urpmf:34
+#, c-format
+msgid ""
+"  --literal, -l  - don't match patterns, use argument as a literal string.\n"
+msgstr ""
+"  --literal, -l  - δεν αντικαθιστά τους μπαλαντέρ, εφαρμογή του ορίσματος ως "
+"έχει.\n"
+
+#: ../urpmf:37 ../urpmi:72 ../urpmq:46
+#, c-format
+msgid ""
+"  --sortmedia    - sort media according to substrings separated by comma.\n"
+msgstr ""
+"  --sortmedia    - ταξινόμηση μέσων κατά υποσυμβολοσειρές διαχωρισμένες με "
+"κόμμα.\n"
+
+#: ../urpmf:38
+#, c-format
+msgid "  --use-distrib  - use the given path to access media\n"
+msgstr ""
+"  --use-distrib  - χρησιμοποιεί την καθορισμένη διαδρομή για πρόσβαση στο "
+"μέσο\n"
+
+#: ../urpmf:39 ../urpmi:73 ../urpmq:47
+#, c-format
+msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+msgstr ""
+"  --synthesis    - χρήση του synthesis που δίδεται αντί του urpmi db.\n"
+
+#: ../urpmf:40
+#, c-format
+msgid "  --uniq         - do not print identical lines twice.\n"
+msgstr "  --uniq         - μην τυπώσεις πανομοιότυπες γραμμές.\n"
+
+#: ../urpmf:41 ../urpmi:70 ../urpmq:42
+#, c-format
+msgid "  --update       - use only update media.\n"
+msgstr "  --update       - χρήση μόνο των μέσων αναβάθμισης.\n"
+
+#: ../urpmf:42
+#, c-format
+msgid "  --verbose      - verbose mode.\n"
+msgstr "  --verbose      - αναλυτική λειτουργία.\n"
+
+#: ../urpmf:43
+#, c-format
+msgid "  -i             - ignore case distinctions in patterns.\n"
+msgstr ""
+"  -i            - αγνόησε τη διάκριση πεζών-κεφαλαίων στις ακολουθίες.\n"
+
+#: ../urpmf:44
+#, c-format
+msgid "  -I             - honor case distinctions in patterns (default).\n"
+msgstr ""
+"  -I             - να γίνει διάκριση πεζών-κεφαλαίων στις ακολουθίες "
+"(προεπιλογή).\n"
+
+#: ../urpmf:45
+#, c-format
+msgid "  -F<str>        - change field separator (defaults to ':').\n"
+msgstr ""
+"  -F<str>        - αντικαθιστά τον διαχωριστή με <str> (από προεπιλογή "
+"':').\n"
+
+#: ../urpmf:46
+#, c-format
+msgid "Pattern expressions:\n"
+msgstr "Ακολουθίες εκφράσεων:\n"
+
+#: ../urpmf:47
+#, c-format
+msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
+msgstr ""
+"  text           - οποιοδήποτε κείμενο επεξεργάζεται σαν απλή έκφραση "
+"(regexp), εκτός αν έχει επιλεγεί το -l .\n"
+
+#: ../urpmf:48
+#, c-format
+msgid "  -e             - include perl code directly as perl -e.\n"
+msgstr "  -e             - συμπεριέλαβε κώδικα perl απευθείας σαν perl -e.\n"
+
+#: ../urpmf:49
+#, c-format
+msgid "  -a             - binary AND operator.\n"
+msgstr "  -a             - δυαδικός AND τελεστής.\n"
+
+#: ../urpmf:50
+#, c-format
+msgid "  -o             - binary OR operator.\n"
+msgstr "  -ο             - δυαδικός OR τελεστής.\n"
+
+#: ../urpmf:51
+#, c-format
+msgid "  !              - unary NOT.\n"
+msgstr "  !              - ΟΧΙ μοναδιαίο.\n"
+
+#: ../urpmf:52
+#, c-format
+msgid "  ( )            - left and right parentheses.\n"
+msgstr "  ( )            - αριστερή και δεξιά παρένθεση.\n"
+
+#: ../urpmf:53
+#, c-format
+msgid "List of tags:\n"
+msgstr "Κατάλογος ετικετών:\n"
+
+#: ../urpmf:54
+#, c-format
+msgid "  --qf           - specify a printf-like output format\n"
+msgstr "  --qf           - καθορίζει την μορφή εμφάνισης του τύπου printf\n"
+
+#: ../urpmf:55
+#, c-format
+msgid "                   example: '%%name:%%files'\n"
+msgstr "                   παράδειγμα: '%%name:%%files'\n"
+
+#: ../urpmf:56
+#, c-format
+msgid "  --arch         - architecture\n"
+msgstr "  --arch         - αρχιτεκτονική\n"
+
+#: ../urpmf:57
+#, c-format
+msgid "  --buildhost    - build host\n"
+msgstr "  --buildhost    - αναζήτηση στο πεδίο «BuildHost»\n"
+
+#: ../urpmf:58
+#, c-format
+msgid "  --buildtime    - build time\n"
+msgstr "  --buildtime    - αναζήτηση στο πεδίο «BuildTime»\n"
+
+#: ../urpmf:59
+#, c-format
+msgid "  --conffiles    - configuration files\n"
+msgstr "  --conffiles    - αρχεία ρυθμίσεων\n"
+
+#: ../urpmf:60
+#, c-format
+msgid "  --conflicts    - conflict tags\n"
+msgstr "  --conflicts    - ετικέτες συγκρούσεων\n"
+
+#: ../urpmf:61
+#, c-format
+msgid "  --description  - package description\n"
+msgstr "  --description  - αναζήτηση στην περιγραφή των πακέτων\n"
+
+#: ../urpmf:62
+#, c-format
+msgid "  --distribution - distribution\n"
+msgstr "  --distribution - διανομή\n"
+
+#: ../urpmf:63
+#, c-format
+msgid "  --epoch        - epoch\n"
+msgstr "  --epoch        - .\n"
+
+#: ../urpmf:64
+#, c-format
+msgid "  --filename     - filename of the package\n"
+msgstr "  --filename      - όνομα αρχείου του πακέτου\n"
+
+#: ../urpmf:65
+#, c-format
+msgid "  --files        - list of files contained in the package\n"
+msgstr "  --files        - λίστα αρχείων που περιέχονται στο πακέτο.\n"
+
+#: ../urpmf:66
+#, c-format
+msgid "  --group        - group\n"
+msgstr "  --group        - ομάδα\n"
+
+#: ../urpmf:67
+#, c-format
+msgid "  --license      - license\n"
+msgstr "  --license      - άδεια\n"
+
+#: ../urpmf:68
+#, c-format
+msgid "  --name         - package name\n"
+msgstr "  --name         - όνομα πακέτου\n"
+
+#: ../urpmf:69
+#, c-format
+msgid "  --obsoletes    - obsoletes tags\n"
+msgstr "  --obsoletes    - αναζήτηση στο πεδίο «obsoletes»\n"
+
+#: ../urpmf:70
+#, c-format
+msgid "  --packager     - packager\n"
+msgstr "  --packager     - δημιουργός πακέτου\n"
+
+#: ../urpmf:71
+#, c-format
+msgid "  --provides     - provides tags\n"
+msgstr "  --provides     - εμφάνιση ετικετών παροχών\n"
+
+#: ../urpmf:72
+#, c-format
+msgid "  --requires     - requires tags\n"
+msgstr "  --requires     - εμφάνιση ετικετών εξαρτήσεων\n"
+
+#: ../urpmf:73
+#, c-format
+msgid "  --size         - installed size\n"
+msgstr "  --size          - μέγεθος εγκατεστημένου\n"
+
+#: ../urpmf:74
+#, c-format
+msgid "  --sourcerpm    - source rpm name\n"
+msgstr "  --sourcerpm    - όνομα πηγαίου rpm\n"
+
+#: ../urpmf:75
+#, c-format
+msgid "  --suggests     - suggests tags\n"
+msgstr "  --suggests     - αναζήτηση στο πεδίο «suggests»\n"
+
+#: ../urpmf:76
+#, c-format
+msgid "  --summary      - summary\n"
+msgstr "  --summary      - περίληψη\n"
+
+#: ../urpmf:77
+#, c-format
+msgid "  --url          - url\n"
+msgstr "  --url          - url\n"
+
+#: ../urpmf:78
+#, c-format
+msgid "  --vendor       - vendor\n"
+msgstr "  --vendor       - κατασκευαστής\n"
+
+#: ../urpmf:79
+#, c-format
+msgid "  -m             - the media in which the package was found\n"
+msgstr "  -m             - το μέσο στο οποίο βρέθηκε το πακέτο\n"
+
+#: ../urpmf:80 ../urpmq:97
+#, c-format
+msgid "  -f             - print version, release and arch with name.\n"
+msgstr ""
+"  -f             - εμφανίζει την έκδοση, κυκλοφορία και αρχιτεκτονική με "
+"όνομα.\n"
+
+#: ../urpmf:148
+#, c-format
+msgid "unterminated expression (%s)"
+msgstr "μη τερματισμένη έκφραση (%s)"
+
+#: ../urpmf:193
+#, c-format
+msgid "Incorrect format: you may use only one multi-valued tag"
+msgstr ""
+"Άγνωστος τύπος: μπορείτε να χρησιμοποιήσετε μόνο μια επιλογή πολλαπλών τιμών "
+"(multi-valued tag)"
+
+#: ../urpmf:286
+#, c-format
+msgid "no hdlist available for medium \"%s\""
+msgstr "δεν βρέθηκε αρχείο hdlist για το μέσο \"%s\""
+
+#: ../urpmf:293
+#, c-format
+msgid "no synthesis available for medium \"%s\""
+msgstr "δεν υπάρχει διαθέσιμη σύνθεση για το μέσο \"%s\""
+
+#: ../urpmf:302
+#, c-format
+msgid "no xml-info available for medium \"%s\""
+msgstr "δεν υπάρχουν διαθέσιμες πληροφορίες xml για το μέσο \"%s\""
+
+#: ../urpmi:76
+#, c-format
+msgid "  --auto-update  - update media then upgrade the system.\n"
+msgstr "  --auto-update  - ενημέρωση των μέσων και έπειτα του συστήματος.\n"
+
+#: ../urpmi:77
+#, c-format
+msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "    --no-md5sum    - απενεργοποίηση του MD5SUM ελέγχου του αρχείου .\n"
+
+#: ../urpmi:78
+#, c-format
+msgid "    --force-key    - force update of gpg key.\n"
+msgstr "    --force-key    - εξαναγκασμός ενημέρωσης του κλειδιού gpg.\n"
+
+#: ../urpmi:79
+#, c-format
+msgid "  --auto-orphans - remove orphans without asking\n"
+msgstr "  --auto-orphans - απομάκρυνση των ορφανών, χωρίς επιβαιβέωση\n"
+
+#: ../urpmi:80 ../urpmq:52
+#, c-format
+msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
+msgstr ""
+"  --no-suggests  - να μην επιλεγούν αυτόματα τα \"προτεινόμενα\" πακέτα.\n"
+
+#: ../urpmi:81
+#, c-format
+msgid ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+msgstr ""
+"  --no-uninstall - μην ρωτήσεις για να απεγκαταστήσεις ένα πακέτο, διέκοψε "
+"την εγκατάσταση.\n"
+
+#: ../urpmi:82
+#, c-format
+msgid "  --no-install   - don't install packages (only download)\n"
+msgstr "  --no-install   - μη εγκατάσταση πακέτων (μόνο λήψη)\n"
+
+#: ../urpmi:83 ../urpmq:54
+#, c-format
+msgid ""
+"  --keep         - keep existing packages if possible, reject requested\n"
+"                   packages that lead to removals.\n"
+msgstr ""
+"  --keep         - κράτα τα υπάρχοντα πακέτα εάν είναι δυνατόν,\n"
+"                   απόρριψε τα ζητούμενα πακέτα που οδηγούν σε αφαιρέσεις.\n"
+
+#: ../urpmi:85
+#, c-format
+msgid ""
+"  --split-level  - split in small transaction if more than given packages\n"
+"                   are going to be installed or upgraded,\n"
+"                   default is %d.\n"
+msgstr ""
+"  --split-level  - διαχωρισμός σε μικρότερες συναλλαγές, αν περισσότερα από "
+"τα καθορισμένα\n"
+"                   πακέτα πρόκειται να ενημερωθούν ή να αναβαθμιστούν.\n"
+"                   Η προεπιλογή είναι %d.\n"
+
+#: ../urpmi:89
+#, c-format
+msgid "  --split-length - small transaction length, default is %d.\n"
+msgstr ""
+"  --split-length - μικρότερο μήκος συναλλαγής, η προεπιλογή είναι %d.\n"
+
+#: ../urpmi:91
+#, c-format
+msgid "  --fuzzy, -y    - impose fuzzy search.\n"
+msgstr "  --fuzzy, -y    - επιβάλει την αναζήτηση κατά προσέγγιση.\n"
+
+#: ../urpmi:92
+#, c-format
+msgid "  --buildrequires - install the buildrequires of the packages\n"
+msgstr "  --buildrequires - εγκατάσταση των buildrequires των πακέτων\n"
+
+#: ../urpmi:93
+#, c-format
+msgid "  --install-src  - install only source package (no binaries).\n"
+msgstr ""
+"  --install-src  - εγκατάσταση μόνο του πηγαίου πακέτου (όχι εκτελέσιμα).\n"
+
+#: ../urpmi:94
+#, c-format
+msgid "  --clean        - remove rpm from cache before anything else.\n"
+msgstr ""
+"  --clean        - αφαίρεσε τα rpm από την προσωρινή μνήμη πριν την εκτέλεση "
+"άλλης ενέργειας.\n"
+
+#: ../urpmi:95
+#, c-format
+msgid "  --noclean      - don't clean rpms from cache.\n"
+msgstr "  --noclean      - κρατά τα rpm στην προσωρινή μνήμη.\n"
+
+#: ../urpmi:97
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr ""
+"  --replacepkgs  - εξαναγκασμός εγκατάστασης πακέτων που είναι ήδη "
+"εγκατεστημένα.\n"
+
+#: ../urpmi:99
+#, c-format
+msgid ""
+"  --allow-nodeps - allow asking user to install packages without\n"
+"                   dependencies checking.\n"
+msgstr ""
+"  --allow-nodeps - επιτρέπει την εγκατάσταση πακέτων χωρίς\n"
+"                   να ελέγχει τις εξαρτήσεις.\n"
+
+#: ../urpmi:101
+#, c-format
+msgid ""
+"  --allow-force  - allow asking user to install packages without\n"
+"                   dependencies checking and integrity.\n"
+msgstr ""
+"  --allow-force  - επιτρέπει την εγκατάσταση πακέτων χωρίς\n"
+"                   να ελέγχει τις εξαρτήσεις και την ακεραιότητα.\n"
+
+#: ../urpmi:103
+#, c-format
+msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
+msgstr "  --allow-suggests - αυτόματη επιλογή των \"προτεινόμενων\" πακέτων.\n"
+
+#: ../urpmi:107
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - ρύθμισε το urpmi απευθείας από ένα δένδρο διανομής, "
+"χρήσιμο\n"
+"                   για να εγκαταστήσετε ένα  chroot με την επιλογή --root .\n"
+
+#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#, c-format
+msgid "  --metalink     - generate and use a local metalink.\n"
+msgstr "  --metalink     - δημιουργία και χρήση ενός τοπικού μετασυνδέσμου.\n"
+
+#: ../urpmi:110
+#, c-format
+msgid ""
+"  --download-all - download all needed packages before trying to install "
+"them\n"
+msgstr ""
+"  --download-all - λήψη όλων των απαραιτήτων πακέτων πριν γίνει η προσπάθεια "
+"εγκατάστασής τους\n"
+
+#: ../urpmi:111
+#, c-format
+msgid ""
+"  --downloader   - program to use to retrieve distant files. \n"
+"                   known programs: %s\n"
+msgstr ""
+"  --downloader   - χρήση προγράμματος για λήψη απομακρυσμένων αρχείων. \n"
+"                   γνωστά προγράμματα: %s\n"
+
+#: ../urpmi:114
+#, c-format
+msgid "  --curl-options - additional options to pass to curl\n"
+msgstr "  --curl-options - πρόσθετες επιλογές για πέρασμα στο curl\n"
+
+#: ../urpmi:115
+#, c-format
+msgid "  --rsync-options- additional options to pass to rsync\n"
+msgstr "  --rsync-options- πρόσθετες επιλογές για πέρασμα στο rsync\n"
+
+#: ../urpmi:116
+#, c-format
+msgid "  --wget-options - additional options to pass to wget\n"
+msgstr "  --wget-options - πρόσθετες επιλογές για να περάσετε στο wget\n"
+
+#: ../urpmi:117
+#, c-format
+msgid "  --prozilla-options - additional options to pass to prozilla\n"
+msgstr ""
+"  --prozilla-options - πρόσθετες επιλογές για να περάσετε στο prozilla\n"
+
+#: ../urpmi:118
+#, c-format
+msgid "  --aria2-options - additional options to pass to aria2\n"
+msgstr "  --aria2-options - πρόσθετες επιλογές για να περάσετε στο aria2\n"
+
+#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#, c-format
+msgid "  --limit-rate   - limit the download speed.\n"
+msgstr "  --limit-rate   - περιόρισε την ταχύτητα λήψης.\n"
+
+#: ../urpmi:120
+#, c-format
+msgid ""
+"  --resume       - resume transfer of partially-downloaded files\n"
+"                   (--no-resume disables it, default is disabled).\n"
+msgstr ""
+"  --resume       - ανάκτηση της λήψης ελλιπών αρχείων\n"
+"                   (--no-resume το απενεργοποιεί, από προεπιλογή είναι "
+"απενεργοποιημένο).\n"
+
+#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#, c-format
+msgid ""
+"  --proxy        - use specified HTTP proxy, the port number is assumed\n"
+"                   to be 1080 by default (format is <proxyhost[:port]>).\n"
+msgstr ""
+"  --proxy        - χρήση καθορισμένου HTTP proxy, ο αριθμός της θύρας\n"
+"                   θεωρείται ότι είναι από προεπιλογή ο 1080  (η μορφή είναι "
+"<proxyhost[:port]>).\n"
+
+#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#, c-format
+msgid ""
+"  --proxy-user   - specify user and password to use for proxy\n"
+"                   authentication (format is <user:password>).\n"
+msgstr ""
+"  --proxy-user   - καθορίζει τον χρήστη και τον κωδικό πρόσβασης που θα "
+"χρησιμοποιηθεί για\n"
+"                   τον έλεγχο ταυτότητας στον proxy (η μορφή είναι <user:"
+"password>).\n"
+
+#: ../urpmi:126
+#, c-format
+msgid ""
+"  --bug          - output a bug report in directory indicated by\n"
+"                   next arg.\n"
+msgstr ""
+"  --bug          - δημιουργία αναφοράς bug στον κατάλογο που καθορίζεται σε\n"
+"                   επόμενο ορισμό.\n"
+
+#: ../urpmi:132
+#, c-format
+msgid "  --excludepath  - exclude path separated by comma.\n"
+msgstr "  --excludepath  - εξαιρούμενες διαδρομές διαχωρισμένες με το κόμμα.\n"
+
+#: ../urpmi:133
+#, c-format
+msgid "  --excludedocs  - exclude doc files.\n"
+msgstr "  --excludedocs  - εξαιρούμενα αρχεία τεκμηρίωσης.\n"
+
+#: ../urpmi:134
+#, c-format
+msgid "  --ignoresize   - don't verify disk space before installation.\n"
+msgstr ""
+"  --ignoresize   - να μην γίνει έλεγχος της χωρητικότητας του δίσκου πριν "
+"την εγκατάσταση.\n"
+
+#: ../urpmi:135
+#, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr ""
+"  --ignorearch   - επιτρέπει την εγκατάσταση πακέτων για άλλες "
+"αρχιτεκτονικές.\n"
+
+#: ../urpmi:136
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr "  --noscripts    - να μην εκτελεστούν τα scripts εγκατάστασης\n"
+
+#: ../urpmi:137
+#, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr "  --replacefiles - αγνοεί τις συγκρούσεις αρχείων\n"
+
+#: ../urpmi:139
+#, c-format
+msgid "  --skip         - packages which installation should be skipped\n"
+msgstr ""
+"  --skip         - πακέτα τα οποία η εγκατάσταση θα πρέπει να παρακάμψει\n"
+
+#: ../urpmi:140
+#, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr "  --prefer       - πακέτα που θα πρέπει να προτιμηθούν\n"
+
+#: ../urpmi:141
+#, c-format
+msgid ""
+"  --more-choices - when several packages are found, propose more choices\n"
+"                   than the default.\n"
+msgstr ""
+"  --more-choices - όταν βρίσκονται πολλά πακέτα, να προτείνονται "
+"περισσότερες επιλογές \n"
+"                   από αυτές της προεπιλογής.\n"
+
+#: ../urpmi:143
+#, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr "  --nolock       - μα μην κλειδωθεί η βάση rpm.\n"
+
+#: ../urpmi:144
+#, c-format
+msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
+msgstr ""
+"  --strict-arch  - αναβάθμισε μόνο τα πακέτα με την ίδια αρχιτεκτονική.\n"
+
+#: ../urpmi:145 ../urpmq:95
+#, c-format
+msgid "  -a             - select all matches on command line.\n"
+msgstr ""
+"  -a             - επιλογή όλων των μέσων που ταιριάζουν στην γραμμή "
+"εντολών.\n"
+
+#: ../urpmi:148
+#, c-format
+msgid "  --quiet, -q    - quiet mode.\n"
+msgstr "  --quiet, -q    - σιωπηλή λειτουργία.\n"
+
+#: ../urpmi:150
+#, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr "  --debug        - περισσότερο αναλυτική λειτουργία.\n"
+
+#: ../urpmi:151
+#, c-format
+msgid "  names or rpm files given on command line will be installed.\n"
+msgstr ""
+"  τα ονόματα ή τα αρχεία rpm που δόθηκαν στην γραμμή εντολών θα "
+"εγκατασταθούν.\n"
+
+#: ../urpmi:179
+#, c-format
+msgid "Error: can't use --auto-select along with package list.\n"
+msgstr ""
+"Σφάλμα: αδύνατη η χρήση του --auto-select παράλληλα με τη λίστα πακέτων.\n"
+
+#: ../urpmi:186
+#, c-format
+msgid ""
+"Error: To generate a bug report, specify the usual command-line arguments\n"
+"along with --bug.\n"
+msgstr ""
+"Σφάλμα: Για την δημιουργία αναφοράς bug, καθορίστε τους ορισμούς της γραμμής "
+"εντολών\n"
+"με το --bug.\n"
+
+#: ../urpmi:216
+#, c-format
+msgid "You can't install binary rpm files when using --install-src"
+msgstr ""
+"Δεν μπορείτε να εγκαταστήσετε δυαδικά αρχεία rpm  όταν χρησιμοποιείτε --"
+"install-src"
+
+#: ../urpmi:217
+#, c-format
+msgid "You can't install spec files"
+msgstr "Δεν μπορείς να εγκαταστήσεις αρχεία προδιαγραφών (spec)"
+
+#: ../urpmi:224
+#, c-format
+msgid "defaulting to --buildrequires"
+msgstr "αντιστοίχηση στο --buildrequires"
+
+#: ../urpmi:229
+#, c-format
+msgid ""
+"please use --buildrequires or --install-src, defaulting to --buildrequires"
+msgstr ""
+"παρακαλώ χρησιμοποιήστε --buildrequires ή --install-src, από προεπιλογή --"
+"buildrequires"
+
+#: ../urpmi:249
+#, c-format
+msgid ""
+"Directory [%s] already exists, please use another directory for bug report "
+"or delete it"
+msgstr ""
+"Ο κατάλογος [%s] υπάρχει ήδη, παρακαλώ χρησιμοποιήστε ένα διαφορετικό "
+"κατάλογο για να αναφορά σφάλματος ή διαγράψτε το"
+
+#: ../urpmi:250
+#, c-format
+msgid "Unable to create directory [%s] for bug report"
+msgstr "αδυναμία δημιουργίας καταλόγου [%s] για την αναφορά σφάλματος"
+
+#: ../urpmi:271
+#, c-format
+msgid ""
+"Error: %s appears to be mounted read-only.\n"
+"Use --allow-force to force operation."
+msgstr ""
+"Σφάλμα: το %s φαίνεται να είναι προσαρτημένο μόνο για ανάγνωση.\n"
+"Χρησιμοποίησε το --allow-force για να εξαναγκάσεις τη λειτουργία."
+
+#. -PO: here format is "<package_name>: <summary> (to upgrade)"
+#: ../urpmi:425
+#, c-format
+msgid "%s: %s (to upgrade)"
+msgstr "%s: %s (προς αναβάθμιση)"
+
+#. -PO: here format is "<package_name> (to upgrade)"
+#: ../urpmi:427
+#, c-format
+msgid "%s (to upgrade)"
+msgstr "%s (προς αναβάθμιση)"
+
+#. -PO: here format is "<package_name>: <summary> (to install)"
+#: ../urpmi:431
+#, c-format
+msgid "%s: %s (to install)"
+msgstr "%s: %s (προς εγκατάσταση)"
+
+#. -PO: here format is "<package_name> (to install)"
+#: ../urpmi:433
+#, c-format
+msgid "%s (to install)"
+msgstr "%s (προς εγκατάσταση)"
+
+#: ../urpmi:439
+#, c-format
+msgid ""
+"In order to satisfy the '%s' dependency, one of the following packages is "
+"needed:"
+msgstr ""
+"Για να ικανοποιηθούν οι εξαρτήσεις του '%s', απαιτείται ένα από τα παρακάτω "
+"πακέτα:"
+
+#: ../urpmi:442
+#, c-format
+msgid "What is your choice? (1-%d) "
+msgstr "Ποια είναι η επιλογή σας; (1-%d) "
+
+#: ../urpmi:484
+#, c-format
+msgid ""
+"The following package cannot be installed because it depends on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Το ακόλουθο πακέτο δεν μπορεί να εγκατασταθεί, γιατί εξαρτάται από πακέτα\n"
+"που είναι παλαιότερα από αυτά που είναι εγκατεστημένα:\n"
+"%s"
+
+#: ../urpmi:486
+#, c-format
+msgid ""
+"The following packages can't be installed because they depend on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Τα ακόλουθα πακέτα δεν μπορούν να εγκατασταθούν, γιατί εξαρτώνται από "
+"πακέτα\n"
+"που είναι παλαιότερα από αυτά που είναι εγκατεστημένα:\n"
+"%s"
+
+#: ../urpmi:492 ../urpmi:510
+#, c-format
+msgid ""
+"\n"
+"Continue installation anyway?"
+msgstr ""
+"\n"
+"Να συνεχίσω την εγκατάσταση ;"
+
+#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#, c-format
+msgid " (Y/n) "
+msgstr " (Y/n) "
+
+#: ../urpmi:504
+#, c-format
+msgid ""
+"A requested package cannot be installed:\n"
+"%s"
+msgstr ""
+"Ένα από τα πακέτα που ζητήθηκε δεν μπορεί να εγκατασταθεί:\n"
+"%s"
+
+#: ../urpmi:525
+#, c-format
+msgid "removing package %s will break your system"
+msgstr "η αφαίρεση του πακέτου %s θα καταστρέψει το σύστημά σου"
+
+#: ../urpmi:533
+#, c-format
+msgid ""
+"The installation cannot continue because the following package\n"
+"has to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Η εγκατάσταση δεν μπορεί να συνεχιστεί διότι το παρακάτω πακέτο \n"
+"πρέπει να αφαιρεθεί, για να αναβαθμιστούν κάποια άλλα:\n"
+"%s\n"
+
+#: ../urpmi:535
+#, c-format
+msgid ""
+"The installation cannot continue because the following packages\n"
+"have to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Η εγκατάσταση δεν μπορεί να συνεχιστεί διότι τα παρακάτω πακέτα πρέπει να "
+"αφαιρεθούν για να αναβαθμιστούν κάποια άλλα:\n"
+"%s\n"
+
+#: ../urpmi:543
+#, c-format
+msgid "(test only, removal will not be actually done)"
+msgstr "(μονάχα έλεγχος, η αφαίρεση δεν θα γίνει πραγματικά)"
+
+#: ../urpmi:562
+#, c-format
+msgid ""
+"You must first call urpmi with --buildrequires to install the following "
+"dependencies:\n"
+"%s\n"
+msgstr ""
+"Πρέπει πρώτα να χρησιμοποιήσετε την urpmi --buildrequires για να "
+"εγκαταστήσετε τις παρακάτω εξαρτήσεις:\n"
+"%s\n"
+
+#: ../urpmi:572
+#, c-format
+msgid "The following orphan package will be removed."
+msgid_plural "The following orphan packages will be removed."
+msgstr[0] "Θα αφαιρεθεί το παρακάτω ορφανό πακέτο."
+msgstr[1] "Θα αφαιρεθούν τα παρακάτω ορφανά πακέτα."
+
+#: ../urpmi:596
+#, c-format
+msgid "WARNING: %s option is in use. Some strange problems may happen"
+msgstr ""
+"ΠΡΟΣΟΧΗ: Η επιλογή %s είναι σε χρήση. Μπορεί να παρουσιαστούν μερικά "
+"παράξενα προβλήματα."
+
+#: ../urpmi:608
+#, c-format
+msgid "(test only, installation will not be actually done)"
+msgstr "(μονάχα έλεγχος, η εγκατάσταση δεν θα γίνει πραγματικά)"
+
+#: ../urpmi:614
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr "Θα χρησιμοποιηθεί επιπλέον χώρος %s στο σκληρό δίσκο."
+
+#: ../urpmi:615
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr "Θα ελευθερωθεί %s χώρου στο σκληρό δίσκο."
+
+#: ../urpmi:616
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr "%s των πακέτων θα ανακτηθούν."
+
+#: ../urpmi:617
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] "Συνέχιση με την εγκατάσταση ενός πακέτου;"
+msgstr[1] "Συνέχιση με την εγκατάσταση των %d πακέτων;"
+
+#: ../urpmi:639
+#, c-format
+msgid "Press Enter when mounted..."
+msgstr "Πατήστε Enter όταν προσαρτηθεί..."
+
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
+#: ../urpmi.addmedia:36
+#, c-format
+msgid ""
+"usage: urpmi.addmedia [options] <name> <url>\n"
+"where <url> is one of\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"usage: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"usage: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"examples:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"and [options] are from\n"
+msgstr ""
+"χρήση: urpmi.addmedia [επιλογές] <όνομα> <url>\n"
+"όπου <url> είναι ένα εκ των\n"
+"       [file:/]/<διαδρομή>\n"
+"       ftp://<login>:<κωδικός_ασφαλείας>@<host>/<διαδρομή>\n"
+"       ftp://<host>/<διαδρομή>\n"
+"       http://<host>/<διαδρομή>\n"
+"       cdrom://<διαδρομή>\n"
+"\n"
+"χρήση: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"χρήση: urpmi.addmedia [options] --mirrorlist <url> <όνομα> <σχετική "
+"διαδρομή>\n"
+"\n"
+"παραδείγματα:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"και οι [επιλογές] είναι από\n"
+
+#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#, c-format
+msgid "  --wget         - use wget to retrieve distant files.\n"
+msgstr ""
+"  --wget         - χρήση του wget για την ανάκτηση απομακρυσμένων αρχείων.\n"
+
+#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#, c-format
+msgid "  --curl         - use curl to retrieve distant files.\n"
+msgstr ""
+"  --curl         - χρήση του curl για την ανάκτηση απομακρυσμένων αρχείων.\n"
+
+#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
+#, c-format
+msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
+msgstr ""
+"  --prozilla     - χρήση του prozilla για την ανάκτηση απομακρυσμένων "
+"αρχείων.\n"
+
+#: ../urpmi.addmedia:59 ../urpmi.update:36
+#, c-format
+msgid "  --aria2        - use aria2 to retrieve distant files.\n"
+msgstr ""
+"  --aria2         - χρήση του aria2, για την ανάκτηση απομακρυσμένων "
+"αρχείων.\n"
+
+#: ../urpmi.addmedia:66
+#, c-format
+msgid ""
+"  --update       - create an update medium, \n"
+"                   or discard non-update media (when used with --distrib)\n"
+msgstr ""
+"  --update       - δημιουργία μέσου «ενημερώσεων» , \n"
+"                   ή εξαναγκασμός χρήσης των μέσων «ενημερώσεων» (αν γίνει "
+"χρήση με --distrib)\n"
+
+#: ../urpmi.addmedia:68
+#, c-format
+msgid ""
+"  --xml-info     - use the specific policy for downloading xml info files\n"
+"                   one of: never, on-demand, update-only, always. cf urpmi."
+"cfg(5)\n"
+msgstr ""
+"  --xml-info     - λήψη των αρχείων xml info με την καθορισμένη πολιτική\n"
+"                   απο τις εξής: never, on-demand, update-only, always. cf "
+"urpmi.cfg(5)\n"
+
+#: ../urpmi.addmedia:70
+#, c-format
+msgid "  --probe-synthesis - use synthesis file.\n"
+msgstr "  --probe-synthesis - χρήση ενός αρχείου synthesis.\n"
+
+#: ../urpmi.addmedia:71
+#, c-format
+msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
+msgstr "  --probe-rpms   - χρήση των αρχείων rpm (αντί των synthesis).\n"
+
+#: ../urpmi.addmedia:72
+#, c-format
+msgid "  --no-probe     - do not try to find any synthesis file.\n"
+msgstr "  --no-probe     - να μην γίνει αναζήτηση για αρχεία synthesis.\n"
+
+#: ../urpmi.addmedia:74
+#, c-format
+msgid ""
+"  --distrib      - automatically create all media from an installation\n"
+"                   medium.\n"
+msgstr ""
+"  --distrib      - αυτόματη δημιουργία όλων των μέσων (media) από ένα μέσο\n"
+"                   εγκατάστασης.\n"
+
+#: ../urpmi.addmedia:76
+#, c-format
+msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
+msgstr ""
+"  --interactive  - με --distrib, ρωτά επιβεβαίωση για κάθε μέσο (media)\n"
+
+#: ../urpmi.addmedia:77
+#, c-format
+msgid "  --all-media    - with --distrib, add every listed media\n"
+msgstr "  --list-media   - εμφανίζει τα διαθέσιμα μέσα.\n"
+
+#: ../urpmi.addmedia:78
+#, c-format
+msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
+msgstr ""
+"  --virtual      - δημιουργία εικονικών μέσων (media) τα οποία είναι πάντα "
+"ενημερωμένα.\n"
+
+#: ../urpmi.addmedia:79 ../urpmi.update:44
+#, c-format
+msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - απενεργοποίηση του MD5SUM ελέγχου του αρχείου .\n"
+
+#: ../urpmi.addmedia:80
+#, c-format
+msgid "  --nopubkey     - don't import pubkey of added media\n"
+msgstr ""
+"  --nopubkey     - να μην γίνει εισαγωγή δημόσιου κλειδιού των νέων μέσων "
+"(media)\n"
+
+#: ../urpmi.addmedia:81
+#, c-format
+msgid "  --raw          - add the media in config, but don't update it.\n"
+msgstr ""
+"  --raw          - προσθήκη του μέσου (media) στην διαμόρφωση, αλλά χωρίς "
+"ενημέρωση.\n"
+
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#, c-format
+msgid "  -q             - quiet mode.\n"
+msgstr "  -q             - σιωπηλή λειτουργία.\n"
+
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#, c-format
+msgid "  -v             - verbose mode.\n"
+msgstr "  -v             - αναλυτική περιγραφή.\n"
+
+#: ../urpmi.addmedia:96
+#, c-format
+msgid "known xml-info policies are %s"
+msgstr "οι γνωστές πολιτικές xml-πληροφοριών είναι οι %s"
+
+#: ../urpmi.addmedia:107
+#, c-format
+msgid "no argument needed for --distrib --mirrorlist <url>"
+msgstr "δεν απαιτείται όρισμα για --distrib --mirrorlist <url>"
+
+#: ../urpmi.addmedia:112
+#, c-format
+msgid "bad <url> (for local directory, the path must be absolute)"
+msgstr ""
+"εσφαλμένο <url> (στην περίπτωση τοπικού καταλόγου, η διαδρομή θα πρέπει να "
+"είναι απόλυτη)"
+
+#: ../urpmi.addmedia:116
+#, c-format
+msgid "Only superuser is allowed to add media"
+msgstr "Μόνο ο διαχειριστής επιτρέπεται να προσθέσει μέσα"
+
+#: ../urpmi.addmedia:119
+#, c-format
+msgid "creating config file [%s]"
+msgstr "δημιουργία αρχείου ρυθμίσεων (config) [%s]"
+
+#: ../urpmi.addmedia:120
+#, c-format
+msgid "Can't create config file [%s]"
+msgstr "Δεν μπορεί να δημιουργηθεί το αρχείο ρυθμίσης [%s]"
+
+#: ../urpmi.addmedia:128
+#, c-format
+msgid "no need to give <relative path of synthesis> with --distrib"
+msgstr ""
+"δε χρειάζεται να δώσεις <σχετική διαδρομή του synthesis>  με το --distrib"
+
+#: ../urpmi.addmedia:136
+#, c-format
+msgid ""
+"\n"
+"Do you want to add media '%s'?"
+msgstr ""
+"\n"
+"Θες να προσθέσεις το μέσο '%s' ;"
+
+#: ../urpmi.addmedia:156 ../urpmi.addmedia:181
+#, c-format
+msgid "unable to add medium"
+msgstr "Αδυναμία προσθήκης μέσου"
+
+#: ../urpmi.addmedia:164
+#, c-format
+msgid "<relative path of synthesis> missing\n"
+msgstr "η <σχετική διαδρομή του synthesis> λείπει\n"
+
+#: ../urpmi.addmedia:167
+#, c-format
+msgid "Can't use %s with remote medium"
+msgstr "Αδυναμία χρήσης του %s με το απομακρυσμένο μέσο"
+
+#: ../urpmi.recover:30
+#, c-format
+msgid "  --checkpoint   - set repackaging start now\n"
+msgstr "  --checkpoint   - ορίστε τώρα το σημείο αναφοράς\n"
+
+#: ../urpmi.recover:31
+#, c-format
+msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
+msgstr ""
+"  --noclean      - να μην γίνει καθαρισμός του φακέλου αναδημιουργίας "
+"πακέτων\n"
+"κατά την αρχικοποίηση του σημείου αναφοράς\n"
+
+#: ../urpmi.recover:33
+#, c-format
+msgid ""
+"  --list         - list transactions since provided date/duration argument\n"
+msgstr ""
+"  --list         - λίστα συναλλαγών που έγιναν από μια καθορισμένη "
+"ημερομηνία/διάρκεια και μετά\n"
+
+#: ../urpmi.recover:34
+#, c-format
+msgid "  --list-all     - list all transactions in rpmdb (long)\n"
+msgstr ""
+"  --list-all     - εμφανίζει την λίστα με όλες τις συναλλαγές της βάσης "
+"RPM.\n"
+
+#: ../urpmi.recover:35
+#, c-format
+msgid "  --list-safe    - list transactions since checkpoint\n"
+msgstr ""
+"  --list-safe    - εμφανίζει την λίστα με τις συναλλαγές από το σημείο\n"
+"                    αναφοράς (checkpoint) και μετά\n"
+
+#: ../urpmi.recover:36
+#, c-format
+msgid ""
+"  --rollback     - rollback until specified date,\n"
+"                   or rollback the specified number of transactions\n"
+msgstr ""
+"  --rollback     - επαναφορά στην κατάσταση που αντιστοιχεί στην καθορισμένη "
+"ημερομηνία,\n"
+"                   ή υποχώρηση σύμφωνα με τον καθορισμένο αριθμό συναλλαγών\n"
+
+#: ../urpmi.recover:38
+#, c-format
+msgid "  --disable      - turn off repackaging\n"
+msgstr "  --disable      - απενεργοποιεί την αναδημιουργία πακέτων\n"
+
+#: ../urpmi.recover:53
+#, c-format
+msgid "Invalid date or duration [%s]\n"
+msgstr "Άκυρη ημερομηνία ή διάρκεια [%s]\n"
+
+#: ../urpmi.recover:61
+#, c-format
+msgid "Repackage directory not defined\n"
+msgstr "Ο κατάλογος επαναπακεταρίσματος δεν προσδιορίστηκε\n"
+
+#: ../urpmi.recover:64
+#, c-format
+msgid "Can't write to repackage directory [%s]\n"
+msgstr "Αδυναμία εγγραφής στον κατάλογο επαναπακεταρίσματος [%s]\n"
+
+#: ../urpmi.recover:66
+#, c-format
+msgid "Cleaning up repackage directory [%s]...\n"
+msgstr "Καθαρισμός του καταλόγου επαναπακεταρίσματος [%s]...\n"
+
+#: ../urpmi.recover:68
+#, c-format
+msgid "%d file removed\n"
+msgid_plural "%d files removed\n"
+msgstr[0] "%d αρχείο αφαιρέθηκε\n"
+msgstr[1] "%d αρχεία αφαιρέθηκαν\n"
+
+#: ../urpmi.recover:78
+#, c-format
+msgid "Spurious command-line arguments [%s]\n"
+msgstr "Λανθασμένα ορίσματα της γραμμής εντολών [%s]\n"
+
+#: ../urpmi.recover:80
+#, c-format
+msgid "You can't specify --checkpoint and --rollback at the same time\n"
+msgstr ""
+"Δεν μπορείς να προσδιορίσεις συγχρόνως το --checkpoint και το --rollback \n"
+
+#: ../urpmi.recover:82
+#, c-format
+msgid "You can't specify --checkpoint and --list at the same time\n"
+msgstr ""
+"Δεν μπορείς να προσδιορίσεις συγχρόνως το --checkpoint και το --list \n"
+
+#: ../urpmi.recover:84
+#, c-format
+msgid "You can't specify --rollback and --list at the same time\n"
+msgstr "Δεν μπορείς να προσδιορίσεις συγχρόνως το --rollback και το --list \n"
+
+#: ../urpmi.recover:86
+#, c-format
+msgid "You can't specify --disable along with another option"
+msgstr "Δεν μπορείς να προσδιορίσεις το --disable μαζί με μια άλλη επιλογή"
+
+#: ../urpmi.recover:111
+#, c-format
+msgid "No transaction found since %s\n"
+msgstr "Δεν βρέθηκε συναλλαγή από %s\n"
+
+#: ../urpmi.recover:126
+#, c-format
+msgid "You must be superuser to do this"
+msgstr "Πρέπει να είστε υπερχρήστης για να  το πράξετε αυτό"
+
+#: ../urpmi.recover:139 ../urpmi.recover:205
+#, c-format
+msgid "Writing rpm macros file [%s]...\n"
+msgstr "Εγγραφή αρχείου rpm μακροεντολών [%s]...\n"
+
+#: ../urpmi.recover:181
+#, c-format
+msgid "No rollback date found\n"
+msgstr "Δεν βρέθηκε ημερομηνία επαναφοράς\n"
+
+#: ../urpmi.recover:184
+#, c-format
+msgid "Rollback until %s...\n"
+msgstr "Υποχώρηση έως %s...\n"
+
+#: ../urpmi.recover:191
+#, c-format
+msgid "Disabling repackaging\n"
+msgstr "Απενεργοποίηση του επαναπακεταρίσματος\n"
+
+#: ../urpmi.removemedia:38
+#, c-format
+msgid ""
+"usage: urpmi.removemedia (-a | <name> ...)\n"
+"where <name> is a medium name to remove.\n"
+msgstr ""
+"χρήση: urpmi.removemedia (-a | <όνομα> ...)\n"
+"όπου <όνομα> είναι ένα μέσο προς αφαίρεση.\n"
+
+#: ../urpmi.removemedia:41
+#, c-format
+msgid "  -a             - select all media.\n"
+msgstr "  -a             - επιλογή όλων των μέσων.\n"
+
+#: ../urpmi.removemedia:42
+#, c-format
+msgid "  -y             - fuzzy match on media names.\n"
+msgstr ""
+"  -y             - επιβάλει την αναζήτηση κατά προσέγγιση στα ονόματα των "
+"μέσων.\n"
+
+#: ../urpmi.removemedia:59
+#, c-format
+msgid "Only superuser is allowed to remove media"
+msgstr "Μόνο ο διαχειριστής επιτρέπεται να αφαιρεί μέσα"
+
+#: ../urpmi.removemedia:71
+#, c-format
+msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
+msgstr ""
+"τίποτα για διαγραφή (χρησιμοποιήστε το urpmi.addmedia για να προσθέσετε ένα "
+"μέσο)\n"
+
+#: ../urpmi.removemedia:77
+#, c-format
+msgid ""
+"the entry to remove is missing\n"
+"(one of %s)\n"
+msgstr ""
+"η επιλογή προς διαγραφή λείπει\n"
+"(ένα εκ των %s)\n"
+
+#: ../urpmi.update:30
+#, c-format
+msgid ""
+"usage: urpmi.update [options] <name> ...\n"
+"where <name> is a medium name to update.\n"
+msgstr ""
+"χρήση: urpmi.update [επιλογές] <όνομα> ...\n"
+"όπου <όνομα> είναι ένα μέσο προς αναβάθμιση.\n"
+
+#: ../urpmi.update:43
+#, c-format
+msgid "  --update       - update only update media.\n"
+msgstr "  --update       - χρήση μόνο των μέσων αναβάθμισης.\n"
+
+#: ../urpmi.update:45
+#, c-format
+msgid "  --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - εξαναγκασμός ενημέρωσης του κλειδιού gpg.\n"
+
+#: ../urpmi.update:46
+#, c-format
+msgid "  --ignore       - don't update, mark the media as ignored.\n"
+msgstr ""
+"  --ignore       - να μην ενημερωθεί, να σημειωθεί το μέσο ως αγνοημένο.\n"
+
+#: ../urpmi.update:47
+#, c-format
+msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
+msgstr ""
+"  --no-ignore    - να μην γίνει ενημέρωση, το μέσο θα σημειωθεί ως "
+"ενεργοποιημένο.\n"
+
+#: ../urpmi.update:49
+#, c-format
+msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
+msgstr "  --probe-rpms   - αγνοεί το αρχείο synthesis, χρήση του αρχείου rpm\n"
+
+#: ../urpmi.update:50
+#, c-format
+msgid "  -a             - select all enabled non-removable media.\n"
+msgstr ""
+"  -a             - επιλογή όλων των ενεργοποιημένων μη αφαιρούμενων μέσων.\n"
+
+#: ../urpmi.update:51
+#, c-format
+msgid "  -f             - force updating synthesis\n"
+msgstr "  -f             - εξαναγκάζει την ενημέρωση των αρχείων synthesis\n"
+
+#: ../urpmi.update:52
+#, c-format
+msgid "  -ff            - really force updating synthesis\n"
+msgstr ""
+"  -ff            - εξαναγκάζει πραγματικά την ενημέρωση των αρχείων "
+"synthesis\n"
+
+#: ../urpmi.update:69
+#, c-format
+msgid "Only superuser is allowed to update media"
+msgstr "Μόνο ο διαχειριστής επιτρέπεται να αναβαθμίζει τα μέσα"
+
+#: ../urpmi.update:86
+#, c-format
+msgid "nothing to update (use urpmi.addmedia to add a media)\n"
+msgstr ""
+"τίποτα για αναβάθμιση (χρησιμοποιήστε urpmi.addmedia για να προσθέσετε ένα "
+"μέσο)\n"
+
+#: ../urpmi.update:87
+#, c-format
+msgid ""
+"the entry to update is missing\n"
+"(one of %s)\n"
+msgstr ""
+"η επιλογή για αναβάθμιση λείπει\n"
+"(ένα εκ των %s)\n"
+
+#: ../urpmi.update:98
+#, c-format
+msgid "\"%s\""
+msgstr "«%s»"
+
+#: ../urpmi.update:99
+#, c-format
+msgid "ignoring media %s"
+msgstr "αγνόηση του μέσου %s"
+
+#: ../urpmi.update:99
+#, c-format
+msgid "enabling media %s"
+msgstr "ενεργοποίηση του μέσου %s"
+
+#: ../urpmq:44
+#, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+msgstr ""
+"  --searchmedia  - χρήση μόνο των μέσων που δόθηκαν, στην αναζήτηση των\n"
+"                   ζητούμενων (ή των αναβαθμιζόμενων) πακέτων.\n"
+
+#: ../urpmq:49
+#, c-format
+msgid "  --auto-orphans - list orphans\n"
+msgstr "  --auto-orphans - προβολή της λίστας με τα ορφανά\n"
+
+#: ../urpmq:50
+#, c-format
+msgid ""
+"  --not-available\n"
+"                 - list installed packages not available on any media.\n"
+msgstr ""
+"  --not-available\n"
+"                 - λίστα με τα εγκατεστημένα πακέτα που δεν είναι διαθέσιμα "
+"σε κάποιο μέσο.\n"
+
+#: ../urpmq:53
+#, c-format
+msgid "  --fuzzy        - impose fuzzy search (same as -y).\n"
+msgstr ""
+"  --fuzzy        - επιβάλει την αναζήτηση κατά προσέγγιση (ίδιο με -y).\n"
+
+#: ../urpmq:56
+#, c-format
+msgid "  --list         - list available packages.\n"
+msgstr "  --list         - εμφανίζει τα διαθέσιμα πακέτα.\n"
+
+#: ../urpmq:57
+#, c-format
+msgid "  --list-media   - list available media.\n"
+msgstr "  --list-media   - εμφανίζει τα διαθέσιμα μέσα ενημέρωσης.\n"
+
+#: ../urpmq:58
+#, c-format
+msgid "  --list-url     - list available media and their url.\n"
+msgstr ""
+"  --list-url     - εμφανίζει τα διαθέσιμα μέσα ενημέρωσης και τα URL τους.\n"
+
+#: ../urpmq:59
+#, c-format
+msgid "  --list-nodes   - list available nodes when using --parallel.\n"
+msgstr ""
+"  --list-nodes   - εμφανίζει την λίστα με τους διαθέσιμους κόμβους\n"
+"                   χρησιμοποιώντας --parallel.\n"
+
+#: ../urpmq:60
+#, c-format
+msgid "  --list-aliases - list available parallel aliases.\n"
+msgstr "  --list-aliases - λίστα των διαθέσιμων παράλληλων ψευδωνύμων.\n"
+
+#: ../urpmq:61
+#, c-format
+msgid ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+msgstr ""
+"  --dump-config  - εμφανίζει την διαμόρφωση με τη μορφή ενός ορίσματος\n"
+"                   urpmi.addmedia.\n"
+
+#: ../urpmq:62
+#, c-format
+msgid "  --src          - next package is a source package (same as -s).\n"
+msgstr ""
+"  --src          - το επόμενο πακέτο είναι ένα πακέτο πηγαίου κώδικα\n"
+"                   (ίδιο με το -s).\n"
+
+#: ../urpmq:63
+#, c-format
+msgid "  --sources      - print source URLs of selected packages\n"
+msgstr "  --sources    - εμφανίζει το πηγαίο URL των επιλεγμένων πακέτων.\n"
+
+#: ../urpmq:65
+#, c-format
+msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
+msgstr ""
+"  --ignorearch   - επιτρέπει την αναζήτηση πακέτων και για\n"
+"                   άλλες αρχιτεκτονικές.\n"
+
+#: ../urpmq:69
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
+"                   This permit to querying a distro.\n"
+msgstr ""
+"  --use-distrib  - ρύθμιση του urpmi στα γρήγορα από ένα δένδρο distrib.\n"
+"                   Αυτό επιτρέπει το querying μιας διανομής (distro).\n"
+
+#: ../urpmq:79
+#, c-format
+msgid "  --changelog    - print changelog.\n"
+msgstr "  --changelog    - εμφανίζει το changelog.\n"
+
+#: ../urpmq:80
+#, c-format
+msgid "  --conflicts    - print conflicts.\n"
+msgstr "  --conflicts    - εμφανίζει τις συγκρούσεις.\n"
+
+#: ../urpmq:81
+#, c-format
+msgid "  --obsoletes    - print obsoletes.\n"
+msgstr "  --obsoletes    - εκτύπωση των μη χρησιμοποιούμενων (obsoletes).\n"
+
+#: ../urpmq:82
+#, c-format
+msgid "  --provides     - print provides.\n"
+msgstr "  --provides     - εμφανίζει το πεδίο «provides».\n"
+
+#: ../urpmq:83
+#, c-format
+msgid "  --requires     - print requires.\n"
+msgstr "  --requires     - εμφανίζει τις εξαρτήσεις.\n"
+
+#: ../urpmq:84
+#, c-format
+msgid "  --suggests     - print suggests.\n"
+msgstr "  --suggests     - εκτύπωση των προτεινόμενων (suggests).\n"
+
+#: ../urpmq:85
+#, c-format
+msgid "  --sourcerpm    - print sourcerpm.\n"
+msgstr "  --sourcerpm    - εμφανίζει το όνομα του πηγαίου πακέτου.\n"
+
+#: ../urpmq:86
+#, c-format
+msgid "  --summary, -S  - print summary.\n"
+msgstr "  --summary, -S  - εμφανίζει την περίληψη.\n"
+
+#: ../urpmq:88
+#, c-format
+msgid ""
+"  --requires-recursive, -d\n"
+"                   - query package dependencies.\n"
+msgstr ""
+"  --requires-recursive, -d\n"
+"                 - αναζήτηση στις εξαρτήσεις του πακέτου.\n"
+
+#: ../urpmq:90
+#, c-format
+msgid "  --whatrequires - reverse search to what requires package.\n"
+msgstr ""
+"  --whatrequires - αντίστροφη αναζήτηση των στοιχείων που απαιτούν αυτό το\n"
+"                   πακέτο.\n"
+
+#: ../urpmq:91
+#, c-format
+msgid ""
+"  --whatrequires-recursive\n"
+"                   - extended reverse search (includes virtual packages).\n"
+msgstr ""
+"  --whatrequires-recursive\n"
+"                 - εκτεταμένη αντίστροφη αναζήτηση\n"
+"                   (περιλαμβάνει και τα εικονικά πακέτα).\n"
+
+#: ../urpmq:93
+#, c-format
+msgid ""
+"  --whatprovides, -p\n"
+"                   - search in provides to find package.\n"
+msgstr ""
+"  --whatprovides, -p\n"
+"                 - αναζήτηση του πακέτου που το παρέχει.\n"
+
+#: ../urpmq:96
+#, c-format
+msgid "  -c             - complete output with package to be removed.\n"
+msgstr ""
+"  -c             - έξοδος στη γραμμή εντολών με τα ονόματα των πακέτων\n"
+"                   προς  απεγκατάσταση.\n"
+
+#: ../urpmq:98
+#, c-format
+msgid "  -g             - print groups with name also.\n"
+msgstr "  -g             - εμφανίζει τις ομάδες καθώς και το όνομα.\n"
+
+#: ../urpmq:99
+#, c-format
+msgid "  -i             - print useful information in human readable form.\n"
+msgstr "  -i             - εμφανίζει χρήσιμες πληροφορίες πιο ευανάγνωστα.\n"
+
+#: ../urpmq:100
+#, c-format
+msgid "  -l             - list files in package.\n"
+msgstr "  -l             - λίστα αρχείων στο πακέτο.\n"
+
+#: ../urpmq:101
+#, c-format
+msgid "  -m             - equivalent to -du\n"
+msgstr "  -m             - ισοδύναμο του -du\n"
+
+#: ../urpmq:102
+#, c-format
+msgid "  -r             - print version and release with name also.\n"
+msgstr "  -r             - αναλυτική εμφάνιση της έκδοσης και του ονόματος.\n"
+
+#: ../urpmq:103
+#, c-format
+msgid "  -s             - next package is a source package (same as --src).\n"
+msgstr ""
+"  -s             - το επόμενο πακέτο είναι πηγαίο πακέτο (ίδιο με το --"
+"src).\n"
+
+#: ../urpmq:104
+#, c-format
+msgid ""
+"  -u             - remove package if a more recent version is already "
+"installed.\n"
+msgstr ""
+"  -u             - αφαίρεση του πακέτου εάν μια πιο πρόσφατη έκδοση είναι "
+"ήδη\n"
+"                   εγκατεστημένη.\n"
+
+#: ../urpmq:105
+#, c-format
+msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
+msgstr ""
+"  -y             - επιβάλει την αναζήτηση κατά προσέγγιση (ίδιο με --"
+"fuzzy).\n"
+
+#: ../urpmq:106
+#, c-format
+msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
+msgstr ""
+"  -Y             - όπως το -y, αλλά δεν λαμβάνει υπόψη τον τύπο των "
+"χαρακτήρων\n"
+"                   (κεφαλαία/πεζά).\n"
+
+# ???
+#: ../urpmq:107
+#, c-format
+msgid "  names or rpm files given on command line are queried.\n"
+msgstr ""
+"  τα ονόματα ή τα αρχεία rpm που δόθηκαν στη γραμμή εντολών συγκεντρώθηκαν.\n"
+
+#: ../urpmq:154
+#, c-format
+msgid "usage: \"urpmq --auto-orphans\" with no argument"
+msgstr "χρήση: \"urpmq --auto-orphans\" χωρίς πρόσθετες επιλογές"
+
+#: ../urpmq:207
+#, c-format
+msgid "--list-nodes can only be used with --parallel"
+msgstr "--list-nodes μπορούν να χρησιμοποιηθούν μόνο με --parallel"
+
+#: ../urpmq:231
+#, c-format
+msgid "use -l to list files"
+msgstr "χρησιμοποίησε το -l για να δεις μια λίστα με τα αρχεία"
+
+#: ../urpmq:416
+#, c-format
+msgid "no xml info for medium \"%s\", only partial result for package %s"
+msgstr ""
+"δεν βρέθηκαν πληροφορίες xml, για το μέσο \"%s\", μονάχα περιορισμένα "
+"αποτελέσματα για το πακέτο %s"
+
+#: ../urpmq:417
+#, c-format
+msgid "no xml info for medium \"%s\", only partial result for packages %s"
+msgstr ""
+"δεν βρέθηκαν πληροφορίες xml, για το μέσο \"%s\", μονάχα περιορισμένα "
+"αποτελέσματα για τα πακέτα %s"
+
+#: ../urpmq:420
+#, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for package %s"
+msgstr ""
+"δεν βρέθηκαν πληροφορίες xml, για το μέσο \"%s\", αδύνατη η λήψη "
+"αποτελεσμάτων για το πακέτο %s"
+
+#: ../urpmq:421
+#, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for packages %s"
+msgstr ""
+"δεν βρέθηκαν πληροφορίες xml, για το μέσο \"%s\", αδύνατη η επιστροφή "
+"αποτελεσμάτων για τα πακέτα %s"
+
+#: ../urpmq:488
+#, c-format
+msgid "No changelog found\n"
+msgstr "Δεν βρέθηκε αρχείο αλλαγών (changelog)\n"
+
+#: ../gurpmi.desktop.in.h:1
+msgid "Software Installer"
+msgstr "Εγκαταστάτης Λογισμικού"
+
+#: ../gurpmi.desktop.in.h:2
+msgid "Graphical front end to install RPM files"
+msgstr "Ένα γραφική πρόσοψη για την εγκατάσταση αρχείων RPM"
+
+#~ msgid ""
+#~ "urpme version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpme έκδοση %s\n"
+#~ "%s\n"
+#~ "Αυτό είναι ελεύθερο λογισμικό και μπορεί να αναδιανεμηθεί υπό τους όρους "
+#~ "της GNU GPL.\n"
+#~ "\n"
+#~ "χρήση :\n"
+
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage: urpmf [options] pattern-expression\n"
+#~ msgstr ""
+#~ " urpmf έκδοση %s\n"
+#~ "%s\n"
+#~ "Αυτό είναι ελεύθερο λογισμικό και μπορεί να αναδιανεμηθεί υπό τους όρους "
+#~ "της GNU GPL.\n"
+#~ "\n"
+#~ "χρήση : urpmf [επιλογές] ακολουθία-έκφραση ( urpmf [options] pattern-"
+#~ "expression )\n"
+
+#~ msgid ""
+#~ "urpmi.recover version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "Έκδοση urpmi.recover %s\n"
+#~ "%s\n"
+#~ "Αυτό είναι ελεύθερο λογισμικό και μπορεί να διανεμηθεί υπό τους όρους της "
+#~ "GNU GPL.\n"
+#~ "\n"
+#~ "χρήση:\n"
+
+#~ msgid ""
+#~ "urpmq version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "Έκδοση urpmq %s\n"
+#~ "%s\n"
+#~ "Αυτό είναι ελεύθερο λογισμικό και μπορεί να διανεμηθεί υπό τους όρους της "
+#~ "GNU GPL.\n"
+#~ "\n"
+#~ "χρήση:\n"
+
+#~ msgid ""
+#~ "Installation failed, some files are missing:\n"
+#~ "%s\n"
+#~ "You may want to update your urpmi database"
+#~ msgstr ""
+#~ "Η εγκατάσταση απέτυχε, ορισμένα αρχεία λείπουν:\n"
+#~ "%s\n"
+#~ "Θα πρέπει να ενημερώσετε τη βάση δεδομένων urpmi"
+
+#~ msgid "Cancel"
+#~ msgstr "Ακύρωση"
+
+#~ msgid ""
+#~ "# Here are logs of your DUDF uploads.\n"
+#~ "# Line format is : <date time of generation> <uid>\n"
+#~ "# You can use uids to see the content of your uploads at this url :\n"
+#~ "# %s"
+#~ msgstr ""
+#~ "# Εδώ είναι οι καταγραφές των αποστολών σας DUDF.\n"
+#~ "# Η μορφή της σειράς είναι : <ημερομηνία ώρα δημιουργίας> <uid>\n"
+#~ "# Μπορείτε να κάνετε χρήση uid για να δείτε το περιεχόμενο των αποστολών "
+#~ "σας σε αυτή τη διεύθυνση :\n"
+#~ "# %s"
+
+#~ msgid "curl is missing, cannot upload DUDF file.\n"
+#~ msgstr "λείπει το curl, αδύνατη η αποστολή του αρχείου DUDF.\n"
+
+#~ msgid "Compressing DUDF data... "
+#~ msgstr "Συμπίεση δεδομένων DUDF..."
+
+#~ msgid "NOT OK\n"
+#~ msgstr "ΔΕΝ ΕΙΝΑΙ ΕΝΤΑΞΕΙ\n"
+
+#~ msgid "OK\n"
+#~ msgstr "ΕΝΤΑΞΕΙ\n"
+
+#~ msgid "Uploading DUDF data:\n"
+#~ msgstr "Αποστολή δεδομένων DUDF:\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "You can see your DUDF report at the following URL :\n"
+#~ "\t"
+#~ msgstr ""
+#~ "\n"
+#~ "Μπορείτε να δείτε την αναφορά DUDF στην παρακάτω διεύθυνση :\n"
+#~ "\t"
+
+#~ msgid ""
+#~ "You can access a log of your uploads in\n"
+#~ "\t"
+#~ msgstr ""
+#~ "Μπορείτε να έχετε πρόσβαση σε μια καταγραφή των αποστολών σας στο\n"
+#~ "\t"
+
+#~ msgid ""
+#~ "A problem has been encountered. You can help Mandriva to improve package\n"
+#~ "installation by uploading a DUDF report file.\n"
+#~ "This is a part of the Mancoosi european research project.\n"
+#~ "More at http://www.mancoosi.org\n"
+#~ msgstr ""
+#~ "Παρουσιάστηκε ένα πρόβλημα. Μπορείτε να συμβάλετε ώστε η Mandriva να "
+#~ "βελτιώσει\n"
+#~ "την εγκατάσταση πακέτων, στέλνοντας ένα αρχείο αναφοράς DUDF.\n"
+#~ "Αυτό είναι ένα μέρος του ευρωπαϊκού έργου έρευνας Mancoosi.\n"
+#~ "Περισσότερα στο http://www.mancoosi.org\n"
+
+#~ msgid "Do you want to upload a DUDF report to Mandriva?"
+#~ msgstr "Επιθυμείτε να στείλετε στη Mandriva μια αναφορά DUDF;"
+
+#~ msgid ""
+#~ "\n"
+#~ "Generating DUDF... "
+#~ msgstr ""
+#~ "\n"
+#~ "Δημιουργία DUDF..."
+
+#~ msgid "Cannot write DUDF file.\n"
+#~ msgstr "Αδυναμία εγγραφής του αρχείου DUDF.\n"
+
+#~ msgid ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+#~ msgstr ""
+#~ "  --sources      - δίνει όλα τα πηγαία πακέτα πριν τη λήψη (μόνο root).\n"
+
+#~ msgid ""
+#~ "A problem has been encountered. You can help Mandriva to improve packages "
+#~ "installation \n"
+#~ msgstr ""
+#~ "Παρουσιάστηκε ένα πρόβλημα. Μπορείτε να βοηθήσετε την Mandriva στην "
+#~ "βελτίωση της εγκατάστασης πακέτων \n"
+
+#~ msgid ""
+#~ "by uploading us a DUDF report file. This is a part of the Mancoosi "
+#~ "european research project.\n"
+#~ msgstr ""
+#~ "στέλνοντας ένα αρχείο αναφοράς DUDF. Είναι μέρος του Ευρωπαϊκού έργου "
+#~ "έρευνας Mancoosi.\n"
+
+#~ msgid "More at http://www.mancoosi.org\n"
+#~ msgstr "Περισσότερα στο http://www.mancoosi.org\n"
+
+#~ msgid "due to already installed %s"
+#~ msgstr "επειδή το %s είναι ήδη εγκατεστημένο"
+
+#~ msgid ""
+#~ "  --from         - use specified url for list of mirrors, the default is\n"
+#~ "                   %s\n"
+#~ msgstr ""
+#~ "  --from         - χρήση του καθορισμένου url για την λίστα των mirrors, "
+#~ "η προεπιλογή είναι\n"
+#~ "                   %s\n"

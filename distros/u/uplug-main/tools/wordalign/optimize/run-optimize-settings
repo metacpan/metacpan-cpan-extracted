@@ -1,0 +1,385 @@
+#!/usr/bin/perl
+#--------------------------------------------------------------------------
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id$
+#
+#-------------------------------------------------------------------------
+# Usage: run-optimize-settings [OPTIONS] bitext gold-standard optimize-log
+#
+#        bitext: sentence-alignments in XCES format
+# gold-standard: word alignments in XML
+#  optimize-log: log-file of the optimze-script
+#
+# OPTIONS
+#
+#   -m MaxNrSettings ........ number of settings to be run
+#   -s ...................... skip static clues (ensv|sven|svde)
+#   -r lang.................. replace language pair of static clues with lang
+#
+
+use FindBin qw($Bin);
+use strict;
+
+my $MaxNrSettings;
+my $SkipStatic=0;
+my $ReplaceLang=undef;
+
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift(@ARGV);
+    if ($opt=~/^\-m/){
+	$MaxNrSettings=shift(@ARGV);
+    }
+    elsif ($opt=~/^\-s/){
+	$SkipStatic=not $SkipStatic;
+    }
+    elsif ($opt=~/^\-r/){
+	$ReplaceLang=shift(@ARGV);;
+    }
+}
+
+my $corpus=shift(@ARGV);
+my $gold=shift(@ARGV);
+
+
+my @gizaclues=('giza-word-prefix',
+	       'giza-word-prefix-i',
+	       'giza-word',
+	       'giza-word-i',
+	       'giza-pos',
+	       'giza-pos-i',
+#	       'giza-pos-word',
+#	       'giza-pos-word-i',
+#	       'giza-word-prefix1',
+#	       'giza-word-prefix2',
+#	       'giza-word-prefix4',
+	       'giza-word-suffix',
+	       'giza-word-suffix-i'
+	      );
+my %DynAlignClues=(
+		'dp'     => 'pos.dbm',
+#		'dpp'    => 'pos_coarse.dbm',
+		'dc'     => 'chunk.dbm',
+		'dx'     => 'position.dbm',
+		'dl'     => 'lex.dbm',
+		'dlp'    => 'lexpos.dbm',
+		'dpx'    => 'posposi.dbm',
+		'dp3'    => 'postri.dbm',
+		'dp3x'   => 'postriposi.dbm',
+		'dc3'    => 'chunktri.dbm',
+		'dc3p'   => 'chunktripos.dbm',
+		'dc3x'   => 'chunktriposi.dbm'
+		);
+
+my $DefWeight=0.05;       # default weight for clues
+
+my $UplugHome="$Bin/../..";
+my $uplug=$UplugHome.'/uplug';
+my $LinkConfig='systems/align/word/test/link';
+my $align=$uplug.' '.$LinkConfig;
+my $eval=$UplugHome.'/bin/evalalign.pl';
+my $dynpar=join (' 1 -',keys %DynAlignClues);
+my $dynamic="$uplug systems/align/word/dynamicclues -$dynpar 1";
+my $DynNr;
+
+my $remote='/home/staff/joerg/bin/remote';
+#my $remote='echo';
+#my $remote='sh -c';
+
+my @settings=();
+my %dynamic=();
+my %Running=();
+
+&ReadSettings(\@settings,\%dynamic);
+@settings=&SelectSettings(\@settings,\%dynamic,
+			  $MaxNrSettings,
+			  $SkipStatic,
+			  $ReplaceLang);
+
+&MakeEstimatedClues();
+&MakeDynAlign(\%dynamic);
+&RunSettings(\@settings,\%dynamic);
+
+
+sub ReadSettings{
+    my $set=shift;
+    my $dyn=shift;
+
+    my $dyncount=0;
+
+    while(<>){
+	if (/^[0-9\.]{4,5}\s+[0-9\.]{4,5}\s+[0-9\.]{4,5}\s+[0-9\:\s]+\s+(\S*)$/){
+	    push (@{$set},$1);
+	}
+	if (/^\#\# top-list/){@{$set}=();}
+	if (/^learn dynamic clues from (.*)\.links$/){
+	    $dyncount++;
+	    $dyn->{'dyn'.$dyncount}=$1;
+	}
+    }
+}
+
+sub SelectSettings{
+    my $settings=shift;
+    my $dynamic=shift;
+    my $runmax=shift;
+    my $skipstatic=shift;
+    my $lang=shift;
+
+    if ($skipstatic){
+	@{$settings}=grep ($_!~/(ensv|sven|svde)/,@{$settings});
+    }
+    if ($lang){
+	map ($_=~s/(ensv|sven|svde)/$lang/g,@{$settings});
+    }
+
+    my $count=0;
+    if (not $runmax){return reverse @{$settings};}
+
+    my @selected;
+    my $steps=$#{$settings}/$runmax;
+    my $idx=0;
+    while ($idx<=$#{$settings}){
+	push (@selected,$settings->[$idx]);
+	$idx+=$steps;
+    }
+    return reverse @selected;
+}
+
+sub RunSettings{
+    my $settings=shift;
+    my $dynamic=shift;
+    while (@{$settings}){
+	my $s=shift(@{$settings});
+	if (not &RunAligner($s,1)){push (@{$settings},$s);}
+    }
+}
+
+
+
+sub MakeDynAlign{
+    my $dynamic=shift;
+    my $dyn=1;
+    while (keys %{$dynamic}){
+	if (not defined $dynamic->{'dyn'.$dyn}){last;}
+	&RunAligner($dynamic->{'dyn'.$dyn});
+	while (not -e $dynamic->{'dyn'.$dyn}.'.ready'){sleep 1;}
+	$DynNr=$dyn;
+	&MakeDynamicClues($dynamic->{'dyn'.$dyn}.'.links.gz');
+	while (not -e "dyn$DynNr.ready"){sleep 1;}
+	mkdir 'dyn'.$dyn,0755;
+	system "cp data/runtime/* dyn$dyn/";
+	$dyn++;
+    }
+}
+
+
+###########################################################
+# RunClueAligner
+#
+#-------------------------------------------------------
+# run clue aligner 
+#    settings: a set of clues with weights
+#-------------------------------------------------------
+
+sub RunAligner{
+
+    my $file=shift;
+    my $rmLinks=shift;             # =1 --> remove link-files
+
+    if ($file=~/^dyn([0-9]+)\_/){
+	if ($1 ne $DynNr){
+	    if (&DynIsRunning){
+		sleep 1;
+		return 0;
+	    }
+	    else{
+		system ("cp dyn$1/* data/runtime/");
+	    }
+#	    while (&DynIsRunning){sleep 1;}
+#	    system ("cp dyn$1/* data/runtime/");
+	}
+	$DynNr=$1;
+    }
+    my $setting={};
+    &File2Setting($setting,$file);
+    if (ref($setting->{clues}) ne 'HASH'){return;}
+
+    my @clues=keys %{$setting->{clues}};
+    my @weights=values %{$setting->{clues}};
+    my $minscore=$setting->{score};
+
+    my $param='';
+    foreach (keys %{$setting->{clues}}){
+#	$param.='-'.$_.' ';
+	if ($setting->{clues}->{$_}){
+	    $param.='-'.$_.' ';
+	    $param.='-'.$_.'_w '.$setting->{clues}->{$_}.' ';
+	}
+    }
+    if ($minscore){$param.=" -min $minscore";}
+
+#    my $file=&Setting2File($setting);
+
+    my $comm="$align -in $corpus $param -out $file.links 2>$file.log";
+    $comm.=";$eval -gold $gold -in $file.links >$file.eval";
+    $comm.=";gzip $file.links";
+    $comm.=";touch $file.ready;";
+    if ($rmLinks){
+	$comm.="rm -f $file.links.gz;";
+    }
+
+#    print "run $file\n";
+    $Running{$file}=1;
+    system ("$remote '$comm'");
+    return $file;
+}
+
+# end of RunClueAligner
+###########################################################
+
+
+
+use File::stat;
+
+sub DynIsRunning{
+    my @dynamic=keys %Running;
+    @dynamic=grep (/^dyn/,@dynamic);
+    foreach (@dynamic){
+	if (-e "$_.links"){
+	    my $fstat=stat("$_.links");        # check file statistics
+	    my $mtime=time-$fstat->mtime;      # time - last-modification-time
+	    if ($mtime>600){                   # no modification since 10 min?
+		unlink ("$_.links");           # --> remove the file!
+		delete $Running{$_};           # --> remove from Running
+	    }                                  # otherwise:
+	    else{return 1;}                    # yes, still running!
+	}
+    }
+    return 0;
+}
+
+
+###########################################################
+# make a unique filename for a clue aligner setting
+
+sub Setting2File{
+
+    my $setting=shift;
+    if (ref($setting->{clues}) ne 'HASH'){return undef;}
+    my $file='C';         # start file names with 'C' (to avoid initial '-') 
+    my $InclDynClue=0;
+    foreach (sort keys %{$setting->{clues}}){
+	if (defined $setting->{clues}->{$_}){          # weights before clues!
+	    $file.=$setting->{clues}->{$_};
+	}
+	$file.=$_;                                     # clue name
+	if (defined $DynAlignClues{$_}){$InclDynClue=1;}
+	$file.='+';
+    }
+    chop ($file);
+    if ($InclDynClue){$file='dyn'.$DynNr.'__'.$file;}  # add dynclue-marker
+    my $minscore=$setting->{score};
+    if ($minscore){$file.="_min$minscore";}
+    return $file;
+}
+
+
+###########################################################
+# create the clue aligner setting from a uniqe filename
+
+sub File2Setting{
+
+    my $setting=shift;
+    my $file=shift;
+
+    $file=~s/^.*?\_\_//;            # remove dynclue-marker
+    $file=~s/^C//;                  # remove initial 'C'
+    if ($file=~s/(\_min)(.*)$//){   # check if there's a score threshold
+	$setting->{score}=$2;
+    }
+    my @clues=split(/\+/,$file);    # split into clues
+    foreach (@clues){
+	if (/^([0-9\.]*)([^0-9].*)$/){
+	    $setting->{clues}->{$2}=$1;
+	}
+	else{
+	    $setting->{clues}->{$_}=$DefWeight;
+	}
+    }
+}
+
+
+
+
+###########################################################
+# MakeDynamicClues
+#
+#------------------------------------------------
+# learn dynamic clues from some previous links
+#------------------------------------------------
+
+sub MakeDynamicClues{
+    my $links=shift;
+    my $comm="$dynamic -in $links >dyn$DynNr.out 2>dyn$DynNr.log";
+    $comm.=";touch dyn$DynNr.ready;";
+    system ("$remote '$comm'");
+}
+
+
+###########################################################
+# MakeEstimatedClues
+#
+#------------------------------------------------
+# create giza clues and basic clues
+# and wait until they are finished
+#------------------------------------------------
+
+
+sub MakeEstimatedClues{
+
+#------------------------------------------------
+# run giza remotely
+
+    print "create estimated clues!\n";
+    foreach my $c (@gizaclues){
+	if (-e "$c.eval"){next;}
+	if (-e "data/runtime/$c.dbm"){next;}
+	my $comm="$uplug systems/align/word/test/$c -in $corpus -out $c.links";
+	$comm.=";gzip -f $c.links;$eval -gold $gold -in $c.links.gz >$c.eval";
+	system ("$remote '$comm'");
+    }
+
+#------------------------------------------------
+# create basic clues (dice+sim)
+
+    if ((not -e "data/runtime/str.dbm") or 
+	(not -e "data/runtime/dice.dbm")){
+	print "create basic clues!\n";
+	system("$uplug systems/align/word/basicclues -in $corpus");
+    }
+
+#------------------------------------------------
+# wait for the remote alignments (giza)
+
+    foreach my $c (@gizaclues){
+	print "waiting for $c.eval!\n";
+	while (not -e "data/runtime/$c.dbm"){sleep 1;}
+    }
+}

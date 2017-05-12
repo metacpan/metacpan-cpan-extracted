@@ -1,0 +1,11 @@
+To compile the examples:
+javac -d classes -cp ../../malt.jar:. srcex/org/maltparser/examples/*.java
+
+To run the examples:
+java -cp classes:../../malt.jar org.maltparser.examples.ReadWriteCoNLL ../data/talbanken05_test.conll out.conll ../../appdata/dataformat/conllx.xml UTF-8
+java -cp classes:../../malt.jar org.maltparser.examples.CreateDependencyGraph
+java -cp classes:../../malt.jar org.maltparser.examples.CreatePhraseStructureGraph
+java -cp classes:../../malt.jar org.maltparser.examples.TrainingExperiment
+java -cp classes:../../malt.jar org.maltparser.examples.ParsingExperiment
+java -cp classes:../../malt.jar org.maltparser.examples.ParseSentence1
+java -cp classes:../../malt.jar org.maltparser.examples.ParseSentence2

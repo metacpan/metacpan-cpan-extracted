@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use Encode;
+
+## don't do anything with extra parameters
+while ($ARGV[0]=~/^-/){shift(@ARGV);}
+
+## conversion between XX..YY
+my $convert = shift(@ARGV);
+my ($in,$out) = split(/\.\./,$convert);
+
+## some simple aliases like 'l1' ==> 'iso-8859-1' (really not complete)
+$in = solve_alias($in);
+$out = solve_alias($out);
+
+
+#binmode(STDIN,":encoding($in)");
+#binmode(STDOUT,":encoding($out)");
+
+binmode(STDIN);
+binmode(STDOUT);
+
+
+while (<>){
+
+    ## handle malformed data by replacing them with ' '
+    my $octets = decode($in, $_,sub{ return ' ' });
+#    print $octets;
+    my $text = encode($out, $octets);
+    print $text;
+
+#    print;
+#    print decode($out, $_);
+
+}
+
+
+
+
+sub solve_alias{
+
+    my $enc=shift;
+
+    my %aliases = (l1 => 'iso-8859-1',
+		   l2 => 'iso-8859-2',
+		   l3 => 'iso-8859-3',
+		   l4 => 'iso-8859-4',
+		   l5 => 'iso-8859-5',
+		   l6 => 'iso-8859-6',
+		   l7 => 'iso-8859-7',
+		   l15 => 'iso-8859-15');
+
+    if (exists $aliases{$enc}){
+	return $aliases{$enc};
+    }
+    return $enc;
+}

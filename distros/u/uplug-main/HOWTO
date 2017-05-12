@@ -1,0 +1,158 @@
+
+
+
+How to include a dictionary in the Clue Aligner
+===============================================
+
+
+1) Create a DBM-clue database
+  * you can use uplug/tools/declclue to create a clue-database-file
+    from a plain-text-file:
+    - if this is your lexicon (lexicon.txt):
+    
+######################################################################
+# everything line that start with '#' is part of the header
+# the header may include parameters in the form attribute: value
+# you may specify source-feature-patterns and target-feature-patterns
+# lexical data is separated by TAB (source<TAB>target<TAB>frequency)
+# frequency-values are optional
+# everything should be in Unicode (UTF8) if not specified with -ci
+#
+# Swedish - English
+#---------------------------------------------------------------------
+enligt	according to
+en	a
+ett	a
+efter	after
+för	for
+för	to
+och	and
+den	the
+regeringen	the Government
+################## this is the end of the file
+
+   - use the following command to create a new clue-DB
+
+uplug/tools/declclue -o data/runtime/lexicon.dbm < lexicon.txt
+
+
+2) The lexicon is now used by the 'link'-module in the clue
+   aligner. Try for example to align the example-bitext from
+   uplug/example (supposing that you copied the corpus to the
+   current directory):
+
+uplug/uplug align/word/link -in svenprf.xces
+
+
+
+How to use alternative sentence alignment approaches (since version 0.2.0)
+==========================================================================
+
+
+1) hunalign
+
+
+hunalign is taken from http://mokk.bme.hu/resources/hunalign
+It is licensed under a Creative Commons License
+http://creativecommons.org/licenses/by/2.0/
+In Uplug it is included in share/bin/Linux/hunalign (pre-compiled for GNU/Linux).
+
+You can run it in a similar way as the default sentence aligner.
+Assuming that you have 2 tokenized files (source.xm & target.xml) run the
+following command:
+
+
+    uplug align/hun -src source.xml -trg target.xml -out aligned.xml
+
+
+This will run hunalign with default settings and the '-realign' flag set
+(refer to the hunalign documentation for more details).
+
+You may use your own dictionary using the -dic flag (in that case it won't run
+-realign!):
+
+
+    uplug align/hun -dic my-dic.txt -src source.xml -trg target.xml
+
+
+The format of a dictionary is as follows 
+(source and target separated by ' @ '):
+
+a little @ egy keveset
+a little @ egy kicsi
+a little @ egy kicsit
+
+(this example is taken from the included english-hungarian dictionary
+ext/hunalign/data/hu-en.dic)
+
+
+You can also run hunalign in 'bisent' mode (only create 1:1 alignments)
+Use flag '-b':
+
+    uplug align/hun -b -src source.xml -trg target.xml -out bisent.xml
+
+
+
+
+2) GMA (geometric mapping and alignment)
+
+
+GMA is taken from http://nlp.cs.nyu.edu/GMA/
+and licensed under the GPL (http://www.gnu.org/licenses/gpl.html)
+In Uplug it is include in share/ext/gma (pre-compiled for GNU/Linux)
+
+
+You can run it in the same way as the default sentence aligner:
+
+    uplug align/gma -src source.xml -trg target.xml -out aligned.xml
+
+However, it is recommended to use GMA with language specific
+configurations. There is only one pre-defined configuration file for GMA in
+Uplug, for English-French. Configuration files are in 
+    share/ext/gma/config/
+for example
+    share/ext/gma/config/GMA.config.enfr
+You can write your own configuration files that points to resource files used
+by the algorithm (look at the example configuration file for enfr). It can be
+used by specifying source and target language when running GMA in Uplug:
+
+
+    uplug align/gma -src source.xml -srclang source-language -trg target.xml -trglang target_;anguage -out aligned.xml
+
+
+
+3) uplug-sentence-align
+
+
+There is another experimental sentence alignment script in
+uplug/tools/uplug-sentence-align which can be used independent of Uplug (doesn't
+require the Uplug modules or any other external resource except XML::Parser)
+
+It's an extension to the Gale&Chruch alignment approach re-implemented by
+Phillip Koehn to align the EuroParl corpus. Essentially it adds a
+cognate/dictionary filter to the standard length-based approach.
+
+You can run it like this:
+
+    uplug/tools/uplug-sentence-align source.xml target.xml > aligned.xml
+
+(this is without any filters)
+There are several options to change the alignment process:
+
+#  -h 'hard-tag-re' .......... regular expression to match hard boundary tags
+#  -i min_length ............. check for identical words (set minimal length)
+#  -c threshold .............. use LCSR cognate filter (with threshold)
+#  -w window ................. define size of sliding window (for all filters)
+#  -d dic-file ............... use dictionary filter (using dic-file)
+#  -u ........................ cognate/identical filter for upper case words
+#  -v ........................ verbose mode
+
+The dicitonary format is a space list of entries where source and target word
+(no multi-word units!) are separated by exactly one space character.
+
+The LCSR threshold should be between 0 and 1. The window parameter and the
+min_length parameter should be positive integers. All filters are applied in a
+sort of sliding window. Hard boundaries will be added after sentence pairs
+containing cognates/dictionary entries identified by the filters.
+
+

@@ -1,0 +1,120 @@
+#!/usr/bin/perl
+#----------------------------------------------------------------------------
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: giza_inv2uplug,v 1.1.1.1 2004/05/03 15:39:55 joerg72 Exp $
+#----------------------------------------------------------------------------
+#
+# 
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/..";
+
+use Uplug::Data::Align;
+use Uplug::Data::DOM;
+use Uplug::IO::Any;
+
+my %InputStream=('format' => 'xces xml');
+$InputStream{file}=shift(@ARGV);
+my %OutputStream=('format' => 'xces xml',
+		  'SkipSrcFile' => 1,
+		  'SkipTrgFile' => 1);
+
+my $giza=shift(@ARGV);
+
+my $TokenLabel='w';
+
+#---------------------------------------------------------------------------
+
+my $input=Uplug::IO::Any->new(\%InputStream);
+my $output=Uplug::IO::Any->new(\%OutputStream);
+$input->open('read',\%InputStream);
+$output->addheader($input->header());
+$output->open('write',\%OutputStream);
+
+open F,"<$giza";
+
+#---------------------------------------------------------------------------
+
+my $data=Uplug::Data::Align->new();
+
+while ($input->read($data)){
+
+    my $srctxt=$data->content('source');
+    my $trgtxt=$data->content('target');
+    $srctxt=~tr/\n/ /;
+    $trgtxt=~tr/\n/ /;
+    if ($srctxt!~/\S/){next;}
+    if ($trgtxt!~/\S/){next;}
+
+    my $SrcData=Uplug::Data::DOM->new();
+    my $TrgData=Uplug::Data::DOM->new();
+    $data->subTree($SrcData,'source');
+    $data->subTree($TrgData,'target');
+
+    my @SrcNodes=$SrcData->getNodes($TokenLabel);
+    my @SrcIds=$data->attribute(\@SrcNodes,'id');
+    my @SrcSpans=$data->attribute(\@SrcNodes,'span');
+    my @SrcTokens=$data->content(\@SrcNodes);
+
+    my @TrgNodes=$TrgData->getNodes($TokenLabel);
+    my @TrgIds=$data->attribute(\@TrgNodes,'id');
+    my @TrgSpans=$data->attribute(\@TrgNodes,'span');
+    my @TrgTokens=$data->content(\@TrgNodes);
+
+    if ((not @SrcNodes) or (not @TrgNodes)){next;}
+
+    $_=<F>;
+    $_=<F>;
+    chomp;
+    my @src=split(/ /);
+    $_=<F>;
+    chomp;
+
+
+    my %align=();
+    my $count=1;
+    my $ggg=$_;
+    while (/\s(\S.*?)\s\(\{\s(.*?)\}\)/g){     # strunta i NULL!!
+	if ($2){push (@{$align{$2}},$count);}
+	$count++;
+    }
+    foreach (sort keys %align){
+	my @t=@{$align{$_}};
+	my @s=split(/\s/);
+
+	my @src=();my @trg=();
+	foreach (@s){push (@src,$SrcTokens[$_-1]);}
+	foreach (@t){push (@trg,$TrgTokens[$_-1]);}
+	my @srcId=();my @trgId=();
+	foreach (@s){push (@srcId,$SrcIds[$_-1]);}
+	foreach (@t){push (@trgId,$TrgIds[$_-1]);}
+	my @srcSpan=();my @trgSpan=();
+	foreach (@s){push (@srcSpan,$SrcSpans[$_-1]);}
+	foreach (@t){push (@trgSpan,$TrgSpans[$_-1]);}
+
+	my %link=();
+	$link{link}=join ' ',@src;
+	$link{link}.=';';
+	$link{link}.=join ' ',@trg;
+	$link{source}=join '+',@srcId;
+	$link{target}=join '+',@trgId;
+	$link{src}=join '&',@srcSpan;
+	$link{trg}=join '&',@trgSpan;
+
+	if ($link{source}!~/\S/){
+	    print '';
+	}
+
+	$data->addWordLink(\%link);
+    }
+
+    $output->write($data);
+}
+
+$input->close;
+$output->close;
+

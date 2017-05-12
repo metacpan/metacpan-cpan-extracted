@@ -1,0 +1,58 @@
+
+
+For the interactive alignment tools (ICA & ISA)
+===============================================
+
+- look at the README in the sub-directory php/
+
+
+
+
+
+
+
+
+For UplugWeb (old and pretty much unsupported)
+==============================================
+
+
+
+You need the following:
+ - Uplug and all its modules and scripts (check that everything works!)
+ - external tools used by Uplug (taggers etc)
+ - Mail::Mailer (part of MailTools, needed by the CGI-script!)
+   (http://search.cpan.org/~markov/MailTools-1.62/)
+ - CWB and Perl modules for IMS CWB and CQP
+   (ftp://ftp.ims.uni-stuttgart.de/pub/outgoing/cwb-beta/index.html)
+ - make for sure that all external tools exist and work on your system,
+   even for web-processes! (TnT, TreeTagger, Grok, CWB) you might have to 
+   adjust things in uplug/ext !!!!
+
+
+
+* copy uplug/web/cgi-bin/uplug to your cgi-bin directory
+* change variables in uplug
+   UPLUGADMIN	e-mail adress of the Uplug administrator
+   UPLUGLOG	log-file for the Uplug cgi-script
+   UPLUGHOME	home directory of the Uplug installation
+   UPLUGDATA	home directory of user data (writeable for the webserver)
+   HTPASSWD	Apaches password management tool
+* make the UPLUGDATA directory (writeable for the Apache web server)
+  (make it accessible for you as well using a 'users' group and add a 
+   sticky-bit to this directory, e.g. with 'chmod g+s UPLUGDATA')
+* copy the entire directory uplug/web/cgi-bin/user to your cgi-bin directory
+  (including all files even .htaccess! use the same cgi-bin directory as 
+   for the uplug script!)
+* modify the .htaccess file in this user directory (the one you've created)
+  to point to the user authentification file .htpasswd in your UPLUGDATA dir
+   AuthUserFile	UPLUGDATA/.htpasswd
+* modify the uplug-server configuration (uplug/web/bin/uplug-server)
+   UPLUGDATA (should be the same as above)
+* start one (or more) uplug-servers (uplug/web/bin/uplug-server)
+   IMPORTANT: the files .todo, .queued, .working, .done, .failed 
+	      in the .process-directory have 
+              to be writeable for the uplug-server processes!!!!!!!!!
+
+
+Now try the uplug-cgi script with your web-browser!
+

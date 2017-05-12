@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+
+<!-- build script for gma program -->
+
+<project name="gma" default="install">
+
+  <property name="bin.dir" value="bin"/>
+  <property name="build.dir" value="build"/>
+  <property name="source.dir" value="src"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="test.dir" value="validation"/>
+  <property name="temp.dir" value="validation/temp"/>
+  <property name="lib.dir" value="lib"/>
+  
+  <property name="package.jar" value="gma.jar"/>
+  <property name="junit.jar" value="junit.jar"/>
+  <property name="dist.jar" value="gma"/>
+  
+  <property name="batch.file" value="gma.bat"/>
+  <property name="shell.script" value="gma.sh"/>
+  <property name="properties.file" value="GMA.properties"/>
+  <property name="manifest.file" value="MANIFEST.MF"/>
+  <property name="ReadMe.file" value="ReadMe.txt"/>
+  <property name="build.file" value="build.xml"/>
+
+  <property name="version" value="version"/>
+  
+  <path id="project.class.path">
+    	<fileset dir="${lib.dir}">
+      		<include name="${junit.jar}"/>
+    	</fileset>
+    	<pathelement location="${build.dir}"/>
+  </path>
+
+  <target name="install" depends="test"/>
+  <target name="build">
+  	<delete dir="${build.dir}" quiet="true"/>
+  	<mkdir dir="${build.dir}"/>
+    	<javac debug="on" srcdir="${source.dir}" destdir="${build.dir}"/>
+    	<javac debug="on" srcdir="${test.dir}" destdir="${build.dir}"/>
+  </target>
+
+  <target name="package" depends="build">
+      	<jar jarfile="${lib.dir}/${package.jar}"
+           basedir="${build.dir}"
+           manifest="${bin.dir}/${manifest.file}"/>
+  </target>
+
+  <target name="dist" depends="check.version">
+
+	<delete dir="${dist.dir}" quiet="true"/>
+  	<mkdir dir="${dist.dir}"/>  	
+
+	<delete dir="${temp.dir}" quiet="true"/>
+	<mkdir dir="${temp.dir}"/>
+	<mkdir dir="${temp.dir}/${lib.dir}"/>
+	<mkdir dir="${temp.dir}/${bin.dir}"/>
+	<mkdir dir="${temp.dir}/${source.dir}"/>
+	<mkdir dir="${temp.dir}/${test.dir}"/>
+
+	<copy todir="${temp.dir}/${lib.dir}">
+    		<fileset dir="${lib.dir}" includes="${junit.jar}"/>
+    	</copy>
+
+	<copy todir="${temp.dir}/${bin.dir}">
+    		<fileset dir="${bin.dir}" includes="${batch.file},${shell.script}"/>
+    	</copy>
+	<copy todir="${temp.dir}/${bin.dir}">
+    		<fileset dir="${bin.dir}" includes="${properties.file},${manifest.file}"/>
+    	</copy>
+	<copy todir="${temp.dir}/${bin.dir}">
+    		<fileset dir="${bin.dir}" includes="frenchFull.axis, englishFull.axis, french.stoplist, english.stoplist"/>
+    	</copy>
+
+	<copy todir="${temp.dir}">
+    		<fileset dir="." includes="${build.file}"/>
+    	</copy>
+	<copy todir="${temp.dir}">
+    		<fileset dir="." includes="${ReadMe.file}"/>
+    	</copy>
+
+	<copy todir="${temp.dir}/${source.dir}">
+    		<fileset dir="${source.dir}"/>
+    	</copy>
+ 
+	<copy todir="${temp.dir}/${test.dir}">
+    		<fileset dir="${test.dir}"/>
+    	</copy>
+    	
+      	<jar jarfile="${dist.dir}/${dist.jar}_${version}.jar"
+           	basedir="${temp.dir}"/>
+    	
+	<delete dir="${temp.dir}"/>  	
+  </target>
+  
+  <target name="test" depends="package">
+
+    <junit printsummary="yes"
+           haltonfailure="yes"
+  	   fork="off">
+
+	  <classpath>
+	  	<pathelement location="${lib.dir}/${package.jar}" />
+	  </classpath>
+
+        <batchtest>
+          <fileset dir="${test.dir}">
+            <include name="**/Test*.java"/>
+  	  </fileset>
+        </batchtest>
+     </junit>
+
+  </target>
+
+  <target name="get.version">
+    <condition property="version.ok">
+        <!-- ant 1.5 <isset property="version"/>-->
+        <not>
+           <equals arg1="${version}" arg2="version"/>
+        </not>
+    </condition>
+  </target>
+
+  <target name="check.version" depends="get.version" unless="version.ok">
+    <fail message="You must specify version, e.g. ant dist -Dversion=1.2.1"/>
+  </target>
+
+</project>

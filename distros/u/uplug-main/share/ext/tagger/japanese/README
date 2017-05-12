@@ -1,0 +1,7 @@
+
+- binaries of the Japanese morphological analyzer ChaSen
+- dictionary files (ipdadic) are included
+- the source code is in uplug/ext/chasen
+  (if you have to recompile)
+- this directory includes 'recode' as well which is used by the startup script 'chasen_japanese'
+ (modify the script if you need another recode version)

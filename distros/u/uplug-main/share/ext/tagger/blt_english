@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+
+use FindBin qw($Bin);
+
+my $JAVA="$ENV{JAVA_HOME}/bin/java";
+my $QTAG="$Bin/../QTag/portuguese/qtag.jar";
+my $MODEL="$Bin/../QTag/english/BLT.dat";
+
+system "${JAVA} -jar ${QTAG} ${MODEL} <$ARGV[0]";
+exit;
+
+
+
+
+#############################
+# bash version
+
+# !/bin/bash
+#
+# JAVA=/usr/java/j2re1.4.2/bin/java
+# BIN=/home/staff/joerg/tools/nlp
+# QTAG=${BIN}/portuguese/qtag.jar
+# MODEL=${BIN}/english/BLT.dat
+#
+# ${JAVA} -jar ${QTAG} ${MODEL} <$1
+

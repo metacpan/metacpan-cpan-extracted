@@ -1,0 +1,15 @@
+
+
+align/		some word alignment scripts for experimenting with 
+		alignment settings
+
+
+summarize-eval .......  summarize all evaluation files (*.eval)
+optimize ............. 	run alignment settings and optimize according to a 
+			gold standard
+run-optimize-settings	run settings logged by the 'optimize' script on 
+			another corpus
+merge-align-results.pl	merge pairs of evaluation scores for word 
+			alignments with identical settings (print some 
+			octave commands for correlation)
+

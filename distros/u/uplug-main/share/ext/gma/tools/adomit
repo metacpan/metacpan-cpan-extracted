@@ -1,0 +1,16 @@
+#!/bin/tcsh
+
+# simplifying wrapper for `maxslopesegments`
+
+if ($#argv != 2) then
+   echo "usage: adomit <max. slope> <bitext map>"
+   exit 0
+endif
+
+set maxslope = $1
+set lastpoint = `tail -1 $2`
+set lastx = $lastpoint[1]
+set lasty = $lastpoint[2]
+set gslope = `perl -e 'print $ARGV[0] / $ARGV[1];' $lasty $lastx `
+
+maxslopesegments $gslope $maxslope $2 | sort -T . -nr 

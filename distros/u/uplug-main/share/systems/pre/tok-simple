@@ -1,0 +1,110 @@
+{
+  'encoding' => 'iso-8859-1',
+  'module' => {
+    'name' => 'tokenizer',
+    'program' => 'uplug-split',
+    'location' => '$UplugBin',
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This module is a simple tokenizer which splits
+  sentences into tokens. It uses simple regular expressions for
+  matching common word boundaries. Do not expect this to work
+  correctly in all cases and for all languages.',
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#      'encoding' => 'iso-8859-1',
+	'status' => 'tok',
+    }
+  },
+  'parameter' => {
+    'segments' => {
+       'tag' => 'w',
+       'add IDs' => 1,
+#       'add spans' => 1,
+       'add parent id' => 1,
+#       'keep spaces' => 1,
+#       'delimiter' => ' ',       # default delimiter used when splitting
+       'delimiter' => ' ',       # default delimiter used when splitting
+    },
+    'split pattern' => {
+
+        # \p{P} ==> punctuations
+        # \P{P} ==> non-punctuations
+
+        10 => '(\P{P})(\p{P}[\p{P}\s]|\p{P}\Z)',  # non-P + P + (P or \s or \Z)
+	20 => '(\A\p{P}|[\p{P}\s]\p{P})(\P{P})',  # (\A or P or \s) + P + non-P
+	40 => '(``)(\S)',                         # special treatment for ``
+
+	# separate punctuations if they are not the same
+	# (use negative look-ahead for that!)
+
+	50 => '(\p{P})(?!\1)',
+
+	100 => '  +',                            # delete multiple spaces
+    },
+    'substitutions' => {
+	'([0-9]) ([0-9])' => '$1\x00sp\x00$2',   # keep numbers together
+    },
+    'final substitutions' => {
+	'\x00sp\x00' => ' ',         # restore number-spaces
+    },
+    'exceptions' => {
+#       't.ex.' => 'abbr',           # put a list of exceptions here
+    },
+    'runtime' => {
+       'verbose' => 0,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'informat' => 'input:text:format',
+#       'indoc' => 'input:text:DocRootTag',
+#       'inhead' => 'input:text:DocHeaderTag',
+       'r' => 'input:text:root',
+       'b' => 'input:text:DocBodyTag',
+       'o' => 'output:text:file',
+	'out' => 'output:text:file',
+       'outformat' => 'output:text:format',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+       't' => 'parameter:segments:tag',
+       'a' => 'parameter:segments:add spans',
+       'id' => 'parameter:segments:add IDs',
+       'k' => 'parameter:segments:keep spaces',
+       'v' => 'parameter:runtime:verbose'
+    }
+  },
+  'help' => {
+    'shortcuts' => {
+       'r' => "root tag of sub-trees, reg. expr.     (default: 's.*')",
+       'b' => 'skip everything before this tag (body)',
+       'in' => 'input file                            (default: STDOUT)',
+       'out' => 'output file                           (default: STDOUT)',
+       'ci' => 'character encoding, input             (default: utf-8)',
+       'co' => 'character encoding, output            (default: utf-8)',
+       't' => "word tag                              (default: 'w')",
+       'k' => 'keep spaces (between xml tags)        (default: no)',
+       'a' => 'add byte span attributes              (default: no)',
+#       'm' => "modify the input file                 (default: don't)",
+    },
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=sent)'
+	  },
+       },
+  }
+}
+

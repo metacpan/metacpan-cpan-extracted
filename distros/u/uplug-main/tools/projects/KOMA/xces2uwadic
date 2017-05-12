@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id$
+
+grep '<wordLink ' |\
+perl -e 'if ($]>=5.008){binmode(STDIN, ":encoding(utf-8)");}
+     while (<>){if (/lexPair=\"([^\"]*)\"/){print "$1\n";}}' |\
+tr ';' "\t" |\
+sort |\
+uniq -c |\
+sort -rn |\
+perl -e 'while (<>){
+       if (/^\s*([0-9]+)\s+(\S.*)\t(\S.*)$/){
+	$dic{$2}{$3}=$1;
+       }
+     }
+     for $s (sort keys %dic){
+       print "{$s}\n{\n";
+       foreach (sort {$dic{$s}{$b} <=> $dic{$s}{$a}} keys %{$dic{$s}}){
+	       print "     $dic{$s}{$_}X:$_\n";
+       }
+       print "}\n";
+     }'
+

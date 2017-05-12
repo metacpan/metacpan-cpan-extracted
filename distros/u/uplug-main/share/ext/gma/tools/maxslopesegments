@@ -1,0 +1,72 @@
+#!/usr/local/bin/perl
+
+########################################################################
+# Author:  I. Dan Melamed
+# Computes:  maximal segments whose elements have a given maximum slope
+# Streams:   file of (x,y) co-ordinates
+#######################################################################
+
+#check for correct usage
+if ($#ARGV < 1) {
+    print "usage:  maxslopesegments <global slope> <max. slope> [<INPUT>]\n";
+    exit; 
+};
+
+$TRUE = 1;
+$FALSE = 0;
+
+$gslope = shift;
+$maxslope = shift;
+
+if ($maxslope >= $gslope) {
+    die "max. slope >= global slope\n";
+};
+
+$_ = <>;
+($lastx, $lasty) = split;
+$min_yint = $lasty - $gslope * $lastx;
+
+while (<>) {
+    ($x, $y) = split;
+
+    if ($x <= $lastx) { $x = $lastx + 1;};
+    $slope = ($y - $lasty) / ($x - $lastx);
+    if ($slope <= $maxslope) {
+	push(@leftx, $lastx);
+	push(@lefty, $lasty);
+	push(@rightx, $x);
+	push(@righty, $y);
+	$yint = $y - $gslope * $x;
+	if ($min_yint > $yint) {
+	    $min_yint = $yint;
+	};
+    };
+    ($lastx, $lasty) = ($x, $y);
+};
+
+if ($#leftx < 0) {exit "No such segments.\n";};
+
+# find and output maximal segments
+for( $i = 0; $i < @lefty; $i++) {
+    $search_yint = $lefty[$i] - $maxslope * $leftx[$i];
+    $ylimit = ($maxslope * ($min_yint + $gslope * $leftx[$i]) - 
+	       $gslope * $lefty[$i]) /  ($maxslope - $gslope);
+    $j = $i + 1;
+    $bestx = $rightx[$i];
+    $besty = $righty[$i];
+    $bestfinal = $i;
+    while (defined($rightx[$j]) && $righty[$j] < $ylimit) {
+	if ($righty[$j] < $maxslope * $rightx[$j] + $search_yint) {
+	    $bestx = $rightx[$j];
+	    $besty = $righty[$j];
+	    $bestfinal = $j;
+	};
+	$j++;
+    };
+
+    $yint = $besty - $gslope * $bestx;
+    $gap = ($lefty[$i] - $yint) / $gslope - $leftx[$i];
+    printf "%5.1f character omission at h:[ %d %d ], v:[ %d %d ]\n", $gap, $leftx[$i], $bestx, $lefty[$i], $besty;
+
+    $i = $bestfinal;
+};

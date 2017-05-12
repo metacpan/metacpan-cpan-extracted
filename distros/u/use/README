@@ -1,0 +1,54 @@
+NAME
+    use - Import several modules with a single use statement
+
+SYNOPSIS
+        # Use several modules in command line:
+        % perl -Muse=CGI,DBI,PPI -e '...'
+
+        # Import several modules at once
+        use use qw[ strict warnings methods invoker ];
+
+        # Pass options as array refs
+        use use 'strict', 'warnings', 'HTTP::Status' => [':constants'];
+
+        # Pass required versions after module names
+        use use '5.12.0', 'HTTP::Status' => '6.00' => [':constants'];
+
+        # ...or in your own module, importing on behalf of its caller:
+        package MY::Macro;
+        sub import {
+            use use;
+            local @_ = qw[ Module1 Module2 ];
+            goto &use::use;
+        }
+
+DESCRIPTION
+    This module lets you import several modules at once.
+
+    This is almost the same as modules, except that "caller" is properly set
+    up so syntax-altering modules based on Devel::Declare, Filter::Simple or
+    Module::Compile work correctly.
+
+    If a Perl version number larger than 5.9.3 appears as the first
+    argument, then it's automatically expanded just like a regular "use
+    VERSION" statement. For example, "use use '5.12.0'" expands to "use
+    strict; use feature ':5.12'".
+
+ACKNOWLEDGEMENTS
+    Thanks to ingy∵net for refactoring most of this module into the perl5
+    module, and making this module a simple subclass of it.
+
+SEE ALSO
+    perl5, modules
+
+AUTHORS
+    唐鳳 <cpan@audreyt.org>
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to use.
+
+    This work is published from Taiwan.
+
+    <http://creativecommons.org/publicdomain/zero/1.0>
+

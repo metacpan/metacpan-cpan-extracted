@@ -1,0 +1,217 @@
+<html><head><title>Hunalign</title></head><body>
+<p>
+
+<h3>Introduction</h3>
+
+<p>hunalign alings bilingual text on the sentence level. Its input is
+tokenized and sentence-segmented text in two languages. In the
+simplest case, its output is a sequence of bilingual sentence pairs
+(bisentences). </p>
+
+<p>In the presence of a dictionary, it uses it, combining this
+information with Gale-Church sentence-length information. In the absence
+of a dictionary, it first falls back to sentence-length information,
+and builds an automatic dictionary based on this alignment. Then it
+realigns the text in a second pass, using the automatic dictionary.</p>
+
+<p>Like most aligners, hunalign does not deal with changes of
+sentence order: it is unable to come up with crossing alignments, i.e.,
+segments A and B in one language corresponding to segments B' A' in the
+other language.</p>
+
+<p>There is nothing Hungarian-specific in hunalign, the name simply 
+refers to the fact that it is part of the hun* NLP toolchain</p> 
+
+<h3>Build</h3>
+
+<p>hunalign was written in portable C++.</p>
+
+<p>Building under Linux/Unix:</p>
+<pre>
+	 tar zxvf hunalign.0.8.tgz
+	 cd hunalign/hunalign
+	 make
+</pre>
+<p>
+Under Windows/MSVC++, the easiest way to build the program is to
+create a project with the source files of hunalign/hunalign and
+hunalign/utils in it. hunalign/include must be in the include path.</p>
+
+<p>The build yields a single application binary called hunalign.  Various
+resources (most importantly a Hungarian-English dictionary file) are
+found in the directory called 'data'. See also Files.  In order to
+test the build, use the example of the next section.<p>
+
+<h3>Basic usage </h3>
+
+<p>The build can be tested and usage can be understood by typing the following:</p>
+<pre>
+    hunalign/hunalign data/hu-en.stem.dic examples/demo.hu.stem examples/demo.en.stem -hand=examples/demo.manual.ladder -text > /tmp/align.txt
+    less /tmp/align.txt
+</pre>
+<p>
+Now and later in this file, it is assumed that you are in the hunalign
+toplevel directory (where this readme file resides), all files are
+meant to be relative to this. </p>
+
+<p>Here, the input files 'examples/demo.hu.stem' and
+'examples/demo.en.stem' contain Hungarian and English test
+respectively. Both segmented to sentences (one sentence per line) and
+segmented into tokens (delimited by space characters). The output
+(here the file '/tmp/align.txt') contains the aligned segments (one
+aligned segment per line). As a result of the option '-text', the
+actual text of the segments (rather than their indexes) are written in
+the output making it suitable for human reading. For details see
+section "File formats". The argument '-hand' specifies a file
+containing a manual alignment. This argument can be omitted, but when
+given, the automatic alignment is evaluated against the manual
+alignment.<p>
+
+<h3>Command-line arguments</h3>
+
+<p>The simple argument-parser accepts switches (e.g. -realign) or
+key-value pairs, where value can be integer or string. The key and
+value can be separated by the '=' sign, but whitespace is NOT allowed.
+For string values, the '=' is mandatory. For example, "-thresh50",
+"-thresh=50" and "-hand=manual.align" are ok, "-thresh 50", "-hand
+manual.align" and "-handmanual.align" are not ok. The order of the
+arguments is free.</p>
+
+<p>Usage either:</p>
+<pre>
+      alignerTool [ common_arguments ] [ -hand=hand_align_file ] dictionary_file source_text target_text
+</pre>
+
+<p>or (batch mode, see section Batch mode):</p>
+<pre>
+   alignerTool [ common_arguments ] -batch dictionary_file batch_file
+</pre>
+
+where common_arguments ::= [ -text ] [ -bisent ] [ -cautious ] [ -thresh=n ] [ -realign ] [ -ppthresh=n ] [ -headerthresh=n ]  [ -topothresh=n ] 
+
+<p>The dictionary argument is always mandatory. This is not a real
+restriction, though. In the lack of a real bilingual dictionary, one can
+provide a zero-byte file as such (data/null.dic).</p>
+
+<p>The non-mandatory options are the following:</p>
+<pre>
+-text
+	The output should be in text format, not the default (numeric) ladder format.
+
+-bisent	
+	Only bisentences (one-to-one alignments) are printed. In non-text mode, their starting rung is printed.
+
+-cautious
+	In -bisent mode, only bisentences for which both the preceeding and the following segments are one-to-one are printed. In the default non-bisent mode, only rungs for which both the preceeding and the following segments are one-to-one are printed.
+
+-hand=file
+	When this argument is given, the precision and recall of the alignment is calculated based on the manually built ladder file. Information like the following is written on the standard error: 
+	53 misaligned out of 6446 correct items, 6035 bets. 
+	Precision: 0.991218, Recall: 0.928017
+	
+        Note that by default, 'item' reads rung, the switch -bisent also changes the semantics of the scoring from rung-based to bisentence-based and item reads bisentences.
+	See File formats about the format of this input align file.
+
+-thresh=n
+	Don't print out segments with score lower than n/100.
+
+-realign
+	Based on a first align, the algorithm rebuilds the dictionary (throws away items with no instances, and adds plausible items). Then it realigns based on this new dictionary. Should be used when there is no dictionary available. But for high quality bitexts and large starting dictionary, realign can even slightly degrade align quality.
+
+Postfiltering options:
+There are various postprocessors which remove implausible rungs based on various heuristics.
+
+-ppthresh=n
+	Filter rungs with less than n/100 average score in their vicinity.
+
+-headerthresh=n
+	Filter all rungs at the start and end of the texts until finding a reliably plausible region.
+
+-topothresh=n
+	Filter rungs with less than n percent of one-to-one segments in their vicinity.
+
+All these 'thresh' values default to zero (i.e., no postfiltering). Typical sensible values are -ppthresh=30 -headerthresh=100 -topothresh=30 and *are* recommended over the default. Of course the optimal parameter values depend on the nature of the bitext, and also depend on the coverage of the dictionary somewhat.
+</pre>
+
+<h3>Batch mode</h3>
+
+<p>
+If we use the -batch switch, the aligner expects a batch file instead of the
+usual two text files. The batch file contains jobs, one per row. A job is
+tab-separated sequence of three file names containing the source text, the
+target text, and the output, respectively. The batch mode saves time over
+shell-based batching of jobs by reading the dictionary into memory only once.
+</p><p>
+In batch mode, for every job, there is an align quality value written on standard error. This line has the format "Quality\t<output_file>\t<quality_value>" so it can be automatically processed.
+</p>
+
+<h3>File formats</h3>
+
+<p>The aligner reads and/or writes the following file formats:</p>
+
+<h4>Bicorpus:</h4>
+
+The input files containing the texts to be aligned are standard text
+files. Each line is one sentence and word tokens are separated by spaces. If a
+line consists of a single <p> token, it is treated specially, as a paragraph
+delimiter. Paragraph separators are treated as virtual sentences, the aligner
+tries to match these with each other, and never aligns them with a real
+sentence.
+
+<h4>Alignments:</h4>
+
+<p>The format of the alignment output comes in two flavors: 
+text style (-text switch) or ladder style (default).</p>
+
+<p>
+- Text format of alignments. Every line is tab-separated into three
+columns. The first is a segment of the source text. The second is a
+(supposedly corresponding) segment of the target text. The third column is a
+confidence value for the segment. Such segments of the source or target text
+will typically (or hopefully) consist of exactly one sentence on both
+sides. But it can consist of zero or more than one sentences also. In the
+latter case, the separating sequence " ~~~ " is placed between sentences. So
+if this sequence of characters may appear in the input, one should use the
+ladder format output.<p>
+
+<p>
+- Ladder format of alignments. Alignments are described by a newline-separated
+list of pairs of integers represented by the first two columns of the ladder
+file. Such a pair is called a rung. The first coordinate denotes a position in
+the source language, the second coordinate denotes a position in the target
+language. A rung (n,m) means the following: The first n sentences of the
+source text correspond to the first m sentences of the target text. The rungs
+cannot intersect (e.g., (10,12) (11,10) is not allowed), which means that the
+order of sentences are preserved by the alignment. The first rung is always
+(0,0), the last one is always
+(sentenceNumber(sourceText),sentenceNumber(targetText)). The third column of
+the ladder format is a confidence value for the segment starting with the
+given rung. The columns of the ladder file are separated by a tab.</p>
+
+<p> The format of the input alignment file (manually aligned file for
+evaluation, see '-hand' option in section Command line arguments) can only be
+given as a ladder. This format is identical to the first two columns of output
+ladder format just described.</p>
+
+<h4>Dictionary:</h4>
+
+<p>The dictionary consists of newline-separated dictionary items. An item
+consists of a target languge phrase and a source language phrase, separated by
+the " @ " sequence. Multiword phrases are allowed. The words of a phrase are
+space-separated as usual. IMPORTANT NOTE: In the current version, for
+historical reasons, the target language phrases come first. So the ordering is
+the opposite of the ordering of the command-line arguments or the results.</p>
+
+<h3>For developers</h3>
+
+<p>If you intend to modify the hunalign source code, note that 
+there are some parameters of the algorithm which are hardwired into the source
+code, because modifying them does not seem to result in any improvements. These
+arguments are local variables (typically bool or double), and always have
+variable names of the form quasiglobal_X, X being some mnemonic name for the
+parameter in question, e.g., 'stopwordRemoval'. In some cases these variables
+hide nontrivial functionality, e.g., quasiglobal_stopwordRemoval,
+quasiglobal_maximalSizeInMegabytes. It is quite straightforward to turn these
+quasiglobals to proper command line arguments of the program.</p>
+
+</body></html>

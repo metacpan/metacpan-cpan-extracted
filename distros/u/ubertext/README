@@ -1,0 +1,28 @@
+Text/UberText version 0.95
+==========================
+
+Text::UberText is a template parsing engine.  It has many features 
+including an extendable template language, the ability to break 
+down a document into a tree for structured processing, and a very 
+simple, friendly command syntax.
+
+More extensive documentation is in the module PODs
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Chris Josephes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

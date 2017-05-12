@@ -1,0 +1,223 @@
+=head1 NAME
+
+Text::UberText::NewModule - Tutorial for writing UberText modules
+
+=head1 INTRODUCTION
+
+UberText provides a mechanism for modules to easily bind to the UberText 
+command language by defining a namespace and a set of commands.  Once 
+your module is written, either the class name, or a blessed object 
+is passed to the Dispatch object.  Then when the document is parsed, 
+the Dispatch object passes along the command data to your code.
+
+This module provides a quick rudimentary overview of how to write 
+modules to Text::UberText.
+
+=head1 WRITING A MODULE
+
+=head2 Defining the namespace and dispatch methods
+
+The following example is designed for a technical writer that wants to 
+pre-preprocess her documents with UberText.  She needs consistant 
+headers and footers for every document she writes, so she automates it 
+by writing a module can handle the formatting for her.
+
+ package ACME::Document;
+
+ use strict;
+ use vars qw/$Namespace $Dispatch/;
+
+ $Namespace="acme.doc";
+ $Dispatch={
+	"media" => &media,
+	"header" => &formatHeader,
+	"footer" => &formatFooter,
+	"warnings" => &formatWarning,
+ };
+
+
+A namespace and a basic dispatch table have been defined, now UberText 
+needs to be informed about it.
+
+=head2 Importing the code to UberText
+
+In the main formatting program, the UberText->extend() method is called.
+
+ $ub=Text::UberText->new();
+ $ub->extend("Acme::Document");
+
+The class name (or a blessed object) passed to extend() is sent to the 
+Dispatch object.  The Dispatch object then takes that parameter and calls 
+the method uberText().
+
+ package ACME::Document;
+
+ sub uberText
+ {
+ my ($proto)=shift;
+ my ($obj);
+ if (ref($proto))
+ {
+     $obj=$proto;
+ } else {
+     $obj={};
+     bless($obj,$proto);
+     $obj->_init();
+ }
+ return ($obj,$Namespace,$Dispatch);
+ }
+
+The ACME::Document object returns an object for the Dispatch module to 
+reference, the namespace assigned to the object, and the hash table 
+identifying which methods to run.
+
+The object returned from the uberText method doesn't need to be 
+the same object that received the uberText call.  It's possible to create 
+a whole new object from a different namespace if you want to keep 
+any UberText handlers in a seperate module namespace.
+
+Since we have a blessed object, we can create a data structure to keep 
+track of internal variables, store portions of the document we want to 
+parse, or receive data from other modules.
+
+=head2 Writing the command methods
+
+Let's say we want to identify which media a particular document is best 
+formatted for.  We don't necessarily want to change any aspects of the 
+document formatting, but we want to identify how the document is laid out.
+
+Within the document we can create a command tag called "media"
+
+ [acme.doc media:(plotter)]
+
+When UberText encoounters the "media" command in the "acme.doc" namespace, 
+it in turn calls ACME::Document->media();
+
+The parameter passed to the media() method is the 
+Text::UberText::Node::Command object that contained the tag.  This object 
+keeps track of the main document tree object, the command itself, and 
+whatever options or values were passed in the command tag.
+
+Here's a simple example of the media method:
+
+ sub media
+ {
+ my ($self,$node)=@_;
+ $self->{media}=$node->commandValue();
+ return;
+ }
+
+This method never made any changes to the document, it simply was used 
+to record information about the document itself.
+
+The commandValue() method is used to return the optional value that 
+was passed to the command, which in the above example was "plotter".
+
+The header method was designed to create a standard header for all 
+documents in order to remain consistant.  In this particular case, the 
+programmer wants a header that can be modified with a couple of lines 
+detailing the title of the document or an executive summary.
+
+ [acme.doc header -> ]
+ Table Specifications For The ACME billing database
+ [<- acme.doc ]
+
+This is known as a block command.  It surrounds a block of text that is 
+associated in some way with the command tag.  The text within the block 
+is to be merged in the header of the document.
+
+ sub header
+ {
+ my ($self,$node)=@_;
+ my ($output);
+ $output="ACME Corp\n";
+ if ($self->{media} eq "plotter")
+ {
+         $output.=->_insertLogo();
+ }
+ if ($node->startBlock())
+ {
+    my ($tree,$index);
+    $tree=$node->tree();
+    $index=$node->index();
+    $tree->run($index);
+    $output.=$tree->output($index);
+ }
+ $output.="--------------------------------------------------\n\n";
+ return $output;
+ }
+
+The method is very simple.  It prints the company name, and if the media 
+is applicable, it adds data to represent the drawing of the company logo 
+(postscript commands, perhaps).
+
+The startBlock method identifies whether or not the node in question
+contains any child elements.  Since it did in this case, it took the 
+UberText::Tree object that contained the structure information of the 
+document and instructed it to process every child node of the header 
+command.  Then, it took the output of those nodes and added it to the 
+header it already created.  Finally, a dashed line was added to $output 
+to identify the end of the header portion of the document.
+
+If the "header" command tag didn't have an opening tag indicator 
+(->) and a closing tag as well, then It would have ignored the process 
+of checking for child nodes and running them.
+
+The programmer has set up the footer tag to be a little different, there 
+is no real variation in the footer, but there should be a couple of 
+conditions that could alter the display of the footer.
+
+ [acme.footer author:(John Public) condifential]
+
+The footer needs to include the author's name in the document, and 
+if the document contains proprietary information, it needs to place 
+warnings in the document.
+
+ sub footer
+ {
+ my ($self,$node)=@_;
+ my ($output,$author);
+ $output="\n--------------------------------------------------\n";
+ $author=$node->getOptValue("author");
+ if ($author)
+ {
+     $output.=$author."\n";
+ } else {
+     $output.="Unknown author\n";
+ }
+ if ($node->getOpt("classified"))
+ {
+    $output.="This document contains proprietary information, and ".
+       "should not be publically distributed.";
+ }
+ return $output;
+ }
+
+There are two different method calls for the Node object.  The getOpt 
+value returns two values, a 1 or 0 depending on whether or not the option 
+was even set in the command tag, and the value that was set to the option 
+(if any).
+
+The getOptValue method is a simpler way of checking the value passed to 
+an option.  If no value was set, undef is returned. Programmers should 
+understand that an undef value doesn't necessarily mean the option was 
+never specified in the command tag; it just means there was no value 
+associated with it.
+
+=head1 AUTHOR
+
+Chris Josephes E<lt>cpj1@visi.comE<gt>     
+
+=head1 SEE ALSO
+
+Refer to the L<Text::UberText::Node::Command> module for all of the methods 
+available to retrieve command data.  Refer to the 
+L<Text::UberText::Dispatch> module for information on how additional 
+modules are loaded.  The L<Text::UberText::Tree> module has information on 
+the document tree structure.
+
+=head1 COPYRIGHT
+
+Copyright 2002, Chris Josephes.  All rights reserved.
+This module is free software.  It may be used, redistributed, 
+and/or modified under the same terms as Perl itself.

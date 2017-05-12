@@ -1,0 +1,104 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package org.maltparser.parser;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import org.maltparser.core.exception.MaltChainedException;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import org.maltparser.core.syntaxgraph.DependencyStructure;<a name="line.4"></a>
+<FONT color="green">005</FONT>    import org.maltparser.parser.guide.OracleGuide;<a name="line.5"></a>
+<FONT color="green">006</FONT>    /**<a name="line.6"></a>
+<FONT color="green">007</FONT>     * @author Johan Hall<a name="line.7"></a>
+<FONT color="green">008</FONT>     *<a name="line.8"></a>
+<FONT color="green">009</FONT>     */<a name="line.9"></a>
+<FONT color="green">010</FONT>    public abstract class Trainer extends Algorithm {<a name="line.10"></a>
+<FONT color="green">011</FONT>            /**<a name="line.11"></a>
+<FONT color="green">012</FONT>             * Creates a parser trainer<a name="line.12"></a>
+<FONT color="green">013</FONT>             * <a name="line.13"></a>
+<FONT color="green">014</FONT>             * @param manager a reference to the single malt configuration<a name="line.14"></a>
+<FONT color="green">015</FONT>             * @throws MaltChainedException<a name="line.15"></a>
+<FONT color="green">016</FONT>             */<a name="line.16"></a>
+<FONT color="green">017</FONT>            public Trainer(DependencyParserConfig manager) throws MaltChainedException {<a name="line.17"></a>
+<FONT color="green">018</FONT>                    super(manager);<a name="line.18"></a>
+<FONT color="green">019</FONT>            }<a name="line.19"></a>
+<FONT color="green">020</FONT>            <a name="line.20"></a>
+<FONT color="green">021</FONT>            /**<a name="line.21"></a>
+<FONT color="green">022</FONT>             * Trains a parser using the gold-standard dependency graph and returns a parsed dependency graph<a name="line.22"></a>
+<FONT color="green">023</FONT>             * <a name="line.23"></a>
+<FONT color="green">024</FONT>             * @param goldDependencyGraph a old-standard dependency graph<a name="line.24"></a>
+<FONT color="green">025</FONT>             * @param parseDependencyGraph a empty dependency graph<a name="line.25"></a>
+<FONT color="green">026</FONT>             * @return a parsed dependency graph<a name="line.26"></a>
+<FONT color="green">027</FONT>             * @throws MaltChainedException<a name="line.27"></a>
+<FONT color="green">028</FONT>             */<a name="line.28"></a>
+<FONT color="green">029</FONT>            public abstract DependencyStructure parse(DependencyStructure goldDependencyGraph, DependencyStructure parseDependencyGraph) throws MaltChainedException;<a name="line.29"></a>
+<FONT color="green">030</FONT>            /**<a name="line.30"></a>
+<FONT color="green">031</FONT>             * Returns the oracle guide.<a name="line.31"></a>
+<FONT color="green">032</FONT>             * <a name="line.32"></a>
+<FONT color="green">033</FONT>             * @return the oracle guide.<a name="line.33"></a>
+<FONT color="green">034</FONT>             */<a name="line.34"></a>
+<FONT color="green">035</FONT>            public abstract OracleGuide getOracleGuide();<a name="line.35"></a>
+<FONT color="green">036</FONT>            public abstract void train() throws MaltChainedException;<a name="line.36"></a>
+<FONT color="green">037</FONT>            <a name="line.37"></a>
+<FONT color="green">038</FONT>    }<a name="line.38"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

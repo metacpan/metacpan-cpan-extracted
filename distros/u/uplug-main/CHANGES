@@ -1,0 +1,183 @@
+
+* v0.3.8 Sat Mar 16 10:58:22 CET 2013
+
+- fixed a serious problem with the sentence splitter
+- added a timout-option to uplug-hunalign
+
+* v0.3.7 - Sat Jan 19 19:03:24 CET 2013
+
+- hunalign wrapper with tokenized and lowercased text
+- default dictionaries for hunalign
+- fixed bug in tools/xces2plain
+- fixed opus/ru/anotate
+- fixed problems with malformed data handling in uplug-tag, uplug-toktag and uplug-chunk
+
+* v0.3.6 - Sat Jan  5 19:34:41 CET 2013
+
+- added tools/xces2plain
+- fixed tests that require java
+- added dependency for DB_File and GDBM_File
+- added auto_install
+
+* v0.3.5 - Fri Dec 28 23:28:20 CET 2012
+
+- added all dependencies in Makefile.PL
+
+* v0.3.4 - Mon Dec 17 17:08:09 CET 2012
+
+- fixed several issues with installation routines
+- added config files for preparing OPUS data
+- changed handling of Uplug environment variables and standard locations
+- fixed call to Grok tagger/chunker
+- fixed word alignment test
+- fixed POS-tagging for Swedish with Grok
+
+* v0.3.3 - Mon Dec 10 19:14:00 CET 2012
+
+- fixed some problems with documentation
+- prepared language packs and Uplug add-ons
+- added documentation for language packs
+
+* v0.3.2 - Fri Dec  7 20:33:14 CET 2012
+
+- added documentation
+- global installation
+- makefile for generating documentation in different formats
+
+* v0.3.1 - Thu Dec  6 20:33:14 CET 2012
+
+- install now compiles external tools on systems without pre-compiled binaries
+- improved uplug-treetagger package (automatic download/install)
+- added flag for fallback modules
+- added test if modules exist to uplug startup script
+- added help information to uplug via command line flags
+- added documentation to uplug startup script
+- list available modules
+- fixed problem with uplug-giza
+
+
+* v0.3 - Mon Nov 26 11:57:26 CET 2012
+
+- re-arranging modules, scripts, config-files
+- include installation routines
+- divide Uplug in several packages (language packs etc)
+- integrate MaltParser and pre-trained models
+- new pre-compiled binaries (also for Mac OSX)
+- improved pre-processing pipelines for several languages
+- pre-trained hunpos models
+- integration of Europarl/Moses sentence splitter/tokenizer
+- (some) unit tests
+- moved to git and bitbucket
+- added Moses-style word alignment format for clue alignment output
+
+
+* unversioned
+
+- toktag.pl: better handling of already tokenized documents
+- added wrapper for alpino (dutch) tokenizer)
+- tools/subtitles/srt2xml: handling of formating tags (<i> etc) is fixed!
+- tools/subtitles/srtalign.pl: added check for illegal subtitle
+  synchronization scaling factor (<=0) and made it possible to use cognates
+  and dictionaries together for automatic synchronization
+- ICA: show only non-empty sentence alignments (x:0 sentence alignments don't
+  make sense for word alignment), changed in include/xmldoc.inc
+- added -adj to all word alignment config files for the 'link' step
+
+* v0.2.0c and v0.2.0d
+
+- added scripts to tools/subtitles to handle (pre-process and sentence align)
+  movie subtitle in srt format
+- robust conversion of encodings in tag.pl/toktag.pl/chunk.pl
+- added treetagger startup scripts for es and nl, replace "nbsp" to " "
+- robust conversion between encodings in bitext-indexer.pl/opus-indexer.pl
+- added startup scripts for spanish and dutch tree-tagger models
+- updated startup scripts for other treetagger models according to latest
+  TreeTagger distribution
+- fixed hunalign (bug in converting alignment output to xml)
+- added missing ';' at line 40 in Uplug.pm
+
+* 13-10-2006 joerg
+
+- ISA & ICA with simple user management (multiple users, password protection)
+- integrated hunalign sentence aligner
+- integrated GMA sentence aligner
+- alternative sentence aligner with cognate filter: uplugalign
+
+
+* 26-05-2006 joerg
+
+- improved ISA & ICA (some fixes, allow empty alignments in ISA ...)
+- bin/wordalign.pl can bee run in server mode (hard-coded port, localhost) to 
+  serve ICA
+
+
+* 16-03-2006 joerg
+
+- nothing really new, serveral bug-fixes done since last time
+- ISA & ICA - two web interfaces for interactive alignment (in web/php)
+
+
+* 28-07-2005 joerg
+
+- fixed a bug in learning bootstrapped clues with linkclue.pl
+  (target language feature strings were not produced correctly)
+- took away Makefile.PL (isn't used anyway and seems to confuse)
+  (there should be a proper installation script but there is none ...)
+
+
+* July 2005 joerg
+
+- added web interfaces for interactive alignment (web/php)
+- fixed some bugs in word alignment (problems with bitext segments
+  other than 1:1 sentence)
+
+
+* 21-06-2005 joerg
+
+- fixed some stupid bugs in bin/markup.pl
+
+
+* 20-06-2005 joerg
+
+- fixed some more bugs in word alignment configuration files
+- added subtree indexing for XML files (enables jumping to certain positions
+  in the corpus)
+- added experimental align.php file for alignment visualization
+
+
+* 24-03-2005 joerg
+
+- found&fixed some bugs in systems/align/word/link and 
+  systems/align/word/test/link (shortcut definitions for dynamic clue 
+  weights)
+- fixed a bug in Uplug/Config.pm in CheckParam
+
+
+* 03-03-2005 joerg
+
+- re-implementation of Uplug.pm, Uplug/Config.pm, uplug
+- some minor changes in Uplug/IO* (mainly cleaning up, it's still messy though)
+- some minor changes in the configuration files for pre-processing and
+
+* 15-02-2005 joerg
+
+- new version of ini/DataStreams.ini
+- new/changed configuration files for word-alignment 
+  (basic, default, tagged, advanced)
+
+* 15-02-2005 lars
+
+- started manual
+- started installation script
+- changed Uplug.pm to call converter.pl from $UPLUGHOME
+
+* 26-10-2004 joerg
+
+- Grok source code files removed from Uplug release
+- added Giza.pm for running GIZA++
+
+* 15-02-2005 joerg
+
+- giza.pl creates 2 clue-dbms when running in both alignment directions
+- standard word alignment settings: basic, default, tagged, advanced
+- some minor bug-fixes

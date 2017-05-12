@@ -1,0 +1,1361 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package org.maltparser.ml.libsvm;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import java.io.BufferedReader;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import java.io.BufferedWriter;<a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.io.File;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import java.io.FileNotFoundException;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import java.io.IOException;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import java.io.InputStream;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import java.io.InputStreamReader;<a name="line.9"></a>
+<FONT color="green">010</FONT>    import java.io.OutputStreamWriter;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import java.io.PrintStream;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import java.text.DecimalFormat;<a name="line.12"></a>
+<FONT color="green">013</FONT>    import java.text.DecimalFormatSymbols;<a name="line.13"></a>
+<FONT color="green">014</FONT>    import java.util.ArrayList;<a name="line.14"></a>
+<FONT color="green">015</FONT>    import java.util.HashMap;<a name="line.15"></a>
+<FONT color="green">016</FONT>    import java.util.Map;<a name="line.16"></a>
+<FONT color="green">017</FONT>    import java.util.Set;<a name="line.17"></a>
+<FONT color="green">018</FONT>    import java.util.jar.JarEntry;<a name="line.18"></a>
+<FONT color="green">019</FONT>    import java.util.regex.Pattern;<a name="line.19"></a>
+<FONT color="green">020</FONT>    import java.util.regex.PatternSyntaxException;<a name="line.20"></a>
+<FONT color="green">021</FONT>    <a name="line.21"></a>
+<FONT color="green">022</FONT>    import libsvm.svm;<a name="line.22"></a>
+<FONT color="green">023</FONT>    import libsvm.svm_model;<a name="line.23"></a>
+<FONT color="green">024</FONT>    import libsvm.svm_node;<a name="line.24"></a>
+<FONT color="green">025</FONT>    import libsvm.svm_parameter;<a name="line.25"></a>
+<FONT color="green">026</FONT>    import libsvm.svm_problem;<a name="line.26"></a>
+<FONT color="green">027</FONT>    <a name="line.27"></a>
+<FONT color="green">028</FONT>    import org.maltparser.core.exception.MaltChainedException;<a name="line.28"></a>
+<FONT color="green">029</FONT>    import org.maltparser.core.feature.FeatureVector;<a name="line.29"></a>
+<FONT color="green">030</FONT>    import org.maltparser.core.feature.function.FeatureFunction;<a name="line.30"></a>
+<FONT color="green">031</FONT>    import org.maltparser.core.feature.value.FeatureValue;<a name="line.31"></a>
+<FONT color="green">032</FONT>    import org.maltparser.core.feature.value.MultipleFeatureValue;<a name="line.32"></a>
+<FONT color="green">033</FONT>    import org.maltparser.core.feature.value.SingleFeatureValue;<a name="line.33"></a>
+<FONT color="green">034</FONT>    import org.maltparser.core.helper.NoPrintStream;<a name="line.34"></a>
+<FONT color="green">035</FONT>    import org.maltparser.core.syntaxgraph.DependencyStructure;<a name="line.35"></a>
+<FONT color="green">036</FONT>    import org.maltparser.ml.LearningMethod;<a name="line.36"></a>
+<FONT color="green">037</FONT>    import org.maltparser.ml.liblinear.LiblinearException;<a name="line.37"></a>
+<FONT color="green">038</FONT>    import org.maltparser.ml.libsvm.LibsvmException;<a name="line.38"></a>
+<FONT color="green">039</FONT>    import org.maltparser.parser.DependencyParserConfig;<a name="line.39"></a>
+<FONT color="green">040</FONT>    import org.maltparser.parser.guide.instance.InstanceModel;<a name="line.40"></a>
+<FONT color="green">041</FONT>    import org.maltparser.parser.history.action.SingleDecision;<a name="line.41"></a>
+<FONT color="green">042</FONT>    import org.maltparser.parser.history.kbest.KBestList;<a name="line.42"></a>
+<FONT color="green">043</FONT>    import org.maltparser.parser.history.kbest.ScoredKBestList;<a name="line.43"></a>
+<FONT color="green">044</FONT>    <a name="line.44"></a>
+<FONT color="green">045</FONT>    /**<a name="line.45"></a>
+<FONT color="green">046</FONT>    Implements an interface to the LIBSVM learner (currently the LIBSVM 2.91 is used). More information<a name="line.46"></a>
+<FONT color="green">047</FONT>    about LIBSVM can be found at <a name="line.47"></a>
+<FONT color="green">048</FONT>    &lt;a href="http://www.csie.ntu.edu.tw/~cjlin/libsvm/" target="_blank"&gt;LIBSVM -- A Library for Support Vector Machines&lt;/a&gt;.<a name="line.48"></a>
+<FONT color="green">049</FONT>    <a name="line.49"></a>
+<FONT color="green">050</FONT>    @author Johan Hall<a name="line.50"></a>
+<FONT color="green">051</FONT>    @since 1.0<a name="line.51"></a>
+<FONT color="green">052</FONT>    */<a name="line.52"></a>
+<FONT color="green">053</FONT>    public class Libsvm implements LearningMethod {<a name="line.53"></a>
+<FONT color="green">054</FONT>            public final static String LIBSVM_VERSION = "2.91";<a name="line.54"></a>
+<FONT color="green">055</FONT>            public enum Verbostity {<a name="line.55"></a>
+<FONT color="green">056</FONT>                    SILENT, ERROR, ALL<a name="line.56"></a>
+<FONT color="green">057</FONT>            }<a name="line.57"></a>
+<FONT color="green">058</FONT>            protected InstanceModel owner;<a name="line.58"></a>
+<FONT color="green">059</FONT>            protected int learnerMode;<a name="line.59"></a>
+<FONT color="green">060</FONT>            protected String name;<a name="line.60"></a>
+<FONT color="green">061</FONT>            protected int numberOfInstances;<a name="line.61"></a>
+<FONT color="green">062</FONT>            protected boolean saveInstanceFiles;<a name="line.62"></a>
+<FONT color="green">063</FONT>            protected boolean excludeNullValues;<a name="line.63"></a>
+<FONT color="green">064</FONT>            protected String pathExternalSVMTrain = null;<a name="line.64"></a>
+<FONT color="green">065</FONT>            private int[] cardinalities;<a name="line.65"></a>
+<FONT color="green">066</FONT>    <a name="line.66"></a>
+<FONT color="green">067</FONT>            /**<a name="line.67"></a>
+<FONT color="green">068</FONT>             * Instance output stream writer <a name="line.68"></a>
+<FONT color="green">069</FONT>             */<a name="line.69"></a>
+<FONT color="green">070</FONT>            private BufferedWriter instanceOutput = null; <a name="line.70"></a>
+<FONT color="green">071</FONT>            /**<a name="line.71"></a>
+<FONT color="green">072</FONT>             * LIBSVM svm_model object, only used during classification.<a name="line.72"></a>
+<FONT color="green">073</FONT>             */<a name="line.73"></a>
+<FONT color="green">074</FONT>            private svm_model model = null;<a name="line.74"></a>
+<FONT color="green">075</FONT>            <a name="line.75"></a>
+<FONT color="green">076</FONT>            /**<a name="line.76"></a>
+<FONT color="green">077</FONT>             * LIBSVM svm_parameter object<a name="line.77"></a>
+<FONT color="green">078</FONT>             */<a name="line.78"></a>
+<FONT color="green">079</FONT>            private svm_parameter svmParam;<a name="line.79"></a>
+<FONT color="green">080</FONT>            /**<a name="line.80"></a>
+<FONT color="green">081</FONT>             * Parameter string<a name="line.81"></a>
+<FONT color="green">082</FONT>             */<a name="line.82"></a>
+<FONT color="green">083</FONT>            private String paramString;<a name="line.83"></a>
+<FONT color="green">084</FONT>            /**<a name="line.84"></a>
+<FONT color="green">085</FONT>             * An array of LIBSVM svm_node objects, only used during classification.<a name="line.85"></a>
+<FONT color="green">086</FONT>             */<a name="line.86"></a>
+<FONT color="green">087</FONT>            private ArrayList&lt;svm_node&gt; xlist = null;<a name="line.87"></a>
+<FONT color="green">088</FONT>    <a name="line.88"></a>
+<FONT color="green">089</FONT>            private Verbostity verbosity;<a name="line.89"></a>
+<FONT color="green">090</FONT>            /**<a name="line.90"></a>
+<FONT color="green">091</FONT>             * Constructs a LIBSVM learner.<a name="line.91"></a>
+<FONT color="green">092</FONT>             * <a name="line.92"></a>
+<FONT color="green">093</FONT>             * @param owner the guide model owner<a name="line.93"></a>
+<FONT color="green">094</FONT>             * @param learnerMode the mode of the learner TRAIN or CLASSIFY<a name="line.94"></a>
+<FONT color="green">095</FONT>             */<a name="line.95"></a>
+<FONT color="green">096</FONT>            public Libsvm(InstanceModel owner, Integer learnerMode) throws MaltChainedException {<a name="line.96"></a>
+<FONT color="green">097</FONT>                    setOwner(owner);<a name="line.97"></a>
+<FONT color="green">098</FONT>                    setLearningMethodName("libsvm");<a name="line.98"></a>
+<FONT color="green">099</FONT>                    setLearnerMode(learnerMode.intValue());<a name="line.99"></a>
+<FONT color="green">100</FONT>                    setNumberOfInstances(0);<a name="line.100"></a>
+<FONT color="green">101</FONT>                    verbosity = Verbostity.SILENT;<a name="line.101"></a>
+<FONT color="green">102</FONT>                    initSvmParam(getConfiguration().getOptionValue("libsvm", "libsvm_options").toString());<a name="line.102"></a>
+<FONT color="green">103</FONT>                    initSpecialParameters();<a name="line.103"></a>
+<FONT color="green">104</FONT>                    if (learnerMode == BATCH) {<a name="line.104"></a>
+<FONT color="green">105</FONT>    //                      if (owner.getGuide().getConfiguration().getConfigLogger().isInfoEnabled()) {<a name="line.105"></a>
+<FONT color="green">106</FONT>    //                              if (pathExternalSVMTrain != null) {<a name="line.106"></a>
+<FONT color="green">107</FONT>    //                                      owner.getGuide().getConfiguration().getConfigLogger().info("  Learner              : LIBSVM external "+ getParamString() + "\n");<a name="line.107"></a>
+<FONT color="green">108</FONT>    //                              } else {<a name="line.108"></a>
+<FONT color="green">109</FONT>    //                                      owner.getGuide().getConfiguration().getConfigLogger().info("  Learner              : LIBSVM "+LIBSVM_VERSION+" "+ getParamString() + "\n");<a name="line.109"></a>
+<FONT color="green">110</FONT>    //                              }<a name="line.110"></a>
+<FONT color="green">111</FONT>    //                      }<a name="line.111"></a>
+<FONT color="green">112</FONT>                            instanceOutput = new BufferedWriter(getInstanceOutputStreamWriter(".ins"));<a name="line.112"></a>
+<FONT color="green">113</FONT>                    } <a name="line.113"></a>
+<FONT color="green">114</FONT>    //              else {<a name="line.114"></a>
+<FONT color="green">115</FONT>    //                      if (owner.getGuide().getConfiguration().getConfigLogger().isInfoEnabled()) {<a name="line.115"></a>
+<FONT color="green">116</FONT>    //                              owner.getGuide().getConfiguration().getConfigLogger().info("  Classifier           : LIBSVM "+LIBSVM_VERSION+" "+ getParamString()+ "\n");<a name="line.116"></a>
+<FONT color="green">117</FONT>    //                      }<a name="line.117"></a>
+<FONT color="green">118</FONT>    //              }<a name="line.118"></a>
+<FONT color="green">119</FONT>            }<a name="line.119"></a>
+<FONT color="green">120</FONT>            <a name="line.120"></a>
+<FONT color="green">121</FONT>            <a name="line.121"></a>
+<FONT color="green">122</FONT>            public void addInstance(SingleDecision decision, FeatureVector featureVector) throws MaltChainedException {<a name="line.122"></a>
+<FONT color="green">123</FONT>                    if (featureVector == null) {<a name="line.123"></a>
+<FONT color="green">124</FONT>                            throw new LibsvmException("The feature vector cannot be found");<a name="line.124"></a>
+<FONT color="green">125</FONT>                    } else if (decision == null) {<a name="line.125"></a>
+<FONT color="green">126</FONT>                            throw new LibsvmException("The decision cannot be found");<a name="line.126"></a>
+<FONT color="green">127</FONT>                    }       <a name="line.127"></a>
+<FONT color="green">128</FONT>                    try {<a name="line.128"></a>
+<FONT color="green">129</FONT>                            instanceOutput.write(decision.getDecisionCode()+"\t");<a name="line.129"></a>
+<FONT color="green">130</FONT>                            for (int i = 0; i &lt; featureVector.size(); i++) {<a name="line.130"></a>
+<FONT color="green">131</FONT>                                    FeatureValue featureValue = featureVector.get(i).getFeatureValue();<a name="line.131"></a>
+<FONT color="green">132</FONT>                                    if (excludeNullValues == true &amp;&amp; featureValue.isNullValue()) {<a name="line.132"></a>
+<FONT color="green">133</FONT>                                            instanceOutput.write("-1");<a name="line.133"></a>
+<FONT color="green">134</FONT>                                    } else {<a name="line.134"></a>
+<FONT color="green">135</FONT>                                            if (featureValue instanceof SingleFeatureValue) {<a name="line.135"></a>
+<FONT color="green">136</FONT>                                                    instanceOutput.write(((SingleFeatureValue)featureValue).getCode()+"");<a name="line.136"></a>
+<FONT color="green">137</FONT>                                            } else if (featureValue instanceof MultipleFeatureValue) {<a name="line.137"></a>
+<FONT color="green">138</FONT>                                                    Set&lt;Integer&gt; values = ((MultipleFeatureValue)featureValue).getCodes();<a name="line.138"></a>
+<FONT color="green">139</FONT>                                                    int j=0;<a name="line.139"></a>
+<FONT color="green">140</FONT>                                                    for (Integer value : values) {<a name="line.140"></a>
+<FONT color="green">141</FONT>                                                            instanceOutput.write(value.toString());<a name="line.141"></a>
+<FONT color="green">142</FONT>                                                            if (j != values.size()-1) {<a name="line.142"></a>
+<FONT color="green">143</FONT>                                                                    instanceOutput.write("|");<a name="line.143"></a>
+<FONT color="green">144</FONT>                                                            }<a name="line.144"></a>
+<FONT color="green">145</FONT>                                                            j++;<a name="line.145"></a>
+<FONT color="green">146</FONT>                                                    }<a name="line.146"></a>
+<FONT color="green">147</FONT>                                            }<a name="line.147"></a>
+<FONT color="green">148</FONT>                                    }<a name="line.148"></a>
+<FONT color="green">149</FONT>                                    if (i != featureVector.size()) {<a name="line.149"></a>
+<FONT color="green">150</FONT>                                            instanceOutput.write('\t');<a name="line.150"></a>
+<FONT color="green">151</FONT>                                    }<a name="line.151"></a>
+<FONT color="green">152</FONT>                            }<a name="line.152"></a>
+<FONT color="green">153</FONT>    <a name="line.153"></a>
+<FONT color="green">154</FONT>                            instanceOutput.write('\n');<a name="line.154"></a>
+<FONT color="green">155</FONT>                            instanceOutput.flush();<a name="line.155"></a>
+<FONT color="green">156</FONT>                            increaseNumberOfInstances();<a name="line.156"></a>
+<FONT color="green">157</FONT>                    } catch (IOException e) {<a name="line.157"></a>
+<FONT color="green">158</FONT>                            throw new LibsvmException("The LIBSVM learner cannot write to the instance file. ", e);<a name="line.158"></a>
+<FONT color="green">159</FONT>                    }<a name="line.159"></a>
+<FONT color="green">160</FONT>            }<a name="line.160"></a>
+<FONT color="green">161</FONT>            <a name="line.161"></a>
+<FONT color="green">162</FONT>            public void finalizeSentence(DependencyStructure dependencyGraph) throws MaltChainedException { }<a name="line.162"></a>
+<FONT color="green">163</FONT>            <a name="line.163"></a>
+<FONT color="green">164</FONT>            /* (non-Javadoc)<a name="line.164"></a>
+<FONT color="green">165</FONT>             * @see org.maltparser.ml.LearningMethod#noMoreInstances()<a name="line.165"></a>
+<FONT color="green">166</FONT>             */<a name="line.166"></a>
+<FONT color="green">167</FONT>            public void noMoreInstances() throws MaltChainedException {<a name="line.167"></a>
+<FONT color="green">168</FONT>                    closeInstanceWriter();<a name="line.168"></a>
+<FONT color="green">169</FONT>            }<a name="line.169"></a>
+<FONT color="green">170</FONT>    <a name="line.170"></a>
+<FONT color="green">171</FONT>    <a name="line.171"></a>
+<FONT color="green">172</FONT>            /* (non-Javadoc)<a name="line.172"></a>
+<FONT color="green">173</FONT>             * @see org.maltparser.ml.LearningMethod#train(org.maltparser.parser.guide.feature.FeatureVector)<a name="line.173"></a>
+<FONT color="green">174</FONT>             */<a name="line.174"></a>
+<FONT color="green">175</FONT>            public void train(FeatureVector featureVector) throws MaltChainedException {<a name="line.175"></a>
+<FONT color="green">176</FONT>                    if (featureVector == null) {<a name="line.176"></a>
+<FONT color="green">177</FONT>                            throw new LibsvmException("The feature vector cannot be found. ");<a name="line.177"></a>
+<FONT color="green">178</FONT>                    } else if (owner == null) {<a name="line.178"></a>
+<FONT color="green">179</FONT>                            throw new LibsvmException("The parent guide model cannot be found. ");<a name="line.179"></a>
+<FONT color="green">180</FONT>                    }<a name="line.180"></a>
+<FONT color="green">181</FONT>                    cardinalities = getCardinalities(featureVector);<a name="line.181"></a>
+<FONT color="green">182</FONT>                    if (pathExternalSVMTrain == null) {<a name="line.182"></a>
+<FONT color="green">183</FONT>                            try {<a name="line.183"></a>
+<FONT color="green">184</FONT>                                    final svm_problem prob = readProblemMaltSVMFormat(getInstanceInputStreamReader(".ins"), cardinalities, svmParam);<a name="line.184"></a>
+<FONT color="green">185</FONT>                                    if(svm.svm_check_parameter(prob, svmParam) != null) {<a name="line.185"></a>
+<FONT color="green">186</FONT>                                            throw new LibsvmException(svm.svm_check_parameter(prob, svmParam));<a name="line.186"></a>
+<FONT color="green">187</FONT>                                    }<a name="line.187"></a>
+<FONT color="green">188</FONT>                                    owner.getGuide().getConfiguration().getConfigLogger().info("Creating LIBSVM model "+getFile(".mod").getName()+"\n");<a name="line.188"></a>
+<FONT color="green">189</FONT>                                    final PrintStream out = System.out;<a name="line.189"></a>
+<FONT color="green">190</FONT>                                    final PrintStream err = System.err;<a name="line.190"></a>
+<FONT color="green">191</FONT>                                    System.setOut(NoPrintStream.NO_PRINTSTREAM);<a name="line.191"></a>
+<FONT color="green">192</FONT>                                    System.setErr(NoPrintStream.NO_PRINTSTREAM);<a name="line.192"></a>
+<FONT color="green">193</FONT>                                    <a name="line.193"></a>
+<FONT color="green">194</FONT>                                    svm.svm_save_model(getFile(".mod").getAbsolutePath(), svm.svm_train(prob, svmParam));<a name="line.194"></a>
+<FONT color="green">195</FONT>                                    System.setOut(err);<a name="line.195"></a>
+<FONT color="green">196</FONT>                                    System.setOut(out);<a name="line.196"></a>
+<FONT color="green">197</FONT>                                    if (!saveInstanceFiles) {<a name="line.197"></a>
+<FONT color="green">198</FONT>                                            getFile(".ins").delete();<a name="line.198"></a>
+<FONT color="green">199</FONT>                                    }<a name="line.199"></a>
+<FONT color="green">200</FONT>                            } catch (OutOfMemoryError e) {<a name="line.200"></a>
+<FONT color="green">201</FONT>                                    throw new LibsvmException("Out of memory. Please increase the Java heap size (-Xmx&lt;size&gt;). ", e);<a name="line.201"></a>
+<FONT color="green">202</FONT>                            } catch (IllegalArgumentException e) {<a name="line.202"></a>
+<FONT color="green">203</FONT>                                    throw new LibsvmException("The LIBSVM learner was not able to redirect Standard Error stream. ", e);<a name="line.203"></a>
+<FONT color="green">204</FONT>                            } catch (SecurityException e) {<a name="line.204"></a>
+<FONT color="green">205</FONT>                                    throw new LibsvmException("The LIBSVM learner cannot remove the instance file. ", e);<a name="line.205"></a>
+<FONT color="green">206</FONT>                            } catch (IOException e) {<a name="line.206"></a>
+<FONT color="green">207</FONT>                                    throw new LibsvmException("The LIBSVM learner cannot save the model file '"+getFile(".mod").getAbsolutePath()+"'. ", e);<a name="line.207"></a>
+<FONT color="green">208</FONT>                            }<a name="line.208"></a>
+<FONT color="green">209</FONT>                    } else {<a name="line.209"></a>
+<FONT color="green">210</FONT>                            trainExternal(featureVector);<a name="line.210"></a>
+<FONT color="green">211</FONT>                    }<a name="line.211"></a>
+<FONT color="green">212</FONT>                    saveCardinalities(getInstanceOutputStreamWriter(".car"), cardinalities);<a name="line.212"></a>
+<FONT color="green">213</FONT>            }<a name="line.213"></a>
+<FONT color="green">214</FONT>            <a name="line.214"></a>
+<FONT color="green">215</FONT>            <a name="line.215"></a>
+<FONT color="green">216</FONT>            @Override<a name="line.216"></a>
+<FONT color="green">217</FONT>            public double crossValidate(FeatureVector featureVector, int nrOfSplits)<a name="line.217"></a>
+<FONT color="green">218</FONT>                            throws MaltChainedException {<a name="line.218"></a>
+<FONT color="green">219</FONT>                    if (featureVector == null) {<a name="line.219"></a>
+<FONT color="green">220</FONT>                            throw new LibsvmException("The feature vector cannot be found. ");<a name="line.220"></a>
+<FONT color="green">221</FONT>                    } else if (owner == null) {<a name="line.221"></a>
+<FONT color="green">222</FONT>                            throw new LibsvmException("The parent guide model cannot be found. ");<a name="line.222"></a>
+<FONT color="green">223</FONT>                    }<a name="line.223"></a>
+<FONT color="green">224</FONT>                    cardinalities = getCardinalities(featureVector);<a name="line.224"></a>
+<FONT color="green">225</FONT>                    //TODO Implement support for externial SVM for cross validation  <a name="line.225"></a>
+<FONT color="green">226</FONT>                    //if (pathExternalSVMTrain == null) {<a name="line.226"></a>
+<FONT color="green">227</FONT>                    <a name="line.227"></a>
+<FONT color="green">228</FONT>                    double crossValidationAccuracy = 0.0;<a name="line.228"></a>
+<FONT color="green">229</FONT>                    <a name="line.229"></a>
+<FONT color="green">230</FONT>                            try {<a name="line.230"></a>
+<FONT color="green">231</FONT>                                    final svm_problem prob = readProblemMaltSVMFormat(getInstanceInputStreamReader(".ins"), cardinalities, svmParam);<a name="line.231"></a>
+<FONT color="green">232</FONT>                                    if(svm.svm_check_parameter(prob, svmParam) != null) {<a name="line.232"></a>
+<FONT color="green">233</FONT>                                            throw new LibsvmException(svm.svm_check_parameter(prob, svmParam));<a name="line.233"></a>
+<FONT color="green">234</FONT>                                    }<a name="line.234"></a>
+<FONT color="green">235</FONT>                                    owner.getGuide().getConfiguration().getConfigLogger().info("Doing cross validation\n");<a name="line.235"></a>
+<FONT color="green">236</FONT>                                    final PrintStream out = System.out;<a name="line.236"></a>
+<FONT color="green">237</FONT>                                    final PrintStream err = System.err;<a name="line.237"></a>
+<FONT color="green">238</FONT>                                    System.setOut(NoPrintStream.NO_PRINTSTREAM);<a name="line.238"></a>
+<FONT color="green">239</FONT>                                    System.setErr(NoPrintStream.NO_PRINTSTREAM);<a name="line.239"></a>
+<FONT color="green">240</FONT>                                    <a name="line.240"></a>
+<FONT color="green">241</FONT>                                    //svm.svm_save_model(getFile(".mod").getAbsolutePath(), svm.svm_train(prob, svmParam));<a name="line.241"></a>
+<FONT color="green">242</FONT>                                    <a name="line.242"></a>
+<FONT color="green">243</FONT>                                    double[] target = new double[prob.l];<a name="line.243"></a>
+<FONT color="green">244</FONT>                                    <a name="line.244"></a>
+<FONT color="green">245</FONT>                                    svm.svm_cross_validation(prob, svmParam, nrOfSplits, target);                           <a name="line.245"></a>
+<FONT color="green">246</FONT>                                    <a name="line.246"></a>
+<FONT color="green">247</FONT>                                    System.setOut(err);<a name="line.247"></a>
+<FONT color="green">248</FONT>                                    System.setOut(out);<a name="line.248"></a>
+<FONT color="green">249</FONT>                                    if (!saveInstanceFiles) {<a name="line.249"></a>
+<FONT color="green">250</FONT>                                            getFile(".ins").delete();<a name="line.250"></a>
+<FONT color="green">251</FONT>                                    }<a name="line.251"></a>
+<FONT color="green">252</FONT>                                    <a name="line.252"></a>
+<FONT color="green">253</FONT>                                    <a name="line.253"></a>
+<FONT color="green">254</FONT>                                    double total_correct = 0.0;<a name="line.254"></a>
+<FONT color="green">255</FONT>                                    <a name="line.255"></a>
+<FONT color="green">256</FONT>                                    for(int i=0;i&lt;prob.l;i++)<a name="line.256"></a>
+<FONT color="green">257</FONT>                                            if(target[i] == prob.y[i])<a name="line.257"></a>
+<FONT color="green">258</FONT>                                                    ++total_correct;<a name="line.258"></a>
+<FONT color="green">259</FONT>                                    <a name="line.259"></a>
+<FONT color="green">260</FONT>                                    if(total_correct&gt;0)<a name="line.260"></a>
+<FONT color="green">261</FONT>                                            crossValidationAccuracy = 100.0*total_correct/prob.l;<a name="line.261"></a>
+<FONT color="green">262</FONT>                                    <a name="line.262"></a>
+<FONT color="green">263</FONT>                                    <a name="line.263"></a>
+<FONT color="green">264</FONT>                            } catch (OutOfMemoryError e) {<a name="line.264"></a>
+<FONT color="green">265</FONT>                                    throw new LibsvmException("Out of memory. Please increase the Java heap size (-Xmx&lt;size&gt;). ", e);<a name="line.265"></a>
+<FONT color="green">266</FONT>                            } catch (IllegalArgumentException e) {<a name="line.266"></a>
+<FONT color="green">267</FONT>                                    throw new LibsvmException("The LIBSVM learner was not able to redirect Standard Error stream. ", e);<a name="line.267"></a>
+<FONT color="green">268</FONT>                            } catch (SecurityException e) {<a name="line.268"></a>
+<FONT color="green">269</FONT>                                    throw new LibsvmException("The LIBSVM learner cannot remove the instance file. ", e);<a name="line.269"></a>
+<FONT color="green">270</FONT>                            }<a name="line.270"></a>
+<FONT color="green">271</FONT>                    //} else {<a name="line.271"></a>
+<FONT color="green">272</FONT>                    //      trainExternal(featureVector);<a name="line.272"></a>
+<FONT color="green">273</FONT>                    //}<a name="line.273"></a>
+<FONT color="green">274</FONT>                    //saveCardinalities(getInstanceOutputStreamWriter(".car"), cardinalities);<a name="line.274"></a>
+<FONT color="green">275</FONT>                    <a name="line.275"></a>
+<FONT color="green">276</FONT>    <a name="line.276"></a>
+<FONT color="green">277</FONT>                            <a name="line.277"></a>
+<FONT color="green">278</FONT>                    return crossValidationAccuracy;<a name="line.278"></a>
+<FONT color="green">279</FONT>            }<a name="line.279"></a>
+<FONT color="green">280</FONT>            <a name="line.280"></a>
+<FONT color="green">281</FONT>            <a name="line.281"></a>
+<FONT color="green">282</FONT>            private void trainExternal(FeatureVector featureVector) throws MaltChainedException {<a name="line.282"></a>
+<FONT color="green">283</FONT>                    try {           <a name="line.283"></a>
+<FONT color="green">284</FONT>                            maltSVMFormat2OriginalSVMFormat(getInstanceInputStreamReader(".ins"), getInstanceOutputStreamWriter(".ins.tmp"), cardinalities);<a name="line.284"></a>
+<FONT color="green">285</FONT>                            owner.getGuide().getConfiguration().getConfigLogger().info("Creating LIBSVM model (svm-train) "+getFile(".mod").getName());<a name="line.285"></a>
+<FONT color="green">286</FONT>    <a name="line.286"></a>
+<FONT color="green">287</FONT>                            final ArrayList&lt;String&gt; commands = new ArrayList&lt;String&gt;();<a name="line.287"></a>
+<FONT color="green">288</FONT>                            commands.add(pathExternalSVMTrain);<a name="line.288"></a>
+<FONT color="green">289</FONT>                            final String[] params = getSVMParamStringArray(svmParam);<a name="line.289"></a>
+<FONT color="green">290</FONT>                            for (int i=0; i &lt; params.length; i++) {<a name="line.290"></a>
+<FONT color="green">291</FONT>                                    commands.add(params[i]);<a name="line.291"></a>
+<FONT color="green">292</FONT>                            }<a name="line.292"></a>
+<FONT color="green">293</FONT>                            commands.add(getFile(".ins.tmp").getAbsolutePath());<a name="line.293"></a>
+<FONT color="green">294</FONT>                            commands.add(getFile(".mod").getAbsolutePath());<a name="line.294"></a>
+<FONT color="green">295</FONT>                            String[] arrayCommands =  commands.toArray(new String[commands.size()]);<a name="line.295"></a>
+<FONT color="green">296</FONT>                            <a name="line.296"></a>
+<FONT color="green">297</FONT>                    if (verbosity == Verbostity.ALL) {<a name="line.297"></a>
+<FONT color="green">298</FONT>                            owner.getGuide().getConfiguration().getConfigLogger().info('\n');<a name="line.298"></a>
+<FONT color="green">299</FONT>                    }<a name="line.299"></a>
+<FONT color="green">300</FONT>                            final Process child = Runtime.getRuntime().exec(arrayCommands);<a name="line.300"></a>
+<FONT color="green">301</FONT>                    final InputStream in = child.getInputStream();<a name="line.301"></a>
+<FONT color="green">302</FONT>                    final InputStream err = child.getErrorStream();<a name="line.302"></a>
+<FONT color="green">303</FONT>                    int c;<a name="line.303"></a>
+<FONT color="green">304</FONT>                    while ((c = in.read()) != -1){<a name="line.304"></a>
+<FONT color="green">305</FONT>                            if (verbosity == Verbostity.ALL) {<a name="line.305"></a>
+<FONT color="green">306</FONT>                                    owner.getGuide().getConfiguration().getConfigLogger().info((char)c);<a name="line.306"></a>
+<FONT color="green">307</FONT>                            }<a name="line.307"></a>
+<FONT color="green">308</FONT>                    }<a name="line.308"></a>
+<FONT color="green">309</FONT>                    while ((c = err.read()) != -1){<a name="line.309"></a>
+<FONT color="green">310</FONT>                            if (verbosity == Verbostity.ALL || verbosity == Verbostity.ERROR) {<a name="line.310"></a>
+<FONT color="green">311</FONT>                                    owner.getGuide().getConfiguration().getConfigLogger().info((char)c);<a name="line.311"></a>
+<FONT color="green">312</FONT>                            }<a name="line.312"></a>
+<FONT color="green">313</FONT>                    }<a name="line.313"></a>
+<FONT color="green">314</FONT>                if (child.waitFor() != 0) {<a name="line.314"></a>
+<FONT color="green">315</FONT>                    owner.getGuide().getConfiguration().getConfigLogger().info(" FAILED ("+child.exitValue()+")");<a name="line.315"></a>
+<FONT color="green">316</FONT>                }<a name="line.316"></a>
+<FONT color="green">317</FONT>                    in.close();<a name="line.317"></a>
+<FONT color="green">318</FONT>                    err.close();<a name="line.318"></a>
+<FONT color="green">319</FONT>                    if (!saveInstanceFiles) {<a name="line.319"></a>
+<FONT color="green">320</FONT>                                    getFile(".ins").delete();<a name="line.320"></a>
+<FONT color="green">321</FONT>                                    getFile(".ins.tmp").delete();<a name="line.321"></a>
+<FONT color="green">322</FONT>                    }<a name="line.322"></a>
+<FONT color="green">323</FONT>                    owner.getGuide().getConfiguration().getConfigLogger().info('\n');<a name="line.323"></a>
+<FONT color="green">324</FONT>                    } catch (InterruptedException e) {<a name="line.324"></a>
+<FONT color="green">325</FONT>                             throw new LibsvmException("SVM-trainer is interrupted. ", e);<a name="line.325"></a>
+<FONT color="green">326</FONT>                    } catch (IllegalArgumentException e) {<a name="line.326"></a>
+<FONT color="green">327</FONT>                            throw new LibsvmException("The LIBSVM learner was not able to redirect Standard Error stream. ", e);<a name="line.327"></a>
+<FONT color="green">328</FONT>                    } catch (SecurityException e) {<a name="line.328"></a>
+<FONT color="green">329</FONT>                            throw new LibsvmException("The LIBSVM learner cannot remove the instance file. ", e);<a name="line.329"></a>
+<FONT color="green">330</FONT>                    } catch (IOException e) {<a name="line.330"></a>
+<FONT color="green">331</FONT>                            throw new LibsvmException("The LIBSVM learner cannot save the model file '"+getFile(".mod").getAbsolutePath()+"'. ", e);<a name="line.331"></a>
+<FONT color="green">332</FONT>                    } catch (OutOfMemoryError e) {<a name="line.332"></a>
+<FONT color="green">333</FONT>                            throw new LibsvmException("Out of memory. Please increase the Java heap size (-Xmx&lt;size&gt;). ", e);<a name="line.333"></a>
+<FONT color="green">334</FONT>                    }<a name="line.334"></a>
+<FONT color="green">335</FONT>            }<a name="line.335"></a>
+<FONT color="green">336</FONT>            <a name="line.336"></a>
+<FONT color="green">337</FONT>            private int[] getCardinalities(FeatureVector featureVector) {<a name="line.337"></a>
+<FONT color="green">338</FONT>                    int[] cardinalities = new int[featureVector.size()];<a name="line.338"></a>
+<FONT color="green">339</FONT>                    int i = 0;<a name="line.339"></a>
+<FONT color="green">340</FONT>                    for (FeatureFunction feature : featureVector) {<a name="line.340"></a>
+<FONT color="green">341</FONT>                            cardinalities[i++] = feature.getFeatureValue().getCardinality();<a name="line.341"></a>
+<FONT color="green">342</FONT>                    }<a name="line.342"></a>
+<FONT color="green">343</FONT>                    return cardinalities;<a name="line.343"></a>
+<FONT color="green">344</FONT>            }<a name="line.344"></a>
+<FONT color="green">345</FONT>            <a name="line.345"></a>
+<FONT color="green">346</FONT>            private void saveCardinalities(OutputStreamWriter osw, int[] cardinalities) throws MaltChainedException {<a name="line.346"></a>
+<FONT color="green">347</FONT>                    final BufferedWriter out = new BufferedWriter(osw);<a name="line.347"></a>
+<FONT color="green">348</FONT>                    try {<a name="line.348"></a>
+<FONT color="green">349</FONT>                            for (int i = 0, n = cardinalities.length; i &lt; n; i++) {<a name="line.349"></a>
+<FONT color="green">350</FONT>                                    out.write(Integer.toString(cardinalities[i]));<a name="line.350"></a>
+<FONT color="green">351</FONT>                                    if (i &lt; n - 1) {<a name="line.351"></a>
+<FONT color="green">352</FONT>                                            out.write(',');<a name="line.352"></a>
+<FONT color="green">353</FONT>                                    }<a name="line.353"></a>
+<FONT color="green">354</FONT>                            }<a name="line.354"></a>
+<FONT color="green">355</FONT>                            out.write('\n');<a name="line.355"></a>
+<FONT color="green">356</FONT>                            out.close();<a name="line.356"></a>
+<FONT color="green">357</FONT>                    } catch (IOException e) {<a name="line.357"></a>
+<FONT color="green">358</FONT>                            throw new LibsvmException("Couldn't save the cardinalities to file. ", e);<a name="line.358"></a>
+<FONT color="green">359</FONT>                    }<a name="line.359"></a>
+<FONT color="green">360</FONT>            }<a name="line.360"></a>
+<FONT color="green">361</FONT>            <a name="line.361"></a>
+<FONT color="green">362</FONT>            private int[] loadCardinalities(InputStreamReader isr) throws MaltChainedException {<a name="line.362"></a>
+<FONT color="green">363</FONT>                    int[] cardinalities = null;<a name="line.363"></a>
+<FONT color="green">364</FONT>                    try {<a name="line.364"></a>
+<FONT color="green">365</FONT>                            final BufferedReader in = new BufferedReader(isr); <a name="line.365"></a>
+<FONT color="green">366</FONT>                            String line;<a name="line.366"></a>
+<FONT color="green">367</FONT>                            if ((line = in.readLine()) != null) {<a name="line.367"></a>
+<FONT color="green">368</FONT>                                    String[] items = line.split(",");<a name="line.368"></a>
+<FONT color="green">369</FONT>                                    cardinalities = new int[items.length];<a name="line.369"></a>
+<FONT color="green">370</FONT>                                    for (int i = 0; i &lt; items.length; i++) {<a name="line.370"></a>
+<FONT color="green">371</FONT>                                            cardinalities[i] = Integer.parseInt(items[i]);<a name="line.371"></a>
+<FONT color="green">372</FONT>                                    }<a name="line.372"></a>
+<FONT color="green">373</FONT>                            }<a name="line.373"></a>
+<FONT color="green">374</FONT>                            in.close();<a name="line.374"></a>
+<FONT color="green">375</FONT>                    } catch (IOException e) {<a name="line.375"></a>
+<FONT color="green">376</FONT>                            throw new LibsvmException("The cardinalities cannot be read because wrongly formatted. ", e);<a name="line.376"></a>
+<FONT color="green">377</FONT>                    } catch (NumberFormatException e) {<a name="line.377"></a>
+<FONT color="green">378</FONT>                            throw new LibsvmException("Couldn't load the cardinalities from file. ", e);<a name="line.378"></a>
+<FONT color="green">379</FONT>                    }<a name="line.379"></a>
+<FONT color="green">380</FONT>                    return cardinalities;<a name="line.380"></a>
+<FONT color="green">381</FONT>            }<a name="line.381"></a>
+<FONT color="green">382</FONT>            <a name="line.382"></a>
+<FONT color="green">383</FONT>            /* (non-Javadoc)<a name="line.383"></a>
+<FONT color="green">384</FONT>             * @see org.maltparser.ml.LearningMethod#moveAllInstances(org.maltparser.ml.LearningMethod, org.maltparser.core.feature.function.FeatureFunction, java.util.ArrayList)<a name="line.384"></a>
+<FONT color="green">385</FONT>             */<a name="line.385"></a>
+<FONT color="green">386</FONT>            public void moveAllInstances(LearningMethod method, FeatureFunction divideFeature, ArrayList&lt;Integer&gt; divideFeatureIndexVector) throws MaltChainedException {<a name="line.386"></a>
+<FONT color="green">387</FONT>                    if (method == null) {<a name="line.387"></a>
+<FONT color="green">388</FONT>                            throw new LibsvmException("The learning method cannot be found. ");<a name="line.388"></a>
+<FONT color="green">389</FONT>                    } else if (divideFeature == null) {<a name="line.389"></a>
+<FONT color="green">390</FONT>                            throw new LibsvmException("The divide feature cannot be found. ");<a name="line.390"></a>
+<FONT color="green">391</FONT>                    } <a name="line.391"></a>
+<FONT color="green">392</FONT>                    try {<a name="line.392"></a>
+<FONT color="green">393</FONT>                            final BufferedReader in = new BufferedReader(getInstanceInputStreamReader(".ins"));<a name="line.393"></a>
+<FONT color="green">394</FONT>                            final BufferedWriter out = method.getInstanceWriter();<a name="line.394"></a>
+<FONT color="green">395</FONT>                            final StringBuilder sb = new StringBuilder(6);<a name="line.395"></a>
+<FONT color="green">396</FONT>                            int l = in.read();<a name="line.396"></a>
+<FONT color="green">397</FONT>                            char c;<a name="line.397"></a>
+<FONT color="green">398</FONT>                            int j = 0;<a name="line.398"></a>
+<FONT color="green">399</FONT>                            while(true) {<a name="line.399"></a>
+<FONT color="green">400</FONT>                                    if (l == -1) {<a name="line.400"></a>
+<FONT color="green">401</FONT>                                            sb.setLength(0);<a name="line.401"></a>
+<FONT color="green">402</FONT>                                            break;<a name="line.402"></a>
+<FONT color="green">403</FONT>                                    }<a name="line.403"></a>
+<FONT color="green">404</FONT>                                    <a name="line.404"></a>
+<FONT color="green">405</FONT>                                    c = (char)l; <a name="line.405"></a>
+<FONT color="green">406</FONT>                                    l = in.read();<a name="line.406"></a>
+<FONT color="green">407</FONT>                                    if (c == '\t') {<a name="line.407"></a>
+<FONT color="green">408</FONT>                                            if (divideFeatureIndexVector.contains(j-1)) {<a name="line.408"></a>
+<FONT color="green">409</FONT>                                                    out.write(Integer.toString(((SingleFeatureValue)divideFeature.getFeatureValue()).getCode()));<a name="line.409"></a>
+<FONT color="green">410</FONT>                                                    out.write('\t');<a name="line.410"></a>
+<FONT color="green">411</FONT>                                            }<a name="line.411"></a>
+<FONT color="green">412</FONT>                                            out.write(sb.toString());<a name="line.412"></a>
+<FONT color="green">413</FONT>                                            j++;<a name="line.413"></a>
+<FONT color="green">414</FONT>                                            out.write('\t');<a name="line.414"></a>
+<FONT color="green">415</FONT>                                            sb.setLength(0);<a name="line.415"></a>
+<FONT color="green">416</FONT>                                    } else if (c == '\n') {<a name="line.416"></a>
+<FONT color="green">417</FONT>                                            if (sb.length() &gt; 0) { <a name="line.417"></a>
+<FONT color="green">418</FONT>                                                    out.write(sb.toString());<a name="line.418"></a>
+<FONT color="green">419</FONT>                                            }<a name="line.419"></a>
+<FONT color="green">420</FONT>                                            if (divideFeatureIndexVector.contains(j-1)) {<a name="line.420"></a>
+<FONT color="green">421</FONT>                                                    if (sb.length() &gt; 0) { <a name="line.421"></a>
+<FONT color="green">422</FONT>                                                            out.write('\t');<a name="line.422"></a>
+<FONT color="green">423</FONT>                                                    }<a name="line.423"></a>
+<FONT color="green">424</FONT>                                                    out.write(Integer.toString(((SingleFeatureValue)divideFeature.getFeatureValue()).getCode()));<a name="line.424"></a>
+<FONT color="green">425</FONT>                                            }<a name="line.425"></a>
+<FONT color="green">426</FONT>                                            out.write('\n');<a name="line.426"></a>
+<FONT color="green">427</FONT>                                            sb.setLength(0);<a name="line.427"></a>
+<FONT color="green">428</FONT>                                            method.increaseNumberOfInstances();<a name="line.428"></a>
+<FONT color="green">429</FONT>                                            this.decreaseNumberOfInstances();<a name="line.429"></a>
+<FONT color="green">430</FONT>                                            j = 0;<a name="line.430"></a>
+<FONT color="green">431</FONT>                                    } else {<a name="line.431"></a>
+<FONT color="green">432</FONT>                                            sb.append(c);<a name="line.432"></a>
+<FONT color="green">433</FONT>                                    }<a name="line.433"></a>
+<FONT color="green">434</FONT>                            }       <a name="line.434"></a>
+<FONT color="green">435</FONT>                            in.close();<a name="line.435"></a>
+<FONT color="green">436</FONT>                            getFile(".ins").delete();<a name="line.436"></a>
+<FONT color="green">437</FONT>                    } catch (SecurityException e) {<a name="line.437"></a>
+<FONT color="green">438</FONT>                            throw new LibsvmException("The LIBSVM learner cannot remove the instance file. ", e);<a name="line.438"></a>
+<FONT color="green">439</FONT>                    } catch (NullPointerException  e) {<a name="line.439"></a>
+<FONT color="green">440</FONT>                            throw new LibsvmException("The instance file cannot be found. ", e);<a name="line.440"></a>
+<FONT color="green">441</FONT>                    } catch (FileNotFoundException e) {<a name="line.441"></a>
+<FONT color="green">442</FONT>                            throw new LibsvmException("The instance file cannot be found. ", e);<a name="line.442"></a>
+<FONT color="green">443</FONT>                    } catch (IOException e) {<a name="line.443"></a>
+<FONT color="green">444</FONT>                            throw new LibsvmException("The LIBSVM learner read from the instance file. ", e);<a name="line.444"></a>
+<FONT color="green">445</FONT>                    }<a name="line.445"></a>
+<FONT color="green">446</FONT>            }<a name="line.446"></a>
+<FONT color="green">447</FONT>            <a name="line.447"></a>
+<FONT color="green">448</FONT>            /* (non-Javadoc)<a name="line.448"></a>
+<FONT color="green">449</FONT>             * @see org.maltparser.ml.LearningMethod#predict(org.maltparser.parser.guide.feature.FeatureVector, org.maltparser.ml.KBestList)<a name="line.449"></a>
+<FONT color="green">450</FONT>             */<a name="line.450"></a>
+<FONT color="green">451</FONT>            public boolean predict(FeatureVector featureVector, SingleDecision decision) throws MaltChainedException {<a name="line.451"></a>
+<FONT color="green">452</FONT>                    if (model == null) {<a name="line.452"></a>
+<FONT color="green">453</FONT>                            try {<a name="line.453"></a>
+<FONT color="green">454</FONT>                                    model = svm.svm_load_model(new BufferedReader(getInstanceInputStreamReaderFromConfigFile(".mod")));<a name="line.454"></a>
+<FONT color="green">455</FONT>                            } catch (IOException e) {<a name="line.455"></a>
+<FONT color="green">456</FONT>                                    throw new LibsvmException("The model cannot be loaded. ", e);<a name="line.456"></a>
+<FONT color="green">457</FONT>                            }<a name="line.457"></a>
+<FONT color="green">458</FONT>                    }<a name="line.458"></a>
+<FONT color="green">459</FONT>                    if (cardinalities == null) {<a name="line.459"></a>
+<FONT color="green">460</FONT>                            if (getConfigFileEntry(".car") != null) {<a name="line.460"></a>
+<FONT color="green">461</FONT>                                    cardinalities = loadCardinalities(getInstanceInputStreamReaderFromConfigFile(".car"));<a name="line.461"></a>
+<FONT color="green">462</FONT>                            } else {<a name="line.462"></a>
+<FONT color="green">463</FONT>                                    cardinalities = getCardinalities(featureVector);<a name="line.463"></a>
+<FONT color="green">464</FONT>                            }<a name="line.464"></a>
+<FONT color="green">465</FONT>                    }<a name="line.465"></a>
+<FONT color="green">466</FONT>                    if (xlist == null) {<a name="line.466"></a>
+<FONT color="green">467</FONT>                            xlist = new ArrayList&lt;svm_node&gt;(featureVector.size()); <a name="line.467"></a>
+<FONT color="green">468</FONT>                    }<a name="line.468"></a>
+<FONT color="green">469</FONT>                    if (model == null) { <a name="line.469"></a>
+<FONT color="green">470</FONT>                            throw new LibsvmException("The LIBSVM learner cannot predict the next class, because the learning model cannot be found. ");<a name="line.470"></a>
+<FONT color="green">471</FONT>                    } else if (featureVector == null) {<a name="line.471"></a>
+<FONT color="green">472</FONT>                            throw new LibsvmException("The LIBSVM learner cannot predict the next class, because the feature vector cannot be found. ");<a name="line.472"></a>
+<FONT color="green">473</FONT>                    }<a name="line.473"></a>
+<FONT color="green">474</FONT>                    int j = 0;<a name="line.474"></a>
+<FONT color="green">475</FONT>                    int offset = 0;<a name="line.475"></a>
+<FONT color="green">476</FONT>                    int i = 0;<a name="line.476"></a>
+<FONT color="green">477</FONT>                    for (FeatureFunction feature : featureVector) {<a name="line.477"></a>
+<FONT color="green">478</FONT>                            final FeatureValue featureValue = feature.getFeatureValue();<a name="line.478"></a>
+<FONT color="green">479</FONT>                            if (!(excludeNullValues == true &amp;&amp; featureValue.isNullValue())) {<a name="line.479"></a>
+<FONT color="green">480</FONT>                                    if (featureValue instanceof SingleFeatureValue) {<a name="line.480"></a>
+<FONT color="green">481</FONT>                                            if (((SingleFeatureValue)featureValue).getCode() &lt; cardinalities[i]) {<a name="line.481"></a>
+<FONT color="green">482</FONT>                                                    if (j &gt;= xlist.size()) {<a name="line.482"></a>
+<FONT color="green">483</FONT>                                                            svm_node x =  new svm_node();<a name="line.483"></a>
+<FONT color="green">484</FONT>                                                            x.value = 1;<a name="line.484"></a>
+<FONT color="green">485</FONT>                                                            xlist.add(j,x);<a name="line.485"></a>
+<FONT color="green">486</FONT>                                                    }<a name="line.486"></a>
+<FONT color="green">487</FONT>                                                    xlist.get(j++).index = ((SingleFeatureValue)featureValue).getCode() + offset;<a name="line.487"></a>
+<FONT color="green">488</FONT>                                            }<a name="line.488"></a>
+<FONT color="green">489</FONT>                                    } else if (featureValue instanceof MultipleFeatureValue) {<a name="line.489"></a>
+<FONT color="green">490</FONT>                                            for (Integer value : ((MultipleFeatureValue)featureValue).getCodes()) {<a name="line.490"></a>
+<FONT color="green">491</FONT>                                                    if (value &lt; cardinalities[i]) {<a name="line.491"></a>
+<FONT color="green">492</FONT>    //                                              if (((MultipleFeatureValue)featureValue).isKnown(value)) {<a name="line.492"></a>
+<FONT color="green">493</FONT>                                                            if (j &gt;= xlist.size()) {<a name="line.493"></a>
+<FONT color="green">494</FONT>                                                                    svm_node x =  new svm_node();<a name="line.494"></a>
+<FONT color="green">495</FONT>                                                                    x.value = 1;<a name="line.495"></a>
+<FONT color="green">496</FONT>                                                                    xlist.add(j,x);<a name="line.496"></a>
+<FONT color="green">497</FONT>                                                            }<a name="line.497"></a>
+<FONT color="green">498</FONT>                                                            xlist.get(j++).index = value + offset;<a name="line.498"></a>
+<FONT color="green">499</FONT>                                                    }<a name="line.499"></a>
+<FONT color="green">500</FONT>                                            }<a name="line.500"></a>
+<FONT color="green">501</FONT>                                    }<a name="line.501"></a>
+<FONT color="green">502</FONT>                            }<a name="line.502"></a>
+<FONT color="green">503</FONT>                            offset += cardinalities[i];<a name="line.503"></a>
+<FONT color="green">504</FONT>                            i++;<a name="line.504"></a>
+<FONT color="green">505</FONT>                    }<a name="line.505"></a>
+<FONT color="green">506</FONT>    <a name="line.506"></a>
+<FONT color="green">507</FONT>                    svm_node[] xarray = new svm_node[j];<a name="line.507"></a>
+<FONT color="green">508</FONT>                    for (int k = 0; k &lt; j; k++) {<a name="line.508"></a>
+<FONT color="green">509</FONT>                            xarray[k] = xlist.get(k);<a name="line.509"></a>
+<FONT color="green">510</FONT>                    }<a name="line.510"></a>
+<FONT color="green">511</FONT>                    try {<a name="line.511"></a>
+<FONT color="green">512</FONT>                            if (decision.getKBestList().getK() == 1 || svm.svm_get_svm_type(model) == svm_parameter.ONE_CLASS ||<a name="line.512"></a>
+<FONT color="green">513</FONT>                                            svm.svm_get_svm_type(model) == svm_parameter.EPSILON_SVR ||<a name="line.513"></a>
+<FONT color="green">514</FONT>                                            svm.svm_get_svm_type(model) == svm_parameter.NU_SVR) {<a name="line.514"></a>
+<FONT color="green">515</FONT>                                    decision.getKBestList().add((int)svm.svm_predict(model, xarray));<a name="line.515"></a>
+<FONT color="green">516</FONT>                            } else {<a name="line.516"></a>
+<FONT color="green">517</FONT>                                    svm_predict_with_kbestlist(model, xarray, decision.getKBestList());<a name="line.517"></a>
+<FONT color="green">518</FONT>                            }<a name="line.518"></a>
+<FONT color="green">519</FONT>    <a name="line.519"></a>
+<FONT color="green">520</FONT>                    } catch (OutOfMemoryError e) {<a name="line.520"></a>
+<FONT color="green">521</FONT>                                    throw new LibsvmException("Out of memory. Please increase the Java heap size (-Xmx&lt;size&gt;). ", e);<a name="line.521"></a>
+<FONT color="green">522</FONT>                    }<a name="line.522"></a>
+<FONT color="green">523</FONT>    <a name="line.523"></a>
+<FONT color="green">524</FONT>                    return true;<a name="line.524"></a>
+<FONT color="green">525</FONT>            }<a name="line.525"></a>
+<FONT color="green">526</FONT>            <a name="line.526"></a>
+<FONT color="green">527</FONT>    <a name="line.527"></a>
+<FONT color="green">528</FONT>            public void terminate() throws MaltChainedException { <a name="line.528"></a>
+<FONT color="green">529</FONT>                    closeInstanceWriter();<a name="line.529"></a>
+<FONT color="green">530</FONT>                    model = null;<a name="line.530"></a>
+<FONT color="green">531</FONT>                    svmParam = null;<a name="line.531"></a>
+<FONT color="green">532</FONT>                    xlist = null;<a name="line.532"></a>
+<FONT color="green">533</FONT>                    owner = null;<a name="line.533"></a>
+<FONT color="green">534</FONT>            }<a name="line.534"></a>
+<FONT color="green">535</FONT>    <a name="line.535"></a>
+<FONT color="green">536</FONT>            public BufferedWriter getInstanceWriter() {<a name="line.536"></a>
+<FONT color="green">537</FONT>                    return instanceOutput;<a name="line.537"></a>
+<FONT color="green">538</FONT>            }<a name="line.538"></a>
+<FONT color="green">539</FONT>            <a name="line.539"></a>
+<FONT color="green">540</FONT>            protected void closeInstanceWriter() throws MaltChainedException {<a name="line.540"></a>
+<FONT color="green">541</FONT>                    try {<a name="line.541"></a>
+<FONT color="green">542</FONT>                            if (instanceOutput != null) {<a name="line.542"></a>
+<FONT color="green">543</FONT>                                    instanceOutput.flush();<a name="line.543"></a>
+<FONT color="green">544</FONT>                                    instanceOutput.close();<a name="line.544"></a>
+<FONT color="green">545</FONT>                                    instanceOutput = null;<a name="line.545"></a>
+<FONT color="green">546</FONT>                            }<a name="line.546"></a>
+<FONT color="green">547</FONT>                    } catch (IOException e) {<a name="line.547"></a>
+<FONT color="green">548</FONT>                            throw new LibsvmException("The LIBSVM learner cannot close the instance file. ", e);<a name="line.548"></a>
+<FONT color="green">549</FONT>                    }<a name="line.549"></a>
+<FONT color="green">550</FONT>            }<a name="line.550"></a>
+<FONT color="green">551</FONT>            <a name="line.551"></a>
+<FONT color="green">552</FONT>            /**<a name="line.552"></a>
+<FONT color="green">553</FONT>             * Initialize the LIBSVM according to the parameter string<a name="line.553"></a>
+<FONT color="green">554</FONT>             * <a name="line.554"></a>
+<FONT color="green">555</FONT>             * @param paramString the parameter string to configure the LIBSVM learner.<a name="line.555"></a>
+<FONT color="green">556</FONT>             * @throws MaltChainedException<a name="line.556"></a>
+<FONT color="green">557</FONT>             */<a name="line.557"></a>
+<FONT color="green">558</FONT>            protected void initSvmParam(String paramString) throws MaltChainedException {<a name="line.558"></a>
+<FONT color="green">559</FONT>                    this.paramString = paramString;<a name="line.559"></a>
+<FONT color="green">560</FONT>                    svmParam = new svm_parameter();<a name="line.560"></a>
+<FONT color="green">561</FONT>                    initParameters(svmParam);<a name="line.561"></a>
+<FONT color="green">562</FONT>                    parseParameters(paramString, svmParam);<a name="line.562"></a>
+<FONT color="green">563</FONT>            }<a name="line.563"></a>
+<FONT color="green">564</FONT>            <a name="line.564"></a>
+<FONT color="green">565</FONT>            /**<a name="line.565"></a>
+<FONT color="green">566</FONT>             * Returns the parameter string for used for configure LIBSVM<a name="line.566"></a>
+<FONT color="green">567</FONT>             * <a name="line.567"></a>
+<FONT color="green">568</FONT>             * @return the parameter string for used for configure LIBSVM<a name="line.568"></a>
+<FONT color="green">569</FONT>             */<a name="line.569"></a>
+<FONT color="green">570</FONT>            public String getParamString() {<a name="line.570"></a>
+<FONT color="green">571</FONT>                    return paramString;<a name="line.571"></a>
+<FONT color="green">572</FONT>            }<a name="line.572"></a>
+<FONT color="green">573</FONT>            <a name="line.573"></a>
+<FONT color="green">574</FONT>            public InstanceModel getOwner() {<a name="line.574"></a>
+<FONT color="green">575</FONT>                    return owner;<a name="line.575"></a>
+<FONT color="green">576</FONT>            }<a name="line.576"></a>
+<FONT color="green">577</FONT>    <a name="line.577"></a>
+<FONT color="green">578</FONT>            protected void setOwner(InstanceModel owner) {<a name="line.578"></a>
+<FONT color="green">579</FONT>                    this.owner = owner;<a name="line.579"></a>
+<FONT color="green">580</FONT>            }<a name="line.580"></a>
+<FONT color="green">581</FONT>            <a name="line.581"></a>
+<FONT color="green">582</FONT>            public int getLearnerMode() {<a name="line.582"></a>
+<FONT color="green">583</FONT>                    return learnerMode;<a name="line.583"></a>
+<FONT color="green">584</FONT>            }<a name="line.584"></a>
+<FONT color="green">585</FONT>    <a name="line.585"></a>
+<FONT color="green">586</FONT>            public void setLearnerMode(int learnerMode) throws MaltChainedException {<a name="line.586"></a>
+<FONT color="green">587</FONT>                    this.learnerMode = learnerMode;<a name="line.587"></a>
+<FONT color="green">588</FONT>            }<a name="line.588"></a>
+<FONT color="green">589</FONT>            <a name="line.589"></a>
+<FONT color="green">590</FONT>            public String getLearningMethodName() {<a name="line.590"></a>
+<FONT color="green">591</FONT>                    return name;<a name="line.591"></a>
+<FONT color="green">592</FONT>            }<a name="line.592"></a>
+<FONT color="green">593</FONT>            <a name="line.593"></a>
+<FONT color="green">594</FONT>            /**<a name="line.594"></a>
+<FONT color="green">595</FONT>             * Returns the current configuration<a name="line.595"></a>
+<FONT color="green">596</FONT>             * <a name="line.596"></a>
+<FONT color="green">597</FONT>             * @return the current configuration<a name="line.597"></a>
+<FONT color="green">598</FONT>             * @throws MaltChainedException<a name="line.598"></a>
+<FONT color="green">599</FONT>             */<a name="line.599"></a>
+<FONT color="green">600</FONT>            public DependencyParserConfig getConfiguration() throws MaltChainedException {<a name="line.600"></a>
+<FONT color="green">601</FONT>                    return owner.getGuide().getConfiguration();<a name="line.601"></a>
+<FONT color="green">602</FONT>            }<a name="line.602"></a>
+<FONT color="green">603</FONT>            <a name="line.603"></a>
+<FONT color="green">604</FONT>            public int getNumberOfInstances() throws MaltChainedException {<a name="line.604"></a>
+<FONT color="green">605</FONT>                    if(numberOfInstances!=0)<a name="line.605"></a>
+<FONT color="green">606</FONT>                            return numberOfInstances;<a name="line.606"></a>
+<FONT color="green">607</FONT>                    else{<a name="line.607"></a>
+<FONT color="green">608</FONT>                            //Do a line count of the instance file and return that<a name="line.608"></a>
+<FONT color="green">609</FONT>                            <a name="line.609"></a>
+<FONT color="green">610</FONT>                            BufferedReader reader = new BufferedReader( getInstanceInputStreamReader(".ins"));<a name="line.610"></a>
+<FONT color="green">611</FONT>                            try {<a name="line.611"></a>
+<FONT color="green">612</FONT>                                    while(reader.readLine()!=null){<a name="line.612"></a>
+<FONT color="green">613</FONT>                                            numberOfInstances++;<a name="line.613"></a>
+<FONT color="green">614</FONT>                                            owner.increaseFrequency();<a name="line.614"></a>
+<FONT color="green">615</FONT>                                    }<a name="line.615"></a>
+<FONT color="green">616</FONT>                                    <a name="line.616"></a>
+<FONT color="green">617</FONT>                                    reader.close();<a name="line.617"></a>
+<FONT color="green">618</FONT>                            } catch (IOException e) {<a name="line.618"></a>
+<FONT color="green">619</FONT>                                    throw new MaltChainedException("No instances found in file",e);<a name="line.619"></a>
+<FONT color="green">620</FONT>                            }<a name="line.620"></a>
+<FONT color="green">621</FONT>                            <a name="line.621"></a>
+<FONT color="green">622</FONT>                            <a name="line.622"></a>
+<FONT color="green">623</FONT>                            <a name="line.623"></a>
+<FONT color="green">624</FONT>                            return numberOfInstances;<a name="line.624"></a>
+<FONT color="green">625</FONT>                            <a name="line.625"></a>
+<FONT color="green">626</FONT>                    }<a name="line.626"></a>
+<FONT color="green">627</FONT>            }<a name="line.627"></a>
+<FONT color="green">628</FONT>    <a name="line.628"></a>
+<FONT color="green">629</FONT>            public void increaseNumberOfInstances() {<a name="line.629"></a>
+<FONT color="green">630</FONT>                    numberOfInstances++;<a name="line.630"></a>
+<FONT color="green">631</FONT>                    owner.increaseFrequency();<a name="line.631"></a>
+<FONT color="green">632</FONT>            }<a name="line.632"></a>
+<FONT color="green">633</FONT>            <a name="line.633"></a>
+<FONT color="green">634</FONT>            public void decreaseNumberOfInstances() {<a name="line.634"></a>
+<FONT color="green">635</FONT>                    numberOfInstances--;<a name="line.635"></a>
+<FONT color="green">636</FONT>                    owner.decreaseFrequency();<a name="line.636"></a>
+<FONT color="green">637</FONT>            }<a name="line.637"></a>
+<FONT color="green">638</FONT>            <a name="line.638"></a>
+<FONT color="green">639</FONT>            protected void setNumberOfInstances(int numberOfInstances) {<a name="line.639"></a>
+<FONT color="green">640</FONT>                    this.numberOfInstances = 0;<a name="line.640"></a>
+<FONT color="green">641</FONT>            }<a name="line.641"></a>
+<FONT color="green">642</FONT>    <a name="line.642"></a>
+<FONT color="green">643</FONT>            protected void setLearningMethodName(String name) {<a name="line.643"></a>
+<FONT color="green">644</FONT>                    this.name = name;<a name="line.644"></a>
+<FONT color="green">645</FONT>            }<a name="line.645"></a>
+<FONT color="green">646</FONT>            <a name="line.646"></a>
+<FONT color="green">647</FONT>            protected OutputStreamWriter getInstanceOutputStreamWriter(String suffix) throws MaltChainedException {<a name="line.647"></a>
+<FONT color="green">648</FONT>                    return getConfiguration().getConfigurationDir().getAppendOutputStreamWriter(owner.getModelName()+getLearningMethodName()+suffix);<a name="line.648"></a>
+<FONT color="green">649</FONT>            }<a name="line.649"></a>
+<FONT color="green">650</FONT>            <a name="line.650"></a>
+<FONT color="green">651</FONT>            protected InputStreamReader getInstanceInputStreamReader(String suffix) throws MaltChainedException {<a name="line.651"></a>
+<FONT color="green">652</FONT>                    return getConfiguration().getConfigurationDir().getInputStreamReader(owner.getModelName()+getLearningMethodName()+suffix);<a name="line.652"></a>
+<FONT color="green">653</FONT>            }<a name="line.653"></a>
+<FONT color="green">654</FONT>            <a name="line.654"></a>
+<FONT color="green">655</FONT>            protected InputStreamReader getInstanceInputStreamReaderFromConfigFile(String suffix) throws MaltChainedException {<a name="line.655"></a>
+<FONT color="green">656</FONT>                    return getConfiguration().getConfigurationDir().getInputStreamReaderFromConfigFile(owner.getModelName()+getLearningMethodName()+suffix);<a name="line.656"></a>
+<FONT color="green">657</FONT>            }<a name="line.657"></a>
+<FONT color="green">658</FONT>            <a name="line.658"></a>
+<FONT color="green">659</FONT>            protected File getFile(String suffix) throws MaltChainedException {<a name="line.659"></a>
+<FONT color="green">660</FONT>                    return getConfiguration().getConfigurationDir().getFile(owner.getModelName()+getLearningMethodName()+suffix);<a name="line.660"></a>
+<FONT color="green">661</FONT>            }<a name="line.661"></a>
+<FONT color="green">662</FONT>            <a name="line.662"></a>
+<FONT color="green">663</FONT>            protected JarEntry getConfigFileEntry(String suffix) throws MaltChainedException {<a name="line.663"></a>
+<FONT color="green">664</FONT>                    return getConfiguration().getConfigurationDir().getConfigFileEntry(owner.getModelName()+getLearningMethodName()+suffix);<a name="line.664"></a>
+<FONT color="green">665</FONT>            }<a name="line.665"></a>
+<FONT color="green">666</FONT>            <a name="line.666"></a>
+<FONT color="green">667</FONT>            /**<a name="line.667"></a>
+<FONT color="green">668</FONT>             * Reads an instance file into a svm_problem object according to the Malt-SVM format, which is column fixed format (tab-separated).<a name="line.668"></a>
+<FONT color="green">669</FONT>             * <a name="line.669"></a>
+<FONT color="green">670</FONT>             * @param isr   the instance stream reader for the instance file<a name="line.670"></a>
+<FONT color="green">671</FONT>             * @param cardinalities a array containing the number of distinct values for a particular column.<a name="line.671"></a>
+<FONT color="green">672</FONT>             * @param param a svm_parameter object<a name="line.672"></a>
+<FONT color="green">673</FONT>             * @throws LibsvmException<a name="line.673"></a>
+<FONT color="green">674</FONT>             */<a name="line.674"></a>
+<FONT color="green">675</FONT>            public final svm_problem readProblemMaltSVMFormat(InputStreamReader isr, int[] cardinalities, svm_parameter param) throws MaltChainedException {<a name="line.675"></a>
+<FONT color="green">676</FONT>                    final svm_problem prob = new svm_problem();<a name="line.676"></a>
+<FONT color="green">677</FONT>                    try {<a name="line.677"></a>
+<FONT color="green">678</FONT>                            final BufferedReader fp = new BufferedReader(isr);<a name="line.678"></a>
+<FONT color="green">679</FONT>                            int max_index = 0;<a name="line.679"></a>
+<FONT color="green">680</FONT>                            if (xlist == null) {<a name="line.680"></a>
+<FONT color="green">681</FONT>                                    xlist = new ArrayList&lt;svm_node&gt;(); <a name="line.681"></a>
+<FONT color="green">682</FONT>                            }<a name="line.682"></a>
+<FONT color="green">683</FONT>                            prob.l = getNumberOfInstances();<a name="line.683"></a>
+<FONT color="green">684</FONT>                            prob.x = new svm_node[prob.l][];<a name="line.684"></a>
+<FONT color="green">685</FONT>                            prob.y = new double[prob.l];<a name="line.685"></a>
+<FONT color="green">686</FONT>                            int i = 0;<a name="line.686"></a>
+<FONT color="green">687</FONT>                            final Pattern tabPattern = Pattern.compile("\t");<a name="line.687"></a>
+<FONT color="green">688</FONT>                            final Pattern pipePattern = Pattern.compile("\\|");<a name="line.688"></a>
+<FONT color="green">689</FONT>                            while(true) {<a name="line.689"></a>
+<FONT color="green">690</FONT>                                    String line = fp.readLine();<a name="line.690"></a>
+<FONT color="green">691</FONT>                                    if(line == null) break;<a name="line.691"></a>
+<FONT color="green">692</FONT>                                    String[] columns = tabPattern.split(line);<a name="line.692"></a>
+<FONT color="green">693</FONT>    <a name="line.693"></a>
+<FONT color="green">694</FONT>                                    if (columns.length == 0) {<a name="line.694"></a>
+<FONT color="green">695</FONT>                                            continue;<a name="line.695"></a>
+<FONT color="green">696</FONT>                                    }<a name="line.696"></a>
+<FONT color="green">697</FONT>                                    <a name="line.697"></a>
+<FONT color="green">698</FONT>                                    int offset = 0; <a name="line.698"></a>
+<FONT color="green">699</FONT>                                    int j = 0;<a name="line.699"></a>
+<FONT color="green">700</FONT>                                    try {<a name="line.700"></a>
+<FONT color="green">701</FONT>                                            prob.y[i] = (double)Integer.parseInt(columns[j]);<a name="line.701"></a>
+<FONT color="green">702</FONT>                                            int p = 0;<a name="line.702"></a>
+<FONT color="green">703</FONT>                                            for(j = 1; j &lt; columns.length; j++) {<a name="line.703"></a>
+<FONT color="green">704</FONT>                                                    final String[] items = pipePattern.split(columns[j]);   <a name="line.704"></a>
+<FONT color="green">705</FONT>                                                    for (int k = 0; k &lt; items.length; k++) {<a name="line.705"></a>
+<FONT color="green">706</FONT>                                                            try {<a name="line.706"></a>
+<FONT color="green">707</FONT>                                                                    if (Integer.parseInt(items[k]) != -1) {<a name="line.707"></a>
+<FONT color="green">708</FONT>                                                                            xlist.add(p, new svm_node());<a name="line.708"></a>
+<FONT color="green">709</FONT>                                                                            xlist.get(p).value = 1;<a name="line.709"></a>
+<FONT color="green">710</FONT>                                                                            xlist.get(p).index = Integer.parseInt(items[k])+offset;<a name="line.710"></a>
+<FONT color="green">711</FONT>                                                                            p++;<a name="line.711"></a>
+<FONT color="green">712</FONT>                                                                    }<a name="line.712"></a>
+<FONT color="green">713</FONT>                                                            } catch (NumberFormatException e) {<a name="line.713"></a>
+<FONT color="green">714</FONT>                                                                    throw new LibsvmException("The instance file contain a non-integer value '"+items[k]+"'", e);<a name="line.714"></a>
+<FONT color="green">715</FONT>                                                            }<a name="line.715"></a>
+<FONT color="green">716</FONT>                                                    }<a name="line.716"></a>
+<FONT color="green">717</FONT>                                                    offset += cardinalities[j-1];<a name="line.717"></a>
+<FONT color="green">718</FONT>                                            }<a name="line.718"></a>
+<FONT color="green">719</FONT>                                            prob.x[i] = xlist.subList(0, p).toArray(new svm_node[0]);<a name="line.719"></a>
+<FONT color="green">720</FONT>                                            if(columns.length &gt; 1) {<a name="line.720"></a>
+<FONT color="green">721</FONT>                                                    max_index = Math.max(max_index, xlist.get(p-1).index);<a name="line.721"></a>
+<FONT color="green">722</FONT>                                            }<a name="line.722"></a>
+<FONT color="green">723</FONT>                                            i++;<a name="line.723"></a>
+<FONT color="green">724</FONT>                                            xlist.clear();<a name="line.724"></a>
+<FONT color="green">725</FONT>                                    } catch (ArrayIndexOutOfBoundsException e) {<a name="line.725"></a>
+<FONT color="green">726</FONT>                                            throw new LibsvmException("Cannot read from the instance file. ", e);<a name="line.726"></a>
+<FONT color="green">727</FONT>                                    }<a name="line.727"></a>
+<FONT color="green">728</FONT>                            }<a name="line.728"></a>
+<FONT color="green">729</FONT>                            fp.close();     <a name="line.729"></a>
+<FONT color="green">730</FONT>                            if (param.gamma == 0) {<a name="line.730"></a>
+<FONT color="green">731</FONT>                                    param.gamma = 1.0/max_index;<a name="line.731"></a>
+<FONT color="green">732</FONT>                            }<a name="line.732"></a>
+<FONT color="green">733</FONT>                            xlist = null;<a name="line.733"></a>
+<FONT color="green">734</FONT>                    } catch (IOException e) {<a name="line.734"></a>
+<FONT color="green">735</FONT>                            throw new LibsvmException("Cannot read from the instance file. ", e);<a name="line.735"></a>
+<FONT color="green">736</FONT>                    }<a name="line.736"></a>
+<FONT color="green">737</FONT>                    return prob;<a name="line.737"></a>
+<FONT color="green">738</FONT>            }<a name="line.738"></a>
+<FONT color="green">739</FONT>            <a name="line.739"></a>
+<FONT color="green">740</FONT>            protected void initSpecialParameters() throws MaltChainedException {<a name="line.740"></a>
+<FONT color="green">741</FONT>                    if (getConfiguration().getOptionValue("singlemalt", "null_value") != null &amp;&amp; getConfiguration().getOptionValue("singlemalt", "null_value").toString().equalsIgnoreCase("none")) {<a name="line.741"></a>
+<FONT color="green">742</FONT>                            excludeNullValues = true;<a name="line.742"></a>
+<FONT color="green">743</FONT>                    } else {<a name="line.743"></a>
+<FONT color="green">744</FONT>                            excludeNullValues = false;<a name="line.744"></a>
+<FONT color="green">745</FONT>                    }<a name="line.745"></a>
+<FONT color="green">746</FONT>                    saveInstanceFiles = ((Boolean)getConfiguration().getOptionValue("libsvm", "save_instance_files")).booleanValue();<a name="line.746"></a>
+<FONT color="green">747</FONT>                            <a name="line.747"></a>
+<FONT color="green">748</FONT>                    if (!getConfiguration().getOptionValue("libsvm", "libsvm_external").toString().equals("")) {<a name="line.748"></a>
+<FONT color="green">749</FONT>                            try {<a name="line.749"></a>
+<FONT color="green">750</FONT>                                    if (!new File(getConfiguration().getOptionValue("libsvm", "libsvm_external").toString()).exists()) {<a name="line.750"></a>
+<FONT color="green">751</FONT>                                            throw new LibsvmException("The path to the external LIBSVM trainer 'svm-train' is wrong.");<a name="line.751"></a>
+<FONT color="green">752</FONT>                                    }<a name="line.752"></a>
+<FONT color="green">753</FONT>                                    if (new File(getConfiguration().getOptionValue("libsvm", "libsvm_external").toString()).isDirectory()) {<a name="line.753"></a>
+<FONT color="green">754</FONT>                                            throw new LibsvmException("The option --libsvm-libsvm_external points to a directory, the path should point at the 'svm-train' file or the 'svm-train.exe' file");<a name="line.754"></a>
+<FONT color="green">755</FONT>                                    }<a name="line.755"></a>
+<FONT color="green">756</FONT>                                    if (!(getConfiguration().getOptionValue("libsvm", "libsvm_external").toString().endsWith("svm-train") || getConfiguration().getOptionValue("libsvm", "libsvm_external").toString().endsWith("svm-train.exe"))) {<a name="line.756"></a>
+<FONT color="green">757</FONT>                                            throw new LibsvmException("The option --libsvm-libsvm_external does not specify the path to 'svm-train' file or the 'svm-train.exe' file. ");<a name="line.757"></a>
+<FONT color="green">758</FONT>                                    }<a name="line.758"></a>
+<FONT color="green">759</FONT>                                    pathExternalSVMTrain = getConfiguration().getOptionValue("libsvm", "libsvm_external").toString();<a name="line.759"></a>
+<FONT color="green">760</FONT>                            } catch (SecurityException e) {<a name="line.760"></a>
+<FONT color="green">761</FONT>                                    throw new LibsvmException("Access denied to the file specified by the option --libsvm-libsvm_external. ", e);<a name="line.761"></a>
+<FONT color="green">762</FONT>                            }<a name="line.762"></a>
+<FONT color="green">763</FONT>                    }<a name="line.763"></a>
+<FONT color="green">764</FONT>                    if (getConfiguration().getOptionValue("libsvm", "verbosity") != null) {<a name="line.764"></a>
+<FONT color="green">765</FONT>                            verbosity = Verbostity.valueOf(getConfiguration().getOptionValue("libsvm", "verbosity").toString().toUpperCase());<a name="line.765"></a>
+<FONT color="green">766</FONT>                    }<a name="line.766"></a>
+<FONT color="green">767</FONT>            }<a name="line.767"></a>
+<FONT color="green">768</FONT>            <a name="line.768"></a>
+<FONT color="green">769</FONT>            /**<a name="line.769"></a>
+<FONT color="green">770</FONT>             * Assign a default value to all svm parameters<a name="line.770"></a>
+<FONT color="green">771</FONT>             * <a name="line.771"></a>
+<FONT color="green">772</FONT>             * @param param a svm_parameter object<a name="line.772"></a>
+<FONT color="green">773</FONT>             */<a name="line.773"></a>
+<FONT color="green">774</FONT>            protected void initParameters(svm_parameter param) throws MaltChainedException {<a name="line.774"></a>
+<FONT color="green">775</FONT>                    if (param == null) {<a name="line.775"></a>
+<FONT color="green">776</FONT>                            throw new LibsvmException("Svm-parameters cannot be found. ");<a name="line.776"></a>
+<FONT color="green">777</FONT>                    }<a name="line.777"></a>
+<FONT color="green">778</FONT>                    param.svm_type = svm_parameter.C_SVC;<a name="line.778"></a>
+<FONT color="green">779</FONT>                    param.kernel_type = svm_parameter.POLY;<a name="line.779"></a>
+<FONT color="green">780</FONT>                    param.degree = 2;<a name="line.780"></a>
+<FONT color="green">781</FONT>                    param.gamma = 0.2;      // 1/k<a name="line.781"></a>
+<FONT color="green">782</FONT>                    param.coef0 = 0;<a name="line.782"></a>
+<FONT color="green">783</FONT>                    param.nu = 0.5;<a name="line.783"></a>
+<FONT color="green">784</FONT>                    param.cache_size = 100; <a name="line.784"></a>
+<FONT color="green">785</FONT>                    param.C = 1; <a name="line.785"></a>
+<FONT color="green">786</FONT>                    param.eps = 1.0; <a name="line.786"></a>
+<FONT color="green">787</FONT>                    param.p = 0.1;<a name="line.787"></a>
+<FONT color="green">788</FONT>                    param.shrinking = 1;<a name="line.788"></a>
+<FONT color="green">789</FONT>                    param.probability = 0;<a name="line.789"></a>
+<FONT color="green">790</FONT>                    param.nr_weight = 0;<a name="line.790"></a>
+<FONT color="green">791</FONT>                    param.weight_label = new int[0];<a name="line.791"></a>
+<FONT color="green">792</FONT>                    param.weight = new double[0];<a name="line.792"></a>
+<FONT color="green">793</FONT>            }<a name="line.793"></a>
+<FONT color="green">794</FONT>            <a name="line.794"></a>
+<FONT color="green">795</FONT>            /**<a name="line.795"></a>
+<FONT color="green">796</FONT>             * Returns a string containing all svm-parameters of interest<a name="line.796"></a>
+<FONT color="green">797</FONT>             * <a name="line.797"></a>
+<FONT color="green">798</FONT>             * @param param a svm_parameter object<a name="line.798"></a>
+<FONT color="green">799</FONT>             * @return a string containing all svm-parameters of interest<a name="line.799"></a>
+<FONT color="green">800</FONT>             */<a name="line.800"></a>
+<FONT color="green">801</FONT>            public String toStringParameters(svm_parameter param)  {<a name="line.801"></a>
+<FONT color="green">802</FONT>                    if (param == null) {<a name="line.802"></a>
+<FONT color="green">803</FONT>                            throw new IllegalArgumentException("Svm-parameters cannot be found. ");<a name="line.803"></a>
+<FONT color="green">804</FONT>                    }<a name="line.804"></a>
+<FONT color="green">805</FONT>                    final StringBuffer sb = new StringBuffer();<a name="line.805"></a>
+<FONT color="green">806</FONT>                    <a name="line.806"></a>
+<FONT color="green">807</FONT>                    final String[] svmtypes = {"C_SVC", "NU_SVC","ONE_CLASS","EPSILON_SVR","NU_SVR"};<a name="line.807"></a>
+<FONT color="green">808</FONT>                    final String[] kerneltypes = {"LINEAR", "POLY","RBF","SIGMOID","PRECOMPUTED"};<a name="line.808"></a>
+<FONT color="green">809</FONT>                    final DecimalFormat dform = new DecimalFormat("#0.0#"); <a name="line.809"></a>
+<FONT color="green">810</FONT>                    final DecimalFormatSymbols sym = new DecimalFormatSymbols();<a name="line.810"></a>
+<FONT color="green">811</FONT>                    sym.setDecimalSeparator('.');<a name="line.811"></a>
+<FONT color="green">812</FONT>                    dform.setDecimalFormatSymbols(sym);<a name="line.812"></a>
+<FONT color="green">813</FONT>                    sb.append("LIBSVM SETTINGS\n");<a name="line.813"></a>
+<FONT color="green">814</FONT>                    sb.append("  SVM type      : " + svmtypes[param.svm_type] + " (" + param.svm_type + ")\n");<a name="line.814"></a>
+<FONT color="green">815</FONT>                    sb.append("  Kernel        : " + kerneltypes[param.kernel_type] + " (" + param.kernel_type + ")\n");<a name="line.815"></a>
+<FONT color="green">816</FONT>                    if (param.kernel_type == svm_parameter.POLY) {<a name="line.816"></a>
+<FONT color="green">817</FONT>                            sb.append("  Degree        : " + param.degree + "\n");<a name="line.817"></a>
+<FONT color="green">818</FONT>                    }<a name="line.818"></a>
+<FONT color="green">819</FONT>                    if (param.kernel_type == svm_parameter.POLY || param.kernel_type == svm_parameter.RBF || param.kernel_type == svm_parameter.SIGMOID) {<a name="line.819"></a>
+<FONT color="green">820</FONT>                            sb.append("  Gamma         : " + dform.format(param.gamma) + "\n");<a name="line.820"></a>
+<FONT color="green">821</FONT>                            if (param.kernel_type == svm_parameter.POLY || param.kernel_type == svm_parameter.SIGMOID) {<a name="line.821"></a>
+<FONT color="green">822</FONT>                                    sb.append("  Coef0         : " + dform.format(param.coef0) + "\n");<a name="line.822"></a>
+<FONT color="green">823</FONT>                            }<a name="line.823"></a>
+<FONT color="green">824</FONT>                    }<a name="line.824"></a>
+<FONT color="green">825</FONT>                    if (param.svm_type == svm_parameter.NU_SVC || param.svm_type == svm_parameter.NU_SVR || param.svm_type == svm_parameter.ONE_CLASS) {<a name="line.825"></a>
+<FONT color="green">826</FONT>                            sb.append("  Nu            : " + dform.format(param.nu) + "\n");<a name="line.826"></a>
+<FONT color="green">827</FONT>                    }<a name="line.827"></a>
+<FONT color="green">828</FONT>                    sb.append("  Cache Size    : " + dform.format(param.cache_size) + " MB\n");<a name="line.828"></a>
+<FONT color="green">829</FONT>                    if (param.svm_type == svm_parameter.C_SVC || param.svm_type == svm_parameter.NU_SVR || param.svm_type == svm_parameter.EPSILON_SVR) {<a name="line.829"></a>
+<FONT color="green">830</FONT>                            sb.append("  C             : " + dform.format(param.C) + "\n");<a name="line.830"></a>
+<FONT color="green">831</FONT>                    }<a name="line.831"></a>
+<FONT color="green">832</FONT>                    sb.append("  Eps           : " + dform.format(param.eps) + "\n");<a name="line.832"></a>
+<FONT color="green">833</FONT>                    if (param.svm_type == svm_parameter.EPSILON_SVR) {<a name="line.833"></a>
+<FONT color="green">834</FONT>                            sb.append("  P             : " + dform.format(param.p) + "\n");<a name="line.834"></a>
+<FONT color="green">835</FONT>                    }<a name="line.835"></a>
+<FONT color="green">836</FONT>                    sb.append("  Shrinking     : " + param.shrinking + "\n");<a name="line.836"></a>
+<FONT color="green">837</FONT>                    sb.append("  Probability   : " + param.probability + "\n");<a name="line.837"></a>
+<FONT color="green">838</FONT>                    if (param.svm_type == svm_parameter.C_SVC) {<a name="line.838"></a>
+<FONT color="green">839</FONT>                            sb.append("  #Weight       : " + param.nr_weight + "\n");<a name="line.839"></a>
+<FONT color="green">840</FONT>                            if (param.nr_weight &gt; 0) {<a name="line.840"></a>
+<FONT color="green">841</FONT>                                    sb.append("  Weight labels : ");<a name="line.841"></a>
+<FONT color="green">842</FONT>                                    for (int i = 0; i &lt; param.nr_weight; i++) {<a name="line.842"></a>
+<FONT color="green">843</FONT>                                            sb.append(param.weight_label[i]);<a name="line.843"></a>
+<FONT color="green">844</FONT>                                            if (i != param.nr_weight-1) {<a name="line.844"></a>
+<FONT color="green">845</FONT>                                                    sb.append(", ");<a name="line.845"></a>
+<FONT color="green">846</FONT>                                            }<a name="line.846"></a>
+<FONT color="green">847</FONT>                                    }<a name="line.847"></a>
+<FONT color="green">848</FONT>                                    sb.append("\n");<a name="line.848"></a>
+<FONT color="green">849</FONT>                                    for (int i = 0; i &lt; param.nr_weight; i++) {<a name="line.849"></a>
+<FONT color="green">850</FONT>                                            sb.append(dform.format(param.weight));<a name="line.850"></a>
+<FONT color="green">851</FONT>                                            if (i != param.nr_weight-1) {<a name="line.851"></a>
+<FONT color="green">852</FONT>                                                    sb.append(", ");<a name="line.852"></a>
+<FONT color="green">853</FONT>                                            }<a name="line.853"></a>
+<FONT color="green">854</FONT>                                    }<a name="line.854"></a>
+<FONT color="green">855</FONT>                                    sb.append("\n");<a name="line.855"></a>
+<FONT color="green">856</FONT>                            }<a name="line.856"></a>
+<FONT color="green">857</FONT>                    }<a name="line.857"></a>
+<FONT color="green">858</FONT>                    return sb.toString();<a name="line.858"></a>
+<FONT color="green">859</FONT>            }<a name="line.859"></a>
+<FONT color="green">860</FONT>            <a name="line.860"></a>
+<FONT color="green">861</FONT>            public String[] getSVMParamStringArray(svm_parameter param) {<a name="line.861"></a>
+<FONT color="green">862</FONT>                    final ArrayList&lt;String&gt; params = new ArrayList&lt;String&gt;();<a name="line.862"></a>
+<FONT color="green">863</FONT>    <a name="line.863"></a>
+<FONT color="green">864</FONT>                    if (param.svm_type != 0) {<a name="line.864"></a>
+<FONT color="green">865</FONT>                            params.add("-s"); params.add(new Integer(param.svm_type).toString());<a name="line.865"></a>
+<FONT color="green">866</FONT>                    }<a name="line.866"></a>
+<FONT color="green">867</FONT>                    if (param.kernel_type != 2) {<a name="line.867"></a>
+<FONT color="green">868</FONT>                            params.add("-t"); params.add(new Integer(param.kernel_type).toString());<a name="line.868"></a>
+<FONT color="green">869</FONT>                    }<a name="line.869"></a>
+<FONT color="green">870</FONT>                    if (param.degree != 3) {<a name="line.870"></a>
+<FONT color="green">871</FONT>                            params.add("-d"); params.add(new Integer(param.degree).toString());<a name="line.871"></a>
+<FONT color="green">872</FONT>                    }<a name="line.872"></a>
+<FONT color="green">873</FONT>                    params.add("-g"); params.add(new Double(param.gamma).toString());<a name="line.873"></a>
+<FONT color="green">874</FONT>                    if (param.coef0 != 0) {<a name="line.874"></a>
+<FONT color="green">875</FONT>                            params.add("-r"); params.add(new Double(param.coef0).toString());<a name="line.875"></a>
+<FONT color="green">876</FONT>                    }<a name="line.876"></a>
+<FONT color="green">877</FONT>                    if (param.nu != 0.5) {<a name="line.877"></a>
+<FONT color="green">878</FONT>                            params.add("-n"); params.add(new Double(param.nu).toString());<a name="line.878"></a>
+<FONT color="green">879</FONT>                    }<a name="line.879"></a>
+<FONT color="green">880</FONT>                    if (param.cache_size != 100) {<a name="line.880"></a>
+<FONT color="green">881</FONT>                            params.add("-m"); params.add(new Double(param.cache_size).toString());<a name="line.881"></a>
+<FONT color="green">882</FONT>                    }<a name="line.882"></a>
+<FONT color="green">883</FONT>                    if (param.C != 1) {<a name="line.883"></a>
+<FONT color="green">884</FONT>                            params.add("-c"); params.add(new Double(param.C).toString());<a name="line.884"></a>
+<FONT color="green">885</FONT>                    }<a name="line.885"></a>
+<FONT color="green">886</FONT>                    if (param.eps != 0.001) {<a name="line.886"></a>
+<FONT color="green">887</FONT>                            params.add("-e"); params.add(new Double(param.eps).toString());<a name="line.887"></a>
+<FONT color="green">888</FONT>                    }<a name="line.888"></a>
+<FONT color="green">889</FONT>                    if (param.p != 0.1) {<a name="line.889"></a>
+<FONT color="green">890</FONT>                            params.add("-p"); params.add(new Double(param.p).toString());<a name="line.890"></a>
+<FONT color="green">891</FONT>                    }<a name="line.891"></a>
+<FONT color="green">892</FONT>                    if (param.shrinking != 1) {<a name="line.892"></a>
+<FONT color="green">893</FONT>                            params.add("-h"); params.add(new Integer(param.shrinking).toString());<a name="line.893"></a>
+<FONT color="green">894</FONT>                    }<a name="line.894"></a>
+<FONT color="green">895</FONT>                    if (param.probability != 0) {<a name="line.895"></a>
+<FONT color="green">896</FONT>                            params.add("-b"); params.add(new Integer(param.probability).toString());<a name="line.896"></a>
+<FONT color="green">897</FONT>                    }<a name="line.897"></a>
+<FONT color="green">898</FONT>    <a name="line.898"></a>
+<FONT color="green">899</FONT>                    return params.toArray(new String[params.size()]);<a name="line.899"></a>
+<FONT color="green">900</FONT>            }<a name="line.900"></a>
+<FONT color="green">901</FONT>            <a name="line.901"></a>
+<FONT color="green">902</FONT>            /**<a name="line.902"></a>
+<FONT color="green">903</FONT>             * Parses the parameter string. The parameter string must contain parameter and value pairs, which are separated by a blank <a name="line.903"></a>
+<FONT color="green">904</FONT>             * or a underscore. The parameter begins with a character '-' followed by a one-character flag and the value must comply with<a name="line.904"></a>
+<FONT color="green">905</FONT>             * the parameters data type. Some examples:<a name="line.905"></a>
+<FONT color="green">906</FONT>             * <a name="line.906"></a>
+<FONT color="green">907</FONT>             * -s 0 -t 1 -d 2 -g 0.4 -e 0.1<a name="line.907"></a>
+<FONT color="green">908</FONT>             * -s_0_-t_1_-d_2_-g_0.4_-e_0.1<a name="line.908"></a>
+<FONT color="green">909</FONT>             * <a name="line.909"></a>
+<FONT color="green">910</FONT>             * @param paramstring   the parameter string <a name="line.910"></a>
+<FONT color="green">911</FONT>             * @param param a svm_parameter object<a name="line.911"></a>
+<FONT color="green">912</FONT>             * @throws LibsvmException<a name="line.912"></a>
+<FONT color="green">913</FONT>             */<a name="line.913"></a>
+<FONT color="green">914</FONT>            public void parseParameters(String paramstring, svm_parameter param) throws MaltChainedException {<a name="line.914"></a>
+<FONT color="green">915</FONT>                    if (param == null) {<a name="line.915"></a>
+<FONT color="green">916</FONT>                            throw new LibsvmException("Svm-parameters cannot be found. ");<a name="line.916"></a>
+<FONT color="green">917</FONT>                    }<a name="line.917"></a>
+<FONT color="green">918</FONT>                    if (paramstring == null) {<a name="line.918"></a>
+<FONT color="green">919</FONT>                            return;<a name="line.919"></a>
+<FONT color="green">920</FONT>                    }<a name="line.920"></a>
+<FONT color="green">921</FONT>                    final String[] argv;<a name="line.921"></a>
+<FONT color="green">922</FONT>                    try {<a name="line.922"></a>
+<FONT color="green">923</FONT>                            argv = paramstring.split("[_\\p{Blank}]");<a name="line.923"></a>
+<FONT color="green">924</FONT>                    } catch (PatternSyntaxException e) {<a name="line.924"></a>
+<FONT color="green">925</FONT>                            throw new LibsvmException("Could not split the svm-parameter string '"+paramstring+"'. ", e);<a name="line.925"></a>
+<FONT color="green">926</FONT>                    }<a name="line.926"></a>
+<FONT color="green">927</FONT>                    for (int i=0; i &lt; argv.length-1; i++) {<a name="line.927"></a>
+<FONT color="green">928</FONT>                            if(argv[i].charAt(0) != '-') {<a name="line.928"></a>
+<FONT color="green">929</FONT>                                    throw new LibsvmException("The argument flag should start with the following character '-', not with "+argv[i].charAt(0));<a name="line.929"></a>
+<FONT color="green">930</FONT>                            }<a name="line.930"></a>
+<FONT color="green">931</FONT>                            if(++i&gt;=argv.length) {<a name="line.931"></a>
+<FONT color="green">932</FONT>                                    throw new LibsvmException("The last argument does not have any value. ");<a name="line.932"></a>
+<FONT color="green">933</FONT>                            }<a name="line.933"></a>
+<FONT color="green">934</FONT>                            try {<a name="line.934"></a>
+<FONT color="green">935</FONT>                                    switch(argv[i-1].charAt(1)) {<a name="line.935"></a>
+<FONT color="green">936</FONT>                                    case 's':<a name="line.936"></a>
+<FONT color="green">937</FONT>                                            param.svm_type = Integer.parseInt(argv[i]);<a name="line.937"></a>
+<FONT color="green">938</FONT>                                            break;<a name="line.938"></a>
+<FONT color="green">939</FONT>                                    case 't':<a name="line.939"></a>
+<FONT color="green">940</FONT>                                            param.kernel_type = Integer.parseInt(argv[i]);<a name="line.940"></a>
+<FONT color="green">941</FONT>                                            break;<a name="line.941"></a>
+<FONT color="green">942</FONT>                                    case 'd':<a name="line.942"></a>
+<FONT color="green">943</FONT>                                            param.degree = Integer.parseInt(argv[i]);<a name="line.943"></a>
+<FONT color="green">944</FONT>                                            break;<a name="line.944"></a>
+<FONT color="green">945</FONT>                                    case 'g':<a name="line.945"></a>
+<FONT color="green">946</FONT>                                            param.gamma = Double.valueOf(argv[i]).doubleValue();<a name="line.946"></a>
+<FONT color="green">947</FONT>                                            break;<a name="line.947"></a>
+<FONT color="green">948</FONT>                                    case 'r':<a name="line.948"></a>
+<FONT color="green">949</FONT>                                            param.coef0 = Double.valueOf(argv[i]).doubleValue();<a name="line.949"></a>
+<FONT color="green">950</FONT>                                            break;<a name="line.950"></a>
+<FONT color="green">951</FONT>                                    case 'n':<a name="line.951"></a>
+<FONT color="green">952</FONT>                                            param.nu = Double.valueOf(argv[i]).doubleValue();<a name="line.952"></a>
+<FONT color="green">953</FONT>                                            break;<a name="line.953"></a>
+<FONT color="green">954</FONT>                                    case 'm':<a name="line.954"></a>
+<FONT color="green">955</FONT>                                            param.cache_size = Double.valueOf(argv[i]).doubleValue();<a name="line.955"></a>
+<FONT color="green">956</FONT>                                            break;<a name="line.956"></a>
+<FONT color="green">957</FONT>                                    case 'c':<a name="line.957"></a>
+<FONT color="green">958</FONT>                                            param.C = Double.valueOf(argv[i]).doubleValue();<a name="line.958"></a>
+<FONT color="green">959</FONT>                                            break;<a name="line.959"></a>
+<FONT color="green">960</FONT>                                    case 'e':<a name="line.960"></a>
+<FONT color="green">961</FONT>                                            param.eps = Double.valueOf(argv[i]).doubleValue();<a name="line.961"></a>
+<FONT color="green">962</FONT>                                            break;<a name="line.962"></a>
+<FONT color="green">963</FONT>                                    case 'p':<a name="line.963"></a>
+<FONT color="green">964</FONT>                                            param.p = Double.valueOf(argv[i]).doubleValue();<a name="line.964"></a>
+<FONT color="green">965</FONT>                                            break;<a name="line.965"></a>
+<FONT color="green">966</FONT>                                    case 'h':<a name="line.966"></a>
+<FONT color="green">967</FONT>                                            param.shrinking = Integer.parseInt(argv[i]);<a name="line.967"></a>
+<FONT color="green">968</FONT>                                            break;<a name="line.968"></a>
+<FONT color="green">969</FONT>                                case 'b':<a name="line.969"></a>
+<FONT color="green">970</FONT>                                            param.probability = Integer.parseInt(argv[i]);<a name="line.970"></a>
+<FONT color="green">971</FONT>                                            break;<a name="line.971"></a>
+<FONT color="green">972</FONT>                                    case 'w':<a name="line.972"></a>
+<FONT color="green">973</FONT>                                            ++param.nr_weight;<a name="line.973"></a>
+<FONT color="green">974</FONT>                                            {<a name="line.974"></a>
+<FONT color="green">975</FONT>                                                    int[] old = param.weight_label;<a name="line.975"></a>
+<FONT color="green">976</FONT>                                                    param.weight_label = new int[param.nr_weight];<a name="line.976"></a>
+<FONT color="green">977</FONT>                                                    System.arraycopy(old,0,param.weight_label,0,param.nr_weight-1);<a name="line.977"></a>
+<FONT color="green">978</FONT>                                            }<a name="line.978"></a>
+<FONT color="green">979</FONT>            <a name="line.979"></a>
+<FONT color="green">980</FONT>                                            {<a name="line.980"></a>
+<FONT color="green">981</FONT>                                                    double[] old = param.weight;<a name="line.981"></a>
+<FONT color="green">982</FONT>                                                    param.weight = new double[param.nr_weight];<a name="line.982"></a>
+<FONT color="green">983</FONT>                                                    System.arraycopy(old,0,param.weight,0,param.nr_weight-1);<a name="line.983"></a>
+<FONT color="green">984</FONT>                                            }<a name="line.984"></a>
+<FONT color="green">985</FONT>            <a name="line.985"></a>
+<FONT color="green">986</FONT>                                            param.weight_label[param.nr_weight-1] = Integer.parseInt(argv[i].substring(2));<a name="line.986"></a>
+<FONT color="green">987</FONT>                                            param.weight[param.nr_weight-1] = Double.valueOf(argv[i]).doubleValue();<a name="line.987"></a>
+<FONT color="green">988</FONT>                                            break;<a name="line.988"></a>
+<FONT color="green">989</FONT>                                    case 'Y':<a name="line.989"></a>
+<FONT color="green">990</FONT>                                    case 'V':<a name="line.990"></a>
+<FONT color="green">991</FONT>                                    case 'S':<a name="line.991"></a>
+<FONT color="green">992</FONT>                                    case 'F':<a name="line.992"></a>
+<FONT color="green">993</FONT>                                    case 'T':<a name="line.993"></a>
+<FONT color="green">994</FONT>                                    case 'M':<a name="line.994"></a>
+<FONT color="green">995</FONT>                                    case 'N':<a name="line.995"></a>
+<FONT color="green">996</FONT>                                            break;<a name="line.996"></a>
+<FONT color="green">997</FONT>                                    default:<a name="line.997"></a>
+<FONT color="green">998</FONT>                                            throw new LibsvmException("Unknown svm parameter: '"+argv[i-1]+"' with value '"+argv[i]+"'. ");         <a name="line.998"></a>
+<FONT color="green">999</FONT>                                    }<a name="line.999"></a>
+<FONT color="green">1000</FONT>                            } catch (ArrayIndexOutOfBoundsException e) {<a name="line.1000"></a>
+<FONT color="green">1001</FONT>                                    throw new LibsvmException("The svm-parameter '"+argv[i-1]+"' could not convert the string value '"+argv[i]+"' into a correct numeric value. ", e);<a name="line.1001"></a>
+<FONT color="green">1002</FONT>                            } catch (NumberFormatException e) {<a name="line.1002"></a>
+<FONT color="green">1003</FONT>                                    throw new LibsvmException("The svm-parameter '"+argv[i-1]+"' could not convert the string value '"+argv[i]+"' into a correct numeric value. ", e);      <a name="line.1003"></a>
+<FONT color="green">1004</FONT>                            } catch (NullPointerException e) {<a name="line.1004"></a>
+<FONT color="green">1005</FONT>                                    throw new LibsvmException("The svm-parameter '"+argv[i-1]+"' could not convert the string value '"+argv[i]+"' into a correct numeric value. ", e);      <a name="line.1005"></a>
+<FONT color="green">1006</FONT>                            }<a name="line.1006"></a>
+<FONT color="green">1007</FONT>                    }<a name="line.1007"></a>
+<FONT color="green">1008</FONT>            }<a name="line.1008"></a>
+<FONT color="green">1009</FONT>    <a name="line.1009"></a>
+<FONT color="green">1010</FONT>            public void svm_predict_with_kbestlist(svm_model model, svm_node[] x, KBestList kBestList) throws MaltChainedException {<a name="line.1010"></a>
+<FONT color="green">1011</FONT>                    int i;<a name="line.1011"></a>
+<FONT color="green">1012</FONT>                    final int nr_class = svm.svm_get_nr_class(model);<a name="line.1012"></a>
+<FONT color="green">1013</FONT>                    final double[] dec_values = new double[nr_class*(nr_class-1)/2];<a name="line.1013"></a>
+<FONT color="green">1014</FONT>                    svm.svm_predict_values(model, x, dec_values);<a name="line.1014"></a>
+<FONT color="green">1015</FONT>    <a name="line.1015"></a>
+<FONT color="green">1016</FONT>                    final int[] vote = new int[nr_class];<a name="line.1016"></a>
+<FONT color="green">1017</FONT>                    final double[] score = new double[nr_class];<a name="line.1017"></a>
+<FONT color="green">1018</FONT>                    final int[] voteindex = new int[nr_class];<a name="line.1018"></a>
+<FONT color="green">1019</FONT>                    for(i=0;i&lt;nr_class;i++) {<a name="line.1019"></a>
+<FONT color="green">1020</FONT>                            vote[i] = 0;<a name="line.1020"></a>
+<FONT color="green">1021</FONT>                            score[i] = 0.0;<a name="line.1021"></a>
+<FONT color="green">1022</FONT>                            voteindex[i] = i;<a name="line.1022"></a>
+<FONT color="green">1023</FONT>                    }<a name="line.1023"></a>
+<FONT color="green">1024</FONT>                    int pos=0;<a name="line.1024"></a>
+<FONT color="green">1025</FONT>                    for(i=0;i&lt;nr_class;i++) {<a name="line.1025"></a>
+<FONT color="green">1026</FONT>                            for(int j=i+1;j&lt;nr_class;j++) {<a name="line.1026"></a>
+<FONT color="green">1027</FONT>                                    if(dec_values[pos] &gt; 0) {<a name="line.1027"></a>
+<FONT color="green">1028</FONT>                                            vote[i]++;<a name="line.1028"></a>
+<FONT color="green">1029</FONT>                                    } else {<a name="line.1029"></a>
+<FONT color="green">1030</FONT>                                            vote[j]++;<a name="line.1030"></a>
+<FONT color="green">1031</FONT>                                    }<a name="line.1031"></a>
+<FONT color="green">1032</FONT>                                    score[i] += dec_values[pos];<a name="line.1032"></a>
+<FONT color="green">1033</FONT>                                    score[j] += dec_values[pos];<a name="line.1033"></a>
+<FONT color="green">1034</FONT>                                    pos++;<a name="line.1034"></a>
+<FONT color="green">1035</FONT>                            }<a name="line.1035"></a>
+<FONT color="green">1036</FONT>                    }<a name="line.1036"></a>
+<FONT color="green">1037</FONT>                    for(i=0;i&lt;nr_class;i++) {<a name="line.1037"></a>
+<FONT color="green">1038</FONT>                            score[i] = score[i]/nr_class;<a name="line.1038"></a>
+<FONT color="green">1039</FONT>                    }<a name="line.1039"></a>
+<FONT color="green">1040</FONT>                    int lagest, tmpint;<a name="line.1040"></a>
+<FONT color="green">1041</FONT>                    double tmpdouble;<a name="line.1041"></a>
+<FONT color="green">1042</FONT>                    for (i=0;i&lt;nr_class-1;i++) {<a name="line.1042"></a>
+<FONT color="green">1043</FONT>                            lagest = i;<a name="line.1043"></a>
+<FONT color="green">1044</FONT>                            for (int j=i;j&lt;nr_class;j++) {<a name="line.1044"></a>
+<FONT color="green">1045</FONT>                                    if (vote[j] &gt; vote[lagest]) {<a name="line.1045"></a>
+<FONT color="green">1046</FONT>                                            lagest = j;<a name="line.1046"></a>
+<FONT color="green">1047</FONT>                                    }<a name="line.1047"></a>
+<FONT color="green">1048</FONT>                            }<a name="line.1048"></a>
+<FONT color="green">1049</FONT>                            tmpint = vote[lagest];<a name="line.1049"></a>
+<FONT color="green">1050</FONT>                            vote[lagest] = vote[i];<a name="line.1050"></a>
+<FONT color="green">1051</FONT>                            vote[i] = tmpint;<a name="line.1051"></a>
+<FONT color="green">1052</FONT>                            tmpdouble = score[lagest];<a name="line.1052"></a>
+<FONT color="green">1053</FONT>                            score[lagest] = score[i];<a name="line.1053"></a>
+<FONT color="green">1054</FONT>                            score[i] = tmpdouble;<a name="line.1054"></a>
+<FONT color="green">1055</FONT>                            tmpint = voteindex[lagest];<a name="line.1055"></a>
+<FONT color="green">1056</FONT>                            voteindex[lagest] = voteindex[i];<a name="line.1056"></a>
+<FONT color="green">1057</FONT>                            voteindex[i] = tmpint;<a name="line.1057"></a>
+<FONT color="green">1058</FONT>                    }<a name="line.1058"></a>
+<FONT color="green">1059</FONT>                    final int[] labels = new int[nr_class];<a name="line.1059"></a>
+<FONT color="green">1060</FONT>                    svm.svm_get_labels(model, labels);<a name="line.1060"></a>
+<FONT color="green">1061</FONT>                    int k = nr_class-1;<a name="line.1061"></a>
+<FONT color="green">1062</FONT>                    if (kBestList.getK() != -1) {<a name="line.1062"></a>
+<FONT color="green">1063</FONT>                            k = kBestList.getK() - 1;<a name="line.1063"></a>
+<FONT color="green">1064</FONT>                    }<a name="line.1064"></a>
+<FONT color="green">1065</FONT>                    <a name="line.1065"></a>
+<FONT color="green">1066</FONT>                    for (i=0; i&lt;nr_class &amp;&amp; k &gt;= 0; i++, k--) {<a name="line.1066"></a>
+<FONT color="green">1067</FONT>                            if (vote[i] &gt; 0 || i == 0) {<a name="line.1067"></a>
+<FONT color="green">1068</FONT>                                    if (kBestList instanceof ScoredKBestList) {<a name="line.1068"></a>
+<FONT color="green">1069</FONT>                                            ((ScoredKBestList)kBestList).add(labels[voteindex[i]], (float)vote[i]/(float)(nr_class*(nr_class-1)/2));<a name="line.1069"></a>
+<FONT color="green">1070</FONT>                                    } else {<a name="line.1070"></a>
+<FONT color="green">1071</FONT>                                            kBestList.add(labels[voteindex[i]]);<a name="line.1071"></a>
+<FONT color="green">1072</FONT>                                    }<a name="line.1072"></a>
+<FONT color="green">1073</FONT>                            }<a name="line.1073"></a>
+<FONT color="green">1074</FONT>                    }<a name="line.1074"></a>
+<FONT color="green">1075</FONT>            }<a name="line.1075"></a>
+<FONT color="green">1076</FONT>            /**<a name="line.1076"></a>
+<FONT color="green">1077</FONT>             * Converts the instance file (Malt's own SVM format) into the LIBSVM (SVMLight) format. The input instance file is removed (replaced)<a name="line.1077"></a>
+<FONT color="green">1078</FONT>             * by the instance file in the LIBSVM (SVMLight) format. If a column contains -1, the value will be removed in destination file. <a name="line.1078"></a>
+<FONT color="green">1079</FONT>             * <a name="line.1079"></a>
+<FONT color="green">1080</FONT>             * @param isr the input stream reader for the source instance file<a name="line.1080"></a>
+<FONT color="green">1081</FONT>             * @param osw   the output stream writer for the destination instance file<a name="line.1081"></a>
+<FONT color="green">1082</FONT>             * @param cardinalities a vector containing the number of distinct values for a particular column<a name="line.1082"></a>
+<FONT color="green">1083</FONT>             * @throws LibsvmException<a name="line.1083"></a>
+<FONT color="green">1084</FONT>             */<a name="line.1084"></a>
+<FONT color="green">1085</FONT>            public static void maltSVMFormat2OriginalSVMFormat(InputStreamReader isr, OutputStreamWriter osw, int[] cardinalities) throws MaltChainedException {<a name="line.1085"></a>
+<FONT color="green">1086</FONT>                    try {<a name="line.1086"></a>
+<FONT color="green">1087</FONT>                            final BufferedReader in = new BufferedReader(isr);<a name="line.1087"></a>
+<FONT color="green">1088</FONT>                            final BufferedWriter out = new BufferedWriter(osw);<a name="line.1088"></a>
+<FONT color="green">1089</FONT>    <a name="line.1089"></a>
+<FONT color="green">1090</FONT>                            int c;<a name="line.1090"></a>
+<FONT color="green">1091</FONT>                            int j = 0;<a name="line.1091"></a>
+<FONT color="green">1092</FONT>                            int offset = 0;<a name="line.1092"></a>
+<FONT color="green">1093</FONT>                            int code = 0;<a name="line.1093"></a>
+<FONT color="green">1094</FONT>                            while(true) {<a name="line.1094"></a>
+<FONT color="green">1095</FONT>                                    c = in.read();<a name="line.1095"></a>
+<FONT color="green">1096</FONT>                                    if (c == -1) {<a name="line.1096"></a>
+<FONT color="green">1097</FONT>                                            break;<a name="line.1097"></a>
+<FONT color="green">1098</FONT>                                    }<a name="line.1098"></a>
+<FONT color="green">1099</FONT>                                    <a name="line.1099"></a>
+<FONT color="green">1100</FONT>                                    if (c == '\t' || c == '|') {<a name="line.1100"></a>
+<FONT color="green">1101</FONT>                                            if (j == 0) {<a name="line.1101"></a>
+<FONT color="green">1102</FONT>                                                    out.write(Integer.toString(code));<a name="line.1102"></a>
+<FONT color="green">1103</FONT>                                                    j++;<a name="line.1103"></a>
+<FONT color="green">1104</FONT>                                            } else {<a name="line.1104"></a>
+<FONT color="green">1105</FONT>                                                    if (code != -1) {<a name="line.1105"></a>
+<FONT color="green">1106</FONT>                                                            out.write(' ');<a name="line.1106"></a>
+<FONT color="green">1107</FONT>                                                            out.write(Integer.toString(code+offset));<a name="line.1107"></a>
+<FONT color="green">1108</FONT>                                                            out.write(":1");<a name="line.1108"></a>
+<FONT color="green">1109</FONT>                                                    }<a name="line.1109"></a>
+<FONT color="green">1110</FONT>                                                    if (c == '\t') {<a name="line.1110"></a>
+<FONT color="green">1111</FONT>                                                            offset += cardinalities[j-1];<a name="line.1111"></a>
+<FONT color="green">1112</FONT>                                                            j++;<a name="line.1112"></a>
+<FONT color="green">1113</FONT>                                                    }<a name="line.1113"></a>
+<FONT color="green">1114</FONT>                                            }<a name="line.1114"></a>
+<FONT color="green">1115</FONT>                                            code = 0;<a name="line.1115"></a>
+<FONT color="green">1116</FONT>                                    } else if (c == '\n') {<a name="line.1116"></a>
+<FONT color="green">1117</FONT>                                            j = 0;<a name="line.1117"></a>
+<FONT color="green">1118</FONT>                                            offset = 0;<a name="line.1118"></a>
+<FONT color="green">1119</FONT>                                            out.write('\n');<a name="line.1119"></a>
+<FONT color="green">1120</FONT>                                            code = 0;<a name="line.1120"></a>
+<FONT color="green">1121</FONT>                                    } else if (c == '-') {<a name="line.1121"></a>
+<FONT color="green">1122</FONT>                                            code = -1;<a name="line.1122"></a>
+<FONT color="green">1123</FONT>                                    } else if (code != -1) {<a name="line.1123"></a>
+<FONT color="green">1124</FONT>                                            if (c &gt; 47 &amp;&amp; c &lt; 58) {<a name="line.1124"></a>
+<FONT color="green">1125</FONT>                                                    code = code * 10 + (c-48);<a name="line.1125"></a>
+<FONT color="green">1126</FONT>                                            } else {<a name="line.1126"></a>
+<FONT color="green">1127</FONT>                                                    throw new LibsvmException("The instance file contain a non-integer value, when converting the Malt SVM format into LIBSVM format.");<a name="line.1127"></a>
+<FONT color="green">1128</FONT>                                            }<a name="line.1128"></a>
+<FONT color="green">1129</FONT>                                    }       <a name="line.1129"></a>
+<FONT color="green">1130</FONT>                            }                       <a name="line.1130"></a>
+<FONT color="green">1131</FONT>                            in.close();     <a name="line.1131"></a>
+<FONT color="green">1132</FONT>                            out.close();<a name="line.1132"></a>
+<FONT color="green">1133</FONT>                    } catch (IOException e) {<a name="line.1133"></a>
+<FONT color="green">1134</FONT>                            throw new LibsvmException("Cannot read from the instance file, when converting the Malt SVM format into LIBSVM format. ", e);<a name="line.1134"></a>
+<FONT color="green">1135</FONT>                    }<a name="line.1135"></a>
+<FONT color="green">1136</FONT>            }<a name="line.1136"></a>
+<FONT color="green">1137</FONT>            <a name="line.1137"></a>
+<FONT color="green">1138</FONT>            protected void finalize() throws Throwable {<a name="line.1138"></a>
+<FONT color="green">1139</FONT>                    try {<a name="line.1139"></a>
+<FONT color="green">1140</FONT>                            closeInstanceWriter();<a name="line.1140"></a>
+<FONT color="green">1141</FONT>                    } finally {<a name="line.1141"></a>
+<FONT color="green">1142</FONT>                            super.finalize();<a name="line.1142"></a>
+<FONT color="green">1143</FONT>                    }<a name="line.1143"></a>
+<FONT color="green">1144</FONT>            }<a name="line.1144"></a>
+<FONT color="green">1145</FONT>            <a name="line.1145"></a>
+<FONT color="green">1146</FONT>            /* (non-Javadoc)<a name="line.1146"></a>
+<FONT color="green">1147</FONT>             * @see java.lang.Object#toString()<a name="line.1147"></a>
+<FONT color="green">1148</FONT>             */<a name="line.1148"></a>
+<FONT color="green">1149</FONT>            public String toString() {<a name="line.1149"></a>
+<FONT color="green">1150</FONT>                    final StringBuffer sb = new StringBuffer();<a name="line.1150"></a>
+<FONT color="green">1151</FONT>                    sb.append("\nLIBSVM INTERFACE\n"); <a name="line.1151"></a>
+<FONT color="green">1152</FONT>                    sb.append("  LIBSVM version: "+LIBSVM_VERSION+"\n");<a name="line.1152"></a>
+<FONT color="green">1153</FONT>                    sb.append("  SVM-param string: "+paramString+"\n");<a name="line.1153"></a>
+<FONT color="green">1154</FONT>                    <a name="line.1154"></a>
+<FONT color="green">1155</FONT>                    sb.append(toStringParameters(svmParam));<a name="line.1155"></a>
+<FONT color="green">1156</FONT>                    return sb.toString();<a name="line.1156"></a>
+<FONT color="green">1157</FONT>            }<a name="line.1157"></a>
+<FONT color="green">1158</FONT>    <a name="line.1158"></a>
+<FONT color="green">1159</FONT>    <a name="line.1159"></a>
+<FONT color="green">1160</FONT>            @Override<a name="line.1160"></a>
+<FONT color="green">1161</FONT>            public void divideByFeatureSet(<a name="line.1161"></a>
+<FONT color="green">1162</FONT>                            Set&lt;Integer&gt; featureIdsToCreateSeparateBranchesForSet, ArrayList&lt;Integer&gt; divideFeatureIndexVector, String otherId)  throws MaltChainedException {<a name="line.1162"></a>
+<FONT color="green">1163</FONT>    <a name="line.1163"></a>
+<FONT color="green">1164</FONT>                    <a name="line.1164"></a>
+<FONT color="green">1165</FONT>                    //Create a hash map that maps every feature id to a writer<a name="line.1165"></a>
+<FONT color="green">1166</FONT>                    HashMap&lt;Integer, BufferedWriter&gt;   featureIdToWriterMap = new HashMap&lt;Integer, BufferedWriter&gt;();<a name="line.1166"></a>
+<FONT color="green">1167</FONT>                    <a name="line.1167"></a>
+<FONT color="green">1168</FONT>                    for(int element:featureIdsToCreateSeparateBranchesForSet){<a name="line.1168"></a>
+<FONT color="green">1169</FONT>                     <a name="line.1169"></a>
+<FONT color="green">1170</FONT>    <a name="line.1170"></a>
+<FONT color="green">1171</FONT>                            BufferedWriter outputWriter = new BufferedWriter(getConfiguration().getConfigurationDir().getOutputStreamWriter(owner.getModelName().replace('.','_') + element + "." + getLearningMethodName()+".ins"));<a name="line.1171"></a>
+<FONT color="green">1172</FONT>                            featureIdToWriterMap.put(element, outputWriter);<a name="line.1172"></a>
+<FONT color="green">1173</FONT>                    <a name="line.1173"></a>
+<FONT color="green">1174</FONT>                    }<a name="line.1174"></a>
+<FONT color="green">1175</FONT>                    <a name="line.1175"></a>
+<FONT color="green">1176</FONT>                    BufferedWriter otherOutputWriter = new BufferedWriter(getConfiguration().getConfigurationDir().getOutputStreamWriter(owner.getModelName().replace('.','_') + otherId + "." + getLearningMethodName()+".ins"));<a name="line.1176"></a>
+<FONT color="green">1177</FONT>    <a name="line.1177"></a>
+<FONT color="green">1178</FONT>                    <a name="line.1178"></a>
+<FONT color="green">1179</FONT>                    try {<a name="line.1179"></a>
+<FONT color="green">1180</FONT>                            final BufferedReader in = new BufferedReader(getInstanceInputStreamReader(".ins"));<a name="line.1180"></a>
+<FONT color="green">1181</FONT>                            //every line will be written to a separate file<a name="line.1181"></a>
+<FONT color="green">1182</FONT>                            String line = in.readLine();<a name="line.1182"></a>
+<FONT color="green">1183</FONT>                            final Pattern tabPattern = Pattern.compile("\t");<a name="line.1183"></a>
+<FONT color="green">1184</FONT>                            while(line!=null){<a name="line.1184"></a>
+<FONT color="green">1185</FONT>                                    <a name="line.1185"></a>
+<FONT color="green">1186</FONT>                                    //Find out which pot the line shall be put in<a name="line.1186"></a>
+<FONT color="green">1187</FONT>                                    String[] lineArray = tabPattern.split(line);<a name="line.1187"></a>
+<FONT color="green">1188</FONT>                                    <a name="line.1188"></a>
+<FONT color="green">1189</FONT>                                    int id = new Integer(lineArray[divideFeatureIndexVector.get(0)+1]);<a name="line.1189"></a>
+<FONT color="green">1190</FONT>                                    <a name="line.1190"></a>
+<FONT color="green">1191</FONT>                                    if(!featureIdToWriterMap.containsKey(id)){<a name="line.1191"></a>
+<FONT color="green">1192</FONT>                                            otherOutputWriter.write(line + "\n");<a name="line.1192"></a>
+<FONT color="green">1193</FONT>                                    }else    <a name="line.1193"></a>
+<FONT color="green">1194</FONT>                                            featureIdToWriterMap.get(id).write(getLineToWrite(lineArray,divideFeatureIndexVector.get(0)+1));<a name="line.1194"></a>
+<FONT color="green">1195</FONT>                                    <a name="line.1195"></a>
+<FONT color="green">1196</FONT>                                    line = in.readLine();<a name="line.1196"></a>
+<FONT color="green">1197</FONT>                            }<a name="line.1197"></a>
+<FONT color="green">1198</FONT>                            <a name="line.1198"></a>
+<FONT color="green">1199</FONT>                            otherOutputWriter.close();<a name="line.1199"></a>
+<FONT color="green">1200</FONT>                            <a name="line.1200"></a>
+<FONT color="green">1201</FONT>                            in.close();<a name="line.1201"></a>
+<FONT color="green">1202</FONT>                            <a name="line.1202"></a>
+<FONT color="green">1203</FONT>                            for(BufferedWriter writer: featureIdToWriterMap.values())<a name="line.1203"></a>
+<FONT color="green">1204</FONT>                                    writer.close();<a name="line.1204"></a>
+<FONT color="green">1205</FONT>    <a name="line.1205"></a>
+<FONT color="green">1206</FONT>                    } catch (SecurityException e) {<a name="line.1206"></a>
+<FONT color="green">1207</FONT>                            throw new LiblinearException("The Liblinear learner cannot remove the instance file. ", e);<a name="line.1207"></a>
+<FONT color="green">1208</FONT>                    } catch (NullPointerException  e) {<a name="line.1208"></a>
+<FONT color="green">1209</FONT>                            throw new LiblinearException("The instance file cannot be found. ", e);<a name="line.1209"></a>
+<FONT color="green">1210</FONT>                    } catch (FileNotFoundException e) {<a name="line.1210"></a>
+<FONT color="green">1211</FONT>                            throw new LiblinearException("The instance file cannot be found. ", e);<a name="line.1211"></a>
+<FONT color="green">1212</FONT>                    } catch (IOException e) {<a name="line.1212"></a>
+<FONT color="green">1213</FONT>                            throw new LiblinearException("The Liblinear learner read from the instance file. ", e);<a name="line.1213"></a>
+<FONT color="green">1214</FONT>                    }<a name="line.1214"></a>
+<FONT color="green">1215</FONT>    <a name="line.1215"></a>
+<FONT color="green">1216</FONT>                    <a name="line.1216"></a>
+<FONT color="green">1217</FONT>    <a name="line.1217"></a>
+<FONT color="green">1218</FONT>            }<a name="line.1218"></a>
+<FONT color="green">1219</FONT>    <a name="line.1219"></a>
+<FONT color="green">1220</FONT>    <a name="line.1220"></a>
+<FONT color="green">1221</FONT>            private String getLineToWrite(String[] lineArray, int excludeIndex) {<a name="line.1221"></a>
+<FONT color="green">1222</FONT>                    StringBuffer buf = new StringBuffer();<a name="line.1222"></a>
+<FONT color="green">1223</FONT>                    <a name="line.1223"></a>
+<FONT color="green">1224</FONT>                    for(int n = 0; n &lt; lineArray.length; n++)<a name="line.1224"></a>
+<FONT color="green">1225</FONT>                            if(n != excludeIndex)<a name="line.1225"></a>
+<FONT color="green">1226</FONT>                                    buf.append(lineArray[n] + "\t");<a name="line.1226"></a>
+<FONT color="green">1227</FONT>                    <a name="line.1227"></a>
+<FONT color="green">1228</FONT>                    <a name="line.1228"></a>
+<FONT color="green">1229</FONT>                    buf.append("\n");               <a name="line.1229"></a>
+<FONT color="green">1230</FONT>    <a name="line.1230"></a>
+<FONT color="green">1231</FONT>                    <a name="line.1231"></a>
+<FONT color="green">1232</FONT>                    return buf.toString();<a name="line.1232"></a>
+<FONT color="green">1233</FONT>            }<a name="line.1233"></a>
+<FONT color="green">1234</FONT>    <a name="line.1234"></a>
+<FONT color="green">1235</FONT>    <a name="line.1235"></a>
+<FONT color="green">1236</FONT>            @Override<a name="line.1236"></a>
+<FONT color="green">1237</FONT>            public Map&lt;Integer, Integer&gt; createFeatureIdToCountMap(<a name="line.1237"></a>
+<FONT color="green">1238</FONT>                            ArrayList&lt;Integer&gt; divideFeatureIndexVector) throws MaltChainedException{<a name="line.1238"></a>
+<FONT color="green">1239</FONT>    <a name="line.1239"></a>
+<FONT color="green">1240</FONT>                    HashMap&lt;Integer, Integer&gt; featureIdToCountMap = new HashMap&lt;Integer, Integer&gt;();<a name="line.1240"></a>
+<FONT color="green">1241</FONT>                    <a name="line.1241"></a>
+<FONT color="green">1242</FONT>                    //Go trough the file and count all feature ids in the given column(s)<a name="line.1242"></a>
+<FONT color="green">1243</FONT>                    <a name="line.1243"></a>
+<FONT color="green">1244</FONT>                    try {<a name="line.1244"></a>
+<FONT color="green">1245</FONT>                            final BufferedReader in = new BufferedReader(getInstanceInputStreamReader(".ins"));<a name="line.1245"></a>
+<FONT color="green">1246</FONT>                            //every line will be written to a separate file<a name="line.1246"></a>
+<FONT color="green">1247</FONT>                            String line = in.readLine();<a name="line.1247"></a>
+<FONT color="green">1248</FONT>                            final Pattern tabPattern = Pattern.compile("\t");<a name="line.1248"></a>
+<FONT color="green">1249</FONT>                            while(line!=null){<a name="line.1249"></a>
+<FONT color="green">1250</FONT>                                    <a name="line.1250"></a>
+<FONT color="green">1251</FONT>                                    //Find out which pot the line shall be put in<a name="line.1251"></a>
+<FONT color="green">1252</FONT>                                    String[] lineArray = tabPattern.split(line);<a name="line.1252"></a>
+<FONT color="green">1253</FONT>                                    <a name="line.1253"></a>
+<FONT color="green">1254</FONT>                                    for(int n = 0; n &lt; divideFeatureIndexVector.size(); n++){<a name="line.1254"></a>
+<FONT color="green">1255</FONT>                                            int id = new Integer(lineArray[divideFeatureIndexVector.get(n)+1]);<a name="line.1255"></a>
+<FONT color="green">1256</FONT>                                            <a name="line.1256"></a>
+<FONT color="green">1257</FONT>                                            <a name="line.1257"></a>
+<FONT color="green">1258</FONT>                                            if (!featureIdToCountMap.containsKey(id)) {<a name="line.1258"></a>
+<FONT color="green">1259</FONT>    <a name="line.1259"></a>
+<FONT color="green">1260</FONT>                                                    featureIdToCountMap.put(id, 0);<a name="line.1260"></a>
+<FONT color="green">1261</FONT>    <a name="line.1261"></a>
+<FONT color="green">1262</FONT>                                            }<a name="line.1262"></a>
+<FONT color="green">1263</FONT>    <a name="line.1263"></a>
+<FONT color="green">1264</FONT>                                            int previousCount = featureIdToCountMap.get(id);<a name="line.1264"></a>
+<FONT color="green">1265</FONT>                                            <a name="line.1265"></a>
+<FONT color="green">1266</FONT>                                            featureIdToCountMap.put(id, previousCount + 1);<a name="line.1266"></a>
+<FONT color="green">1267</FONT>                                            <a name="line.1267"></a>
+<FONT color="green">1268</FONT>                                    }                               <a name="line.1268"></a>
+<FONT color="green">1269</FONT>                                    <a name="line.1269"></a>
+<FONT color="green">1270</FONT>                                    line = in.readLine();<a name="line.1270"></a>
+<FONT color="green">1271</FONT>                            }<a name="line.1271"></a>
+<FONT color="green">1272</FONT>                            <a name="line.1272"></a>
+<FONT color="green">1273</FONT>    <a name="line.1273"></a>
+<FONT color="green">1274</FONT>                            <a name="line.1274"></a>
+<FONT color="green">1275</FONT>                            in.close();<a name="line.1275"></a>
+<FONT color="green">1276</FONT>                            <a name="line.1276"></a>
+<FONT color="green">1277</FONT>    <a name="line.1277"></a>
+<FONT color="green">1278</FONT>                    } catch (SecurityException e) {<a name="line.1278"></a>
+<FONT color="green">1279</FONT>                            throw new LiblinearException("The Libsvm learner cannot remove the instance file. ", e);<a name="line.1279"></a>
+<FONT color="green">1280</FONT>                    } catch (NullPointerException  e) {<a name="line.1280"></a>
+<FONT color="green">1281</FONT>                            throw new LiblinearException("The instance file cannot be found. ", e);<a name="line.1281"></a>
+<FONT color="green">1282</FONT>                    } catch (FileNotFoundException e) {<a name="line.1282"></a>
+<FONT color="green">1283</FONT>                            throw new LiblinearException("The instance file cannot be found. ", e);<a name="line.1283"></a>
+<FONT color="green">1284</FONT>                    } catch (IOException e) {<a name="line.1284"></a>
+<FONT color="green">1285</FONT>                            throw new LiblinearException("The Liblinear learner read from the instance file. ", e);<a name="line.1285"></a>
+<FONT color="green">1286</FONT>                    }<a name="line.1286"></a>
+<FONT color="green">1287</FONT>                    <a name="line.1287"></a>
+<FONT color="green">1288</FONT>                    <a name="line.1288"></a>
+<FONT color="green">1289</FONT>                    <a name="line.1289"></a>
+<FONT color="green">1290</FONT>                    return featureIdToCountMap;<a name="line.1290"></a>
+<FONT color="green">1291</FONT>            }<a name="line.1291"></a>
+<FONT color="green">1292</FONT>    <a name="line.1292"></a>
+<FONT color="green">1293</FONT>    <a name="line.1293"></a>
+<FONT color="green">1294</FONT>    <a name="line.1294"></a>
+<FONT color="green">1295</FONT>    }<a name="line.1295"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

@@ -1,0 +1,4 @@
+you need to be root to run superuser--*.t,
+with a normal user those tests are simply skipped.
+
+use "make testall"

@@ -1,0 +1,28 @@
+---
+abstract: 'convert from unigreek notation and back'
+author:
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
+build_requires:
+  FindBin: 0
+  Test::Exception: 0
+  Test::More: 0
+  Unicode::Normalize: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: unigreek
+provides:
+  UniGreek:
+    file: lib/UniGreek.pm
+    version: 0.2
+requires:
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/nicolasfranck/unigreek
+version: 0.2

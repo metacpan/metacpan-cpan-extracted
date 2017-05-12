@@ -1,0 +1,26 @@
+Changes
+ex/sample.pl
+lib/uni/perl/dumper.pm
+lib/uni/perl/encodebase.pm
+lib/uni/perl/ru.pm
+lib/uni/perl/ua.pm
+lib/uni/perl/utf.pm
+lib/uni/perl/xd.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+perl.pm.PL
+README
+t/00-load.t
+t/01-tests.t
+t/02-carp.t
+t/03-ru.t
+t/04-warns.t
+t/05-xd.t
+t/06-dumper.t
+t/data/file
+t/pod-coverage.t
+t/pod.t
+xt/99-dist.t
+META.yml                                 Module meta-data (added by MakeMaker)

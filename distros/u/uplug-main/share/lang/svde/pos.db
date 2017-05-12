@@ -1,0 +1,18 @@
+# features (source): { 'pos' => '^(.).*$/$1' }
+# features (target): { 'pos' => '^(..).*$/$1' }
+A	AD		# ADJECTIVE, PARTICIPLE
+C	KO		# CONJUNCTION, SUBJUNCTION
+D	AR		# DETERMINER
+F	$.		# PUNCTUATION
+F	$,		# PUNCTUATION
+F	$(		# PUNCTUATION
+I	AP		# IN
+M	OR		# ORDINAL
+M	CA		# ORDINAL
+N	NN		# NOUN
+N	NE		# PROPER NOUN (conflict with swedish pronouns)
+P	PR		# PRONOUN (conflict with proper name (PM))
+R	AD		# ADVERB  (conflict)
+V	VV		# VERB
+V	VA		# VERB
+V	VM		# VERB

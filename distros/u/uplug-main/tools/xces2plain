@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+
+use XML::DT;
+
+use warnings;
+no warnings 'recursion';
+use strict;
+
+=head1 NAME
+
+xces2moses - based on XML::XCES
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+our $VERSION = '0.01';
+
+=head1 SYNOPSIS
+
+ xces2moses alignfile.xml basename src trg
+
+=cut
+
+&align2pair(@ARGV);
+
+
+sub align2pair {
+
+  my $xces     = shift;
+  my $basename = shift || $xces;
+  my $srcID    = shift || 'src';
+  my $trgID    = shift || 'trg';
+
+  my $tuCount = 0;
+
+  open S, ">$basename.$srcID" or die;
+  open T, ">$basename.$trgID" or die;
+  binmode(S,":utf8");
+  binmode(T,":utf8");
+
+  my %handler = (
+      -type => { linkGrp => 'SEQ' },
+      'link' => sub {
+	  my ($s, $t) = split /\s*;\s*/, $v{xtargets};
+	  my @s = grep { /./ } split /\s+/, $s;
+	  my @t = grep { /./ } split /\s+/, $t;
+	  return [[@s],[@t],$v{certainty}];
+      },
+      
+      'linkGrp' => sub {
+	  my ($source,$target) = ($v{fromDoc},$v{toDoc});
+	  print STDERR "fromDoc $source does not exist" unless -f $source;
+	  print STDERR "  toDoc $target does not exist" unless -f $target;
+	  return unless -f $source and -f $target;
+	  
+	  my $cont = $c;
+	  printf STDERR "+ %s * %s ", _last26($source), _last26($target);
+	  
+	  my (%s,%t);
+	  my $ACTIVE;
+	  my %h2 = (
+	      -type => { linkGrp => 'SEQ' },
+	      
+	      -outputenc => 'UTF-8',
+	      
+	      -default => sub {
+		  $c = _trim($c);
+		  if ($v{id} && exists($ACTIVE->{$v{id}})) {
+		      $ACTIVE->{$v{id}} = $c;
+		  }
+		  $c
+	      });
+	  
+	  my $tu = 0;
+	  for my $link (@$cont) {
+	      $tu++;
+	      @s{@{$link->[0]}} = 1 x @{$link->[0]};
+	      @t{@{$link->[1]}} = 1 x @{$link->[1]};
+	  }
+	  print STDERR "($tu TUs)\n";
+	  $tuCount+=$tu;
+	  
+	  $ACTIVE = \%s;
+	  dt($source, %h2);
+	  
+	  $ACTIVE = \%t;
+	  dt($target, %h2);
+	  
+	  for my $link (@$cont) {
+	      print S join(' ',@s{@{$link->[0]}}),"\n";
+	      print T join(' ',@t{@{$link->[1]}}),"\n";
+	  }
+      },
+      );
+  
+  dt($xces, %handler);
+  
+  return $tuCount;
+}
+
+
+sub _trim {
+  my $x = shift;
+  $x =~ s/\s+/ /g;
+  $x =~ s/^\s+//;
+  $x =~ s/\s+$//;
+  return $x;
+}
+
+sub _last26 {
+  my $x = shift;
+  if (length($x)>26) {
+    return "...".substr($x,-23,23);
+  } else {
+    return $x
+  }
+}
+
+
+
+=head1 AUTHOR
+
+Alberto Simoes, C<< <ambs@cpan.org> >>
+
+adapted by Joerg Tiedemann
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004-2005 Alberto Simoes, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

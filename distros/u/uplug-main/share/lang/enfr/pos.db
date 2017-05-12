@@ -1,0 +1,16 @@
+# features (source): { 'pos' => '^(..).*$/$1' }
+# features (target): { 'pos' => '^(...).*$/$1' }
+JJ	ADJ		# ADJECTIVE, PARTICIPLE
+CC	CON		# CONJUNCTION, SUBJUNCTION
+DT	DET		# DETERMINER
+.	PON		# PUNCTUATION
+:	PON		# PUNCTUATION
+(	PON		# PUNCTUATION
+)	PON		# PUNCTUATION
+IN	PRE		# IN
+CD	ADJ		# 'RÄKNEORD?'
+NN	NOM		# NOUN
+PR	PRO		# PRONOUN (conflict with proper name (PM))
+RB	ADV		# ADVERB  (conflict with quest. words (RH0S))
+VB	VER		# VERB
+NN:NN	NOM:PRE:NOM		# NP

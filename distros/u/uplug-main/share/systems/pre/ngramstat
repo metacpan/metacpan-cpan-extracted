@@ -1,0 +1,50 @@
+{
+  'module' => {
+    'name' => 'N-gram statistics',
+    'program' => 'uplug-ngramstat',
+    'location' => '$UplugBin',
+    'stin' => 'text',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'ngram freq' => {
+      'format' => 'DBM',
+      'key' => ['token']
+    },
+  },
+  'output' => {
+    'phrases' => {
+      'stream name' => 'ngram stat',
+#       'format' => 'uwa tab',
+#       'columns' => ['ngram'],
+#       'write_mode' => 'overwrite',
+    },
+  },
+  'parameter' => {
+    'token' => {
+      'minimal frequency' => 2,
+#      'delimiter' => '\s+',
+    },
+    'statistics' => {
+       'minimal score' => 0.3,
+       'measure' => 'dice',
+    },
+    'runtime' => {
+      'print progress' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:ngram freq:file',
+       'infile' => 'input:ngram freq:file',
+       'informat' => 'input:ngram freq:format',
+       'out' => 'output:ngram stat:file',
+       's' => 'parameter:statistics:measure',
+       'stat' => 'parameter:statistics:measure',
+       'm' => 'parameter:statistics:minimal score',
+       'min' => 'parameter:statistics:minimal score',
+       'prec' => 'parameter:statistics:precision',
+       'lang' => 'parameter:token:language (target)',
+    }
+  },
+}

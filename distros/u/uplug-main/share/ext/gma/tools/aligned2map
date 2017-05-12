@@ -1,0 +1,11 @@
+#!/bin/tcsh
+ 
+if ($#argv != 2) then
+   echo "usage: $0 <aligned file 1> <aligned file 2>"
+   exit 0
+endif
+
+
+lineindex < $1 > $1.li
+lineindex < $2 > $2.li
+paste -d" " $1.li $2.li

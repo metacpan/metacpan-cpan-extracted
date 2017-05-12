@@ -1,0 +1,78 @@
+{
+  'module' => {
+    'program' => 'uplug-coocstat',
+    'location' => '$UplugBin',
+    'name' => 'Dice coefficient',
+  },
+  'description' => 'This module calculates Dice scores from
+  co-occurrence counts.',
+  'input' => {
+    'cooc freq' => {
+	'file' => 'data/runtime/cooc.tab',
+	'format' => 'tab',
+    },
+    'source freq' => {
+	'file' => 'data/runtime/src.tab',
+	'format' => 'tab',
+    },
+    'target freq' => {
+	'file' => 'data/runtime/trg.tab',
+	'format' => 'tab',
+    },
+    'source vocabulary' => {
+	'file' => 'data/runtime/src.voc',
+	'format' => 'tab',
+    },
+    'target vocabulary' => {
+	'file' => 'data/runtime/trg.voc',
+	'format' => 'tab',
+    }
+  },
+  'output' => {
+    'dice' => {
+      'stream name' => 'dice',
+    },
+  },
+  'parameter' => {
+    'token pair' => {
+      'minimal frequency' => 2,
+#      'minimal length diff' => 0.5,
+#      'matching word class' => 'openclosed'
+    },
+    'source token' => {
+      'minimal frequency' => 2,
+#      'minimal length' => 4,
+#      'grep token' => 'contains alphabetic',
+#      'language' => 'default',
+#      'lower case' => 1,
+
+    },
+    'target token' => {
+      'minimal frequency' => 2,
+#      'minimal length' => 4,
+#      'grep token' => 'contains alphabetic',
+#      'language' => 'default',
+#      'lower case' => 1
+
+    },
+    'co-occurrence' => {
+      'minimal score' => 0.2,
+#      'minimal score' => 0.3,
+      'measure' => 'dice',
+#      'precision' => 4,
+    },
+    'runtime' => {
+      'print progress' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source freq:file',
+       'trg' => 'input:target freq:file',
+       'cooc' => 'input:cooc freq:file',
+       'stat' => 'output:cooc stat:file',
+    }
+  },
+  'widgets' => {
+  }
+}

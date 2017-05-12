@@ -1,0 +1,53 @@
+=head1 NAME
+
+urpmi.removemedia - remove a rpm media from the known media of urpmi
+
+=head1 SYNOPSIS
+
+    urpmi.removemedia [options] names
+
+=head1 DESCRIPTION
+
+urpmi.removemedia removes from all configuration files all references
+to the named media and to rpms from that media. <I<names>> is a list of
+names you first told to urpmi.addmedia.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-a>
+
+Select and remove all media. 
+
+=item B<-y>
+
+Fuzzy match on media names, so you can remove several media at once.
+
+=item B<-v>
+
+Be verbose (the default).
+
+=item B<-q>
+
+Be quiet.
+
+=item B<--urpmi-root> I<directory>
+
+Use the file system tree rooted for urpmi database and rpm install. Contrary
+to B<--root>, the urpmi configuration comes from the rooted tree.
+
+=item B<--wait-lock>
+
+If the urpmi or rpm db is busy, wait until it is available
+
+=back
+
+=head1 SEE ALSO
+
+urpmi(8), urpmi.addmedia(8), urpmi.update(8).
+
+=head1 AUTHOR
+
+Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+FranE<ccedil>ois Pons, Rafael Garcia-Suarez 

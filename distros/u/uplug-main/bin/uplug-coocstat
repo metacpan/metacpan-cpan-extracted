@@ -1,0 +1,298 @@
+#!/usr/bin/env perl
+#
+# coocstat.pl: count token frequencies
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+#
+# $Id$
+#
+# usage: coocstat.pl [OPTIONS]
+#        
+#
+# default parameters are given in the &GetDefaultIni subfunction
+#    at the end of the script!
+#
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Uplug::Data;
+use Uplug::IO::Any;
+use Uplug::Config;
+use Uplug::CoocStat;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='coocstat.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+if (ref($IniData{output}) ne 'HASH'){die "# coocstat.pl: no output found!\n";}
+my ($StatStreamName,$StatStream)=each %{$IniData{output}};
+my $coocstat=Uplug::IO::Any->new($StatStream);
+$coocstat->open('write',$StatStream);
+
+#---------------------------------------------------------------------------
+
+my $SrcVocFile=$IniData{input}{'source vocabulary'}{file}; # source vocabulary
+my $TrgVocFile=$IniData{input}{'target vocabulary'}{file}; # target vocabulary
+my $SrcFreqFile=$IniData{input}{'source freq'}{file};      # source freq
+my $TrgFreqFile=$IniData{input}{'target freq'}{file};      # target freq
+my $CoocFreqFile=$IniData{input}{'cooc freq'}{file};       # co-occurrence freq
+
+my (@SrcVoc,@TrgVoc);
+&ReadVoc(\@SrcVoc,$SrcVocFile);
+&ReadVoc(\@TrgVoc,$TrgVocFile);
+my (%SrcFreq,%SrcHeader,%TrgFreq,%TrgHeader);
+&ReadFreq(\%SrcFreq,\%SrcHeader,$SrcFreqFile);
+&ReadFreq(\%TrgFreq,\%TrgHeader,$TrgFreqFile);
+
+my $SrcCount=$SrcHeader{'token count'};
+my $TrgCount=$TrgHeader{'token count'};
+
+
+#---------------------------------------------------------------------------
+# set module parameters (from IniData)
+
+my ($measure,$precision,$MinScore);   # statistics
+my %length;                           # token length thresholds (source+target)
+my %MinFreq;                          # minimal frequency (source+target)
+my $PrintProgr;                       # verbose-mode
+
+if (ref($IniData{parameter}) eq 'HASH'){
+    if (ref($IniData{parameter}{'co-occurrence'}) eq 'HASH'){
+	$precision=$IniData{'parameter'}{'co-occurrence'}{'precision'};
+	$MinScore=$IniData{'parameter'}{'co-occurrence'}{'minimal score'};
+	$measure=$IniData{'parameter'}{'co-occurrence'}{'measure'};
+    }
+    if (ref($IniData{parameter}{'token pair'}) eq 'HASH'){
+	$MinFreq{cooc}=
+	    $IniData{'parameter'}{'token pair'}{'minimal frequency'};
+    }
+    if (ref($IniData{parameter}{'source token'}) eq 'HASH'){
+	$length{source}=
+	    $IniData{'parameter'}{'source token'}{'minimal length'};
+	$MinFreq{source}=
+	    $IniData{'parameter'}{'source token'}{'minimal frequency'};
+    }
+    if (ref($IniData{parameter}{'target token'}) eq 'HASH'){
+	$length{target}=
+	    $IniData{'parameter'}{'target token'}{'minimal length'};
+	$MinFreq{target}=
+	    $IniData{'parameter'}{'target token'}{'minimal frequency'};
+    }
+    if (ref($IniData{parameter}{runtime}) eq 'HASH'){
+	$PrintProgr=$IniData{'parameter'}{runtime}{'print progress'};
+    }
+}
+
+my $stat=Uplug::CoocStat->new($measure);
+if (not ref($stat)){die "# coocstat.pl: cannot find '$measure'!\n";}
+
+#---------------------------------------------------------------------------
+# create instances of data objects
+
+my $OutData=Uplug::Data->new;                       # output data
+
+#---------------------------------------------------------------------------
+# main: read frequency files and compute scores
+
+if ($PrintProgr){print STDERR "read frequencies and calculate '$measure'\n";}
+
+my $count=0;
+my %CoocStats;
+my %header;
+
+open F,"<$CoocFreqFile";
+
+while (<F>){
+    chomp;
+    if (/^\#\s*([^\:]+)\:\s*(\S.*)\s*$/){
+	$header{$1}=eval $2;next;
+    }
+
+    $count++;
+    my ($srcID,$trgID,$freq)=split(/\t/,$_);
+
+    #------------------------------------------------------
+    if ($PrintProgr){
+	if (not ($count % 500)){
+	    $|=1;print STDERR '.';$|=0;
+	}
+	if (not ($count % 10000)){
+	    $|=1;print STDERR "$count pairs\n";$|=0;
+	}
+    }
+    #------------------------------------------------------
+
+    my $src=$SrcVoc[$srcID];
+    my $trg=$TrgVoc[$trgID];
+
+    my $srcfreq=$SrcFreq{$srcID};
+    my $trgfreq=$TrgFreq{$trgID};
+
+    if ($MinFreq{cooc} and ($freq<$MinFreq{cooc})){next;}
+    if ($length{source} and (length($src)<$length{source})){next;}
+    if ($length{target} and (length($trg)<$length{target})){next;}
+
+
+    #------------------------------------------------------
+    # finally: compute the score!
+
+    my $score=$stat->compute($freq,
+			     $srcfreq,
+			     $trgfreq,
+			     $header{'token pair count'});
+
+
+    if ($precision){
+	$score=int($score*10**$precision+0.5)/(10**$precision);
+    }
+    if ($MinScore){
+	if ($score<$MinScore){next;}
+    }
+
+    #------------------------------------------------------
+    # save score in output
+
+    $OutData->init();
+    $OutData->setAttribute('source',$src);
+    $OutData->setAttribute('target',$trg);
+    $OutData->setAttribute('score',$score);
+
+    $coocstat->write($OutData);
+}
+
+$coocstat->addheader(\%header);
+$coocstat->writeheader();
+$coocstat->close;
+
+
+# end of main
+#---------------------------------------------------------------------------
+
+
+
+sub ReadVoc{
+    my ($voc,$file)=@_;
+    open F,"<$file";
+    if ($]>=5.008){binmode(F,':encoding(utf-8)');}
+    while (<F>){
+	chomp;
+#	if (/^\#/){next;}
+	push (@{$voc},$_);
+    }
+    close F;
+}
+
+sub ReadFreq{
+    my ($freq,$header,$file)=@_;
+    open F,"<$file";
+    while (<F>){
+	chomp;
+	if (/^\#\s*([^\:]+)\:\s*(\S.*)\s*$/){
+	    $header->{$1}=eval $2;
+	    next;
+	}
+	my @a=split(/\t/,$_);
+	$$freq{$a[0]}=$a[1];
+    }
+    close F;
+}
+
+
+
+sub GetDefaultIni{
+
+    my $DefaultIni = {
+  'module' => {
+    'program' => 'coocstat.pl',
+    'location' => '$UplugBin',
+    'name' => 'Dice coefficient',
+  },
+  'description' => 'This module calculates Dice scores from
+  co-occurrence counts.',
+  'input' => {
+    'cooc freq' => {
+	'file' => 'data/runtime/cooc.tab',
+	'format' => 'tab',
+    },
+    'source freq' => {
+	'file' => 'data/runtime/src.tab',
+	'format' => 'tab',
+    },
+    'target freq' => {
+	'file' => 'data/runtime/trg.tab',
+	'format' => 'tab',
+    },
+    'source vocabulary' => {
+	'file' => 'data/runtime/src.voc',
+	'format' => 'tab',
+    },
+    'target vocabulary' => {
+	'file' => 'data/runtime/trg.voc',
+	'format' => 'tab',
+    }
+  },
+  'output' => {
+    'dice' => {
+      'stream name' => 'dice',
+    },
+  },
+  'parameter' => {
+    'token pair' => {
+      'minimal frequency' => 2,
+    },
+    'source token' => {
+      'minimal frequency' => 2,
+#      'minimal length' => 4,
+
+    },
+    'target token' => {
+      'minimal frequency' => 2,
+#      'minimal length' => 4,
+
+    },
+    'co-occurrence' => {
+      'minimal score' => 0.2,
+      'measure' => 'dice',
+#      'precision' => 4,
+    },
+    'runtime' => {
+      'print progress' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source freq:file',
+       'trg' => 'input:target freq:file',
+       'cooc' => 'input:cooc freq:file',
+       'stat' => 'output:cooc stat:file',
+       's' => 'parameter:co-occurrence:measure',
+       'm' => 'parameter:co-occurrence:minimal score',
+       'min' => 'parameter:co-occurrence:minimal score',
+    }
+  },
+  'widgets' => {
+  }
+};
+
+    return %{$DefaultIni};
+}

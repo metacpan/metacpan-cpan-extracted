@@ -1,0 +1,170 @@
+# TODO sOmeone need to change this with Mandrakesoft OID.
+
+# http://www.iana.org/assignments/enterprise-numbers
+# 21103
+#  Mandrakesoft
+#    Frederic Lepied
+#      flepied@mandrakesoft.com
+
+objectidentifier MANDRIVA 1.3.6.1.4.1.21103
+#objectidentifier MANDRIVA:1
+objectidentifier URPMI 1.3.6.4.1.3.1.21103.1
+objectidentifier URPMIA URPMI:1
+objectidentifier URPMIO URPMI:2
+
+# name is already taken
+attributetype ( URPMIA:1
+		NAME 'source-name'
+		DESC 'Name appended to the source'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+
+attributetype (URPMIA:2
+		NAME 'url'
+		DESC 'Url of the rpm repository'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype (URPMIA:3
+		NAME 'downloader'
+		DESC 'Software used to download ( curl or wget )'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype (URPMIA:4
+		NAME 'hdlist'
+		DESC 'Name of the hdlist'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype (URPMIA:5
+		NAME 'key-ids'
+		DESC 'Key identifier'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype (URPMIA:6
+		NAME 'list'
+		DESC 'Name of the list file'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+#           md5sum => ?? 
+attributetype (URPMIA:7
+		NAME 'md5sum'
+		DESC '??'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+#           removable => ?? 
+attributetype (URPMIA:9
+		NAME 'removable'
+		DESC '??'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# _ is forbidden, so i use -
+attributetype (URPMIA:10
+		NAME 'with-hdlist'
+		DESC 'Path to the hdlist'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+
+# 1.3.6.1.4.1.1466.115.121.1.7
+#           verify-rpm 
+attributetype (URPMIA:11
+		NAME 'verify-rpm'
+		DESC 'Check if rpm needs to be verified'
+		EQUALITY booleanMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 )
+
+#           synthesis
+attributetype (URPMIA:12
+		NAME 'synthesis'
+		DESC 'Use synthesis index'
+		EQUALITY booleanMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 )
+
+#           virtual   bool
+attributetype (URPMIA:13
+		NAME 'virtual'
+		DESC 'Is the repostiroy constructed on the fly'
+		EQUALITY booleanMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 )
+
+#           noreconfigure bool
+# TODO isn't this implied, as urpmi cannot write to ldap
+attributetype (URPMIA:14
+		NAME 'noreconfigure'
+		DESC 'Do not attempt to reconfigure the source'
+		EQUALITY booleanMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 )
+
+#           update bool
+attributetype (URPMIA:15
+		NAME 'update'
+		DESC 'Source is a update one'
+		EQUALITY booleanMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 )
+
+#           ignore   bool
+attributetype (URPMIA:16
+		NAME 'ignore'
+		DESC 'Source is ignored'
+		EQUALITY booleanMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 )
+
+attributetype (URPMIA:17
+		NAME 'http-proxy'
+		DESC 'Http proxy specification'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype (URPMIA:18
+		NAME 'ftp-proxy'
+		DESC 'Ftp proxy'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype (URPMIA:19
+		NAME 'proxy-user'
+		DESC 'User of the proxy'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype (URPMIA:20
+		NAME 'proxy-password'
+		DESC 'Password of the proxy'
+		EQUALITY caseExactMatch
+		SUBSTR caseIgnoreSubstringsMatch
+		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+
+
+
+# TODO if virtual is TRUE, no need for hdlist
+objectclass (URPMIO:1 NAME 'urpmiRepository'	
+			DESC 'A urpmi repository'
+			SUP top
+			STRUCTURAL
+			MUST ( source-name $ url $ hdlist $ with-hdlist )
+			MAY ( downloader $ key-ids $ list $ priority $
+				md5sum $ removable $ verify-rpm $ synthesis $ virtual $
+				noreconfigure $ update $ ignore $ http-proxy $ ftp-proxy $
+                proxy-user $ proxy-password $
+				cn )
+			)

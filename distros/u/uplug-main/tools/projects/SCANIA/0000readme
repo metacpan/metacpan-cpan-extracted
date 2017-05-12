@@ -1,0 +1,7 @@
+$Id$
+
+SCANIA/		scripts for processing Scania-corpora
+		(http://stp.ling.uu.se/~corpora/scania/)
+
+
+tei2xces.pl ..........	convert Uppsala's TEI-files to XCES-alignment

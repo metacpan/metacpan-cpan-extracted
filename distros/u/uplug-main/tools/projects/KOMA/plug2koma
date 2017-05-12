@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+#
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id$
+#----------------------------------------------------------------------------
+# usage: plug2koma lang1 lang2 plug-xml-file
+#
+# convert PLUG XML files into tokenized, tagged, parsed KOMA XML files
+# all arguments are required:
+#
+#           lang1: source language (sv|en|de|fr)
+#           lang2: target language (sv|en|de|fr)
+#   plug-xml-file: bitex-file in PLUG XML format
+#
+# output:       alignment file: same base-name as input + '.ces'
+#         source language file: alignment-file + '.src'
+#         target language file: alignment-file + '.trg'
+#
+
+use strict;
+use FindBin qw($Bin);
+
+if (@ARGV<3){die "usage: plug2koma lang1 lang2 plug-xml-file\n";}
+my $SRC=$ARGV[0];
+my $TRG=$ARGV[1];
+my $FILE=$ARGV[2];
+if (not -f $FILE){die "cannot open file $FILE!"}
+
+my $BASE=$FILE;
+if ($BASE=~/^(.*)\.gz/){$BASE=$1;}
+if ($BASE=~/^(.*)\./){$BASE=$1;}
+my $ALIGN="$BASE.ces";
+my $SRCTXT="$ALIGN.src";
+my $TRGTXT="$ALIGN.trg";
+
+my $UPLUGHOME="$Bin/../..";
+my $UPLUGSYSTEM="$UPLUGHOME/systems";
+my $UPLUG="$UPLUGHOME/uplug";
+my $TOOLS="$UPLUGHOME/tools";
+
+my $PLUG2KOMA="$UPLUG convert -if plug -of koma";
+my $TOK="$UPLUG systems/pre/tok -a";
+
+my ($TAGSRC,$TAGTRG);
+my ($PARSESRC,$PARSETRG);
+if (-f "$UPLUGSYSTEM/pre/$SRC/tag"){$TAGSRC="$UPLUG pre/$SRC/tag";}
+if (-f "$UPLUGSYSTEM/pre/$TRG/tag"){$TAGTRG="$UPLUG pre/$TRG/tag";}
+if (-f "$UPLUGSYSTEM/pre/$SRC/parse"){$PARSESRC="$UPLUG pre/$SRC/parse";}
+if (-f "$UPLUGSYSTEM/pre/$TRG/parse"){$PARSETRG="$UPLUG pre/$TRG/parse";}
+
+
+
+
+if (-f $SRCTXT){unlink $SRCTXT;}
+if (-f $TRGTXT){unlink $TRGTXT;}
+system "$PLUG2KOMA -in $FILE -out $ALIGN";
+
+if (-f "$SRCTXT.tmp"){unlink "$SRCTXT.tmp";}
+system "$TOK -in $SRCTXT -o $SRCTXT.tmp";
+rename ("$SRCTXT.tmp",$SRCTXT);
+
+if (-f "$TRGTXT.tmp"){unlink "$TRGTXT.tmp";}
+system "$TOK -in $TRGTXT -o $TRGTXT.tmp";
+rename ("$TRGTXT.tmp",$TRGTXT);
+
+if (defined $TAGSRC){
+    if (-f "$SRCTXT.tmp"){unlink "$SRCTXT.tmp";}
+    system "$TAGSRC -in $SRCTXT -out $SRCTXT.tmp";
+    rename ("$SRCTXT.tmp",$SRCTXT);
+}
+if (defined $TAGTRG){
+    if (-f "$TRGTXT.tmp"){unlink "$TRGTXT.tmp";}
+    system "$TAGTRG -in $TRGTXT -out $TRGTXT.tmp";
+    rename ("$TRGTXT.tmp",$TRGTXT);
+}
+if (defined $PARSESRC){
+    if (-f "$SRCTXT.tmp"){unlink "$SRCTXT.tmp";}
+    system "$PARSESRC -in $SRCTXT -out $SRCTXT.tmp";
+    rename ("$SRCTXT.tmp",$SRCTXT);
+}
+if (defined $PARSETRG){
+    if (-f "$TRGTXT.tmp"){unlink "$TRGTXT.tmp";}
+    system "$PARSETRG -in $TRGTXT -out $TRGTXT.tmp";
+    rename ("$TRGTXT.tmp",$TRGTXT);
+}
+

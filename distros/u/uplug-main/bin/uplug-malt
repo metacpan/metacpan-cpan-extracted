@@ -1,0 +1,221 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+# uplug_malt: a simple UPLUG wrapper for MaltParser
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004-2011 Jörg Tiedemann  <jorg.tiedemann@lingfil.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+# $Id: tag.pl,v 1.3 2008/04/03 11:16:21 joerg72 Exp $
+#----------------------------------------------------------------------------
+# 
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Uplug::Data;
+use Uplug::IO::Any;
+use Uplug::Config;
+use Uplug::Encoding;
+use Encode;
+use Cwd;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='tag.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+my ($InputStreamName,$InputStream)=
+    each %{$IniData{'input'}};               # the first input stream;
+my ($OutputStreamName,$OutputStream)=         # take only
+    each %{$IniData{'output'}};               # the first output stream
+
+my $input=Uplug::IO::Any->new($InputStream);
+my $output=Uplug::IO::Any->new($OutputStream);
+
+#---------------------------------------------------------------------------
+
+
+my $UplugHome = &shared_home;
+my $MaltHome  = $UplugHome.'/ext/parser/malt';
+my $MaltModel = $IniData{parameter}{parser}{model} || "engmalt.linear";
+my $JavaCmd   = $IniData{parameter}{java} || "java -Xmx2048m";
+
+
+my $TmpUnparsed=Uplug::IO::Any::GetTempFileName;
+my $TmpParsed=Uplug::IO::Any::GetTempFileName;
+
+#---------------------------------------------------------------------------
+
+my $data=Uplug::Data->new;
+
+print STDERR "uplug_malt: create temporary text file!\n";
+
+$input->open('read',$InputStream);
+my $UplugEncoding=$input->getInternalEncoding();
+my $OutEncoding=$IniData{parameter}{output}{encoding};
+if (not defined $OutEncoding){$OutEncoding=$UplugEncoding;}
+my $InEncoding=$IniData{parameter}{input}{encoding};
+if (not defined $InEncoding){$InEncoding=$OutEncoding;}
+
+
+## read data from input stream and convert to input format needed 
+## by the external tagger
+
+open F,">$TmpUnparsed";
+binmode(F,":encoding($OutEncoding)");
+while ($input->read($data)){
+    my @nodes=$data->contentElements;
+    my $count = 0;
+    foreach my $n (@nodes){
+	$count++;
+	my $attr = $n->attributes();
+	my $pos = 
+	    exists $$attr{hun} ? $$attr{hun} :
+	    exists $$attr{melt} ? $$attr{melt} :
+	    exists $$attr{svmtool} ? $$attr{svmtool} : 
+	    exists $$attr{pos} ? $$attr{pos} : '-';
+	my $word = $n->content();
+
+	# ID will be used for deprel arcs
+	my $id = exists $$attr{id} ? $$attr{id} : $count;
+	$id =~s/^.*\.([0-9]+)$/$1/;
+
+	# TODO: are these subst necessary?
+	$word=~s/^\t*([^\t]+)\t*/$1/;
+	$word=~s/^\s*//;
+	$word=~s/\s*$//;
+	$pos=~s/^([^\ ]+) .*$/$1/;
+
+	## handle malformed data by converting to octets and back
+	## the sub in encode ensures that malformed characters are ignored!
+	## (see http://perldoc.perl.org/Encode.html#Handling-Malformed-Data)
+	if ($OutEncoding ne $UplugEncoding){
+	    my $octets = encode($OutEncoding, $word,sub{ return '' });
+	    $word = decode($OutEncoding, $octets);
+	}
+	print F "$id\t$word\t\_\t$pos\t$pos\t\_\t\_\t\_\t\_\t\_\n";
+    }
+    print F "\n";
+}
+
+close F;
+$input->close;
+
+
+# my $currentDir = getcwd();
+# chdir $MaltHome;
+
+my $command = $JavaCmd.' -jar malt.jar -c '.$MaltModel." -i $TmpUnparsed -o $TmpParsed -m parse";
+
+print STDERR "uplug_malt: call MaltParser!\n";
+print STDERR "            cd MaltHome;$command\n";
+
+if (my $sig=system "cd $MaltHome;$command;"){
+    die "# uplug_malt: Got signal $? from MaltParser! ($@)\n$command\n";
+}
+
+print STDERR "uplug_malt: read parsed date and create output file!\n";
+
+$input->open('read',$InputStream);
+$output->open('write',$OutputStream);
+open F,"<$TmpParsed";
+binmode(F,":encoding($OutEncoding)");
+my $data=Uplug::Data->new;    # use a new data-object (new XML parser!)
+my $ret;
+while ($ret=$input->read($data)){
+    my @nodes=$data->contentElements;
+
+    my @deps=();
+
+    while(<F>){
+	last if(/^\s*$/);
+
+	if (/^[^\t]+\t[^\t]+\t[^\t]+\t[^\t]+\t[^\t]+\t[^\t]+\t(\d*)\t([^\t]+)\t[^\t]+\t[^\t]+\s*$/){
+	    push(@deps,($1,$2));
+	}
+    }
+    if (@deps != 2 * @nodes){
+	print STDERR "number of tokens does not match number of dep-rels!\n";
+	## TODO: try to match words .....?!
+    }
+
+    foreach my $n (@nodes){
+	$data->setAttribute($n,'head',shift(@deps));
+	$data->setAttribute($n,'deprel',shift(@deps));
+    }
+    $output->write($data);
+}
+
+close F;
+$input->close;
+$output->close;
+
+
+
+
+END {
+    unlink $TmpUnparsed;
+    unlink $TmpParsed;
+}
+
+############################################################################
+
+sub GetDefaultIni{
+
+    my $DefaultIni = 
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#     'encoding' => 'iso-8859-1',
+      'status' => 'malt',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef
+    }
+  },
+  'module' => {
+    'program' => 'uplug_malt',
+    'location' => '$UplugBin',
+    'name' => 'MaltParser (English)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+      'in' => 'input:text:file',
+      'out' => 'output:text:file',
+      'm' => 'parameter:parser:model',
+      'j' => 'parameter:java',
+    }
+  },
+};
+
+return %{$DefaultIni};
+}

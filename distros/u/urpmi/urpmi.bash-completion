@@ -1,0 +1,326 @@
+# bash completion for urpmi and friends
+# Copyright (c) 2002-2006 Guillaume Rousse <guillomovitch@mandriva.com>
+# $Id: urpmi.bash-completion 266536 2010-02-26 21:07:37Z guillomovitch $
+
+common_options="-q --quiet -v --verbose --debug -h --help --urpmi-root --wait-lock"
+
+# utility functions
+_urpmi_get_medias()
+{
+    medias=( $( urpmq --list-media $1 2>/dev/null \
+	| sed -e 's/(/\\(/g' -e 's/)/\\)/g' -e 's/ /\\ /g' ) )
+}
+
+_urpmi_medias()
+{
+    local medias IFS=$'\t\n'
+    # get medias list
+    _urpmi_get_medias all
+    # return matching ones
+    COMPREPLY=( $( compgen -W '${medias[@]}' -- $cur ) )
+}
+
+_urpmi_aliases()
+{
+    # return list of available aliases
+    COMPREPLY=( $( awk -F: '{print $1}' /etc/urpmi/parallel.cfg 2>/dev/null \
+	| grep "^${cur//\\\\/}" ) )
+}
+
+_urpmi_packages()
+{
+    local options
+
+
+    # find media selection options
+    for (( i=1; i < COMP_CWORD; i++ )); do
+	case "${COMP_WORDS[i]}" in
+	    --@\(excludemedia|media\))
+		options="$options ${COMP_WORDS[i]} ${COMP_WORDS[i+1]}"
+		i=$(($i+1))
+		;;
+	    --update)
+		options="$options ${COMP_WORDS[i]}"
+		;;
+	esac
+    done
+
+    COMPREPLY=( $( compgen -W "$(urpmq $options --list | grep ^$cur )" -- ) )
+}
+
+# urpmi completion
+#
+_urpmi()
+{
+    local cur prev options
+
+    COMPREPLY=()
+    cur=`_get_cword`
+    prev=`_get_pword`
+
+    case "$prev" in
+	--media)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--excludemedia)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--sortmedia)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--searchmedia)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--parallel)
+	    _urpmi_aliases
+	    return 0
+	    ;;
+	--root|--urpmi-root)
+	    _filedir -d
+	    return 0
+	    ;;
+    esac
+
+    if [[ "$cur" == -* ]]; then
+	# return list of available options
+	options="$common_options -a -p -P -y --update --media --excludemedia \
+	    --sortmedia --synthesis --auto --auto-select --no-uninstall \
+	    --split-level --split-length --fuzzy --buildrequires --install-src \
+	    --clean --noclean --parallel --wget --prozilla --curl --limit-rate \
+	    --proxy --proxy-user --bug --no-verify-rpm --no-install --test \
+	    --excludepath --excludedocs --searchmedia --ignoresize \
+	    --ignorearch --strict-arch --wget-options --curl-options \
+	    --prozilla-options --rsync-options --resume --retry --skip \
+	    --prefer --nolock --more-choices"
+	# add dangereous option for everything else as rurpmi
+	if [[ ${COMP_WORDS[0]} != *rurpmi ]]; then
+	    options="$options --root --use-distrib --env --auto-orphans \
+		--replacepkgs --justdb --allow-nodeps --allow-force \
+		--no-suggests --force --noscripts --auto-update --keep \
+		--nokeep --replacefiles --verify-rpm"
+	    for (( i=1; i < COMP_CWORD; i++ )); do
+		case ${COMP_WORDS[i]} in
+		    ----auto-update)
+			options="$options --no-md5sum \
+			--force-key"
+			;;
+		esac
+	    done
+	fi
+	COMPREPLY=( $( compgen -W "$options" -- $cur ) )
+    else
+	if [[ ${COMP_WORDS[0]} == *rurpmi ]]; then
+	    # return available packages only
+	    _urpmi_packages
+	else
+	    # return available packages (unless clearly a file)
+	    # and rpm files
+	    if [[ "$cur" != */* ]]; then
+		_urpmi_packages
+	    fi
+	    _filedir '@(rpm|spec)'
+	fi
+    fi
+}
+complete -F _urpmi $filenames urpmi gurpmi rurpmi
+
+# urpmq completion
+#
+_urpmq()
+{
+    local cur prev
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    case "$prev" in
+	--media)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--excludemedia)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--sortmedia)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--parallel)
+	    _urpmi_nodes
+	    return 0
+	    ;;
+	--list-media)
+	    COMPREPLY=( $( compgen -W 'all update active' -- $cur))
+	    return 0
+	    ;;
+    esac
+
+    if [[ "$cur" == -* ]]; then
+	# return list of available options
+	COMPREPLY=( $( compgen -W "$common_options -d -u -m -a -c -y -s -i -g \
+	    -p -r -f -l --update --media --excludemedia --sortmedia \
+	    --synthesis --auto-select --auto-orphans --not-available \
+	    --no-suggests --fuzzy \
+	    --keep --nokeep --list --list-url --list-media --list-nodes \
+	    --list-aliases --src --sources --provides --requires --obsoletes \
+	    --suggests --summary --sourcerpm --force --parallel --wget --curl \
+	    --prozilla --changelog --conflicts --proxy --proxy-user --env \
+	    --dump-config --whatprovides --whatrequires \
+	    --whatrequires-recursive --skip --prefer --use-distrib \
+	    --searchmedia --ignorearch" -- $cur))
+    else
+	# return rpm files (can't list available packages anymore)
+	_filedir rpm
+    fi
+}
+complete -F _urpmq urpmq
+
+# urpme completion
+#
+_urpme()
+{
+    local cur prev
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+
+    if [[ "$cur" == -* ]]; then
+	# return list of available options
+	COMPREPLY=( $( compgen -W "$common_options -a --auto --test \
+	    --auto-orphans --parallel --justdb --noscripts" -- $cur ) )
+    else
+	# return list of available packages
+	_xfunc rpm _rpm_installed_packages
+    fi
+}
+complete -F _urpme urpme
+
+# urpmf completion
+#
+_urpmf()
+{
+    local cur prev
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    case "$prev" in
+	--media)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--excludemedia)
+	    _urpmi_medias
+	    return 0
+	    ;;
+	--sortmedia)
+	    _urpmi_medias
+	    return 0
+	    ;;
+    esac
+
+    if [[ "$cur" == -* ]]; then
+	# return list of available options
+	COMPREPLY=( $( compgen -W "$common_options -i -f -e -a -o -m --update \
+	    --media --excludemedia --sortmedia --synthesis --use-distrib \
+	    --uniq --name --group --license --size --epoch --summary \
+	    --description --sourcerpm --packager--buildhost --url --provides \
+	    --requires --suggests --files --conflicts --obsoletes --env" \
+	    -- $cur ) )
+    else
+	# return available files
+	_filedir
+    fi
+}
+complete -F _urpmf urpmf
+
+# urpmi.update completion
+#
+_urpmi_update()
+{
+    local cur
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+
+    if [[ "$cur" == -* ]]; then
+	# return list of available options
+	COMPREPLY=( $( compgen -W "$common_options -a -f --wget --prozilla \
+	    --curl --limit-rate --proxy --proxy-user --update --ignore \
+	    --no-ignore --no-md5sum --force-key --norebuild" -- $cur))
+    else
+	# return list of available media
+	_urpmi_medias
+    fi
+}
+complete -F _urpmi_update urpmi.update
+
+# urpmi.addmedia completion
+#
+_urpmi_addmedia()
+{
+    local cur i args
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+
+    if [[ "$cur" == -* ]]; then
+	# return list of available options
+	COMPREPLY=( $( compgen -W "$common_options -f --wget --curl --prozilla \
+	    --limit-rate --proxy --proxy-user --update --raw \
+	    --probe-synthesis --probe-hdlist --probe-rpms --no-probe --distrib \
+	    --env --version --arch --virtual --norebuild --nopubkey" -- $cur ) )
+    else
+	# count number of mandatory args given sofar
+	args=$COMP_CWORD
+	for (( i=1; i < COMP_CWORD; i++ )); do
+	    if [[ "${COMP_WORDS[i]}" == -* ]]; then
+		args=$(($args-1))
+	    fi
+	done
+	case $args in
+	    1)
+		# return list of available media
+		_urpmi_medias
+		;;
+	    2)
+		# return list of available protocols
+		COMPREPLY=( $( compgen -W 'file:// http:// \
+		    ftp:// removable:// ssh:// \
+		    rsync://' -- $cur ) )
+		;;
+	    3)
+		# return word "with"
+		COMPREPLY=( 'with' )
+		;;
+	esac
+    fi
+}
+complete -F _urpmi_addmedia urpmi.addmedia
+
+# urpmi.removemedia completion
+#
+_urpmi_removemedia()
+{
+    local cur
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+
+    if [[ "$cur" == -* ]]; then
+	# if word begins with a dash, return list of available options
+	COMPREPLY=( $( compgen -W "$common_options -a -y" -- $cur ) )
+    else
+	# elsewhere, return list of available media
+	_urpmi_medias
+    fi
+
+}
+complete -F _urpmi_removemedia urpmi.removemedia

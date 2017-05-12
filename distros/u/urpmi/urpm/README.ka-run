@@ -1,0 +1,14 @@
+This extension module allows to use the ka-run or the taktuk2 package to
+perform distributed copy and installation of rpm packages over the network.
+(Taktuk is the next generation of ka-run tools.)
+
+To use this module, edit /etc/urpmi/parallel.cfg and add an alias line as
+follow :
+  <name>:ka-run:<ka-run tools command line options>
+or
+  <name>:ka-run(<default media>):<ka-run tools command line options>
+where <name> is alias name parameter of --parallel options of urpmi,
+      <default media> is default --media parameter for this alias,
+      <ka-run tools command line options> is options which will be given to
+            rshp and mput command, for example "-c ssh -m node1 -m node2 ... -m
+	    nodeN".

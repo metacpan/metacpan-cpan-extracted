@@ -1,0 +1,41 @@
+{
+  'module' => {
+    'name' => 'Dutch pre-processing',
+    'submodules' => [
+        'pre/nl/tagMBT',
+    ],
+    'submodule names' => [
+        'POS tagger (MBT)',
+    ],
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'chunk'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+	'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=sv)'
+	  },
+       },
+  }
+}

@@ -1,0 +1,47 @@
+{
+  'module' => {
+    'name' => 'basic pre-processing',
+    'submodules' => [
+        'pre/markup',
+        'pre/sent',
+    ],
+    'submodule names' => [
+        'basic XML markup',
+        'sentence splitter',
+    ],
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'The basic pre-processing module includes a tool
+  for basic XML markup, a simple sentence splitter and a general
+  tokenizer which probably does not work sufficiently for most
+  languages :-)',
+  'input' => {
+    'text' => {
+      'format' => 'text',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'tok'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text)'
+	  },
+       },
+  }
+}

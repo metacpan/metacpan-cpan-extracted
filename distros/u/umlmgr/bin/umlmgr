@@ -1,0 +1,178 @@
+#!/usr/bin/perl
+
+use strict;
+use Umlmgr;
+
+use Getopt::Long;
+use Pod::Usage;
+
+=head1 NAME
+
+umlmgr - A user mode linux manager
+
+=cut
+
+GetOptions(
+    'h|help' => sub { pod2usage(1); },
+    'config=s' => \my $config,
+) or pod2usage(0);
+
+my $mgr = Umlmgr->new(
+    config => $config,
+) or die "Can't instanciate Umlmgr\n";
+
+=head1 SYNOPSIS
+
+    umlmgr <command>
+    umlmgr --help
+
+Availlable commandes:
+
+    list        list vm configuration
+    startnet    start network related things
+    start       start all onboot vitual machine
+    stop        stop all running virtual machine
+    boot        start listed virtual machine
+    status      list running machines
+
+=cut
+
+my $action = shift(@ARGV) or pod2usage(0);
+
+for($action) {
+    /^startnet$/ and do { $mgr->setup_network; last; };
+    /^start$/ and do { $mgr->setup_network; $mgr->start; last };
+    /^stop$/ and do { $mgr->stop; last };
+    /^restart$/ and do {
+        $mgr->stop;
+        $mgr->setup_network;
+        $mgr->start;
+        last 
+    };
+    /^list$/ and do {
+        print "$_\n"
+        foreach ($mgr->list_machines_config);
+        last;
+    };
+    /^status$/ and do {
+        foreach ($mgr->list_machines_config) {
+            my $ma = $mgr->get_machine($_);
+            print $_ . ($ma->status ? ' running' : ' down') . "\n";
+        }
+        last;
+    };
+    /^boot$/ and do {
+        foreach (@ARGV) {
+            my $ma = $mgr->get_machine($_) or do {
+                warn "can't load machine `$_'\n";
+                next;
+            };
+            $ma->start;
+            print "$_ started\n";
+        }
+        last;
+    };
+    pod2usage(0);
+}
+
+__END__
+
+=head1 DESCRIPTION
+
+umlmgr is a tools to start/stop a set User Mode Linux virtuals machines.
+
+=head1 CONFIGURATION
+
+All configurations files are Ini file like.
+
+An ini file is composed of sections, value are setup per section in the form:
+
+    var=value
+
+=head2 umlmgr
+
+As root, the configuration default configuration file is I</etc/umlmgr.cfg>.
+As a standard user it is I<$HOME/.umlmgr/config>.
+This file is not mandatory as normal user, espcially since most of settings
+need root privilege to be achieve (network related things on the host).
+
+The default location for vm configs is I<$HOME/.umlmgr>.
+
+I<Example:>
+
+    [env]
+    user=vmuser
+
+    [machines]
+    dir=/vm
+
+    [network]
+    tap=tap0
+    addr=192.168.0.254
+    # switch=yes
+    hub=yes
+
+=head3 B<env> section
+
+Envirronement related values to run everythings
+
+    user    the user account vm should be run as
+
+=head3 B<machines> section
+
+    dir     the directory where vm configuration files are located
+
+=head3 B<network> section
+
+    tap     the tap device to setup
+    addr    the ip address to setup
+    switch  if set, will start uml_switch, using tap device if set
+    hub     make uml_switch acting as a hub
+
+
+=head2 each vm
+
+Virtual machines files should be name in from ID.uml. The first
+part of the file name is used as uml identifier (used by uml_mconsole).
+
+I<Example:>
+
+    [env]
+    kernel=/tmp/usr/bin/kernel-uml-2.6.25
+
+    [uml]
+    ubda=/tmp/mdv
+    con=pts
+    eth0=daemon
+
+=head3 B<env> section
+
+    kernel      the excutable name to use as kernel
+    onboot      if set, the machine is started by 'start' function
+                (otherwise should be start explicitly with 'boot' function)
+
+=head3 B<uml>
+
+Each value in this will be passed as argument to the kernel.
+
+Umlmgr will automatically add as argument:
+
+    con0=fd:0,fd:1
+    con=pts
+
+The first force log output to go to STDIN/STDERR, umlmgr fetch the output
+and push it to syslog.
+
+The second one will bind all console to /dev/pts device. This setup make hard
+to wonder which device has to be used to access to vm console. umlmgr come
+with L<umltty> tools to find it.
+
+=head1 AUTHOR
+
+Olivier Thauvin <nanardon@nanardon.zarb.org>
+
+=head1 LICENSE
+
+WTFPL !
+
+=cut

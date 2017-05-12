@@ -1,0 +1,47 @@
+{
+  'module' => {
+    'name' => 'English pre-processing',
+    'submodules' => [
+        'pre/en/tagHunPos',
+        'pre/en/tagGrok',
+        'pre/en/chunk',
+        'pre/en/malt',
+    ],
+    'submodule names' => [
+        'English POS tagger (hunpos)',
+        'English POS tagger (Grok)',
+        'English chunker (Grok)',
+        'English dependency parser (malt)',
+    ],
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'chunk'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+	'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=en)'
+	  },
+       },
+  }
+}

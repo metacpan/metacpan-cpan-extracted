@@ -1,0 +1,378 @@
+{
+  'module' => {
+    'program' => 'uplug-wordalign',
+    'location' => '$UplugBin',
+    'name' => 'The clue aligner - linking words',
+    'stdin' => 'bitext',
+    'stdout' => 'bitext',
+  },
+  'description' => 'This module links words and phrases using the
+  clues that are available and which have been enabled for the
+  alignment. Note: If you enable additional clues make sure that they
+  exist, i.e. that they have been produced before. Non-existing clues
+  are simply ignored.<p>
+  The search parameter sets the link strategy:
+  The default search
+  strategy is a constrained best-first search (=best first). Other
+  available strategies are 
+  <ul><li>a refined bi-directional alignment
+  (=refined)
+  <li>the intersection of directional alignments (source to
+  target and target to source) (=intersection)
+  <li>the union of
+  directional alignments (=union)
+  <li>a competitive linking approach (=competitive)
+  <li>and two directional alignment strategies
+  (directional_src and directional_trg).<ul>',
+  'input' => {
+    'bitext' => {
+      'stream name' => 'runtime xml',
+      'format' => 'xces align',
+    },
+
+    ##########################
+    # user lexicon
+
+    'lexicon' => {
+	'format' => 'DBM',
+	'file' => 'data/runtime/lexicon.dbm',
+	'key' => ['source','target'],
+    },
+
+    ##########################
+
+    'giza-pos' => {
+	'format' => 'DBM',
+	'file' => 'data/runtime/giza-pos.dbm',
+	'key' => ['source','target'],
+    },
+    'giza-word' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-word.dbm',
+        'key' => ['source','target'],
+    },
+    'giza-pos-word' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-pos-word.dbm',
+        'key' => ['source','target'],
+    },
+    'giza-word-prefix' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-word-prefix.dbm',
+        'key' => ['source','target'],
+    },
+    'giza-word-suffix' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-word-suffix.dbm',
+        'key' => ['source','target'],
+    },
+
+    'giza-pos-i' => {
+	'format' => 'DBM',
+	'file' => 'data/runtime/giza-pos-i.dbm',
+	'key' => ['source','target'],
+    },
+    'giza-word-i' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-word-i.dbm',
+        'key' => ['source','target'],
+    },
+    'giza-pos-word-i' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-pos-word-i.dbm',
+        'key' => ['source','target'],
+    },
+    'giza-word-prefix-i' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-word-prefix-i.dbm',
+        'key' => ['source','target'],
+    },
+    'giza-word-suffix-i' => {
+        'format' => 'DBM',
+        'file' => 'data/runtime/giza-word-suffix-i.dbm',
+        'key' => ['source','target'],
+    },
+
+
+    'string similarities' => {'stream name' => 'string similarities'},
+    'dice'		  => {'stream name' => 'dice'},
+    'mutual information'  => {'stream name' => 'mutual information'},
+    't-score'		  => {'stream name' => 't-score'},
+    'coocstat1' => {'stream name' => 'co-occurrence statistics 1'},
+    'coocstat2' => {'stream name' => 'co-occurrence statistics 2'},
+    'coocstat3' => {'stream name' => 'co-occurrence statistics 3'},
+    'coocstat4' => {'stream name' => 'co-occurrence statistics 4'},
+
+    'clue dl'		=> {'stream name' => 'clue dl',},
+    'clue dlp'		=> {'stream name' => 'clue dlp'},
+    'clue dlx'		=> {'stream name' => 'clue dlx'},
+    'clue dl3x'		=> {'stream name' => 'clue dl3x'},
+    'clue dpx'	        => {'stream name' => 'clue dpx'},
+    'clue dp3'		=> {'stream name' => 'clue dp3'},
+    'clue dp3 (prefix)' => {'stream name' => 'clue dp3 (prefix)'},
+    'clue dp3x'		=> {'stream name' => 'clue dp3x'},
+    'clue dc3'		=> {'stream name' => 'clue dc3'},
+    'clue dc3p'		=> {'stream name' => 'clue dc3p'},
+    'clue dc3x'		=> {'stream name' => 'clue dc3x'},
+
+    'sven static POS clue' => {'stream name' => 'sven pos clue'},
+    'sven static POS clue 2' => {'stream name' => 'sven pos clue 2'},
+    'sven static chunk clue' => {'stream name' => 'sven chunk clue'},
+
+    'ensv static POS clue' => {'stream name' => 'ensv pos clue'},
+    'ensv static POS clue 2' => {'stream name' => 'ensv pos clue 2'},
+    'ensv static chunk clue' => {'stream name' => 'ensv chunk clue'},
+
+    'svde static POS clue' => {'stream name' => 'svde pos clue'},
+    'svde static POS clue 2' => {'stream name' => 'svde pos clue 2'},
+    'svde static chunk clue' => {'stream name' => 'svde chunk clue'},
+
+    'enfr static POS clue' => {'stream name' => 'enfr pos clue'},
+    'enfr static POS clue 2' => {'stream name' => 'enfr pos clue 2'},
+
+  },
+  'output' => {
+    'bitext' => {
+      'format' => 'xces align',
+      'status' => 'word',
+      'write_mode' => 'overwrite',
+    },
+  },
+
+
+
+
+  'parameter' => {
+    'string similarities' => {
+#      'minimal score' => 0.3,
+#      'score weight' => 0.05,
+    },
+    'dice' => {
+#      'minimal score' => 0.2,
+#      'score weight' => 0.05,
+    },
+    'mutual information' => {
+#      'minimal score' => 2,
+#      'score weight' => 0.005,
+    },
+    't-score' => {
+#      'minimal score' => 0.8,
+#      'score weight' => 0.01,
+    },
+    'general input parameter' => {
+       'chunks (source)' => 'c.*',
+       'chunks (target)' => 'c.*',
+    },
+#    'general' => {
+#       'chunks (source)' => 'c.*',
+#       'chunks (target)' => 'c.*',
+#    },
+    'alignment' => {
+      'remove word links' => 0,
+      'clues' => {
+        'lexicon' => 1,
+        'string similarities' => 1,
+        'dice'		      => 1,
+        'mutual information'  => 0,
+        't-score'	      => 0,
+        'coocstat1'	      => 1,
+        'coocstat2'	      => 1,
+        'coocstat3'	      => 1,
+        'coocstat4'	      => 1,
+
+	'giza-word' => 1,
+	'giza-pos' => 1,
+	'giza-pos-word' => 1,
+	'giza-word-prefix' => 1,
+	'giza-word-suffix' => 1,
+
+	'giza-word-i' => 1,
+	'giza-pos-i' => 1,
+	'giza-pos-word-i' => 1,
+	'giza-word-prefix-i' => 1,
+	'giza-word-suffix-i' => 1,
+
+
+	'clue dl' => 1,
+	'clue dlp' => 1,
+	'clue dlx' => 1,
+	'clue dl3x' => 1,
+	'clue dpx' => 1,
+	'clue dp3' => 1,
+	'clue dp3 (prefix)' => 1,
+	'clue dp3x' => 1,
+	'clue dc3' => 1,
+	'clue dc3p' => 1,
+	'clue dc3x' => 1,
+
+	'sven static POS clue' => 1,
+	'sven static POS clue 2' => 1,
+	'sven static chunk clue' => 1,
+
+      },
+      'minimal score' => '0.00001',
+      'search' => 'matrix',
+       'verbose' => 0,                         # verbose mode
+#      'minimal score' => '70%',
+#      'general stream' => 'dice',
+#      'align 1:1' => '0.5',
+#      'remove linked' => 1,
+#      'align identical' => '0.08',
+    },
+    'runtime' => {
+      'print progress' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+
+      'lex' => 'parameter:alignment:clues:lexicon',
+
+      #---- basic clues --------------------------
+
+      'sim' => 'parameter:alignment:clues:string similarities',
+      'dice' => 'parameter:alignment:clues:dice',
+      'mi' => 'parameter:alignment:clues:mutual information',
+      'tscore' => 'parameter:alignment:clues:t-score',
+      'stat1' => 'parameter:alignment:clues:coocstat1',
+      'stat2' => 'parameter:alignment:clues:coocstat2',
+      'stat3' => 'parameter:alignment:clues:coocstat3',
+      'stat4' => 'parameter:alignment:clues:coocstat4',
+
+      #---- giza-clues-----------------------
+
+      'gw' => 'parameter:alignment:clues:giza-word',
+      'gp' => 'parameter:alignment:clues:giza-pos',
+      'gpw' => 'parameter:alignment:clues:giza-pos-word',
+      'gwp' => 'parameter:alignment:clues:giza-word-prefix',
+      'gws' => 'parameter:alignment:clues:giza-word-suffix',
+
+      #---- giza inverse
+
+      'gwi' => 'parameter:alignment:clues:giza-word-i',
+      'gpi' => 'parameter:alignment:clues:giza-pos-i',
+      'gpwi' => 'parameter:alignment:clues:giza-pos-word-i',
+      'gwpi' => 'parameter:alignment:clues:giza-word-prefix-i',
+      'gwsi' => 'parameter:alignment:clues:giza-word-suffix-i',
+
+      #------- bootstrapped clues---------------------
+
+      'dl' => 'parameter:alignment:clues:clue dl',
+      'dlp' => 'parameter:alignment:clues:clue dlp',
+      'dlx' => 'parameter:alignment:clues:clue dlx',
+      'dl3x' => 'parameter:alignment:clues:clue dl3x',
+      'dpx' => 'parameter:alignment:clues:clue dpx',
+      'dp3' => 'parameter:alignment:clues:clue dp3',
+      'dp3 (prefix)' => 'parameter:alignment:clues:clue dp3 (prefix)',
+      'dp3x' => 'parameter:alignment:clues:clue dp3x',
+      'dc3' => 'parameter:alignment:clues:clue dc3',
+      'dc3p' => 'parameter:alignment:clues:clue dc3p',
+      'dc3x' => 'parameter:alignment:clues:clue dc3x',
+
+      #---- language-specific clues ------------------------
+
+      'svenp' => 'parameter:alignment:clues:sven static POS clue',
+      'svenpp' => 'parameter:alignment:clues:sven static POS clue 2',
+      'svenc' => 'parameter:alignment:clues:sven static chunk clue',
+
+      'svdep' => 'parameter:alignment:clues:svde static POS clue',
+      'svdepp' => 'parameter:alignment:clues:svde static POS clue 2',
+      'svdec' => 'parameter:alignment:clues:svde static chunk clue',
+
+      'ensvp' => 'parameter:alignment:clues:ensv static POS clue',
+      'ensvpp' => 'parameter:alignment:clues:ensv static POS clue 2',
+      'ensvc' => 'parameter:alignment:clues:ensv static chunk clue',
+
+      'enfrp' => 'parameter:alignment:clues:enfr static POS clue',
+      'enfrpp' => 'parameter:alignment:clues:enfr static POS clue 2',
+
+      #-----------clue weights -------------------------
+
+      'sim_w' => 'parameter:string similarities:score weight',
+      'dice_w' => 'parameter:dice:score weight',
+      'mi_w' => 'parameter:mutual information:score weight',
+      'tscore_w' => 'parameter:t-score:score weight',
+      'stat1_w' => 'parameter:coocstat1:score weight',
+      'stat2_w' => 'parameter:coocstat2:score weight',
+      'stat3_w' => 'parameter:coocstat3:score weight',
+      'stat4_w' => 'parameter:coocstat4:score weight',
+
+      'gw_w' => 'parameter:giza-word:score weight',
+      'gp_w' => 'parameter:giza-pos:score weight',
+      'gpw_w' => 'parameter:giza-pos-word:score weight',
+      'gwp_w' => 'parameter:giza-word-prefix:score weight',
+      'gws_w' => 'parameter:giza-word-suffix:score weight',
+
+      'gwi_w' => 'parameter:giza-word-i:score weight',
+      'gpi_w' => 'parameter:giza-pos-i:score weight',
+      'gpwi_w' => 'parameter:giza-pos-word-i:score weight',
+      'gwpi_w' => 'parameter:giza-word-prefix-i:score weight',
+      'gwsi_w' => 'parameter:giza-word-suffix-i:score weight',
+
+
+      'dl' => 'parameter:clues:clue dl:score weight',
+      'dlp' => 'parameter:clues:clue dlp:score weight',
+      'dlx' => 'parameter:clues:clue dlx:score weight',
+      'dl3x' => 'parameter:clues:clue dl3x:score weight',
+      'dpx' => 'parameter:clues:clue dpx:score weight',
+      'dp3' => 'parameter:clues:clue dp3:score weight',
+      'dp3 (prefix)' => 'parameter:clues:clue dp3 (prefix):score weight',
+      'dp3x' => 'parameter:clues:clue dp3x:score weight',
+      'dc3' => 'parameter:clues:clue dc3:score weight',
+      'dc3p' => 'parameter:clues:clue dc3p:score weight',
+      'dc3x' => 'parameter:clues:clue dc3x:score weight',
+
+
+      'svenp_w' => 'parameter:sven static POS clue:score weight',
+      'svenpp_w' => 'parameter:sven static POS clue 2:score weight',
+      'svenc_w' => 'parameter:sven static chunk clue:score weight',
+
+      'svdep_w' => 'parameter:svde static POS clue:score weight',
+      'svdepp_w' => 'parameter:svde static POS clue 2:score weight',
+      'svdec_w' => 'parameter:svde static chunk clue:score weight',
+
+      'ensvp_w' => 'parameter:ensv static POS clue:score weight',
+      'ensvpp_w' => 'parameter:ensv static POS clue 2:score weight',
+      'ensvc_w' => 'parameter:ensv static chunk clue:score weight',
+
+      'enfrp_w' => 'parameter:enfr static POS clue:score weight',
+      'enfrpp_w' => 'parameter:enfr static POS clue 2:score weight',
+
+
+      #------other parameters-----------
+
+      'new' => 'parameter:alignment:non-aligned only',
+      'in' => 'input:bitext:file',
+      'infile' => 'input:bitext:file',
+      'informat' => 'input:bitext:format',
+      'out' => 'output:bitext:file',
+      'srclang' => 'parameter:general:language (source)',
+      'trglang' => 'parameter:general:language (target)',
+      'id' => 'parameter:alignment:index',
+      'html' => 'parameter:runtime:print html only',
+      'search' => 'parameter:alignment:search',
+      'v' => 'parameter:alignment:verbose',
+      'comb' => 'parameter:alignment:score combination',
+      'adj' => 'parameter:alignment:adjacent_only',
+      'phr' => 'parameter:alignment:in_phrases_only',
+      'min' => 'parameter:alignment:minimal score',
+    }
+  },
+  'widgets' => {
+#       'input' => {
+#            'bitext' => {
+#               'stream name' => 'stream (format=xces align,status=sent)',
+#            },
+#        },
+       'parameter' => {
+         'alignment' => {
+	   'clues' => {
+	      'string similarities' => 'checkbox',
+	      'dice' => 'checkbox',
+	   },
+	   'minimal score' => 'scale (0,1,0.00001,0.005)',
+	   'search' => 'optionmenu (best first,refined,intersection,union,competitive,directional_src,directedional_trg)',
+            },
+        }
+  }
+}

@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: swap-lang,v 1.1.1.1 2004/05/03 15:39:55 joerg72 Exp $
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/..";
+use Uplug::Data::Tree;
+use Uplug::IO::Any;
+
+my $prob=0;
+my $delimiter="\t";
+
+
+if ($#ARGV != 1){die "usage: swap-lang in-dbm out-dbm\n";}
+
+
+my %in=('file' => $ARGV[0],
+	'format' => 'dbm',
+	'key' => ['source','target']);
+
+my %out=('file' => $ARGV[1],
+	'format' => 'dbm',
+	'write_mode' => 'overwrite',
+	'key' => ['target','source']);
+
+my $data=Uplug::Data::Tree->new;
+
+my $i=Uplug::IO::Any->new(\%in);
+my $o=Uplug::IO::Any->new(\%out);
+
+$i->open('read',\%in);
+$o->open('write',\%out);
+my $head=$i->header();
+if (ref($head) eq 'HASH'){
+    my %new=();
+    foreach (keys %{$head}){
+	my $old=$_;
+	if (not s/source/target/g){s/target/source/g;}
+	$new{$_}=$head->{$old};
+    }
+    %{$head}=%new;
+}
+$o->addheader($head);
+$o->writeheader();
+
+while ($i->read($data)){
+    $o->write($data);
+}
+
+$i->close();
+$o->close();

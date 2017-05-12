@@ -1,0 +1,41 @@
+
+Uplug - NLP tools for processing (parallel) corpora
+---------------------------------------------------
+
+Uplug is a collection of tools and scripts for processing text-corpora
+
+uplug		  script for running Uplug modules
+bin/		  executable scripts (Uplug modules)
+share/systems/	  configuration files of Uplug modules
+share/ext/	  external programs/tools integrated in Uplug
+tools/		  simple tools (converting, dumping, etc)
+web/		  experimental web interface (not maintained)
+
+share/ini/	  some configuration files
+share/lang/	  language specific data
+example/	  small example corpora
+
+lib/Uplug.pm      main library for running Uplug modules
+lib/Uplug/	  Uplug libraries
+
+
+The new project home page:	https://bitbucket.org/tiedemann/uplug
+The old pages at SourceForge:	http://sourceforge.net/projects/uplug/
+
+Installing/using Uplug: 	read INSTALL, QUICKSTART & HOWTO
+
+
+Please cite the following dissertation if you use Uplug:
+
+ @PhdThesis{Tiedemann:PhD03,
+  author =	 {J\"org Tiedemann},
+  title =	 {Recycling Translations -- {E}xtraction of Lexical
+                  Data from Parallel Corpora and their Application in
+                  Natural Language Processing},
+  school =	 {Uppsala University},
+  year =	 2003,
+  address =	 {Uppsala, Sweden},
+  note =	 {Anna S{\aa}gvall{ }Hein, {\AA}ke Viberg (eds): Studia
+                  Linguistica Upsaliensia},
+  url =		 {http://uu.diva-portal.org/smash/record.jsf?pid=diva2:163715},
+ }

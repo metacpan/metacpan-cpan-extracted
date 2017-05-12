@@ -1,0 +1,51 @@
+
+----------------
+Installing Uplug
+----------------
+
+Get the sources and Uplug modules from
+https://bitbucket.org/tiedemann/uplug
+
+You can either run Uplug without explicitly installing it 
+or you can run the usual perlish installation steps (for putting Uplug into a global loction)
+
+   perl Makefile.PL
+   make
+   sudo make install
+
+Note: Uplug includes some pre-compiled binaries (see share/bin). You may have to compile and install your own binaries in case your OS and system architecture is not supported. Currently, there are GNU/Linux binaries (i686 and x86_64) and Intel-based Mac OSX (x86_64) binaries.
+
+There are language-specific packages with annotation tools and pre-rpocessing pipelines. Check the Uplug website for details. Download the packages you like to use and follow there installation instructions.
+
+
+Other requirements:
+-------------------
+
+* Perl (>v5.5)
+* Perl modules:
+       XML::Parser
+       XML::Simple
+       File::ShareDir
+* Java (in your global path)
+* Some external tools are called via startup scripts in share/ext
+  You may have to check whether they work properly (if you want to use these tools)
+  Check especially the scripts in
+	  share/ext/tagger
+	  share/ext/parser
+	  share/ext/chunker
+* Several external tools are not included in this package. Install them if you want to use them.
+     TreeTagger: download the uplug-treetagger package and read installation instructions 
+     SVMTool: download uplug-es or uplug-ca
+     MElt: download uplug-fr
+  Support for some additional tools may be broken in the current version:
+     Qtag Tagger: http://web.bham.ac.uk/O.Mason/software/tagger/
+     TnT tagger: http://www.coli.uni-sb.de/~thorsten/tnt/
+     Brill-tagger, MBT, BLT
+
+
+Mac OSX
+--------
+
+If you use macports (http://www.macports.org):
+
+  sudo port install p5-xml-parser p5-xml-simple p5-file-sharedir

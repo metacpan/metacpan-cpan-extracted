@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: xces2dic,v 1.4 2005/11/21 17:03:44 joerg72 Exp $
+
+grep '<wordLink ' |\
+perl -e '#if ($]>=5.008){binmode(STDIN, ":encoding(utf-8)");};
+         while (<>){if (/lexPair=\"([^\"]*)\"/){print "$1\n";}}' |\
+sed 's/^ *//;s/ *$//;s/ *; */;/;' |\
+tr ';' "\t" |\
+sort |\
+uniq -c |\
+sort -rn 

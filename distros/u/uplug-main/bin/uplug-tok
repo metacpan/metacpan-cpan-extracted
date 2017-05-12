@@ -1,0 +1,227 @@
+#!/usr/bin/env perl
+# -*-perl-*-
+#
+# uplug-tok: split text into segments/tokens
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+#
+# usage: uplug-tok <infile >outfile
+#        uplug-tok [-i configfile] [-in infile] [-out outfile] [-s system]
+#        uplug-tok [-i configfile] [-s system] <infile >outfile
+#
+# configfile  : configuration file
+# infile      : input file
+# outfile     : output file
+# system      : Uplug system (subdirectory of UPLUGSYSTEM)
+# 
+# 
+#
+
+use strict;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+# use utf8;
+
+use Uplug::Data;
+use Uplug::IO::Any;
+use Uplug::Config;
+use Uplug::PreProcess::Tokenizer;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='sent.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+my ($InputStreamName,$InputStream)=           # take only 
+    each %{$IniData{'input'}};                # the first input stream
+my ($OutputStreamName,$OutputStream)=         # take only
+    each %{$IniData{'output'}};               # the first output stream
+
+my $input=Uplug::IO::Any->new($InputStream);
+my $output=Uplug::IO::Any->new($OutputStream);
+
+#---------------------------------------------------------------------------
+
+$input->open('read',$InputStream);
+my $header=$input->header;
+$output->addheader($header);
+$output->open('write',$OutputStream);
+
+#---------------------------------------------------------------------------
+
+
+my $SegTag=$IniData{parameter}{Tokenizer}{tag} || 's';
+my $lang=$IniData{parameter}{Tokenizer}{language} || 'en';
+my $AddId=$IniData{parameter}{Tokenizer}{'add IDs'};
+my $KeepSpaces=$IniData{parameter}{Tokenizer}{'keep spaces'};
+my $AddParId=$IniData{parameter}{Tokenizer}{'add parent id'};
+
+my $verbose=$IniData{parameter}{runtime}{verbose};
+
+#---------------------------------------------------------------------------
+
+my $splitter = new Uplug::PreProcess::Tokenizer( lang => $lang );
+
+if ($KeepSpaces){$input->keepSpaces();}
+my $data=Uplug::Data->new();
+my $count=0;
+
+while ($input->read($data)){
+    $count++;
+    if ($verbose){
+	if (not ($count % 1000)){
+	    print STDERR "$count\n";
+	}
+	if (not ($count % 100)){
+	    print STDERR '.';
+	}
+    }
+    &split($data);
+    $output->write($data);
+}
+
+$input->close;
+$output->close;
+
+my $parId;
+my $id;
+my $idhead;
+sub split{
+    my $data=shift;
+    my %subst=();
+
+    my @text=();
+    my @attr=();
+    my @nodes=$data->findNodes($SegTag);
+    if (@nodes){return;}                     # data are already segmented!!!!
+
+    my $text=$data->content();
+    my @seg=$splitter->tokenize($text);
+    if (not @seg){return;}
+
+    my $root=$data->root();
+    my @children=$data->splitContent($root,$SegTag,\@seg);
+
+    #-------------------------------------------------------
+    if ($AddParId){                        # add parent id's
+	$idhead=$data->attribute('id');
+	if ($idhead=~/^[^0-9]([0-9].*)$/){
+	    $idhead=$1;
+	}
+	if (not defined $idhead){
+	    $parId++;
+	    $idhead=$parId;
+	    $data->setAttribute('id',$parId);
+	}
+	$idhead.='.';
+	$id=0;
+    }
+    #-------------------------------------------------------
+    if ($AddId){              # add id's and spans
+	foreach my $c (0..$#children){
+		if (not ref($children[$c])){next;}
+	    if ($AddId){
+		$id++;
+		$data->setAttribute($children[$c],
+				    'id',"$SegTag$idhead$id");
+	    }
+	}
+    }
+}
+
+############################################################################
+
+
+sub GetDefaultIni{
+
+    my $DefaultIni = {
+	'encoding' => 'iso-8859-1',
+	'module' => {
+	    'name' => 'tokenizer',
+	    'program' => 'uplug-tok',
+	    'location' => '$UplugBin',
+	    'stdin' => 'text',
+	    'stdout' => 'text',
+	},
+	'description' => '',
+        'input' => {
+	    'text' => {
+		'format' => 'xml',
+	    }
+	},
+	'output' => {
+	    'text' => {
+		'format' => 'xml',
+		'write_mode' => 'overwrite',
+		'status' => 'tok',
+	    }
+	},
+	'parameter' => {
+	    'Tokenizer' => {
+		'tag' => 'w',
+		'add IDs' => 1,
+		'add parent id' => 1,
+#		'keep spaces' => 1,
+	    },
+	    'runtime' => {
+		'verbose' => 0,
+	    },
+	},
+	'arguments' => {
+	    'shortcuts' => {
+		'in' => 'input:text:file',
+		'informat' => 'input:text:format',
+		'r' => 'input:text:root',
+		'b' => 'input:text:DocBodyTag',
+		'o' => 'output:text:file',
+		'outformat' => 'output:text:format',
+		'ci' => 'input:text:encoding',
+		'co' => 'output:text:encoding',
+		'l' => 'parameter:Tokenizer:language',
+		't' => 'parameter:Tokenizer:tag',
+		'id' => 'parameter:Tokenizer:add IDs',
+		'k' => 'parameter:Tokenizer:keep spaces',
+		'v' => 'parameter:runtime:verbose'
+		}
+	},
+	'help' => {
+	    'shortcuts' => {
+		'r' => 'root tag of sub-trees, reg. expr.',
+		'b' => 'skip everything before this tag (body)',
+		'in' => 'input file                        (default: STDOUT)',
+		'o' => 'output file                        (default: STDOUT)',
+		'ci' => 'character encoding, input         (default: utf-8)',
+		'co' => 'character encoding, output        (default: utf-8)',
+		'l' => "language                           (default: 'en')",
+		't' => "word tag                           (default: 's')",
+		'k' => 'keep spaces (between xml tags)     (default: no)',
+	    },
+	},
+	'widgets' => {
+	    'input' => {
+		'text' => {
+		    'stream name' => 'stream(format=xml,status=sent)'
+		    },
+		    },
+		    }
+    };
+    return %{$DefaultIni};
+}

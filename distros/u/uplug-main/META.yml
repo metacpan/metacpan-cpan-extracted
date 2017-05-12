@@ -1,0 +1,52 @@
+---
+abstract: 'a toolbox for processing (parallel) text corpora'
+author:
+  - 'Joerg Tiedemann'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Uplug
+no_index:
+  directory:
+    - example
+    - inc
+    - share
+    - t
+requires:
+  AnyDBM_File: 0
+  Cwd: 0
+  DB_File: 0
+  Data::Dumper: 0
+  Encode: 0
+  Exporter: 0
+  File::Basename: 0
+  File::Compare: 0
+  File::Copy: 0
+  File::ShareDir: 0
+  File::stat: 0
+  FileHandle: 0
+  FindBin: 0
+  GDBM_File: 0
+  Getopt::Std: 0
+  HTML::Entities: 0
+  IO: 0
+  IO::File: 0
+  IPC::Run: 0
+  POSIX: 0
+  Storable: 0
+  Sys::Hostname: 0
+  Test::More: 0
+  XML::Parser: 0
+  XML::Simple: 0
+  perl: 5.005
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.3.8

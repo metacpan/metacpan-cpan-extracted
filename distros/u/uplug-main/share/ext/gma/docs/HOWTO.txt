@@ -1,0 +1,454 @@
+GMA HOWTO 
+
+#######################################################################
+#COPYRIGHT (C) 1996-2004 by I. Dan Melamed
+#######################################################################
+
+GMA stands for Geometric Mapping and Alignment, and it includes the
+Smooth Injective Map Recognizer (SIMR) algorithm for mapping bitext
+correspondence, as well as the Geometric Segment Alignment (GSA)
+post-processor for converting general bitext maps to monotonic segment
+alignments.  To get the most benefit from this software, you are
+encouraged to read the relevant publications, most of which are
+downloadable from Dan's home page and referenced at the end of this 
+HOWTO file.
+
+
+CONTENTS
+
+0.	how to contribute
+I.	how to install GMA
+II.	how to run GMA
+III.	how to interpret GMA's output
+IV.	more information on config files
+V.	how to choose a matching predicate for your language pair
+VI.	how to create bitext axes for GMA
+VII.	why you must generate end-of-segment markers
+VIII.	how to reoptimize SIMR's numerical parameters
+IX.	troubleshooting
+X.	how to submit bug reports
+XI.	references
+
+========================================================================
+
+0. GMA is open source.  You can change it to your liking.  If you make
+significant improvements from which others might benefit, then of
+course you should share.  Patches, modules, language-specific
+resources, and additional documentation are all welcome.  Please submit
+your contribution to the bugzilla GMA project at 
+http://nlp.cs.nyu.edu/bugzilla.  We will try to include it in the next 
+release, giving you full credit, and everlasting glory shall be yours.
+
+I.  how to install GMA
+
+1. Download the package from the website.
+
+2. At this point, you might want to confirm that your GMA package is
+genuine by checking the md5sum.  See the FAQ for instructions.
+
+3. Linux: Run gunzip and tar -xvf on the package (or just tar -xzvf if 
+your tar supports that switch)
+   Windows: Run any util that can unzip the .zip package. 
+
+4. This will create a directory called gma-[version], cd into it.
+
+5. Set the environment variable $GMApath to the directory where GMA
+now lives.  You will need to pass this environment variable to GMA
+with -DGMApath=$GMApath or GMA will not be able to see it.  It is 
+much easier to define an alias that passes this to java by default.
+In my .bashrc i have the following definitions:
+
+export GMApath=/home/argyle/gma-2.0
+alias java='java -DGMApath=$GMApath'
+export JAVA_HOME_BIN=/usr/java/bin/
+export JAVA_HOME=/usr/java/j2sdk1.4.2_04
+
+6. You will need to have Apache Ant installed on your machine. Your 
+installation of Ant should contain both the core tasks and optional tasks.
+You might have to add ant's /bin directory to your PATH in order to 
+avoid typing the complete path each time.
+
+In addition you will need to setup several environment variables.  In 
+particular the environment variable ANT_HOME should point to the install
+dir of your ant (on linux it is /usr/share/ant):
+
+export ANT_HOME=/usr/share/ant
+
+7. Copy the junit.jar file from [GMA_HOME]/lib, where [GMA_HOME] is the 
+directory you have unjarred the distribution program, to [ANT_HOME]/lib 
+directory.  In your environment variables make sure the gma.jar gets
+put in your CLASSPATH:
+
+export CLASSPATH=lib/gma.jar 
+
+8. Under the directory [GMA_HOME], type "ant". This will install the program 
+by building the source code and conducting unit tests.  Please be patient,
+this may take up to 5 minutes.  When it is done you should get a message
+that says BUILD SUCCESSFUL.
+
+9. Create a config file, possibly starting with one of the samples in
+the config/ subdirectory (see below for more info).  Make sure the
+path names to any #INCLUDE'd config files are correct and either 
+explicit or are in reference to the directory you have chosen for GMA.
+You will probably also need to update the paths to the various
+resource files in your SIMR.config.* file(s). Grep for "<changepath>"
+in the sample config files to identify where the path might need to be
+changed.
+
+10. Once you have installed the program, you are able to use it. For
+this howto we will run GMA directly with java.  Keep in mind that the 
+default behavior is to run both SIMR and GSA, but they can be run 
+separately.
+
+As an alternative you can run the batch file in the bin directory or the 
+shell script depending on your environment.
+
+Note: /tmp will be used for temporary files and unspecified simr output
+files.
+
+========================================================================
+
+II.  how to run GMA
+
+The GMA program takes between two and ten command-line arguments: 
+
+Usage: java gma.GMA [arguments]
+
+where [arguments] are:
+
+	-properties properties
+	required argument; e.g., -properties ./GMA.properties
+
+	-xAxisFile xAxisFile
+	optional argument; e.g., -xAxisFile ./french.txt
+
+	-yAxisFile yAxisFile
+	optional argument; e.g., -yAxisFile ./english.txt
+
+	-simr.outputFile simr.outputFile
+	optional argument; e.g., -simr.outputFile ./simrOutput.txt
+
+	-gsa.outputFile gsa.outputFile
+	optional argument; e.g., -gsa.outputFile ./gsaOutput.txt
+
+Description of each of the arguments:
+
+(1 & 2) the name of your config file.
+
+(3 & 4) xAxisFile and (5 & 6) yAxisFile 
+the names of the two files that contain the two halves
+of your bitext (Make sure they're in the right order!)  These can be
+either text files or pre-generated axis files.  These can also 
+be set in the config files instead of at the command line, but must 
+be in one of the two places, not both. 
+
+(7 & 8) simr.outputFile
+the name of the file where you want the SIMR output stored.
+
+(9 & 10) gsa.outputFile
+the name of the file where you want the GSA output stored.
+
+The xAxisFile will be passed as the first language , the yAxisFile
+as the second.  The order you give your axis files in should correspond to 
+the order of your dictionary entries.  For example, if you are in the directory 
+where GMA is installed, and you have a French/English bitext in files E.text 
+and F.text, you might run GMA as follows:
+
+java gma.GMA -properties config/GMA.config.default -xAxisFile E.text /
+-yAxisFile F.text -simr.outputFile E.F.simr -gsa.outputFile E.F.align
+
+If you do not specify a simr output file the map will be written to 
+/tmp/temp.map
+
+If you do not specify a gsa output file the result will go to std err.
+
+Note to users familiar with older GMA versions:
+Remember that in previous versions of GMA special steps were required to
+save the resulting bitext map produced by SIMR you can now do it straight
+from the command line.
+
+WARNING:
+When using large translation lexicons you may find that java runs out
+of memory.  You can fix this by allocating more memory to the stack and 
+the heap with the switches -Xms128m -Xmx512m. Adding these to the example
+above gives:
+
+EXAMPLE (with resources that come with the package):
+
+java -Xms128m -Xmx512m gma.GMA -properties config/GMA.config.F.E -xAxisFile validation/french-test1.axis -yAxisFile validation/english-test1.axis -simr.outputFile F.E.simr -gsa.outputFile F.E.align
+
+========================================================================
+
+III. how to interpret GMA's output
+
+GMA outputs aligned blocks, one per line.  The two sides of each
+aligned block are separated by the five ASCII characters " <=> ".  When
+multiple segments are involved on one side of an aligned block, they
+are separated by commas.  When one side of an aligned block is empty,
+it is represented by the word "omitted."  E.g., suppose you try to
+align a 6-line text A and a 5-line text B, and GMA outputs
+
+1 <=> 1
+2 <=> 2,3
+3,4,5 <=> omitted
+6 <=> 4
+omitted <=> 5
+
+This means that segment A1 is aligned with segment B1; segment A2 is
+aligned with segments B2 and B3; segments A3, A4, and A5 are not
+aligned with anything; segment A6 is aligned with segment B4; and
+segment B5 is not aligned with anything.
+
+
+========================================================================
+
+
+IV. more information on config files
+
+The config files contain some documentation on each parameter, in the
+hope that these files will be self-explanatory.  More realistically,
+this part of the HOWTO will likely be expanded in the future.
+
+The one thing that needs immediate clarification is that GMA's config
+files can be nested (and the default ones are).  There is one
+top-level file called GMA.config.default.  This file uses #INCLUDE
+statements to make the config file reader load two other config files,
+one specific to SIMR, the other specific to the GSA post-processor.
+Parameters that are common to both processes, such as the
+end-of-segment marker, are set in the top-level config file.
+
+
+========================================================================
+
+V. how to choose a matching predicate for your language pair
+
+A matching predicate is a heuristic for deciding whether two given
+tokens might be mutual translations.  Different matching predicates
+are appropriate for different language pairs.  The matching predicate
+is one of the required parameters in SIMR's config file.  The 
+matchingPredicate parameter must be set to one of the matching 
+predicates that are available in the current implementation. 
+
+These are:
+
+(1) gma.simr.ExactMatching
+    the two tokens are identical
+(2) gma.simr.LcsrMatching            
+    the two tokens exceed the given LCSR threshold
+(3) gma.simr.DictMatching
+    the two tokens appear as an entry in the
+    supplied translation lexicon 
+(4) gma.simr.DictExactMatching		    
+    disjunction of (1) and (3)
+(3) gma.simr.LscrLexMatching   
+    disjunction of (2) and (3)     
+
+Note that (1) is an extreme case of (2)
+
+As the available predicates suggest, the two kinds of information that
+a matching predicate can rely on most often are cognates and
+translation lexicons.
+
+Two tokens in a bitext are orthographic cognates if they have
+the same meaning and similar spellings.  Similarity of spelling can be
+measured in more or less complicated ways.  The matching predicates in
+SIMR's current implementation threshold the Longest Common Subsequence
+Ratio (LCSR).  The LCSR of two tokens is the ratio of the length of
+their longest (not necessarily contiguous) common subsequence (LCS)
+and the length of the longer token.  For example, "gouvernement,"
+which is 12 characters long, has 10 characters that appear in the same
+order in "government."  So, the LCSR for these two words is 10/12.
+On the other hand, the LCSR for "conseil" and "conservative" is
+only 6/12.
+
+When dealing with language pairs that have different alphabets, the
+matching predicate can employ "phonetic cognates."  When language
+L1 borrows a word from language L2, the word is usually written in L1
+similarly to the way it sounds in L2. For many languages, it is not
+difficult to construct an approximate mapping from the orthography to
+its underlying phonological form.  Given such a mapping for L1 and L2,
+it is possible to identify cognates despite incomparable
+orthographies.  If you have such a grapheme to phoneme converter, you
+should embed it in your axis generator (see section V), so that the
+axes list the phonetic forms.  The phonetic forms can then be matched
+by the lcsrcogp matching predicate.
+
+Cognates are more common in bitexts from more similar language pairs,
+and from text genres where more word borrowing occurs, such as
+technical texts.  Even distantly related languages like
+English and Czech will share a large number of orthographic cognates
+in the form of proper nouns, numerals and punctuation.  When one or
+both of the languages involved is written in pictographs, cognates can
+still be found among punctuation and numerals.  However, these kinds
+of cognates are usually too sparse to build an accurate bitext map
+from.
+
+When the matching predicate cannot generate enough candidate
+correspondence points based on cognates, its signal can be
+strengthened by a seed translation lexicon -- a simple list of word
+pairs that are believed to be mutual translations.  Seed translation
+lexicons can be extracted from machine-readable bilingual dictionaries
+(MRBDs) in the rare cases where MRBDs are available.  In other cases,
+they can be constructed automatically or semi-automatically using any
+of several published methods.  A matching predicate based on a seed
+translation lexicon deems two candidate tokens to be mutual
+translations if the token pair appears in the lexicon.  Since the
+matching predicate need not be perfectly accurate, the seed
+translation lexicons need not be perfectly accurate either.  You can
+supply SIMR with a translation lexicon by setting the translationLexicon 
+parameter to its full name (including explicit path).  The translation 
+lexicon should have one equivalence per line.  Each equivalence should 
+have the four characters " <> " (space, less than, greater than, space)
+separating its two halves.  Either half can contain spaces, Unicode,
+or anything else except the center marker " <> ".  
+
+All the matching predicates described above can be fine-tuned with
+stop-lists for one or both languages.  For example, closed-class words
+are unlikely to have cognates.  Indeed, French/English words like "a,"
+"an," "on," and "par" often produce spurious points of correspondence.
+The same problem is caused by "false friends," words with similar
+spellings but different meanings in different languages.  For example,
+the French word "librarie" means "bookstore," not "library," and
+"actuel" means "current," not "actual."  SIMR can use a list of
+closed class words and/or a list of pairs of "false friends" to
+filter out spurious matches.  To pass a list of stopwords to SIMR, put
+them in a file, one word per line, and set the parameters xStopWordFile 
+and/or yStopWordFile to the file's full name (including explicit pathname) 
+in SIMR's config file.
+
+
+========================================================================
+
+VI.  how to create bitext axes for GMA
+
+This subject is dealt with at length in the gma-axis package available
+for download on the main website. Simply put, a text axis consists of all 
+the units of meaning in a text with their positions. 
+
+
+========================================================================
+
+VII. why you must generate end-of-segment markers
+
+This is an important topic that plays a major role in the process that
+converts SIMR's bitext maps to segment alignments. Please refer to the
+gma-axis package for more information.
+
+
+========================================================================
+
+VIII. how to reoptimize SIMR's numerical parameters
+
+This is an involved topic that deserves separate treatment.
+Please visit our website to get the information and resources that will 
+help you reoptimize: http://nlp.cs.nyu.edu/GMA/.
+
+
+Why should you reoptimize?
+The GMA package provides a number of default configuration files for
+different language pairs.  However, the numerical parameters in these
+files were optimized with language-specific resources that are not
+included in the package (because we don't own them).  Therefore, you
+would be well advised to reoptimize for your own text type(s).
+
+
+========================================================================
+
+IX. troubleshooting
+
+Problem:  GMA's accuracy is significantly lower than what has been
+reported for a certain language pair.
+
+Diagnosis 1:  You didn't reoptimize GMA's parameters for your particular
+text type and language-specific resources.
+
+Solution:  Follow the directions in VIII, above.
+
+Diagnosis 2: Your language specific resources are not in the right
+format, and are consequently being underutilized.
+
+Solution:  See resource descriptions in V above and elsewhere.
+
+------------------------------------------------------------------------
+
+Problem:  SIMR runs OK and produces a bitext map, but GSA produces no
+output.
+
+Diagnosis:  It's possible that your config file has carriage returns
+in addition to newlines.  In this case, GSA thinks that the EOSMarker
+parameter includes the trailing carriage return.  If there are no
+carriage returns in the bitext axis, then GSA never sees any
+EOSMarkers.  So it thinks there's nothing to align.
+
+Solution:   Run your config file(s) through the utility crnl2nl
+(available online), to remove the carriage returns and leave just the 
+newlines.
+
+========================================================================
+
+X. how to submit bug reports
+
+First, package up the following in a tarball:
+
+* your two input bitext axes
+* all your config files (there are probably 3 of them)
+* the simr output file, if your run managed to create it
+
+Then go to our bugzilla server at:
+
+http://nlp.cs.nyu.edu/bugzilla
+
+You will need to give your email address in order to get a 
+password, but it is all automated and relatively painless.  
+Once you are logged in, click 'Enter a new Bug', Proteus
+Project and then for the component of the Proteus Project, 
+pick 'GMA'.
+
+Then fill out the form with appropriate values.
+In the 'Description' block you should include:
+
+* the output of `uname -a` and `echo $path`
+* the output of `ls -alt` in the directory where GMA in installed
+* the output of `ls -alt` in the directory where you ran GMA
+* a copy of the exact command you used to run GMA, with all parameters
+
+You may leave the 'Assigned To' field blank.
+Then click the 'Commit' button.
+
+You can now create a new attachment to the bug including:
+
+* the uuencoded compressed tarball
+
+Then click 'Commit' again, please be patient.
+
+
+========================================================================
+
+XI. references
+
+Except for the "Porting" TR, everything is in Dan's book:
+
+I. Dan Melamed (2001). Empirical Methods for Exploiting Parallel
+Texts. MIT Press.
+
+
+Or you can grab individual papers from http://www.cs.nyu.edu/~melamed/pubs.html
+
+I. Dan Melamed (1996). A Geometric Approach to Mapping Bitext
+Correspondence, IRCS Technical Report #96-22, a revised version of the
+paper presented at the First Conference on Empirical Methods in
+Natural Language Processing (EMNLP'96), Philadelphia, PA, May.
+    
+I. Dan Melamed (1996). Automatic Detection of Omissions in
+Translations, IRCS Technical Report #96-23, a revised version of the
+paper presented at the 16th International Conference on Computational
+Linguistics (COLING'96), Copenhagen, Denmark.
+
+I. Dan Melamed (1996). Porting SIMR to New Language Pairs, IRCS
+Technical Report #96-26.
+
+I. Dan Melamed (1997). A Portable Algorithm for Mapping Bitext
+Correspondence, 35th Conference of the Association for Computational
+Linguistics (ACL'97), Madrid, Spain.
+========================================================================
+

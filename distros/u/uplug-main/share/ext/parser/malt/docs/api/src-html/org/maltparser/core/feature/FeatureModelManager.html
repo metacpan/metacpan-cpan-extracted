@@ -1,0 +1,160 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package org.maltparser.core.feature;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import java.io.File;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import java.net.MalformedURLException;<a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.net.URL;<a name="line.5"></a>
+<FONT color="green">006</FONT>    <a name="line.6"></a>
+<FONT color="green">007</FONT>    import org.maltparser.core.config.ConfigurationDir;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import org.maltparser.core.config.ConfigurationRegistry;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import org.maltparser.core.exception.MaltChainedException;<a name="line.9"></a>
+<FONT color="green">010</FONT>    import org.maltparser.core.feature.spec.SpecificationModel;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import org.maltparser.core.feature.spec.SpecificationModels;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import org.maltparser.core.feature.system.FeatureEngine;<a name="line.12"></a>
+<FONT color="green">013</FONT>    <a name="line.13"></a>
+<FONT color="green">014</FONT>    /**<a name="line.14"></a>
+<FONT color="green">015</FONT>    *<a name="line.15"></a>
+<FONT color="green">016</FONT>    *<a name="line.16"></a>
+<FONT color="green">017</FONT>    * @author Johan Hall<a name="line.17"></a>
+<FONT color="green">018</FONT>    */<a name="line.18"></a>
+<FONT color="green">019</FONT>    public class FeatureModelManager {<a name="line.19"></a>
+<FONT color="green">020</FONT>            protected SpecificationModels specModels;<a name="line.20"></a>
+<FONT color="green">021</FONT>            protected FeatureEngine featureEngine;<a name="line.21"></a>
+<FONT color="green">022</FONT>            protected ConfigurationDir configDirectory;<a name="line.22"></a>
+<FONT color="green">023</FONT>    <a name="line.23"></a>
+<FONT color="green">024</FONT>            <a name="line.24"></a>
+<FONT color="green">025</FONT>            public FeatureModelManager(FeatureEngine engine, ConfigurationDir configDirectory) throws MaltChainedException {<a name="line.25"></a>
+<FONT color="green">026</FONT>                    specModels = new SpecificationModels();<a name="line.26"></a>
+<FONT color="green">027</FONT>                    setConfigDirectory(configDirectory);<a name="line.27"></a>
+<FONT color="green">028</FONT>                    setFeatureEngine(engine);<a name="line.28"></a>
+<FONT color="green">029</FONT>            }<a name="line.29"></a>
+<FONT color="green">030</FONT>            <a name="line.30"></a>
+<FONT color="green">031</FONT>            private URL findURL(String specModelFileName) throws MaltChainedException {<a name="line.31"></a>
+<FONT color="green">032</FONT>                    URL url = null;<a name="line.32"></a>
+<FONT color="green">033</FONT>                    File specFile = configDirectory.getFile(specModelFileName);<a name="line.33"></a>
+<FONT color="green">034</FONT>                    if (specFile.exists()) {<a name="line.34"></a>
+<FONT color="green">035</FONT>                            try {<a name="line.35"></a>
+<FONT color="green">036</FONT>                                    url = new URL("file:///"+specFile.getAbsolutePath());<a name="line.36"></a>
+<FONT color="green">037</FONT>                            } catch (MalformedURLException e) {<a name="line.37"></a>
+<FONT color="green">038</FONT>                                    throw new MaltChainedException("Malformed URL: "+specFile, e);<a name="line.38"></a>
+<FONT color="green">039</FONT>                            }<a name="line.39"></a>
+<FONT color="green">040</FONT>                    } else {<a name="line.40"></a>
+<FONT color="green">041</FONT>                            url = configDirectory.getConfigFileEntryURL(specModelFileName);<a name="line.41"></a>
+<FONT color="green">042</FONT>                    }<a name="line.42"></a>
+<FONT color="green">043</FONT>                    return url;<a name="line.43"></a>
+<FONT color="green">044</FONT>            }<a name="line.44"></a>
+<FONT color="green">045</FONT>            <a name="line.45"></a>
+<FONT color="green">046</FONT>            public void loadSpecification(String specModelFileName) throws MaltChainedException {<a name="line.46"></a>
+<FONT color="green">047</FONT>                    specModels.load(findURL(specModelFileName));<a name="line.47"></a>
+<FONT color="green">048</FONT>            }<a name="line.48"></a>
+<FONT color="green">049</FONT>    <a name="line.49"></a>
+<FONT color="green">050</FONT>            <a name="line.50"></a>
+<FONT color="green">051</FONT>            public void loadParSpecification(String specModelFileName, String markingStrategy, String coveredRoot) throws MaltChainedException {<a name="line.51"></a>
+<FONT color="green">052</FONT>                    specModels.loadParReader(findURL(specModelFileName), markingStrategy, coveredRoot);<a name="line.52"></a>
+<FONT color="green">053</FONT>            }<a name="line.53"></a>
+<FONT color="green">054</FONT>            <a name="line.54"></a>
+<FONT color="green">055</FONT>            public FeatureModel getFeatureModel(String specModelURL, int specModelUrlIndex, ConfigurationRegistry registry) throws MaltChainedException {<a name="line.55"></a>
+<FONT color="green">056</FONT>                    return new FeatureModel(specModels.getSpecificationModel(findURL(specModelURL), specModelUrlIndex), registry, featureEngine);<a name="line.56"></a>
+<FONT color="green">057</FONT>            }<a name="line.57"></a>
+<FONT color="green">058</FONT>            <a name="line.58"></a>
+<FONT color="green">059</FONT>            public FeatureModel getFeatureModel(String specModelURL, ConfigurationRegistry registry) throws MaltChainedException {<a name="line.59"></a>
+<FONT color="green">060</FONT>                    return new FeatureModel(specModels.getSpecificationModel(findURL(specModelURL), 0), registry, featureEngine);<a name="line.60"></a>
+<FONT color="green">061</FONT>            }<a name="line.61"></a>
+<FONT color="green">062</FONT>            <a name="line.62"></a>
+<FONT color="green">063</FONT>            public FeatureModel getFeatureModel(SpecificationModel specModel, ConfigurationRegistry registry) throws MaltChainedException {<a name="line.63"></a>
+<FONT color="green">064</FONT>                    return new FeatureModel(specModel, registry, featureEngine);<a name="line.64"></a>
+<FONT color="green">065</FONT>            }<a name="line.65"></a>
+<FONT color="green">066</FONT>            <a name="line.66"></a>
+<FONT color="green">067</FONT>            public SpecificationModels getSpecModels() {<a name="line.67"></a>
+<FONT color="green">068</FONT>                    return specModels;<a name="line.68"></a>
+<FONT color="green">069</FONT>            }<a name="line.69"></a>
+<FONT color="green">070</FONT>    <a name="line.70"></a>
+<FONT color="green">071</FONT>            protected void setSpecModels(SpecificationModels specModel) {<a name="line.71"></a>
+<FONT color="green">072</FONT>                    this.specModels = specModel;<a name="line.72"></a>
+<FONT color="green">073</FONT>            }<a name="line.73"></a>
+<FONT color="green">074</FONT>            <a name="line.74"></a>
+<FONT color="green">075</FONT>            public FeatureEngine getFeatureEngine() {<a name="line.75"></a>
+<FONT color="green">076</FONT>                    return featureEngine;<a name="line.76"></a>
+<FONT color="green">077</FONT>            }<a name="line.77"></a>
+<FONT color="green">078</FONT>    <a name="line.78"></a>
+<FONT color="green">079</FONT>            public void setFeatureEngine(FeatureEngine featureEngine) {<a name="line.79"></a>
+<FONT color="green">080</FONT>                    this.featureEngine = featureEngine;<a name="line.80"></a>
+<FONT color="green">081</FONT>            }<a name="line.81"></a>
+<FONT color="green">082</FONT>    <a name="line.82"></a>
+<FONT color="green">083</FONT>            public ConfigurationDir getConfigDirectory() {<a name="line.83"></a>
+<FONT color="green">084</FONT>                    return configDirectory;<a name="line.84"></a>
+<FONT color="green">085</FONT>            }<a name="line.85"></a>
+<FONT color="green">086</FONT>    <a name="line.86"></a>
+<FONT color="green">087</FONT>            public void setConfigDirectory(ConfigurationDir configDirectory) {<a name="line.87"></a>
+<FONT color="green">088</FONT>                    this.configDirectory = configDirectory;<a name="line.88"></a>
+<FONT color="green">089</FONT>            }<a name="line.89"></a>
+<FONT color="green">090</FONT>    <a name="line.90"></a>
+<FONT color="green">091</FONT>            public String toString() {<a name="line.91"></a>
+<FONT color="green">092</FONT>                    return specModels.toString();<a name="line.92"></a>
+<FONT color="green">093</FONT>            }<a name="line.93"></a>
+<FONT color="green">094</FONT>    }<a name="line.94"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

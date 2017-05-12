@@ -1,0 +1,168 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id$
+#
+# summarizes recall, precision, F from all *eval* files in the current DIR
+#
+# usage: summarize-eval [OPTIONS] [FILES]
+#
+#  OPTIONS:  -s sort-key ............. specify sorting key (default: F)
+#                                      (mtime = modification time)
+#  FILES: evaluation files to be checked
+#
+
+
+use File::stat;
+
+
+my $sort='F';
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift(@ARGV);
+    if ($opt=~/^\-s/){
+	$sort=shift(@ARGV);
+    }
+}
+my @files=@ARGV;
+if (not @files){
+    opendir(DIR, '.');
+    @files = grep { /\.eval/ } readdir(DIR);
+    closedir DIR;
+}
+
+
+my %s;
+
+foreach my $f (@files){
+    chomp $f;
+    if (not -f $f){next;}
+    my $filestat=stat($f);
+    my @result=();
+    if ($f=~/\.gz$/){
+#	@result=`gzip -cd $f \| grep -A2 'recall:'`;
+	@result=`gzip -cd $f \| grep -A13 'size of gold standard:'`;
+    }
+    else{
+#	@result=`grep -A2 'recall:' $f`;
+	@result=`grep -A13 'size of gold standard:' $f`;
+    }
+    $f=~s/links\.//g;
+    $f=~s/\.xml//g;
+    $f=~s/\.eval//g;
+    $f=~s/\.gz//g;
+    if ($result[0]=~/size of gold standard:\s+([0-9]+)[\s\,]/s){$s{$f}{N}=$1;}
+    if ($result[-3]=~/recall:\s+([0-9\.]+)\%/s){$s{$f}{R}=$1;}
+    if ($result[-2]=~/precision:\s+([0-9\.]+)\%/s){$s{$f}{P}=$1;}
+    if ($result[-1]=~/F:\s+([0-9\.]+)\%/s){$s{$f}{F}=$1;}
+
+    if ($result[-6]=~/links:\s+([0-9]+)\,/s){$s{$f}{incorrect}=$1;}
+    if ($result[-7]=~/links:\s+([0-9]+)\,/s){$s{$f}{partial}=$1;}
+    if ($result[-8]=~/links:\s+([0-9]+)\,/s){$s{$f}{correct}=$1;}
+    $s{$f}{mtime}=$filestat->mtime;
+}
+
+if ($sort eq 'mtime'){
+    print "   P      R      F  (time) - ";
+    print scalar @files;
+    print " files found, sorted by mtime\n";
+    foreach (sort {$s{$a}{mtime} <=> $s{$b}{mtime}} keys %s){
+	printf "%3.2f  %3.2f  %3.2f (%d) %s\n",
+	$s{$_}{P},$s{$_}{R},$s{$_}{F},$s{$_}{mtime},$_;
+    }
+}
+elsif ($sort eq 'correct'){
+    print " correct partial wrong (size) - ";
+    print scalar @files;
+    print " files found, sorted by mtime\n";
+    foreach (sort {$s{$b}{correct} <=> $s{$a}{correct}} keys %s){
+	printf "%5d  %5d  %5d (%d) %s\n",
+	$s{$_}{correct},$s{$_}{partial},$s{$_}{incorrect},$s{$_}{N},$_;
+    }
+}
+elsif ($sort eq 'partial'){
+    print " correct partial wrong (size) - ";
+    print scalar @files;
+    print " files found, sorted by mtime\n";
+    foreach (sort {$s{$b}{partial} <=> $s{$a}{partial}} keys %s){
+	printf "%5d  %5d  %5d (%d) %s\n",
+	$s{$_}{correct},$s{$_}{partial},$s{$_}{incorrect},$s{$_}{N},$_;
+    }
+}
+else{
+    print "   P      R      F   time - ";
+    print scalar @files;
+    print " files found, sorted by F-scores\n";
+    foreach (sort {$s{$b}{F} <=> $s{$a}{F}} keys %s){
+	printf "%3.2f  %3.2f  %3.2f  (%d) %s\n",
+	$s{$_}{P},$s{$_}{R},$s{$_}{F},$s{$_}{N},$_;
+    }
+}
+
+exit;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+opendir(DIR, '.');
+my @files = grep { /\.eval/ } readdir(DIR);
+closedir DIR;
+# my @files=`ls *eval*`;
+
+my %s;
+
+foreach my $f (@files){
+    chomp $f;
+    if (not -f $f){next;}
+    my @result=();
+    if ($f=~/\.gz$/){
+#	@result=`gzip -cd $f \| grep -A2 'recall:'`;
+	@result=`gzip -cd $f \| grep -A13 'size of gold standard:'`;
+    }
+    else{
+#	@result=`grep -A2 'recall:' $f`;
+	@result=`grep -A13 'size of gold standard:' $f`;
+    }
+    $f=~s/links\.//g;
+    $f=~s/\.xml//g;
+    $f=~s/\.eval//g;
+    $f=~s/\.gz//g;
+    if ($result[0]=~/size of gold standard:\s+([0-9]+)[\s\,]/s){$s{$f}{N}=$1;}
+    if ($result[-3]=~/recall:\s+([0-9\.]+)\%/s){$s{$f}{R}=$1;}
+    if ($result[-2]=~/precision:\s+([0-9\.]+)\%/s){$s{$f}{P}=$1;}
+    if ($result[-1]=~/F:\s+([0-9\.]+)\%/s){$s{$f}{F}=$1;}
+}
+
+print "   P      R      F  (size) - ";
+print scalar @files;
+print " files found, sorted by F-scores\n";
+foreach (sort {$s{$b}{F} <=> $s{$a}{F}} keys %s){
+    printf "%3.2f  %3.2f  %3.2f (%d) %s\n",
+    $s{$_}{P},$s{$_}{R},$s{$_}{F},$s{$_}{N},$_;
+}
+
+

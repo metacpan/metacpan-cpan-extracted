@@ -1,0 +1,123 @@
+
+== NAME ==
+
+Uplug - a toolbox for processing (parallel) text corpora
+
+
+== SYNOPSIS ==
+
+
+{{{
+  $module = 'pre/basic';
+  %args = ( '-in' => $input_file_name,
+            '-ci' => $input_char_encoding );
+
+  my $uplug=Uplug->new($module, %args);   # create a new uplug module
+  $uplug->load();                         # load it
+  $uplug->run();                          # and run it
+}}}
+
+== DESCRIPTION ==
+
+This library provides the main methods for loading Uplug modules and running them. Configuration files describe the module and its parameters (see Uplug::Config). Each module may contain a number of sub-modules. Each of them can usually calls the uplug scripts provided in the package.
+
+
+== USAGE ==
+
+More information on how to use the Uplug toolkit with the provided modules can be found here: uplug
+
+Add-ons and language-specific modules can be downloaded from the Uplug project website at bitbucket: https://bitbucket.org/tiedemann/uplug
+
+
+== Class methods ==
+
+
+=== Constructor ===
+
+
+{{{
+ $uplug = new Uplug ( $module, %args )
+}}}
+Construct a new Uplug object for the given Uplug module ($module refers to a configuration file). Module arguments are specified in **%args** and depend on the module. For more information about specific Uplug modules, use the Uplug startup script:
+
+
+{{{
+ uplug -h module-name
+}}}
+
+=== **load** ===
+
+
+{{{
+ $uplug->load()
+}}}
+Load the module given in the constructor and all its sub-modules. This also creates temporary configuration files with adjusted parameters in **data/runtime**.
+
+
+=== **run** ===
+
+
+{{{
+ $uplug->run()
+}}}
+Run all commands specified in all sub-modules. Pipeline commands will be constructed according to the sequence of sub-modules and the specifications in the Uplug configuration files. The will be simply executed as external system calls.
+
+
+== Class-internal methods ==
+
+
+=== **loadSubMods** ===
+
+Load all sub-modules and adjust input and output according to the configuration files and the current pipe-line. Output streams will be used as input streams with the same name for the next sub-module. This method tries to find possible pipelines for combining commands.
+
+
+=== **command** ===
+
+
+{{{
+ $cmd = $uplug->command()
+}}}
+Return a sequence of system commands for the entire pipeline. Commands are separated by ';'. System command may include several pipelines through STDIN/STDOUT.
+
+
+=== **input** ===
+
+Change the input settings in a particular configuration.
+
+
+=== **output** ===
+
+Change the output settings in a particular configuration.
+
+
+=== **data** ===
+
+Set/return data files available in the current pipeline.
+
+
+=== **stdin** ===
+
+Check whether their is an input stream that can read from STDIN.
+
+
+=== **stdout** ===
+
+Check whether their is an output stream that can write to STDOUT.
+
+
+=== FileInUse ===
+
+Checks whether a particular file is already in use in the current pipeline (avoids writing over files that a command still reads from).
+
+
+=== **NewTempFile** ===
+
+Return a new temporary file (in data/runtime).
+
+
+== SEE ALSO ==
+
+uplug, Uplug::Config, Uplug::IO::Any
+
+For the latest sources, language packs, additional modules and tools: Please, have a look at the project website at https://bitbucket.org/tiedemann/uplug
+

@@ -1,0 +1,45 @@
+{
+   "abstract" : "use a Perl module unless a condition holds",
+   "author" : [
+      "Ilya Zakharevich <ilyaz@cpan.org>",
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "unless",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/unless",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/unless.git",
+         "web" : "https://github.com/bingos/unless"
+      }
+   },
+   "version" : "0.06"
+}
+

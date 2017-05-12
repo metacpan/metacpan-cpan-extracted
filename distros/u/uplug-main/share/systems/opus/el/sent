@@ -1,0 +1,95 @@
+{
+  'encoding' => 'iso-8859-1',
+  'module' => {
+    'name' => 'sentence splitter',
+    'program' => 'uplug-split',
+    'location' => '$UplugBin',
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This is a simple sentence splitter which splits
+  paragraphs into sentences at positions which match simple regular
+  expressions. Basically, it adds sentence boundary tags after common
+  punctuation marks [.!?¿:] which are followed by at least one
+  white-space character and a capital letter or the end of the
+  string. Obviously, this will not work properly for all cases and all
+  languages.',
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'write_mode' => 'overwrite',
+	'status' => 'sent',
+	'root' => 's'
+    }
+  },
+  'parameter' => {
+    'segments' => {
+       'tag' => 's',
+       'add IDs' => 1,
+	'add parent id' => 1,
+    },
+    'split pattern' => {
+
+       # 10: full stop + maybe ["'] + 0 or more whitespaces + end-of-line
+       # 20: full stop + 
+       #     maybe ["'] + 
+       #     1 or more whitespaces + 
+       #     maybe ["'] +
+       #     (upper case letter|number|opening punctuation)
+
+       10 => '([\.\!\?\:\;][\"\']?)\s*(\Z)',
+       20 => '([\.\!\?\:\;][\"\']?)\s+([\"\']?[\¿\¡\p{Lu}\p{N}\p{Ps}])',
+#       30 => '(\A)\s*(\-\s+)',
+
+    },
+    'exceptions' => {
+#       't.ex.' => 'abbr',
+#	'el.' => 'abbr',
+    },
+    'word delimiter' => {
+       'exceptions' => '\b',
+    },
+    'runtime' => {
+       'verbose' => 0,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'infile' => 'input:text:file',
+       'informat' => 'input:text:format',
+       'indoc' => 'input:text:DocRootTag',
+       'inhead' => 'input:text:DocHeaderTag',
+       'inbody' => 'input:text:DocBodyTag',
+       'inroot' => 'input:text:root',
+       'r' => 'input:text:root',
+       'out' => 'output:text:file',
+       'o' => 'output:text:file',
+       'outfile' => 'output:text:file',
+       'outformat' => 'output:text:format',
+       'outenc' => 'output:text:encoding',
+       'outbody' => 'output:text:DocBodyTag',
+       'char' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'span' => 'parameter:segments:add spans',
+       'id' => 'parameter:segments:add IDs',
+       'space' => 'parameter:segments:keep spaces',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+       'v' => 'parameter:runtime:verbose'
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=markup)'
+	  },
+       },
+  }
+}

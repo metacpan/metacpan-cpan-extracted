@@ -1,0 +1,45 @@
+{
+  'module' => {
+    'name' => 'Spanish pre-processing',
+    'submodules' => [
+        'pre/es/tagSvmTool',
+#        'pre/es/tagMBT',
+        'pre/es/malt',
+    ],
+    'submodule names' => [
+        'POS tagger (SVMTool)',
+#        'POS tagger (MBT)',
+        'dependency parser (malt)',
+    ],
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'chunk'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+	'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=sv)'
+	  },
+       },
+  }
+}

@@ -1,0 +1,352 @@
+=head1 NAME
+
+urpmq - urpmi database query tool.
+
+=head1 SYNOPSIS
+
+    urpmq [options] [package_names | rpm_files...]
+
+=head1 DESCRIPTION
+
+urpmq is a tool to access and query the urpmi database. It can be used to
+list available packages in the various urpmi media, or to list the full
+dependencies of a package, or to list the packages that will be installed
+if you start urpmi. The output of urpmq has the following format, adjusted
+according to the command-line options that were used:
+
+    [group/]package_name[-version][-release][.arch]
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+Prints a help message and exit (this is the same as B<-h> or B<-?>).
+
+=item B<--list>
+
+List available packages.
+
+=item B<--list-media> [I<type>]
+
+List available media. You can optionally add a type selector: B<all> to
+list all media (the default), B<update> to list the update media, or
+B<active> to list only active media.
+
+=item B<--list-url>
+
+List available media and their URLs.
+
+=item B<--list-nodes>
+
+List available nodes for parallel installation (when using B<--parallel>).
+
+=item B<--list-aliases>
+
+List available parallel aliases.
+
+=item B<--update>
+
+Use only update media. This means that urpmq will search and resolve
+dependencies only in media marked as containing updates (e.g. which have
+been created with C<urpmi.addmedia --update>).
+
+=item B<--media> I<media1,...,mediaN>
+
+Select specific media to be used, instead of defaulting
+to all available media (or all update media if B<--update> is used).
+No rpm will be found in other media.
+
+=item B<--excludemedia> I<media1,...,mediaN>
+
+Do not use the specified media.
+
+=item B<--searchmedia> I<media>
+
+Use only the specified media to search for packages that are specified on
+the command-line, or which are found when using B<--auto-select>.
+Dependencies of those packages can still be found in other media.
+
+=item B<--sortmedia> I<media1,...,mediaN>
+
+Sort the specified media. Substrings may be used to simplify grouping.
+This way, C<media1> will be taken into account first, then C<media2>, and
+so on. Media which aren't listed are taken into account after the others.
+
+=item B<--synthesis> I<file>
+
+Use the specified synthesis file instead of the urpmi database for
+searching packages and resolving dependencies.
+
+=item B<--auto-select>
+
+Select all packages that can be upgraded, according to already installed
+packages and packages listed in various registered media.
+
+=item B<--auto-orphans>
+
+List orphans.
+
+=item B<--not-available>
+
+List packages that are not available on any media. This can help to find
+packages that are still installed but that are now obsolete because they
+have been removed from the current version of Mageia Linux.
+
+=item B<--no-suggests>
+
+With this option, urpmq will not require "suggested" packages. 
+By default, urpmq will require (newly) suggested packages.
+
+=item B<--allow-suggests>
+
+With this option, urpmi will install "suggested" packages. 
+This is useful if you have C<no-suggests> in urpmi.cfg.
+
+=item B<--keep>
+
+When some dependencies cannot be satisfied,
+change the selection of packages to try to keep existing packages instead
+of removing them. This behaviour generally rejects the upgrade of packages
+given on command line (or when using B<--auto-select>) when a dependency error
+occurs.
+
+=item B<--fuzzy>
+
+Disable fast search on exact package name; i.e. it will propose
+all packages matching the name partially, even if one of them matches exactly
+the specified name (this is the same as B<-y>).
+
+=item B<--src> I<name>
+
+Search a source package
+matching I<name> and it will select all dependencies by default.
+
+=item B<--sources>
+
+Prints source URLs (or file names) of all selected
+packages.
+
+=item B<--force>
+
+Continue when requesting packages that are not available.
+
+=item B<--ignorearch>
+
+Allow to search packages whose architecture isn't compatible with the
+architecture of the host.
+
+=item B<--parallel> I<alias>
+
+Activate distributed execution of urpmi to other machines (it is mandatory
+that urpmi is installed but it is not necessary to have media defined on
+any machines). I<alias> defines which extension module to use by urpmi
+(currently urpmi-parallel-ka-run or urpmi-parallel-ssh) and which
+machines should be updated, this alias is defined in the file
+F</etc/urpmi/parallel.cfg> as described below.
+
+=item B<--root> I<directory>
+
+Use the file system tree rooted for rpm install. All operations and
+scripts will run after chroot(2). The rpm database in the rooted tree
+will be used but urpmi configuration comes from normal system.
+
+=item B<--urpmi-root> I<directory>
+
+Use the file system tree rooted for urpmi database and rpm install. Contrary
+to B<--root>, the urpmi configuration comes from the rooted tree.
+
+=item B<--wget>
+
+Use wget for downloading distant files. By default curl
+is used if available, or wget instead.
+
+=item B<--curl>
+
+Use curl for downloading distant files. By default curl is used if
+available, or wget instead.
+
+=item B<--curl-options> I<'options'>
+
+=item B<--rsync-options> I<'options'>
+
+=item B<--wget-options> I<'options'>
+
+Specify additional command-line options to be passed to curl, rsync or
+wget when retrieving files. If several options are to be passed, separate
+them with spaces and enclose them in quotes.
+
+Note that the rsync options will also be used for ssh media.
+
+=item B<--proxy> I<proxyhost[:port|1080]>
+
+Use specified HTTP proxy.
+
+=item B<--proxy-user> I<user:password>
+
+Use specified user and password to use for proxy authentication.
+Specifying B<--proxy-user=ask> will cause urpmq to prompt for a username
+and a password.
+
+=item B<--use-distrib> I<directory>
+
+Configure urpmq on the fly from a distribution tree.
+
+=item B<--env> I<directory>
+
+Use a different environment directly from a bug report to replay a bug.
+The argument is the same argument given to B<--bug> option.
+
+=item B<--skip> I<pattern,...>
+
+You can specify a list of packages which installation should be skipped.
+You can also include patterns between //, just like in
+F</etc/urpmi/skip.list> (see urpmi.files(5)).
+
+=item B<--prefer> I<pattern,...>
+
+You can specify a list of packages which installation should be preferred
+(especially useful with B<--auto>).
+You can also include patterns between //, just like in
+F</etc/urpmi/prefer.list> (see urpmi.files(5)).
+
+=item B<--wait-lock>
+
+If the urpmi or rpm db is busy, wait until it is available
+
+=item B<--changelog>
+
+Prints the package changelog.
+
+=item B<--conflicts>
+
+Prints the package conflicts.
+
+=item B<--obsoletes>
+
+Prints the package obsoletes.
+
+=item B<--provides>
+
+Prints the package provides.
+
+=item B<--requires>
+
+Prints the package requires.
+
+=item B<--suggests>
+
+Prints the package suggests.
+
+=item B<--sourcerpm>
+
+Prints the sourcerpm of the package
+
+=item B<--summary>
+
+Prints concise information about the package.
+
+=item B<--verbose>
+
+Activate verbose mode.
+
+=item B<-v>
+
+This is the same as B<--verbose>.
+
+=item B<-d>
+
+This is the same as B<--requires-recursive>.
+
+=item B<-u>
+
+Deselect packages if a better version is already installed.
+
+=item B<-m>
+
+Equivalent to B<-du>.
+
+=item B<-a>
+
+Select all matches on command line; that's useful when one gives an
+incomplete package name and when using B<-f> or B<-r>.
+
+=item B<-c>
+
+If maximal closure is used, assume that a package listed may have wrong or
+not up-to-date dependencies. This causes more packages to be upgraded and
+may correct unresolved dependencies on the rpm database.
+
+=item B<--requires-recursive>
+
+Print dependencies (maximal closure).
+
+=item B<--whatprovides>
+
+Search in provides to find package.
+
+=item B<--whatrequires>
+
+Reverse search to what requires the package given.
+
+=item B<--whatrequires-recursive>
+
+Reverse search to what requires recursively the package given
+(looking through virtual packages).
+
+=item B<-S>
+
+Same as B<--summary>.
+
+=item B<-y>
+
+This is the same as B<--fuzzy>.
+
+=item B<-Y>
+
+Like B<-y>, but forces to match case-insensitively.
+
+=item B<-s>
+
+This is the same as B<--src>.
+
+=item B<-p>
+
+This is the same as B<--whatprovides>.
+
+=item B<-i>
+
+Prints useful information in human readable form, as for I<rpm -qi>.
+
+=item B<-g>
+
+Prints groups of each package listed.
+
+=item B<-r>
+
+Prints also version and release of each package listed.
+
+=item B<-f>
+
+Prints also version, release and arch of each package listed.
+
+=item B<-l>
+
+Lists files in packages.
+
+=back
+
+=head1 FILES
+
+See urpmi.files(5).
+
+=head1 SEE ALSO
+
+urpmi.addmedia(8), urpmi.update(8), urpmi.removemedia(8), urpmf(8),
+urpmi(8), urpmi.files(5).
+
+=head1 AUTHOR
+
+Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+FranE<ccedil>ois Pons, Rafael Garcia-Suarez 

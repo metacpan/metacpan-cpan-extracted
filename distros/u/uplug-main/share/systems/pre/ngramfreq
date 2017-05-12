@@ -1,0 +1,74 @@
+{
+  'module' => {
+    'name' => 'N-gram frequencies',
+    'program' => 'uplug-ngramfreq',
+    'location' => '$UplugBin',
+    'stin' => 'text',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'write_mode' => 'write',
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'ngram freq' => {
+      'stream name' => 'ngram freq',
+#      'format' => 'DBM',
+#      'key' => ['token'],
+#      'write_mode' => 'overwrite',
+    },
+  },
+  'parameter' => {
+    'token' => {
+
+    #------------------------------------------------------------------
+    # token features
+    #     define contextual features for counting
+    #     for example:
+    #
+    # 'features' => {
+    #   'pos' => undef,              # POS-attribute of the current token
+    #   'left:pos' => '^(..).*$$1', # 1st 2 char's of POS of the left neighbor
+    #   '#text' => '(.{4})$$1',     # last 4 char's of the word itself
+    #   'c.*:right:type' => undef,   # type attribute of a right neighbor
+    # },                             #    of a parent-tag that starts with 'c'
+    #
+    #------------------------------------------------------------------
+
+      'minimal frequency' => 2,
+      'minimal length' => 1,
+      'minimal ngram length' => 2,
+      'maximal ngram length' => 4,
+      'use attribute' => 'stem',
+#      'grep token' => 'contains alphabetic',
+      'lower case' => 1,
+      'exclude stop words' => 0,
+      'language' => 'default',
+      'token label' => 'w',
+    },
+    'runtime' => {
+      'print progress' => 1,
+      'max nr of segments' => 0,
+      'buffer' => 10000000,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'infile' => 'input:text:file',
+       'informat' => 'input:text:format',
+       'maxseg' => 'parameter:runtime:max nr of segments',
+       'max' => 'parameter:token:maximal ngram length',
+       'min' => 'parameter:token:minimal ngram length',
+       'out' => 'output:ngram freq:file',
+       'freq' => 'output:ngram freq:file',
+       'ngram' => 'output:ngram freq:file',
+       'lang' => 'parameter:token:language',
+       'a' => 'parameter:token:use attribute',
+    }
+  },
+}
+

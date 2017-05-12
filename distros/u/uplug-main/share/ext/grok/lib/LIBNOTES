@@ -1,0 +1,89 @@
+This file briefly describes some of the libraries which are used by
+Grok. For libraries which are distributed under the terms of the LGPL,
+please see the file LGPL in this directory for details. For those
+distributed under the Apache Software License, please see the file
+ASL.
+
+------------------------------------------------------------------------
+ant.jar 
+
+The Jakarta Ant Build System, version 1.4
+Homepage: http://jakarta.apache.org/ant/
+License: Apache Software License
+
+A Java based build tool. It is supported by crimson.jar and jaxp.jar,
+and license information for those is included in this directory.
+
+
+------------------------------------------------------------------------
+hylo.jar
+
+The Java Hybrid Logic API, version 0.2.0
+Homepage: http://opennlp.sf.net
+License: LGPL
+
+A Java API for data structures representing terms of hybrid logic. See
+http://www.hylo.net for more info on hybrid logic in general.
+
+
+------------------------------------------------------------------------
+java-getopt.jar
+
+The GNU Java Getopt Package, version 1.0.8
+Homepage: http://www.urbanophile.com/arenn/hacking/download.html
+License: LGPL
+
+A Java command line option parser.
+
+
+------------------------------------------------------------------------
+jdom.jar
+
+JDOM, version 1.0 beta 7
+Homepage: http://www.jdom.org
+License: see jdom.license
+
+A complete, Java-based solution for accessing, manipulating, and
+outputting XML data from Java code
+
+
+------------------------------------------------------------------------
+maxent.jar:
+
+The OpenNLP Maxent Package, version 1.2.10
+Homepage: http://maxent.sf.net
+License: LGPL
+
+A Java library for training and using statistical models using maximum
+entropy.
+
+
+------------------------------------------------------------------------
+opennlp.jar
+
+The OpenNLP API, version 0.8.3
+Homepage: http://opennlp.sf.net
+License: LGPL
+
+A Java API defining the behavior of a many components of a NLP system.
+
+
+------------------------------------------------------------------------
+trove.jar
+
+GNU Trove, version 0.1.4
+Homepage: http://trove4j.sf.net
+License: LGPL
+
+High performance collections for Java.
+
+
+------------------------------------------------------------------------
+xerces.jar
+
+The Xerces Java Parser for XML, version 1.4.3
+Homepage: http://xml.apache.org/xerces-j/
+License: Apache Software License
+
+Java parser for XML.
+

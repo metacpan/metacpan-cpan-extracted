@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                uny2k
+version:             19.1080828
+abstract:            ~
+license:             perl
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Test::More:                    0.08
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

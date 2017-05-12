@@ -1,0 +1,62 @@
+{
+  'module' => {
+    'name' => 'The clue aligner',
+    'submodules' => [
+        'align/word/basicclues',
+        'align/word/GIZA/giza-word-refined -c 1 -out giza-refined.links',
+        'align/word/dynamicclues -in giza-refined.links',
+        'align/word/GIZA/gizaclue-pos',
+        'align/word/GIZA/gizaclue-word-prefix',
+#        'align/word/GIZA/gizaclue-word',
+#        'align/word/GIZA/gizaclue-pos-word',
+#        'align/word/GIZA/gizaclue-word-suffix',
+        'align/word/sven/link -adj',
+        'align/word/dynamicclues',
+        'align/word/sven/link -adj',
+	],
+    'loop' => '6:7',
+    'iterations' => '3',
+  },
+  'description' => 'The clue aligner runs several sub-modules:
+    <ul><li>basicclues: computes basic alignment clues using association
+        measures
+	<li>giza: runs GIZA++ and converts the lexical probabilities to the
+	clue aligner format
+	<li>link: clue alignment using basic clues and the giza clue
+	<li>learnclues: learns clues from previously aligned data
+	<li>link: clue alignment using all clues (basic, giza, learned)
+    <ul><p>Note: Word alignment may take quite a while. Processing time
+     depends on the size of the corpus and on the processing load on the
+     local computer system. UplugWeb processes do not have the highest
+     priority on the local machines! Alignment results will be send to
+     you by e-mail.',
+  'input' => {
+    'bitext' => {
+      'format' => 'xces align',
+    }
+  },
+  'output' => {
+    'bitext' => {
+      'format' => 'xces align',
+      'write_mode' => 'overwrite',
+      'status' => 'word',
+      'SkipSrcFile' => 1,
+      'SkipTrgFile' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'iter' => 'module:iterations',
+       'in' => 'input:bitext:file',
+       'out' => 'output:bitext:file',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'bitext' => {
+	    'stream name' => 'stream(format=xces align,status=sent)'
+	  },
+       },
+  }
+}
+

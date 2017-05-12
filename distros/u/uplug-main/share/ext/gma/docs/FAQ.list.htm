@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+  <HEAD>
+    <META NAME="ROBOTS" CONTENT="NONE">
+    <TITLE>FAQ list for the GMA software package</TITLE>
+  </HEAD>
+  <BODY>
+
+<h1>Frequently Asked Questions List for GMA</h1>
+<br>
+last updated: May 17, 2004
+
+<div>
+<br>
+<br>
+<h2><b>Table of Contents:</b></h2>
+<h2><b>I. Administrative</b></h2>
+<OL>
+<LI>
+    <a href="FAQ.list.htm#1.1">How can I make sure that the GMA
+    package I received is genuine?</a><br> 
+
+<LI>    <a href="FAQ.list.htm#1.2">How do I sign up for the GMA
+email list(s)?</a>
+<LI>    <a href="FAQ.list.htm#1.3">I found a bug! How do i report it?</a>
+<LI>    <a href="FAQ.list.htm#1.4">What is a release candidate and which version of GMA should i choose?</a>
+</OL>
+
+<h2><b>II. Technical</b></h2>
+<OL>
+<LI>    
+<a href="FAQ.list.htm#3.1">What is "mapping bitext correspondence" and
+	    how does it differ from inducing translation models?</a>
+<LI>
+<a href="FAQ.list.htm#3.2">On what platforms does GMA run?</a>
+<LI>
+<a href="FAQ.list.htm#3.3">How efficient is GMA?</a><br>
+<LI>
+<a href="FAQ.list.htm#3.4">What language pairs can GMA be used for?</a></b>
+<LI>
+<a href="FAQ.list.htm#3.5">What language-specific resources are
+required/desirable for use with GMA?  What language-specific resources
+are included with this package?</a><br>
+<LI>
+<a href="FAQ.list.htm#3.6">When should I re-optimize the GMA
+parameters?</a><br>
+<LI>
+    <a href="FAQ.list.htm#3.last">Where can I learn more about how
+      SIMR and GSA work?</a><br>
+</OL>
+</div>
+<hr>
+
+<div>
+
+<h2>I. Administrative</h2>
+<OL>
+
+
+<BR><BR><LI> <b><a name="1.1">How can I make sure that the GMA package I received is genuine?</a></b> <BR>
+
+Verify the md5sum of the package against the md5sum listed for that package on the main download page.
+
+
+<BR><BR><LI> <b><a name="1.2">How do I sign up for the GMA email lists?</a></b> <BR>
+
+You can use the web-based interface to (un)subscribe to the moderated
+<a
+href="http://www.cs.nyu.edu/mailman/listinfo/GMA-announce">GMA-announce
+	  list</a>
+and the unmoderated <a
+href="http://www.cs.nyu.edu/mailman/listinfo/GMA">GMA</a> list.
+
+<BR><BR><LI> <b><a name="1.3">I found a bug! How do i report it?</a></b> <BR>
+
+You can use our bugzilla server at <a href="http://nlp.cs.nyu.edu/bugzilla">
+http://nlp.cs.nyu.edu/bugzilla</a> to report a bug.
+When it asks you which component of the Proteus Project to use, pick 'GMA'.
+
+<BR><BR><LI> <b><a name="1.4">What is a release candidate and which
+version of GMA should i choose?</a></b> <BR> 
+
+A release candidate (RC) is a pre-release of a new version of the
+software.  Its purpose is to facilitate further testing, and to give
+prospective users an idea of what to expect in the final
+release. Unless you are a tester or developer, you should download
+only final versions.
+
+  
+</OL>
+
+<h2>II. Technical</h2>
+<OL>
+<LI> <b><a name="3.1">What is "mapping bitext correspondence" and how
+is it different from inducing translation models?</a></b> <BR> 
+
+A bitext map is a partial (ideally quite dense) relation between the
+tokens and token boundaries of a text and those of its translation.
+Translation models are relations between types, not tokens.  E.g., GMA
+can tell you that the 3rd word in text X arose as a translation of the
+4th word in X's translation Y, but it cannot tell you whether that
+pair of words would be a good entry in a bilingual dictionary.
+Methods exist for converting between bitext maps and translation
+models, but the reliable ones are not trivial.
+
+<BR><BR>
+<LI> <b><a name="3.2">On what platforms does GMA run?</a></b> <BR>
+
+Starting from version 2.0, GMA has been thoroughly tested on Linux/i386 and
+Solaris/SPARC.  Since it is all in Java, it should in theory run the
+same way on other platforms.  We know of users who have successfully
+run it under Windows, but we have not done thorough testing ourselves.
+    
+
+<BR><BR><LI>
+<b><a name="3.3">How efficient is GMA?</a></b> <BR>
+
+The underlying algorithms are linear in the size of the input.
+However, GMA 2.0 is the first release of a complete rewrite (in Java),
+and we haven't got around to doing any serious optimization
+yet. Therefore the current implementation is still very slow and
+memory intensive.
+
+<BR><BR><LI>
+<b><a name="3.4">What language pairs can GMA be used for?</a></b> <BR>
+
+We're not aware of any written languages that GMA cannot be used for.
+So far, GMA has been applied to:<BR>
+<UL>
+<LI> French/English
+<LI> Spanish/English
+<LI> Korean/English
+<LI> Chinese/English
+<LI> Arabic/English
+<LI> Czech/English
+<LI> Malay/English
+<LI> Russian/English
+</UL>
+The next version will include a module for retargeting GMA to new
+language pairs.
+
+<BR><BR><LI>
+<b><a name="3.5">What language-specific resources are required/desirable
+for use with GMA?  What language-specific resources are included with 
+this package?</a></b> <BR>
+
+
+GMA is based on an implementation of the Smooth Injective Map
+Recognizer (SIMR) algorithm. SIMR works best when supplied with
+language-specific information such as seed translation lexicons and
+lists of stop words.  No such resources are included with this
+distribution, except stop words for English, French, and Malay 
+(all encoded in ISO8859-1) and an English-Malay tralex, since these 
+are used in the testing suite for the program.  Even without seed
+lexicons, the software can be useful for language pairs that share
+lots of cognates, but performance will suffer without lists of
+stopwords.  If you want to work with a language that does not use the
+roman alphabet, then you definitely need a seed translation lexicon
+(see the HOWTO section on matching predicates).  If you have some
+resources of this type that you would like to share, we'd be happy to
+include them on our resources page and give you credit.
+
+<BR><BR><LI>
+<b><a name="3.6">When should I re-optimize the GMA parameters?</a></b> <BR>
+
+SIMR has several numerical parameters that should be re-optimized
+every time you decide to use a new resource, new tokenization of the
+input, new matching predicate, etc..  If you just use the default
+parameters, as many people have done with Gale &amp; Church's
+algorithm, the accuracy of the output may suffer greatly.  
+To learn how to re-optimize the parameters, read the tech
+report on "Porting..."  mentioned below, and the HOWTO-train file.
+
+<BR><BR><LI>
+<b><a name="3.last">Where can I learn more about how SIMR and GSA work?</a></b> <BR>
+
+To better understand what this software does, we suggest you read one
+or more of the following publications on this subject.
+    <UL>
+
+        <LI><P>I. Dan Melamed (1997). <A
+        HREF="http://www.cs.nyu.edu/~melamed/ftp/papers/portable.ps.gz"><B>A
+        Portable Algorithm for Mapping Bitext Correspondence</B></A>,
+        35th Conference of the Association for Computational
+        Linguistics (ACL'97), Madrid, Spain.
+        </P>
+
+        <LI><P>I. Dan Melamed (1996). <A HREF="http://www.cs.nyu.edu/~melamed/ftp/papers/SIMRport.ps.gz"><B>Porting
+        SIMR to New Language Pairs</B></A>, IRCS Technical Report #96-26. 
+        </P>
+
+        <LI><P>I. Dan Melamed (1996). <A HREF="http://www.cs.nyu.edu/~melamed/ftp/papers/emnlp96.ps.gz"><B>A
+        Geometric Approach to Mapping Bitext Correspondence</B></A>, IRCS
+        Technical Report #96-22, a revised version of the paper presented at
+        the First Conference on Empirical Methods in Natural Language
+        Processing (EMNLP'96), Philadelphia, PA, May. 
+        </P>
+
+    </UL>
+	  Or just get the book:
+    <UL>
+
+        <LI><P> I. Dan Melamed (2001). <a href="http://www.booksense.com/product/info.jsp?affiliateId=Melamed&isbn=0262133806"><em> Empirical Methods for
+        Exploiting Parallel Texts</em></a> , MIT Press.
+        </P>
+
+    </UL>
+</OL>
+
+    </div>
+</BODY>
+</HTML>

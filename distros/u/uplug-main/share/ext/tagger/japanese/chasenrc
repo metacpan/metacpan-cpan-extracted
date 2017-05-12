@@ -1,0 +1,38 @@
+;;
+;;  chasenrc for ipadic-2.4.4
+;;
+
+( ∏À°•’•°•§•${UPLUGHOME}/ext/chasendic/ipadic)
+(PATDIC        chadic)
+;(SUFDIC        chadic)
+
+(Ã§√Œ∏Ï… ªÏ (ÃæªÏ •µ —¿‹¬≥))
+
+(Ã§ƒÍµ¡œ¢¿‹•≥•π•» 10000)
+(… ªÏ•≥•π•»
+	((*) 		1)
+	((Ã§√Œ∏Ï)    30000)
+)
+(œ¢¿‹•≥•π•»Ω≈§ﬂ 1)
+(∑¡¬÷¡«•≥•π•»Ω≈§ﬂ 1)
+(•≥•π•»…˝	  0)
+
+;(œ¢∑Î… ªÏ ((ÃæªÏ øÙ))
+;          ((µ≠πÊ •¢•Î•’•°•Ÿ•√•»)))
+
+;(Ω–Œœ•’•©°º•ﬁ•√•» "%m\t%y\t%M\t%U(%P-)\t%T \t%F \n")    ; default(-f)
+;(Ω–Œœ•’•©°º•ﬁ•√•» "%m\t%y\t%M\t%P-\t%T \t%F \n")        ; … ªÏÃæΩ–Œœ
+;(Ω–Œœ•’•©°º•ﬁ•√•» "%m\t%?U/Ã§√Œ∏Ï/%y/\t%M\t%h/%t/%f\n") ; •≥°º•…Ω–Œœ
+;(Ω–Œœ•’•©°º•ﬁ•√•» "%M\t%P-\n")
+
+;(∂ı«Ú… ªÏ (µ≠πÊ ∂ı«Ú))
+;(√Ìº· (("<" ">") (µ≠πÊ ∞Ï»Ã)))
+(ANNOTATION (("<" ">") "%m\n"))
+;(ANNOTATION (("<head>" "<\/head>") "%m"))
+;(EOS_STRING "</s>\n")
+;(BOS_STRING "<s>\n")
+;(EOS_STRING "\n")
+(EOS_STRING "")
+;(OUTPUT_FORMAT "<w base=\"%M\" pos=\"%P-\" reading=\"%y\">%m</w>\n")
+;(OUTPUT_FORMAT "<w base=\"%f\" pos=\"%h\" conj=\"%t\">%m</w>\n")
+(OUTPUT_FORMAT "%m\t%P-\t%M\n")

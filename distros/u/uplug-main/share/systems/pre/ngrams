@@ -1,0 +1,38 @@
+{
+  'module' => {
+    'name' => 'find and mark significant N-grams',
+    'submodules' => [
+        'pre/ngramfreq',
+        'pre/ngramstat',
+        'pre/markphr',
+    ],
+    'submodule names' => [
+        'N-gram frequencies',
+        'N-gram statistics',
+        'N-gram markup',
+    ],
+  },
+  'description' => '',
+  'input' => {
+     'text' => {
+        'root' => 's',
+	'format' => 'xml',
+     },
+  },
+  'output' => {
+     'text' => {
+	'format' => 'xml',
+	'write_mode' => 'overwrite',
+	}
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'infile' => 'input:text:file',
+       'informat' => 'input:text:format',
+       'out' => 'output:text:file',
+       'outfile' => 'output:text:file',
+       'outformat' => 'output:text:format',
+    }
+  },
+}

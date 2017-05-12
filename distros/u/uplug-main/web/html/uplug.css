@@ -1,0 +1,93 @@
+
+
+body { 	background-color: white;
+ 	font-size: small;
+       	color: black; }
+
+
+a:link { text-decoration: none;
+         font-weight: bold; }
+a:visited { text-decoration: none;
+            font-weight: bold; }
+
+
+
+
+
+
+
+.menu table { background-color: white;
+        padding: 0;
+	border-style: none;
+	border-width: 0;
+	border-spacing: 0;
+        color: black; }
+
+
+.menu td    { background-color: white; 
+     	color: black;
+ 	font-size: 12px;}
+
+.menu th { 	background-color: #cccccc; 
+     	color: black;
+ 	font-size: 12px;
+	text-align: left; }
+
+
+
+
+
+
+.main { font-size: 12px; }
+
+.main table { background-color: white;
+        padding: 0;
+	border-style: none;
+	border-width: 0;
+	border-spacing: 0;
+        color: black; }
+
+
+.main td    { background-color: white; 
+     	color: black;
+ 	font-size: 12px;}
+
+.main th { 	background-color: #cccccc; 
+     	color: black;
+ 	font-size: 12px;
+	text-align: left; }
+
+
+
+
+
+
+
+
+
+
+div.license { font-size: 10px; }
+
+div.dom td { font-size: 12px;
+         text-align: center; }
+
+div.dom th { font-size: 10px;
+	        text-align: center; }
+
+
+
+
+
+
+div.matrix table { background-color: white;
+        padding: 0;
+	border-style: none;
+	border-width: 0;
+	border-spacing: 0;
+        color: black; }
+
+div.matrix td { font-size: 10px;background-color: #aaaaaa;
+         text-align: center; }
+
+div.matrix th { font-size: 10px;background-color: #cccccc;
+	        text-align: center; }

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/uny2k.pm
+t/embedded-uny2k.t
+t/uny2k.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

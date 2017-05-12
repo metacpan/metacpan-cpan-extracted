@@ -1,0 +1,42 @@
+{
+  'module' => {
+    'name' => 'basic pre-processing',
+    'submodules' => [
+        'pre/el/basic',
+    ],
+    'submodule names' => [
+        'basic XML markup',
+    ],
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'description' => 'This is the default pre-processing pipe-line for Greek.',
+  'input' => {
+    'text' => {
+      'format' => 'text',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'tok'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text)'
+	  },
+       },
+  }
+}

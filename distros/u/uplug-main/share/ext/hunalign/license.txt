@@ -1,0 +1,6 @@
+hunalign
+http://mokk.bme.hu/resources/hunalign
+-------------------------------------------
+
+licensed under a Creative Commons License
+http://creativecommons.org/licenses/by/2.0/

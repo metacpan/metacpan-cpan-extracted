@@ -1,0 +1,20 @@
+# features (source): { 'c.*:type' => undef }
+# features (target): { 'c.*:type' => undef }
+VP	VC	0.5
+VP	INFP	0.5
+ADVP	ADVP	0.5
+VP ADVP VP	VC ADVP VC	0.5
+VP ADJP VP	VC ADVP VC	0.5
+ADJP	APMIN	0.5
+ADJP	APMAX	0.5
+ADJP	ADVP PP APMIN	0.5
+PP	PP	0.5
+PP NP	PP NP	0.5
+PP NP	PP APMIN NP	0.5
+NP PP NP	NPMAX	0.5
+NP PP NP	NP	0.5
+NP PP NP	NP PP NP	0.5
+NP	NP	0.5
+NP	NP APMIN NP	0.5
+NP	ADVP APMIN NP	0.5
+NP	ADVP NP	0.5

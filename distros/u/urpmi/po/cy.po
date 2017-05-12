@@ -1,0 +1,3751 @@
+# translation of urpmi-cy.po to Cymraeg
+#
+# Copyright (C) 2007 Free Software Foundation, Inc.
+#
+# Rhoslyn Prys <rhoslyn.prys@meddal.org.uk>, 2002, 2004.
+# Rhoslyn Prys <post@meddal.com>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: Mandriva Linux\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-09-01 19:38+0200\n"
+"PO-Revision-Date: 2009-08-24 20:33-0000\n"
+"Last-Translator: Rhoslyn Prys <rprys@yahoo.com>\n"
+"Language-Team: Cymraeg\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Welsh\n"
+"X-Poedit-Country: UK\n"
+"Plural-Forms: nplurals=2; plural=(n == 2) ? 1 : 0;\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: ../gurpmi:32
+#, c-format
+msgid "RPM installation"
+msgstr "Gosod RPM"
+
+#: ../gurpmi:46
+#, c-format
+msgid "Error: unable to find file %s, will cancel operation"
+msgstr "Gwall: methu canfod ffeil %s, diddymu'r weithred"
+
+#: ../gurpmi:47 ../gurpmi2:197 ../gurpmi2:222
+#, c-format
+msgid "_Ok"
+msgstr "_Iawn"
+
+#: ../gurpmi:67
+#, c-format
+msgid ""
+"You have selected a source package:\n"
+"\n"
+"%s\n"
+"\n"
+"You probably didn't want to install it on your computer (installing it would "
+"allow you to make modifications to its sourcecode then compile it).\n"
+"\n"
+"What would you like to do?"
+msgstr ""
+"Rydych wedi dewis pecyn ffynhonnell:\n"
+"\n"
+"%s\n"
+"\n"
+"Efallai nad oeddech wedi bwriadu ei osod ar eich cyfrifiadur (byddai ei osod "
+"yn caniatáu i chi i wneud newidiadau i'r cod ffynhonnell a'i grynhoi.).\n"
+"\n"
+"Beth hoffech chi ei wneud?"
+
+#: ../gurpmi:75 ../gurpmi:86
+#, c-format
+msgid ""
+"You are about to install the following software packages on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"Proceed?"
+msgstr ""
+"Rydych ar fin gosod y pecynnau meddalwedd canlynol ar eich cyfrifiadur:\n"
+"\n"
+"%s\n"
+"\n"
+"Parhau?"
+
+#: ../gurpmi:81
+#, c-format
+msgid ""
+"You are about to install the following software package on your computer:\n"
+"\n"
+"%s\n"
+"\n"
+"You may prefer to just save it. What is your choice?"
+msgstr ""
+"Rydych ar fin gosod y pecyn meddalwedd canlynol ar eich cyfrifiadur:\n"
+"\n"
+"%s\n"
+"\n"
+"Efallai byddai'n well gennych ei gadw. Beth yw eich dewis?"
+
+#: ../gurpmi:99
+#, c-format
+msgid "_Install"
+msgstr "_Gosod"
+
+#: ../gurpmi:100
+#, c-format
+msgid "_Save"
+msgstr "_Cadw"
+
+#: ../gurpmi:101 ../gurpmi2:197
+#, c-format
+msgid "_Cancel"
+msgstr "_Dileu"
+
+#: ../gurpmi:109
+#, c-format
+msgid "Choose location to save file"
+msgstr "Dewiswch leoliad i gadw'r ffeil"
+
+#: ../gurpmi.pm:41
+#, c-format
+msgid "Options:"
+msgstr "Dewisiadau:"
+
+#: ../gurpmi.pm:42 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
+#: ../urpmi.recover:29 ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
+#, c-format
+msgid "  --help         - print this help message.\n"
+msgstr "  --help         - argraffu neges cymorth.\n"
+
+#: ../gurpmi.pm:43 ../urpmi:74
+#, c-format
+msgid ""
+"  --auto         - non-interactive mode, assume default answers to "
+"questions.\n"
+msgstr ""
+"  --auto         - modd anrhyngweithiol, derbyn atebion rhagosodedig i "
+"gwestiynau.\n"
+
+#: ../gurpmi.pm:44 ../urpmi:75 ../urpmq:48
+#, c-format
+msgid ""
+"  --auto-select  - automatically select packages to upgrade the system.\n"
+msgstr "  --auto-select  - dewis pecynnau'n awtomatig i uwchraddio'r system.\n"
+
+#: ../gurpmi.pm:45 ../urpme:46 ../urpmi:98 ../urpmq:64
+#, c-format
+msgid ""
+"  --force        - force invocation even if some packages do not exist.\n"
+msgstr ""
+"  --force        - gorfodi galwad hyd yn oed os na yw rhai pecynnau'n "
+"bodoli.\n"
+
+#: ../gurpmi.pm:46 ../urpmi:129
+#, c-format
+msgid ""
+"  --verify-rpm   - verify rpm signature before installation\n"
+"                   (--no-verify-rpm disables it, default is enabled).\n"
+msgstr ""
+"  --verify-rpm   - gwirio llofnod rpm cyn gosod\n"
+"                   (--no-verify-rpm analluogi, galluogi yw'r rhagosodedig).\n"
+
+#: ../gurpmi.pm:48 ../urpmf:36 ../urpmi:68 ../urpmq:43
+#, c-format
+msgid "  --media        - use only the given media, separated by comma.\n"
+msgstr "  --media          - defnyddio'r cyfrwng, wedi ei ran gan gollnod.\n"
+
+#: ../gurpmi.pm:49 ../urpmi:146
+#, c-format
+msgid "  -p             - allow search in provides to find package.\n"
+msgstr "  -p             - caniatáu i chwilio canfod pecyn.\n"
+
+#: ../gurpmi.pm:50 ../urpmi:147
+#, c-format
+msgid "  -P             - do not search in provides to find package.\n"
+msgstr "  -P             - peidio chwilio yn provides i ganfod pecyn.\n"
+
+#: ../gurpmi.pm:51 ../urpmi:105 ../urpmq:67
+#, c-format
+msgid "  --root         - use another root for rpm installation.\n"
+msgstr "  --root         - defnyddio root arall ar gyfer gosod rpm.\n"
+
+#: ../gurpmi.pm:52 ../urpmi:131
+#, c-format
+msgid ""
+"  --test         - only verify if the installation can be achieved "
+"correctly.\n"
+msgstr "  --test          - gwirio os oes modd gosod yn iawn.\n"
+
+#: ../gurpmi.pm:53 ../urpmi:71
+#, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested packages.\n"
+msgstr ""
+"  --searchmedia  - defnyddio'r cyfrwng darparwyd i chwilio'r pecynnau "
+"gofynnwyd.\n"
+
+#: ../gurpmi.pm:96
+#, c-format
+msgid "No packages specified"
+msgstr "Heb enwi pecyn"
+
+#: ../gurpmi2:55
+#, c-format
+msgid "Please wait..."
+msgstr "Arhoswch..."
+
+#: ../gurpmi2:64
+#, c-format
+msgid "Must be root"
+msgstr "Rhaid bod yn root"
+
+#: ../gurpmi2:71
+#, c-format
+msgid "Distribution Upgrade"
+msgstr "Diweddaru'r Dosbarthiad"
+
+#: ../gurpmi2:71
+#, c-format
+msgid "Packages installation"
+msgstr "Gosod pecynnau"
+
+#: ../gurpmi2:98
+#, c-format
+msgid "Preparing packages installation..."
+msgstr "Paratoi pecynnau i'w gosod..."
+
+#: ../gurpmi2:113 ../urpmi:505
+#, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s"
+msgstr ""
+"Nid oes modd gosod rhai pecynnau gofynnwyd amdanynt:\n"
+"%s"
+
+#: ../gurpmi2:121
+#, c-format
+msgid ""
+"Some requested packages cannot be installed:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Nid oes modd gosod rhai pecynnau gofynnwyd amdanynt:\n"
+"%s\n"
+"Parhau beth bynnag?"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Warning"
+msgstr "Rhybudd"
+
+#: ../gurpmi2:156
+#, c-format
+msgid "Ok"
+msgstr "Iawn"
+
+#: ../gurpmi2:193
+#, c-format
+msgid " (to upgrade)"
+msgstr "(uwchraddio)"
+
+#: ../gurpmi2:194
+#, c-format
+msgid " (to install)"
+msgstr "(gosod)"
+
+#: ../gurpmi2:197
+#, c-format
+msgid "Package choice"
+msgstr "Dewis pecyn"
+
+#: ../gurpmi2:198
+#, c-format
+msgid "One of the following packages is needed:"
+msgstr "Mae angen un o'r pecynnau canlynol:"
+
+#: ../gurpmi2:223
+#, c-format
+msgid "_Abort"
+msgstr "_Atal"
+
+#: ../gurpmi2:258
+#, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s\n"
+"Continue installation anyway?"
+msgstr ""
+"Rhaid i'r pecynnau canlynol gael eu tynnu i eraill gael eu diweddaru.\n"
+"%s\n"
+"Parhau beth bynnag?"
+
+#: ../gurpmi2:277 ../urpmi:605
+#, c-format
+msgid ""
+"To satisfy dependencies, the following package is going to be installed:"
+msgstr "I fodloni dibyniaethau, bydd y pecynnau canlynol yn cael eu gosod"
+
+#: ../gurpmi2:278 ../urpmi:606
+#, c-format
+msgid ""
+"To satisfy dependencies, the following packages are going to be installed:"
+msgstr "I fodloni dibyniaethau, bydd y pecyn canlynol yn cael ei osod"
+
+#: ../gurpmi2:280
+#, c-format
+msgid "(%d package, %d MB)"
+msgid_plural "(%d packages, %d MB)"
+msgstr[0] "(%d pecyn, %d MB)"
+msgstr[1] "(%d pecyn, %d MB)"
+
+#: ../gurpmi2:288 ../urpm/main_loop.pm:367
+#, c-format
+msgid "unable to get source packages, aborting"
+msgstr "methu estyn pecynnau ffynhonnell, atal"
+
+#: ../gurpmi2:320 ../urpm/install.pm:104
+#, c-format
+msgid "Preparing..."
+msgstr "Paratoi..."
+
+#: ../gurpmi2:326
+#, c-format
+msgid "Installing package `%s' (%s/%s)..."
+msgstr "Gosod pecyn `%s' (%s/%s)..."
+
+#: ../gurpmi2:344 ../urpmi:633
+#, c-format
+msgid "Please insert the medium named \"%s\""
+msgstr "Rhowch gyfrwng \"%s\" yn y ddyfais"
+
+#: ../gurpmi2:358
+#, c-format
+msgid "Downloading package `%s'..."
+msgstr "Llwytho pecynnau i lawr ' %s'..."
+
+#: ../gurpmi2:371 ../urpm.pm:338 ../urpm/download.pm:863
+#: ../urpm/get_pkgs.pm:286 ../urpm/media.pm:994 ../urpm/media.pm:1506
+#: ../urpm/media.pm:1657
+#, c-format
+msgid "...retrieving failed: %s"
+msgstr "... methodd ail-lwytho: %s"
+
+#: ../gurpmi2:387
+#, c-format
+msgid "_Done"
+msgstr "_Gorffen"
+
+#: ../gurpmi2:404 ../urpm/main_loop.pm:82
+#, c-format
+msgid ""
+"Installation failed, some files are missing:\n"
+"%s"
+msgstr ""
+"Methodd y gosod, mae rhai ffiliau ar goll:\n"
+"%s"
+
+#: ../gurpmi2:407
+#, fuzzy, c-format
+msgid "You may want to update your urpmi database."
+msgstr "Hoffech chi ddiweddaru eich cronfa ddata urpmi?"
+
+#: ../gurpmi2:411 ../urpm/main_loop.pm:286 ../urpm/main_loop.pm:480
+#, c-format
+msgid "Installation failed:"
+msgstr "Methodd y gosod:"
+
+#: ../gurpmi2:416
+#, c-format
+msgid "The package(s) are already installed"
+msgstr "Popeth wedi eu gosod eisoes"
+
+#: ../gurpmi2:418
+#, c-format
+msgid "Installation finished"
+msgstr "Cwblhawyd y gosod"
+
+#: ../gurpmi2:419 ../urpme:165
+#, c-format
+msgid "removing %s"
+msgstr "tynnu %s"
+
+#: ../gurpmi2:430 ../urpmi:691
+#, c-format
+msgid "restarting urpmi"
+msgstr "ailgychwyn urpmi"
+
+#: ../rpm-find-leaves:15
+#, c-format
+msgid ""
+"usage: %s [options]\n"
+"where [options] are from\n"
+msgstr ""
+"usage: %s [dewisiadau]\n"
+"lle mae [dewisiadau] o\n"
+
+#: ../rpm-find-leaves:17
+#, c-format
+msgid "   -h|--help      - print this help message.\n"
+msgstr "   -h|--help     - argraffu neges cymorth.\n"
+
+#: ../rpm-find-leaves:18
+#, c-format
+msgid "   --root <path>  - use the given root instead of /\n"
+msgstr "  --root <path>   - defnyddio'r root hwn yn lle /\n"
+
+#: ../rpm-find-leaves:19
+#, c-format
+msgid "   -g [group]     - restrict results to specified group.\n"
+msgstr "   -g [group]     - cyfyngu canlyniadau i'r grŵp.\n"
+
+#: ../rpm-find-leaves:20
+#, c-format
+msgid "                    defaults to %s.\n"
+msgstr "                   rhagosodedig yw %s.\n"
+
+#: ../rpm-find-leaves:21
+#, c-format
+msgid "   -f             - output rpm full name (NVRA)\n"
+msgstr "  -f            - allbynnu enw llawn rpm (NVRA)\n"
+
+#: ../rurpmi:11 ../urpmi:265
+#, c-format
+msgid "Only superuser is allowed to install packages"
+msgstr "Dim ond uwch ddefnyddiwr sy'n cael gosod pecynnau"
+
+#: ../rurpmi:18
+#, c-format
+msgid "Running urpmi in restricted mode..."
+msgstr "Rhedeg urpmi mewn modd cyfyngedig..."
+
+#: ../urpm.pm:23
+#, c-format
+msgid "While some packages may have been installed, there were failures.\n"
+msgstr ""
+
+#: ../urpm.pm:110
+#, c-format
+msgid "fail to create directory %s"
+msgstr "methu creu cyfeiriadur %s"
+
+#: ../urpm.pm:111
+#, c-format
+msgid "invalid owner for directory %s"
+msgstr "perchennog annilys cyfeiriadur %s"
+
+#: ../urpm.pm:135
+#, c-format
+msgid "Can not download packages into %s"
+msgstr "Methu llwytho pecynnau i lawr i %s"
+
+#: ../urpm.pm:150
+#, c-format
+msgid "Environment directory %s does not exist"
+msgstr "Nid yw cyfeiriadur amgylchedd %s yn bodoli"
+
+#: ../urpm.pm:151 ../urpmf:243 ../urpmq:163
+#, c-format
+msgid "using specific environment on %s\n"
+msgstr "ddefnyddio amgylchedd penodol ar %s\n"
+
+#: ../urpm.pm:313
+#, c-format
+msgid "unable to open rpmdb"
+msgstr "methu agor rpmdb"
+
+#: ../urpm.pm:327
+#, c-format
+msgid "invalid rpm file name [%s]"
+msgstr "enw ffeil rpm annilys [%s]"
+
+#: ../urpm.pm:333
+#, c-format
+msgid "retrieving rpm file [%s] ..."
+msgstr "adfer ffeil rpm (%s)..."
+
+#: ../urpm.pm:335 ../urpm/get_pkgs.pm:284
+#, c-format
+msgid "...retrieving done"
+msgstr ".cwblhau adfer"
+
+#: ../urpm.pm:343
+#, c-format
+msgid "unable to access rpm file [%s]"
+msgstr "methu cael mynediad  ffeil rpm (%s)"
+
+#: ../urpm.pm:348
+#, c-format
+msgid "unable to parse spec file %s [%s]"
+msgstr "methu didoli ffeil spec %s [%s]"
+
+#: ../urpm.pm:356
+#, c-format
+msgid "unable to register rpm file"
+msgstr "methu cofrestr ffeil rpm"
+
+#: ../urpm.pm:358
+#, c-format
+msgid "Incompatible architecture for rpm [%s]"
+msgstr "Saernïaeth anghydnaws ar gyfer rpm [%s]"
+
+#: ../urpm.pm:362
+#, c-format
+msgid "error registering local packages"
+msgstr "gwall cofrestru pecynnau lleol"
+
+#: ../urpm.pm:450
+#, c-format
+msgid "This operation is forbidden while running in restricted mode"
+msgstr "Mae'r weithred yn waharddedig wrth redeg ym modd cyfyngedig"
+
+#: ../urpm/args.pm:151 ../urpm/args.pm:160
+#, c-format
+msgid "bad proxy declaration on command line\n"
+msgstr "datganiad dirprwy gwallus ar y llinell orchymyn\n"
+
+#: ../urpm/args.pm:306
+#, c-format
+msgid "urpmq: cannot read rpm file \"%s\"\n"
+msgstr "urpmq: methu darllen ffeil rpm \"%s\"\n"
+
+#: ../urpm/args.pm:384
+#, c-format
+msgid "unexpected expression %s"
+msgstr "mynegiadau annisgwyl %s"
+
+#: ../urpm/args.pm:385
+#, c-format
+msgid "missing expression before %s"
+msgstr "mynegiad coll cyn %s"
+
+#: ../urpm/args.pm:391
+#, c-format
+msgid "unexpected expression %s (suggestion: use -a or -o ?)"
+msgstr "mynegiad annisgwyl %s (awgrym: defnyddio -a neu-0 ?)"
+
+#: ../urpm/args.pm:395
+#, c-format
+msgid "no expression to close"
+msgstr "dim mynegiad i'w gau"
+
+#: ../urpm/args.pm:404
+#, c-format
+msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
+msgstr ""
+"drwy ragosodiad mae urmpf yn disgwyl regexp, dylech ddefnyddio dewis  \"--"
+"literal\""
+
+#: ../urpm/args.pm:478
+#, c-format
+msgid "chroot directory doesn't exist"
+msgstr "Nid yw cyfeiriadur chroot yn bodoli"
+
+#: ../urpm/args.pm:501
+#, c-format
+msgid "Can't use %s without %s"
+msgstr "Methu defnyddio %s heb %s"
+
+#: ../urpm/args.pm:504 ../urpm/args.pm:507 ../urpmq:155
+#, c-format
+msgid "Can't use %s with %s"
+msgstr "Methu defnyddio %s gyda %s"
+
+#: ../urpm/args.pm:515
+#, c-format
+msgid "Too many arguments\n"
+msgstr "Gormod o ymresymiadau\n"
+
+#: ../urpm/args.pm:523
+#, c-format
+msgid ""
+"%s version %s\n"
+"%s\n"
+"This is free software and may be redistributed under the terms of the GNU "
+"GPL.\n"
+"\n"
+"usage:\n"
+msgstr ""
+"%s fersiwn %s\n"
+"%s\n"
+"Meddalwedd rhydd yw hwn a gall gael ei ddosbarthu o dan amodau'r GPL GNU.\n"
+"\n"
+"defnydd:\n"
+
+#: ../urpm/args.pm:529
+#, c-format
+msgid "Copyright (C) %s by %s"
+msgstr "Hawlfraint (C) %s %s"
+
+#: ../urpm/bug_report.pm:67 ../urpmi:255
+#, c-format
+msgid "Copying failed"
+msgstr "Methodd y copïo"
+
+#: ../urpm/cdrom.pm:80
+#, c-format
+msgid ""
+"You must mount CD-ROM yourself (or install perl-Hal-Cdroms to have it done "
+"automatically)"
+msgstr ""
+"Rhaid i chi arosod y CD-ROM eich hun (neu osod perl-Hal-Cdroms i'w wneud yn "
+"awtomatig)"
+
+#: ../urpm/cdrom.pm:82
+#, c-format
+msgid "Udisks daemon (udisks-daemon) is not running or not ready"
+msgstr "Nid yw'r Udisks daemon (udisks-daemon) yn rhedeg neu nid yw'n barod"
+
+#: ../urpm/cdrom.pm:174 ../urpm/cdrom.pm:179
+#, c-format
+msgid "medium \"%s\" is not available"
+msgstr "nid yw cyfrwng \"%s\" ar gael"
+
+#: ../urpm/cdrom.pm:218
+#, c-format
+msgid "unable to read rpm file [%s] from medium \"%s\""
+msgstr "methu darllen ffeil rpm (%s) o gyfrwng \"%s\""
+
+#: ../urpm/cfg.pm:82
+#, c-format
+msgid "syntax error in config file at line %s"
+msgstr "gwall cystrawen yn ffeil config ar linell %s"
+
+#: ../urpm/cfg.pm:115
+#, c-format
+msgid "unable to read config file [%s]"
+msgstr "Methu creu ffeil config (%s)"
+
+#: ../urpm/cfg.pm:141
+#, c-format
+msgid "medium `%s' is defined twice, aborting"
+msgstr "mae cyfrwng '%s' wedi ei ddiffinio ddwy waith, cau"
+
+#: ../urpm/cfg.pm:254 ../urpm/media.pm:553
+#, c-format
+msgid "unable to write config file [%s]"
+msgstr "methu ysgrifennu i ffeil ffurfweddiad (%s)"
+
+#: ../urpm/download.pm:95
+#, c-format
+msgid "%s is not available, falling back on %s"
+msgstr "Nid yw %s ar gael, mynd yn ôl at %s"
+
+#: ../urpm/download.pm:178
+#, c-format
+msgid "can not read proxy settings (not enough rights to read %s)"
+msgstr "methu darllen y gosodiadau dirprwy (dim digon o hawl i ddarllen %s)"
+
+#: ../urpm/download.pm:208
+#, c-format
+msgid "Please enter your credentials for accessing proxy\n"
+msgstr "Rhowch eich hawliau ar gyfer cael mynediad i ddirprwy\n"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "User name:"
+msgstr "Enw Defnyddiwr"
+
+#: ../urpm/download.pm:209
+#, c-format
+msgid "Password:"
+msgstr "Cyfrinair:"
+
+#: ../urpm/download.pm:295
+#, c-format
+msgid "Unknown webfetch `%s' !!!\n"
+msgstr "Webfetch anhysbys '%s' !!!\n"
+
+#: ../urpm/download.pm:303
+#, c-format
+msgid "%s failed: exited with signal %d"
+msgstr "Methodd '%s': gadael gydag arwydd %d"
+
+#: ../urpm/download.pm:304
+#, c-format
+msgid "%s failed: exited with %d"
+msgstr "Methodd '%s': gadael gyda %d"
+
+#: ../urpm/download.pm:338
+#, c-format
+msgid "copy failed"
+msgstr "methodd y copïo"
+
+#: ../urpm/download.pm:344
+#, c-format
+msgid "wget is missing\n"
+msgstr "mae wget ar goll\n"
+
+#: ../urpm/download.pm:411
+#, c-format
+msgid "curl is missing\n"
+msgstr "mae curl ar goll\n"
+
+#: ../urpm/download.pm:547
+#, c-format
+msgid "curl failed: upload canceled\n"
+msgstr "methodd curl: diddymwyd y llwytho\n"
+
+#: ../urpm/download.pm:548
+#, c-format
+msgid "curl failed: download canceled\n"
+msgstr "methodd curl: diddymwyd y llwytho i lawr\n"
+
+#: ../urpm/download.pm:583
+#, c-format
+msgid "rsync is missing\n"
+msgstr "rsync ar goll\n"
+
+#: ../urpm/download.pm:651
+#, c-format
+msgid "ssh is missing\n"
+msgstr "ssh ar goll\n"
+
+#: ../urpm/download.pm:670
+#, c-format
+msgid "prozilla is missing\n"
+msgstr "prozilla ar goll\n"
+
+#: ../urpm/download.pm:686
+#, c-format
+msgid "Couldn't execute prozilla\n"
+msgstr "Methu gweithredu prozilla\n"
+
+#: ../urpm/download.pm:696
+#, c-format
+msgid "aria2 is missing\n"
+msgstr "aria2 ar goll\n"
+
+#: ../urpm/download.pm:740
+#, c-format
+msgid "Failed to download %s"
+msgstr "Methu llwytho %s i lawr"
+
+#: ../urpm/download.pm:835
+#, c-format
+msgid "        %s%% of %s completed, ETA = %s, speed = %s"
+msgstr "        %s%% o %s wedi ei gwblhau, Amser = %s, cyflymder = %s"
+
+#: ../urpm/download.pm:836
+#, c-format
+msgid "        %s%% completed, speed = %s"
+msgstr "        %s%% wedi ei gwblhau, cyflymder = %s"
+
+#: ../urpm/download.pm:921
+#, c-format
+msgid "retrieving %s"
+msgstr "estyn %s"
+
+#: ../urpm/download.pm:932
+#, c-format
+msgid "retrieved %s"
+msgstr "estynwyd: %s"
+
+#: ../urpm/download.pm:994
+#, c-format
+msgid "unknown protocol defined for %s"
+msgstr "protocol anhysbys ar gyfer %s"
+
+#: ../urpm/download.pm:1008
+#, c-format
+msgid "no webfetch found, supported webfetch are: %s\n"
+msgstr "heb ganfod webfetch, yn cael eu cynnal gan webfetch: %s\n"
+
+#: ../urpm/download.pm:1023
+#, c-format
+msgid "unable to handle protocol: %s"
+msgstr "methu trin protocol: %s"
+
+#: ../urpm/get_pkgs.pm:29
+#, c-format
+msgid "cleaning %s and %s"
+msgstr "glanhau %s ac %s"
+
+#: ../urpm/get_pkgs.pm:141
+#, c-format
+msgid "package %s is not found."
+msgstr "heb ganfod pecyn %s"
+
+#: ../urpm/get_pkgs.pm:277
+#, c-format
+msgid "retrieving rpm files from medium \"%s\"..."
+msgstr "adfer ffeiliau rpm o gyfrwng [%s]"
+
+#: ../urpm/install.pm:110
+#, c-format
+msgid "[repackaging]"
+msgstr "[ailbecynnu]"
+
+#: ../urpm/install.pm:201
+#, c-format
+msgid ""
+"created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
+msgstr ""
+"crëwyd trosglwyddiad ar gyfer gosod ar %s (tynnu=%d, gosod=%d, uwchraddio=%d)"
+
+#: ../urpm/install.pm:204
+#, c-format
+msgid "unable to create transaction"
+msgstr "methu creu trosglwyddiad."
+
+#: ../urpm/install.pm:229
+#, c-format
+msgid "unable to extract rpm from delta-rpm package %s"
+msgstr "methu tynnu rpm o becyn delta-rpm %s"
+
+#: ../urpm/install.pm:242
+#, c-format
+msgid "unable to install package %s"
+msgstr "methu gosod pecyn %s"
+
+#: ../urpm/install.pm:245
+#, c-format
+msgid "removing bad rpm (%s) from %s"
+msgstr "tynnu rpm gwallus (%s) o %s"
+
+#: ../urpm/install.pm:246 ../urpm/install.pm:311
+#, c-format
+msgid "removing %s failed: %s"
+msgstr "tynnu %s methodd: %s"
+
+#: ../urpm/install.pm:292
+#, c-format
+msgid "Removing package %s"
+msgstr "Tynnu pecyn %s."
+
+#: ../urpm/install.pm:293
+#, c-format
+msgid "removing package %s"
+msgstr "tynnu pecyn %s."
+
+#: ../urpm/install.pm:309
+#, c-format
+msgid "removing installed rpms (%s) from %s"
+msgstr "tynnu rpm wedi eu gosod (%s) o %s"
+
+#: ../urpm/install.pm:318
+#, c-format
+msgid "More information on package %s"
+msgstr "Rhagor o wybodaeth ar becyn %s"
+
+#: ../urpm/ldap.pm:44
+#, c-format
+msgid "Cannot create ldap cache directory"
+msgstr "Methu creu cyfeiriadur storfa Idap"
+
+#: ../urpm/ldap.pm:46
+#, c-format
+msgid "Cannot write cache file for ldap\n"
+msgstr "Methu ysgrifennu ffeil storfa ar gyfer Idap\n"
+
+#: ../urpm/ldap.pm:181
+#, c-format
+msgid "No server defined, missing uri or host"
+msgstr "Heb ddiffinio gweinydd, uri neu westeiwr coll"
+
+#: ../urpm/ldap.pm:182
+#, c-format
+msgid "No base defined"
+msgstr "Sail heb ei ddiffinio"
+
+#: ../urpm/ldap.pm:192 ../urpm/ldap.pm:195
+#, c-format
+msgid "Cannot connect to ldap uri:"
+msgstr "Methu cysylltu  æg uri ldap:"
+
+#: ../urpm/lock.pm:99
+#, fuzzy, c-format
+msgid "%s database is locked, process %d is already using it"
+msgstr "Mae cronfa ddata %s wedi ei chloi (mae rhaglen arall yn ei defnyddio)"
+
+#: ../urpm/lock.pm:101
+#, c-format
+msgid "%s database is locked (another program is already using it)"
+msgstr "Mae cronfa ddata %s wedi ei chloi (mae rhaglen arall yn ei defnyddio)"
+
+#: ../urpm/lock.pm:115
+#, c-format
+msgid "%s database is locked. Waiting..."
+msgstr "Cronfa ddata %s wedi cloi, aros..."
+
+#: ../urpm/lock.pm:116
+#, c-format
+msgid "aborting"
+msgstr "atal"
+
+#: ../urpm/main_loop.pm:58
+#, c-format
+msgid "Retry?"
+msgstr "Ceisio eto?"
+
+#: ../urpm/main_loop.pm:85
+#, c-format
+msgid "You may need to update your urpmi database."
+msgstr "Hoffech chi ddiweddaru eich cronfa ddata urpmi?"
+
+#: ../urpm/main_loop.pm:89
+#, c-format
+msgid ""
+"Installation failed, bad rpms:\n"
+"%s"
+msgstr ""
+"Methodd y gosod, rpm gwallus:\n"
+"%s"
+
+#: ../urpm/main_loop.pm:108
+#, c-format
+msgid ""
+"There is not enough space on your filesystem to download all packages (%s "
+"needed, %s available).\n"
+"Are you sure you want to continue?"
+msgstr ""
+
+#: ../urpm/main_loop.pm:138
+#, c-format
+msgid "The following package has bad signature"
+msgstr "Mae gan y pecyn canlynol lofnod gwallus"
+
+#: ../urpm/main_loop.pm:139
+#, c-format
+msgid "The following packages have bad signatures"
+msgstr "Mae gan y pecynnau canlynol lofnod gwallus"
+
+#: ../urpm/main_loop.pm:140
+#, c-format
+msgid "Do you want to continue installation ?"
+msgstr "Ydych chi am barhau gosod?"
+
+#: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:288
+#: ../urpm/main_loop.pm:296
+#, c-format
+msgid "Installation failed"
+msgstr "Methodd y gosod"
+
+#: ../urpm/main_loop.pm:159
+#, c-format
+msgid "removing installed rpms (%s)"
+msgstr "tynnu rpm wedi eu gosod (%s)"
+
+#: ../urpm/main_loop.pm:185
+#, c-format
+msgid "Try to continue anyway?"
+msgstr "Ymlaen beth bynnag?"
+
+#: ../urpm/main_loop.pm:234
+#, c-format
+msgid "installing %s from %s"
+msgstr "gosod %s o %s"
+
+#: ../urpm/main_loop.pm:236
+#, c-format
+msgid "installing %s"
+msgstr "gosod %s"
+
+#: ../urpm/main_loop.pm:243
+#, c-format
+msgid "distributing %s"
+msgstr "dosbarthu %s"
+
+#: ../urpm/main_loop.pm:289
+#, c-format
+msgid "Try installation without checking dependencies?"
+msgstr "Ceisio gosod heb wirio dibyniaethau?"
+
+#: ../urpm/main_loop.pm:297
+#, c-format
+msgid "Try harder to install (--force)?"
+msgstr "Mwy o orfodaeth gyda'r gosod?  (--force)?"
+
+#: ../urpm/main_loop.pm:490
+#, c-format
+msgid "Packages are up to date"
+msgstr "Mae'r pecynnau'n rhai diweddaraf"
+
+#: ../urpm/main_loop.pm:501 ../urpm/parallel.pm:299
+#, c-format
+msgid "Installation is possible"
+msgstr "Gosod yn bosibl"
+
+#: ../urpm/md5sum.pm:55
+#, c-format
+msgid "warning: md5sum for %s unavailable in MD5SUM file"
+msgstr "rhybudd: nid yw md5sum ar gyfer %s ar gael yn ffeil MD5SUM"
+
+#: ../urpm/media.pm:270
+#, c-format
+msgid "virtual medium \"%s\" should have a clear url, medium ignored"
+msgstr "dylai cyfrwng rhithiol  \"%s\" gael url clir, anwybyddu'r cyfrwng"
+
+#: ../urpm/media.pm:272
+#, c-format
+msgid "unable to access list file of \"%s\", medium ignored"
+msgstr "methu cael mynediad ffeil rhestr \"%s\", anwybyddu'r cyfrwng"
+
+#: ../urpm/media.pm:275
+#, c-format
+msgid "unable to access synthesis file of \"%s\", medium ignored"
+msgstr "methu cael mynediad i  ffeil \"%s\", anwybyddu'r cyfrwng"
+
+#: ../urpm/media.pm:301
+#, c-format
+msgid "trying to override existing medium \"%s\", skipping"
+msgstr "ceisio osgoi'r cyfrwng presennol \"%s\", hepgor"
+
+#: ../urpm/media.pm:517
+#, c-format
+msgid "failed to migrate removable device, ignoring media"
+msgstr "methu symud y ddyfais symudol, anwybyddu'r cyfrwng"
+
+#: ../urpm/media.pm:555
+#, c-format
+msgid "wrote config file [%s]"
+msgstr "ysgrifennu ffeil ffurfweddu (%s)"
+
+#: ../urpm/media.pm:598
+#, c-format
+msgid "Can't use parallel mode with use-distrib mode"
+msgstr "Methu defnyddio'r modd paralel gyda'r modd use-distrib"
+
+#: ../urpm/media.pm:606
+#, c-format
+msgid "using associated media for parallel mode: %s"
+msgstr "defnyddio cyfrwng cysylltiedig ar gyfer modd paralel: %s"
+
+#: ../urpm/media.pm:622
+#, c-format
+msgid ""
+"--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
+"update, --use-distrib or --parallel"
+msgstr ""
+"--nid oes modd defnyddio synthesis gyda --media, --excludemedia, --"
+"sortmedia, --diweddaru, --use-distrib or --parallel"
+
+#: ../urpm/media.pm:731
+#, c-format
+msgid "Search start: %s end: %s"
+msgstr "Cychwyn chwilio: %s diwedd: %s"
+
+#: ../urpm/media.pm:748
+#, c-format
+msgid "skipping package %s"
+msgstr "hepgor pecyn %s"
+
+#: ../urpm/media.pm:764
+#, c-format
+msgid "would install instead of upgrade package %s"
+msgstr "gosod yn lle uwchraddio pecyn %s"
+
+#: ../urpm/media.pm:840
+#, c-format
+msgid "medium \"%s\" already exists"
+msgstr "cyfrwng \"%s\" yn bodoli eisoes"
+
+#: ../urpm/media.pm:882
+#, c-format
+msgid "(ignored by default)"
+msgstr "(anwybyddwyd drwy ragosodiad)"
+
+#: ../urpm/media.pm:888
+#, c-format
+msgid "adding medium \"%s\" before remote medium \"%s\""
+msgstr "ychwanegu cyfrwng \"%s\", cyn cyfrwng pell \"%s\""
+
+#: ../urpm/media.pm:894
+#, c-format
+msgid "adding medium \"%s\""
+msgstr "ychwanegu cyfrwng \"%s\""
+
+#: ../urpm/media.pm:918
+#, c-format
+msgid "failed to copy media.cfg to %s (%d)"
+msgstr "methu copïo media.cfg i %s (%d)"
+
+#: ../urpm/media.pm:960
+#, c-format
+msgid "directory %s does not exist"
+msgstr "nid yw cyfeiriadur %s yn bodoli"
+
+#: ../urpm/media.pm:968
+#, c-format
+msgid "this location doesn't seem to contain any distribution"
+msgstr "nid yw'r lleoliad i weld yn cynnwys unrhyw ddosbarthiad"
+
+#: ../urpm/media.pm:992
+#, c-format
+msgid "unable to parse media.cfg"
+msgstr "methu didoli media.cfg"
+
+#: ../urpm/media.pm:995
+#, c-format
+msgid "unable to access the distribution medium (no media.cfg file found)"
+msgstr ""
+"methu cael mynediad at gyfrwng y dosbarthiad (heb ganfod ffeil media.cfg)"
+
+#: ../urpm/media.pm:1016
+#, c-format
+msgid "skipping non compatible media `%s' (for %s)"
+msgstr "hepgor cyfrwng anghymarus '%s' (ar gyfer %s)"
+
+#: ../urpm/media.pm:1031
+#, fuzzy, c-format
+msgid "ignoring non-free medium `%s'"
+msgstr "anwybyddu cyfrwng %s"
+
+#: ../urpm/media.pm:1074
+#, c-format
+msgid "retrieving media.cfg file..."
+msgstr "estyn ffeil media.cfg..."
+
+#: ../urpm/media.pm:1117
+#, c-format
+msgid "trying to select nonexistent medium \"%s\""
+msgstr "ceisio dewis y cyfrwng nad yw'n bod \"%s\""
+
+#: ../urpm/media.pm:1120
+#, c-format
+msgid "selecting multiple media: %s"
+msgstr "dewis aml-gyfrwng: %s"
+
+#: ../urpm/media.pm:1179
+#, c-format
+msgid "removing medium \"%s\""
+msgstr "dewis cyfrwng \"%s\":"
+
+#: ../urpm/media.pm:1262
+#, c-format
+msgid "reconfiguring urpmi for media \"%s\""
+msgstr "ail-ffurfweddu urpmi ar gyfer cyfrwng \"%s\""
+
+#: ../urpm/media.pm:1296
+#, c-format
+msgid "...reconfiguration failed"
+msgstr "...methodd ail-ffurfweddu"
+
+#: ../urpm/media.pm:1302
+#, c-format
+msgid "reconfiguration done"
+msgstr "cwblhau ail-ffurfweddu"
+
+#: ../urpm/media.pm:1318
+#, c-format
+msgid "Error generating names file: dependency %d not found"
+msgstr "Gwall wrth gynhyrchu ffeil enwau: heb ganfod dibyniaeth %d"
+
+#: ../urpm/media.pm:1339
+#, c-format
+msgid "medium \"%s\" is up-to-date"
+msgstr "cyfrwng \"%s\" wedi ei ddiweddaru"
+
+#: ../urpm/media.pm:1350
+#, c-format
+msgid "examining synthesis file [%s]"
+msgstr "archwilio ffeil synthesis [%s]"
+
+#: ../urpm/media.pm:1370
+#, c-format
+msgid "problem reading synthesis file of medium \"%s\""
+msgstr "anhawster darllen synthesis ffeil cyfrwng \"%s\""
+
+#: ../urpm/media.pm:1383 ../urpm/media.pm:1478
+#, c-format
+msgid "copying [%s] for medium \"%s\"..."
+msgstr "copïo [%s] ar gyfer cyfrwng \"%s\"..."
+
+#: ../urpm/media.pm:1385 ../urpm/media.pm:1455 ../urpm/media.pm:1708
+#, c-format
+msgid "...copying failed"
+msgstr "...methodd y copïo"
+
+#: ../urpm/media.pm:1451
+#, c-format
+msgid "copying description file of \"%s\"..."
+msgstr "copïo ffeil disgrifiad o \"%s\""
+
+#: ../urpm/media.pm:1453 ../urpm/media.pm:1482
+#, c-format
+msgid "...copying done"
+msgstr "...cwblhau'r copïo"
+
+#: ../urpm/media.pm:1484
+#, c-format
+msgid "copy of [%s] failed (file is suspiciously small)"
+msgstr "methodd copïo (%s) (Mae'r ffeil yn rhy fach)"
+
+#: ../urpm/media.pm:1532
+#, c-format
+msgid "computing md5sum of retrieved source synthesis"
+msgstr "cyfrifo md5sum o ffynhonnell synthesis adferwyd (neu synthesis)"
+
+#: ../urpm/media.pm:1534 ../urpm/media.pm:1974
+#, c-format
+msgid "retrieval of [%s] failed (md5sum mismatch)"
+msgstr "methodd estyn (%s) (md5sum gwallus)"
+
+#: ../urpm/media.pm:1549
+#, c-format
+msgid "genhdlist2 failed on %s"
+msgstr "methodd genhdlist2 ar %s"
+
+#: ../urpm/media.pm:1559
+#, c-format
+msgid "comparing %s and %s"
+msgstr "cymharu %s ac %s"
+
+#: ../urpm/media.pm:1589
+#, c-format
+msgid "invalid hdlist file %s for medium \"%s\""
+msgstr "ffeil hdlist annilys %s ar gyfer cyfrwng \"%s\""
+
+#: ../urpm/media.pm:1615
+#, c-format
+msgid "copying MD5SUM file of \"%s\"..."
+msgstr "copïo ffeil MD5SUM o \"%s\""
+
+#: ../urpm/media.pm:1655
+#, c-format
+msgid "invalid MD5SUM file (downloaded from %s)"
+msgstr "ffeil MD5SUM annilys (llwytho i lawr o %s)"
+
+#: ../urpm/media.pm:1658
+#, c-format
+msgid "no metadata found for medium \"%s\""
+msgstr "dim metadata ar gyfer cyfrwng \"%s\""
+
+#: ../urpm/media.pm:1690
+#, c-format
+msgid "retrieving source synthesis of \"%s\"..."
+msgstr "adfer ffynhonnell synthesis \"%s\"..."
+
+#: ../urpm/media.pm:1756
+#, c-format
+msgid "examining pubkey file of \"%s\"..."
+msgstr "archwilio ffeil pubkey \"%s\""
+
+#: ../urpm/media.pm:1768
+#, c-format
+msgid "...imported key %s from pubkey file of \"%s\""
+msgstr "...allwedd %s wedi ei fewnforio o ffeil pubkey \"%s\""
+
+#: ../urpm/media.pm:1772
+#, c-format
+msgid "unable to import pubkey file of \"%s\""
+msgstr "methu mewnforio ffeil pubkey \"%s\""
+
+#: ../urpm/media.pm:1813
+#, c-format
+msgid "no synthesis file found for medium \"%s\""
+msgstr "dim ffeil synthesis file ar gyfer cyfrwng \"%s\""
+
+#: ../urpm/media.pm:1846
+#, c-format
+msgid "updated medium \"%s\""
+msgstr "cyfrwng \"%s\" wedi ei ddiweddaru"
+
+#: ../urpm/media.pm:1968
+#, c-format
+msgid "retrieval of [%s] failed"
+msgstr "methodd estyn [%s]"
+
+#: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
+#, c-format
+msgid "trying again with mirror %s"
+msgstr "ceisio eto gyda drych %s"
+
+#: ../urpm/mirrors.pm:112
+#, c-format
+msgid "Could not find a mirror from mirrorlist %s"
+msgstr "Methu canfod drych o restr drychau %s"
+
+#: ../urpm/mirrors.pm:260
+#, c-format
+msgid "found geolocalisation %s %.2f %.2f from timezone %s"
+msgstr "wedi canfod geolleoleiddio %s %.2f %.2f  o gylchfa amser %s"
+
+#: ../urpm/mirrors.pm:305
+#, c-format
+msgid "getting mirror list from %s"
+msgstr "estyn rhestr drychai o %s"
+
+#: ../urpm/msg.pm:76 ../urpmi:491 ../urpmi:509 ../urpmi:625
+#, c-format
+msgid "Nn"
+msgstr "Nn"
+
+#  This is a list of chars acceptable as a 'yes' answer to a Yes/No question;
+#  you can put here the letters for 'yes' for your language, so people
+#  can hit those keys in their keyboard to reply.
+#  please keep the 'Yy' for compatibility reasons
+#. -PO: Add here the keys which might be pressed in the "Yes"-case.
+#: ../urpm/msg.pm:77 ../urpme:38 ../urpmi.addmedia:133
+#, c-format
+msgid "Yy"
+msgstr "Yy"
+
+#: ../urpm/msg.pm:107 ../urpme:159 ../urpmi.addmedia:136
+#, c-format
+msgid " (y/N) "
+msgstr " (y/N) "
+
+#: ../urpm/msg.pm:139
+#, c-format
+msgid "Sorry, bad choice, try again\n"
+msgstr "Dewis gwael, ceisiwch eto\n"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Package"
+msgstr "Pecyn"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Version"
+msgstr "Fersiwn"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Release"
+msgstr "Ryddhad"
+
+#: ../urpm/msg.pm:170
+#, c-format
+msgid "Arch"
+msgstr "Arch"
+
+#: ../urpm/msg.pm:179
+#, c-format
+msgid "(suggested)"
+msgstr "(awgrym)"
+
+#: ../urpm/msg.pm:194
+#, c-format
+msgid "medium \"%s\""
+msgstr "cyfrwng \"%s\""
+
+#: ../urpm/msg.pm:194
+#, c-format
+msgid "command line"
+msgstr "llinell orchymyn"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "B"
+msgstr "B"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "KB"
+msgstr "KB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "MB"
+msgstr "MB"
+
+#: ../urpm/msg.pm:208
+#, c-format
+msgid "GB"
+msgstr "GB"
+
+#: ../urpm/msg.pm:208 ../urpm/msg.pm:217
+#, c-format
+msgid "TB"
+msgstr "TB"
+
+#: ../urpm/orphans.pm:79
+#, c-format
+msgid "Marking %s as manually installed, it won't be auto-orphaned"
+msgstr ""
+"Marcio %s fel ei fod wedi ei osod â llaw, ni fydd yn cael ei awto-amddifadu"
+
+#: ../urpm/orphans.pm:522
+#, fuzzy, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned."
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned."
+msgstr[0] "Mae angen un o'r pecynnau canlynol:"
+msgstr[1] "Mae angen un o'r pecynnau canlynol:"
+
+#: ../urpm/orphans.pm:525
+#, fuzzy, c-format
+msgid "You may wish to remove it."
+msgid_plural "You may wish to remove them."
+msgstr[0] "Dim amddifad i'w tynnu"
+msgstr[1] "Dim amddifad i'w tynnu"
+
+#: ../urpm/orphans.pm:542
+#, c-format
+msgid ""
+"The following package:\n"
+"%s\n"
+"is now orphaned, if you wish to remove it, you can use \"urpme --auto-orphans"
+"\""
+msgid_plural ""
+"The following packages:\n"
+"%s\n"
+"are now orphaned, if you wish to remove them, you can use \"urpme --auto-"
+"orphans\""
+msgstr[0] ""
+"Mae'r pecyn canlynol:\n"
+"%s\n"
+"yn amddifad, os hoffech ei dynnu defnyddiwch \"urpme --auto-orphans\"."
+msgstr[1] ""
+"Mae'r pecynnau canlynol:\n"
+"%s\n"
+"yn amddifad, os hoffech eu tynnu defnyddiwch \"urpme --auto-orphans\"."
+
+#: ../urpm/parallel.pm:15
+#, c-format
+msgid "unable to parse \"%s\" in file [%s]"
+msgstr "methu didoli ffeil hdlist \"%s\" yn ffeil (%s)"
+
+#: ../urpm/parallel.pm:24
+#, c-format
+msgid "examining parallel handler in file [%s]"
+msgstr "archwilio trinydd paralel mewn ffeil [%s]"
+
+#: ../urpm/parallel.pm:35
+#, c-format
+msgid "found parallel handler for nodes: %s"
+msgstr "canfod trinydd paralel ar gyfer nodau: %s"
+
+#: ../urpm/parallel.pm:39
+#, c-format
+msgid "unable to use parallel option \"%s\""
+msgstr "methu defnyddio dewis paralel \"%s\""
+
+#: ../urpm/parallel.pm:94
+#, c-format
+msgid "on node %s"
+msgstr "ar nod %s"
+
+#: ../urpm/parallel.pm:294
+#, c-format
+msgid "Installation failed on node %s"
+msgstr "Methodd y gosod ar nod %s"
+
+#: ../urpm/parallel_ka_run.pm:58
+#, c-format
+msgid "rshp failed, maybe a node is unreacheable"
+msgstr "methodd rshp, efallai fod y nod yn anghyraeddadwy"
+
+#: ../urpm/parallel_ka_run.pm:80
+#, c-format
+msgid "mput failed, maybe a node is unreacheable"
+msgstr "methodd mput, efallai fod y nod yn anghyraeddadwy"
+
+#: ../urpm/parallel_ssh.pm:27
+#, c-format
+msgid "scp failed on host %s (%d)"
+msgstr "methodd scp ar westai %s (%d)"
+
+#: ../urpm/parallel_ssh.pm:39
+#, c-format
+msgid "cp failed on host %s (%d)"
+msgstr "methodd cp ar westai %s (%d)"
+
+#: ../urpm/parallel_ssh.pm:86
+#, c-format
+msgid ""
+"%s failed on host %s (maybe it does not have a good version of urpmi?) (exit "
+"code: %d)"
+msgstr ""
+"methodd %s ar westai %s (efallai nad oes ganddo fersiwn da o urpmi?) (cod "
+"gadael: %d)"
+
+#: ../urpm/removable.pm:46
+#, c-format
+msgid "unable to access medium \"%s\"."
+msgstr "methu cael mynediad at gyfrwng. \"%s\""
+
+#: ../urpm/removable.pm:86 ../urpm/removable.pm:104
+#, c-format
+msgid "mounting %s"
+msgstr "gosod %s"
+
+#: ../urpm/removable.pm:117
+#, c-format
+msgid "unmounting %s"
+msgstr "dadosod %s"
+
+#: ../urpm/select.pm:45
+#, c-format
+msgid "urpmi was restarted, and the list of priority packages did not change"
+msgstr "ail gychwynnwyd urpmi, ac nid yw'r rhestr prif pecynnau wedi newid"
+
+#: ../urpm/select.pm:47
+#, c-format
+msgid ""
+"urpmi was restarted, and the list of priority packages did change: %s vs %s"
+msgstr ""
+"ail gychwynnwyd urpmi, ac mae'r rhestr prif pecynnau wedi newid: %s vs %s"
+
+#: ../urpm/select.pm:217
+#, c-format
+msgid "No package named %s"
+msgstr "Dim pecyn o'r enw %s"
+
+#: ../urpm/select.pm:219 ../urpme:113
+#, c-format
+msgid "The following packages contain %s: %s"
+msgstr "Mae pecynnau canlynol yn cynnwys %s: %s:"
+
+#: ../urpm/select.pm:221
+#, c-format
+msgid "You should use \"-a\" to use all of them"
+msgstr "Dylech ddefnyddio \"-a\" i'w defnyddio i gyd"
+
+#: ../urpm/select.pm:368
+#, c-format
+msgid "found package(s) %s in urpmi db, but none are installed"
+msgstr "wedi canfod pecyn(nau) %s yn urpmi db, ond heb eu gosod"
+
+#: ../urpm/select.pm:600
+#, c-format
+msgid "Package %s is already installed"
+msgstr "Pecyn %s wedi ei osod eisoes"
+
+#: ../urpm/select.pm:601
+#, c-format
+msgid "Packages %s are already installed"
+msgstr "Pecynnau %s wedi eu gosod eisoes"
+
+#: ../urpm/select.pm:618 ../urpm/select.pm:705
+#, c-format
+msgid "due to conflicts with %s"
+msgstr "oherwydd gwrthdaro gyda %s"
+
+#: ../urpm/select.pm:619 ../urpm/select.pm:699
+#, c-format
+msgid "due to unsatisfied %s"
+msgstr "%s heb ei foddloni"
+
+#: ../urpm/select.pm:625
+#, c-format
+msgid "trying to promote %s"
+msgstr "ceisio hybu %s"
+
+#: ../urpm/select.pm:626
+#, c-format
+msgid "in order to keep %s"
+msgstr "fel modd i gadw %s"
+
+#: ../urpm/select.pm:667
+#, c-format
+msgid ""
+"The following package has to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Rhaid i'r pecyn canlynol gael ei dynnu i eraill gael eu diweddaru.\n"
+"%s"
+
+#: ../urpm/select.pm:668
+#, c-format
+msgid ""
+"The following packages have to be removed for others to be upgraded:\n"
+"%s"
+msgstr ""
+"Rhaid i'r pecynnau canlynol gael eu tynnu i eraill gael eu diweddaru.\n"
+"%s"
+
+#: ../urpm/select.pm:695
+#, c-format
+msgid "in order to install %s"
+msgstr "er mwyn gosod %s"
+
+#: ../urpm/select.pm:701
+#, c-format
+msgid "due to missing %s"
+msgstr "oherwydd %s coll"
+
+#: ../urpm/signature.pm:62
+#, c-format
+msgid "Invalid signature (%s)"
+msgstr "Llofnod annilys (%s)"
+
+#: ../urpm/signature.pm:77
+#, fuzzy, c-format
+msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
+msgstr "Mae pecynnau canlynol yn cynnwys %s: %s:"
+
+#: ../urpm/signature.pm:83
+#, c-format
+msgid "SECURITY: NOT checking package \"%s\" (due to configuration)"
+msgstr ""
+
+#: ../urpm/signature.pm:102
+#, c-format
+msgid "Invalid Key ID (%s)"
+msgstr "Enw Allwedd Annilys (%s)"
+
+#: ../urpm/signature.pm:104
+#, c-format
+msgid "Missing signature (%s)"
+msgstr "Llofnod coll (%s)"
+
+#: ../urpm/signature.pm:107
+#, c-format
+msgid "SECURITY: Medium \"%s\" has no key (%s)!"
+msgstr ""
+
+#: ../urpm/signature.pm:109
+#, c-format
+msgid "Medium without key (%s)"
+msgstr ""
+
+#: ../urpm/sys.pm:225
+#, c-format
+msgid "system"
+msgstr "system"
+
+#: ../urpm/sys.pm:262
+#, fuzzy, c-format
+msgid "You should restart your computer for %s"
+msgstr "Dylech ailddechrau %s ar gyfer %s"
+
+#: ../urpm/sys.pm:264
+#, fuzzy, c-format
+msgid "You should restart your session for %s"
+msgstr "Dylech ailddechrau %s ar gyfer %s"
+
+#: ../urpm/sys.pm:266
+#, c-format
+msgid "You should restart %s for %s"
+msgstr "Dylech ailddechrau %s ar gyfer %s"
+
+#: ../urpm/sys.pm:404
+#, c-format
+msgid "Can't write file"
+msgstr "Methu ysgrifennu'r ffeil"
+
+#: ../urpm/sys.pm:404
+#, c-format
+msgid "Can't open file"
+msgstr "Methu agor y ffeil"
+
+#: ../urpm/sys.pm:417
+#, c-format
+msgid "Can't move file %s to %s"
+msgstr "Methu symud ffeil %s i %s"
+
+#: ../urpme:43
+#, c-format
+msgid "  --auto         - automatically select a package in choices.\n"
+msgstr "  --auto         - dewis pecyn yn awtomatig o fewn dewisiadau.\n"
+
+#: ../urpme:44
+#, c-format
+msgid "  --auto-orphans - remove orphans\n"
+msgstr "  --auto-orphans - tynnu amddifad\n"
+
+#: ../urpme:45
+#, c-format
+msgid "  --test         - verify if the removal can be achieved correctly.\n"
+msgstr "  --test          - gwirio os oes modd tynnu'n iawn.\n"
+
+#: ../urpme:47 ../urpmi:104 ../urpmq:66
+#, c-format
+msgid "  --parallel     - distributed urpmi across machines of alias.\n"
+msgstr ""
+"  --parallel    - urpmi wedi ei ddosbarthu ar draws beiriannau eraill.\n"
+
+#: ../urpme:48 ../urpmi:138
+#, c-format
+msgid "  --repackage    - Re-package the files before erasing\n"
+msgstr "  --repackage    - Ailbecynnu'r ffeiliau cyn eu dileu\n"
+
+#: ../urpme:49
+#, c-format
+msgid "  --root         - use another root for rpm removal.\n"
+msgstr "  --root         - defnyddio root arall ar gyfer tynnu rpm.\n"
+
+#: ../urpme:50 ../urpmf:35 ../urpmi:106 ../urpmi.addmedia:73
+#: ../urpmi.recover:32 ../urpmi.removemedia:45 ../urpmi.update:48 ../urpmq:68
+#, c-format
+msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
+msgstr ""
+"  --urpmi-root         - defnyddio root arall ar gyfer gosod urpmi db ac "
+"rpm.\n"
+
+#: ../urpme:51 ../urpmi:96
+#, c-format
+msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
+msgstr "  --justdb       - diweddaru'n unig db yr rpm, nid y system ffeilio.\n"
+
+#: ../urpme:52
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s).\n"
+msgstr "  --noscripts    - peidio gweithredu sgriptledi'r pecyn(au).\n"
+
+#: ../urpme:53
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
+"                   to (un)install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - ffurfweddu urpmi wrth fynd o goeden distrib, defnyddiol\n"
+"                   wrth (ddad)osod chroot gyda dewis  --root.\n"
+
+#: ../urpme:55 ../urpmi:149 ../urpmq:87
+#, c-format
+msgid "  --verbose, -v  - verbose mode.\n"
+msgstr "  --verbose, -v  - modd llafar.\n"
+
+#: ../urpme:56
+#, c-format
+msgid "  -a             - select all packages matching expression.\n"
+msgstr "  -a             - select all packages matching expression.\n"
+
+#: ../urpme:71
+#, c-format
+msgid "Only superuser is allowed to remove packages"
+msgstr "Dim ond uwch ddefnyddiwr sy'n cael tynnu pecynnau"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown packages"
+msgstr "pecynnau anhysbys"
+
+#: ../urpme:104
+#, c-format
+msgid "unknown package"
+msgstr "pecyn anhysbys"
+
+#: ../urpme:119
+#, c-format
+msgid "Removing the following package will break your system:"
+msgid_plural "Removing the following packages will break your system:"
+msgstr[0] "Bydd tynnu pecyn canlynol yn torri eich system:"
+msgstr[1] "Bydd tynnu pecynnau canlynol yn torri eich system:"
+
+#: ../urpme:124
+#, c-format
+msgid "Nothing to remove"
+msgstr "Dim i'w dynnu"
+
+#: ../urpme:141
+#, c-format
+msgid "No orphans to remove"
+msgstr "Dim amddifad i'w tynnu"
+
+#: ../urpme:147
+#, c-format
+msgid "To satisfy dependencies, the following package will be removed"
+msgid_plural ""
+"To satisfy dependencies, the following %d packages will be removed"
+msgstr[0] "I fodloni dibyniaethau, bydd y %d pecyn canlynol yn cael eu tynnu"
+msgstr[1] "I fodloni dibyniaethau, bydd y %d pecyn canlynol yn cael eu tynnu"
+
+#: ../urpme:152
+#, c-format
+msgid "(orphan package)"
+msgid_plural "(orphan packages)"
+msgstr[0] "pecyn amddifad"
+msgstr[1] "pecynnau amddifad"
+
+#: ../urpme:159
+#, c-format
+msgid "Remove %d package?"
+msgid_plural "Remove %d packages?"
+msgstr[0] "Tynnu pecynnau %d?"
+msgstr[1] "Tynnu pecynnau %d?"
+
+#: ../urpme:164
+#, c-format
+msgid "testing removal of %s"
+msgstr "profi tynnu %s"
+
+#: ../urpme:181
+#, c-format
+msgid "Removal failed"
+msgstr "Methodd y tynnu"
+
+#: ../urpme:183
+#, c-format
+msgid "Removal is possible"
+msgstr "Mae tynnu yn bosibl"
+
+#: ../urpmf:31
+#, c-format
+msgid "  --version      - print this tool's version number.\n"
+msgstr "  --version      - argraffu rhif fersiwn yr offeryn.\n"
+
+#: ../urpmf:32 ../urpmi:128 ../urpmq:78
+#, c-format
+msgid "  --env          - use specific environment (typically a bug report).\n"
+msgstr ""
+"  --env          - defnyddio amgylchedd penodol (adroddiad gwall fel "
+"rheol).\n"
+
+#: ../urpmf:33 ../urpmi:69 ../urpmq:45
+#, c-format
+msgid "  --excludemedia - do not use the given media, separated by comma.\n"
+msgstr ""
+"  --excludemedia - peidio defnyddio'r cyfrwng hwn, rhannwyd gyda choma.\n"
+
+#: ../urpmf:34
+#, c-format
+msgid ""
+"  --literal, -l  - don't match patterns, use argument as a literal string.\n"
+msgstr ""
+"  --literal, -l  - peidio cydweddu patrymau, defnyddio ymresymiad fel llinyn "
+"llythrennedd.\n"
+
+#: ../urpmf:37 ../urpmi:72 ../urpmq:46
+#, c-format
+msgid ""
+"  --sortmedia    - sort media according to substrings separated by comma.\n"
+msgstr ""
+"   --sortmedia    - didoli'r cyfrwng yn ôl llinynnau wedi eu rhannu gyda "
+"choma.\n"
+
+#: ../urpmf:38
+#, c-format
+msgid "  --use-distrib  - use the given path to access media\n"
+msgstr ""
+"  --use-distrib  - defnyddio'r llwybr yma i gael mynediad ar y cyfrwng.\n"
+
+#: ../urpmf:39 ../urpmi:73 ../urpmq:47
+#, c-format
+msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
+msgstr "  --synthesis    - defnyddio'r synthesis yn lle urpmi db.\n"
+
+#: ../urpmf:40
+#, c-format
+msgid "  --uniq         - do not print identical lines twice.\n"
+msgstr "  --uniq         - peidio argraffu llinellau'r un fath.\n"
+
+#: ../urpmf:41 ../urpmi:70 ../urpmq:42
+#, c-format
+msgid "  --update       - use only update media.\n"
+msgstr "  --update          - defnyddio cyfrwng diweddaru'n unig.\n"
+
+#: ../urpmf:42
+#, c-format
+msgid "  --verbose      - verbose mode.\n"
+msgstr "  --verbose      - modd llafar.\n"
+
+#: ../urpmf:43
+#, c-format
+msgid "  -i             - ignore case distinctions in patterns.\n"
+msgstr ""
+"  -i             - anwybyddu gwahaniaeth maint llythrennau ym mhob patrwm.\n"
+
+#: ../urpmf:44
+#, c-format
+msgid "  -I             - honor case distinctions in patterns (default).\n"
+msgstr ""
+"  -i             - cadw gwahaniaeth maint llythrennau ym mhob patrwm "
+"(rhagosodiad).\n"
+
+#: ../urpmf:45
+#, c-format
+msgid "  -F<str>        - change field separator (defaults to ':').\n"
+msgstr "  -F<str>        - newid ymwahanydd maes (arferol i ':').\n"
+
+#: ../urpmf:46
+#, c-format
+msgid "Pattern expressions:\n"
+msgstr "Mynegiadau patrymau:\n"
+
+#: ../urpmf:47
+#, c-format
+msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
+msgstr ""
+"  text           - unrhyw destun wedi ei ddidoli fel regexp, onibai fod -l "
+"yn cael ei ddefnyddio.\n"
+
+#: ../urpmf:48
+#, c-format
+msgid "  -e             - include perl code directly as perl -e.\n"
+msgstr "  -e             - cynnwys perl cod yn union fel perl -e.\n"
+
+#: ../urpmf:49
+#, c-format
+msgid "  -a             - binary AND operator.\n"
+msgstr "  -a             - gweithredwr deuaidd AND.\n"
+
+#: ../urpmf:50
+#, c-format
+msgid "  -o             - binary OR operator.\n"
+msgstr "  -o             - gweithredwr deuaidd OR.\n"
+
+#: ../urpmf:51
+#, c-format
+msgid "  !              - unary NOT.\n"
+msgstr "  !              - unaidd NOT.\n"
+
+#: ../urpmf:52
+#, c-format
+msgid "  ( )            - left and right parentheses.\n"
+msgstr "  ( )              - parenthesis de a chwith.\n"
+
+#: ../urpmf:53
+#, c-format
+msgid "List of tags:\n"
+msgstr "Rhestr tagiau:\n"
+
+#: ../urpmf:54
+#, c-format
+msgid "  --qf           - specify a printf-like output format\n"
+msgstr "  --qf           - pennu allbwn fformat printf-aidd\n"
+
+#: ../urpmf:55
+#, c-format
+msgid "                   example: '%%name:%%files'\n"
+msgstr "                   esiampl: '%%enw:%%ffeil'\n"
+
+#: ../urpmf:56
+#, c-format
+msgid "  --arch         - architecture\n"
+msgstr "  --arch         - saernïaeth\n"
+
+#: ../urpmf:57
+#, c-format
+msgid "  --buildhost    - build host\n"
+msgstr "  --buildhost    - gwestai'r adeiladedd\n"
+
+#: ../urpmf:58
+#, c-format
+msgid "  --buildtime    - build time\n"
+msgstr "  --buildtime    - amser adeiladu\n"
+
+#: ../urpmf:59
+#, c-format
+msgid "  --conffiles    - configuration files\n"
+msgstr "  --conffiles    - ffeiliau ffurfweddiad\n"
+
+#: ../urpmf:60
+#, c-format
+msgid "  --conflicts    - conflict tags\n"
+msgstr "  --conflicts    - tagiau gwrthdaro\n"
+
+#: ../urpmf:61
+#, c-format
+msgid "  --description  - package description\n"
+msgstr "  --description  - disgrifiad pecyn\n"
+
+#: ../urpmf:62
+#, c-format
+msgid "  --distribution - distribution\n"
+msgstr "  --distribution - dosbarthiad\n"
+
+#: ../urpmf:63
+#, c-format
+msgid "  --epoch        - epoch\n"
+msgstr "  --epoch        - cyfnod\n"
+
+#: ../urpmf:64
+#, c-format
+msgid "  --filename     - filename of the package\n"
+msgstr "  --filename     - enw ffeil y pecyn\n"
+
+#: ../urpmf:65
+#, c-format
+msgid "  --files        - list of files contained in the package\n"
+msgstr "  --files        - rhestr ffeiliau o fewn y pecyn\n"
+
+#: ../urpmf:66
+#, c-format
+msgid "  --group        - group\n"
+msgstr "  --group        - grŵp\n"
+
+#: ../urpmf:67
+#, c-format
+msgid "  --license      - license\n"
+msgstr "  --license          - trwydded\n"
+
+#: ../urpmf:68
+#, c-format
+msgid "  --name         - package name\n"
+msgstr "  --name          - enw'r pecyn\n"
+
+#: ../urpmf:69
+#, c-format
+msgid "  --obsoletes    - obsoletes tags\n"
+msgstr "  --obsoletes     - tagiau'r hen\n"
+
+#: ../urpmf:70
+#, c-format
+msgid "  --packager     - packager\n"
+msgstr "  --packager      - pecynydd\n"
+
+#: ../urpmf:71
+#, c-format
+msgid "  --provides     - provides tags\n"
+msgstr "  --provides      - tag darparu\n"
+
+#: ../urpmf:72
+#, c-format
+msgid "  --requires     - requires tags\n"
+msgstr "  --requires     - tagiau angenrhaid\n"
+
+#: ../urpmf:73
+#, c-format
+msgid "  --size         - installed size\n"
+msgstr "  --size         - maint wedi gosod\n"
+
+#: ../urpmf:74
+#, c-format
+msgid "  --sourcerpm    - source rpm name\n"
+msgstr "  --sourcerpm    - enw rpm ffynhonnell\n"
+
+#: ../urpmf:75
+#, c-format
+msgid "  --suggests     - suggests tags\n"
+msgstr "  --suggests     - cynnig tagiau\n"
+
+#: ../urpmf:76
+#, c-format
+msgid "  --summary      - summary\n"
+msgstr "  --summary      - crynodeb\n"
+
+#: ../urpmf:77
+#, c-format
+msgid "  --url          - url\n"
+msgstr "  --url          - url\n"
+
+#: ../urpmf:78
+#, c-format
+msgid "  --vendor       - vendor\n"
+msgstr "  --vendor       - gwerthwr\n"
+
+#: ../urpmf:79
+#, c-format
+msgid "  -m             - the media in which the package was found\n"
+msgstr "  -m             - y cyfrwng lle cafwyd y pecyn\n"
+
+#: ../urpmf:80 ../urpmq:97
+#, c-format
+msgid "  -f             - print version, release and arch with name.\n"
+msgstr "  -f             - argraffu fersiwn a rhyddhad ac arch gydag enw.\n"
+
+#: ../urpmf:148
+#, c-format
+msgid "unterminated expression (%s)"
+msgstr "Mynegiadauheb ei derfynnu (%s)"
+
+#: ../urpmf:193
+#, c-format
+msgid "Incorrect format: you may use only one multi-valued tag"
+msgstr "Fformat anghywir: gallwch ddefnyddio un tag aml-werth yn unig"
+
+#: ../urpmf:286
+#, c-format
+msgid "no hdlist available for medium \"%s\""
+msgstr "dim ffeil hdlist ar gyfer cyfrwng \"%s\""
+
+#: ../urpmf:293
+#, c-format
+msgid "no synthesis available for medium \"%s\""
+msgstr "adeiladu ffeil synthesis file ar gyfer cyfrwng \"%s\""
+
+#: ../urpmf:302
+#, c-format
+msgid "no xml-info available for medium \"%s\""
+msgstr "dim xml-info ar gyfer cyfrwng \"%s\""
+
+#: ../urpmi:76
+#, c-format
+msgid "  --auto-update  - update media then upgrade the system.\n"
+msgstr "  --auto-update  - diweddaru'r cyfrwng ac yna uwchraddio'r system.\n"
+
+#: ../urpmi:77
+#, c-format
+msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - analluogi gwirio ffeil  MD5SUM.\n"
+
+#: ../urpmi:78
+#, c-format
+msgid "    --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - gorfodi diweddaru allwedd gpg.\n"
+
+#: ../urpmi:79
+#, c-format
+msgid "  --auto-orphans - remove orphans without asking\n"
+msgstr "  --auto-orphans - tynnu'r amddifad heb ofyn\n"
+
+#: ../urpmi:80 ../urpmq:52
+#, c-format
+msgid "  --no-suggests  - do not auto select \"suggested\" packages.\n"
+msgstr "  --no-suggests  - peidio awto ddewis pecynnau \"suggested\" .\n"
+
+#: ../urpmi:81
+#, c-format
+msgid ""
+"  --no-uninstall - never ask to uninstall a package, abort the "
+"installation.\n"
+msgstr "  --no-uninstall - peidio gofyn i ddadosod pecyn, atal gosod.\n"
+
+#: ../urpmi:82
+#, c-format
+msgid "  --no-install   - don't install packages (only download)\n"
+msgstr ""
+"  --no-install   - peidio gosod y pecynnau (dim ond eu llwytho i lawr)\n"
+
+#: ../urpmi:83 ../urpmq:54
+#, c-format
+msgid ""
+"  --keep         - keep existing packages if possible, reject requested\n"
+"                   packages that lead to removals.\n"
+msgstr ""
+"  --keep         - cadw'r pecynnau presennol os yn bosibl, gwrthod\n"
+"                   pecynnau sy'n arwain at dynnu.\n"
+
+#: ../urpmi:85
+#, c-format
+msgid ""
+"  --split-level  - split in small transaction if more than given packages\n"
+"                   are going to be installed or upgraded,\n"
+"                   default is %d.\n"
+msgstr ""
+"  --split-level  - hollti'n ddarnau llai os yw mwy na'r pecynnau hyn yn "
+"cael\n"
+"                   eu gosod neu eu uwchraddio\n"
+"                   rhagosodiad yw %d.\n"
+
+#: ../urpmi:89
+#, c-format
+msgid "  --split-length - small transaction length, default is %d.\n"
+msgstr "  --split-length - hyd drosglwyddiad byr, rhagosodiad yw %d.\n"
+
+#: ../urpmi:91
+#, c-format
+msgid "  --fuzzy, -y    - impose fuzzy search.\n"
+msgstr "  --fuzzy        - mynnu chwiliad bras.\n"
+
+#: ../urpmi:92
+#, c-format
+msgid "  --buildrequires - install the buildrequires of the packages\n"
+msgstr "  --buildrequires - gosod buildrequires y pecynnau\n"
+
+#: ../urpmi:93
+#, c-format
+msgid "  --install-src  - install only source package (no binaries).\n"
+msgstr ""
+"  --install-src  - gosod pecynnau ffynhonnell yn unig (dim binaries).\n"
+
+#: ../urpmi:94
+#, c-format
+msgid "  --clean        - remove rpm from cache before anything else.\n"
+msgstr "  --clean        - tynnu rpm o'r storfa cyn unrhyw beth arall.\n"
+
+#: ../urpmi:95
+#, c-format
+msgid "  --noclean      - don't clean rpms from cache.\n"
+msgstr "  --noclean      - peidio glanhau rpm o'r storfa.\n"
+
+#: ../urpmi:97
+#, c-format
+msgid ""
+"  --replacepkgs  - force installing packages which are already installed.\n"
+msgstr "  --replacepkgs  - gorfodi gosod pecynnau sydd wedi eu gosod eisoes.\n"
+
+#: ../urpmi:99
+#, c-format
+msgid ""
+"  --allow-nodeps - allow asking user to install packages without\n"
+"                   dependencies checking.\n"
+msgstr ""
+"  --allow-nodeps - caniatáu gofyn i ddefnyddiwr i osod pecynnau heb\n"
+"                   wirio dibyniaethau.\n"
+
+#: ../urpmi:101
+#, c-format
+msgid ""
+"  --allow-force  - allow asking user to install packages without\n"
+"                   dependencies checking and integrity.\n"
+msgstr ""
+"  --allow-force  - caniatáu gofyn i ddefnyddiwr osod pecyn heb\n"
+"                   wirio dibyniaethau na'u cyfanrwydd.\n"
+
+#: ../urpmi:103
+#, c-format
+msgid "  --allow-suggests - auto select \"suggested\" packages.\n"
+msgstr "  --allow-suggests - awto ddewis pecynnau \"awgrymwyd\".\n"
+
+#: ../urpmi:107
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree, useful\n"
+"                   to install a chroot with --root option.\n"
+msgstr ""
+"  --use-distrib  - ffurfweddu urpmi wrth fynd o goeden distrib, defnyddiol\n"
+"                   wrth osod chroot gyda dewis o  --root.\n"
+
+#: ../urpmi:109 ../urpmi.addmedia:60 ../urpmi.update:37
+#, c-format
+msgid "  --metalink     - generate and use a local metalink.\n"
+msgstr "  --metalink     - cynhyrchu a defnyddio metalink lleol.\n"
+
+#: ../urpmi:110
+#, c-format
+msgid ""
+"  --download-all - download all needed packages before trying to install "
+"them\n"
+msgstr ""
+
+#: ../urpmi:111
+#, c-format
+msgid ""
+"  --downloader   - program to use to retrieve distant files. \n"
+"                   known programs: %s\n"
+msgstr ""
+"  --downloader   - rhaglen i'w defnyddio ar gyfer estyn ffeiliau pell. \n"
+"                   rhaglenni hysbys: %s\n"
+
+#: ../urpmi:114
+#, c-format
+msgid "  --curl-options - additional options to pass to curl\n"
+msgstr "  --curl-options - dewis ychwanegol wrth ddefnyddio curl\n"
+
+#: ../urpmi:115
+#, c-format
+msgid "  --rsync-options- additional options to pass to rsync\n"
+msgstr "  --rsync-options- dewis ychwanegol wrth ddefnyddio rsync\n"
+
+#: ../urpmi:116
+#, c-format
+msgid "  --wget-options - additional options to pass to wget\n"
+msgstr "  --wget-options - dewis ychwanegol wrth ddefnyddio wget\n"
+
+#: ../urpmi:117
+#, c-format
+msgid "  --prozilla-options - additional options to pass to prozilla\n"
+msgstr "  --cprozilla-options - dewis ychwanegol wrth ddefnyddio prozilla\n"
+
+#: ../urpmi:118
+#, c-format
+msgid "  --aria2-options - additional options to pass to aria2\n"
+msgstr "  --aria2-options -dewis ychwanegol  i'w estyn i aria2\n"
+
+#: ../urpmi:119 ../urpmi.addmedia:61 ../urpmi.update:38
+#, c-format
+msgid "  --limit-rate   - limit the download speed.\n"
+msgstr "  --limit-rate   - cyfyngu cyflymder y llwytho i lawr.\n"
+
+#: ../urpmi:120
+#, c-format
+msgid ""
+"  --resume       - resume transfer of partially-downloaded files\n"
+"                   (--no-resume disables it, default is disabled).\n"
+msgstr ""
+"  --verify-rpm   - gwirio llofnod rpm cyn gosod\n"
+"                   (--no-verify-rpm analluogi, galluogi yw'r rhagosodedig)\n"
+
+#: ../urpmi:122 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
+#, c-format
+msgid ""
+"  --proxy        - use specified HTTP proxy, the port number is assumed\n"
+"                   to be 1080 by default (format is <proxyhost[:port]>).\n"
+msgstr ""
+"  --proxy        - defnyddio'r dirprwy HTTP enwyd, rhif y porth trwy\n"
+"                   rhagosodiad yw 1080 (fformat yw <proxyhost[:port]>).\n"
+
+#: ../urpmi:124 ../urpmi.addmedia:64 ../urpmi.update:41 ../urpmq:76
+#, c-format
+msgid ""
+"  --proxy-user   - specify user and password to use for proxy\n"
+"                   authentication (format is <user:password>).\n"
+msgstr ""
+"  --proxy-user   - enwi defnyddiwr a chyfrinair i'w ddefnyddio fel y\n"
+"                   dilysiad dirprwy (fformat yw <user:password>).\n"
+
+#: ../urpmi:126
+#, c-format
+msgid ""
+"  --bug          - output a bug report in directory indicated by\n"
+"                   next arg.\n"
+msgstr ""
+"  --bug          - cynhyrchu adroddiad gwall i'r cyfeiriadur nodir gan\n"
+"                   yr arg. nesaf\n"
+
+#: ../urpmi:132
+#, c-format
+msgid "  --excludepath  - exclude path separated by comma.\n"
+msgstr "  --excludepath  - eithrio llwybr wedi ei wahanu a chollnod.\n"
+
+#: ../urpmi:133
+#, c-format
+msgid "  --excludedocs  - exclude doc files.\n"
+msgstr "  --excludedocs  - eithrio ffeiliau docs.\n"
+
+#: ../urpmi:134
+#, c-format
+msgid "  --ignoresize   - don't verify disk space before installation.\n"
+msgstr "  --ignoresize   - peidio gwirio maint ar ddisg cyn gosod.\n"
+
+#: ../urpmi:135
+#, c-format
+msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
+msgstr "  --ignorearch   - caniatáu gosod rpm ar gyfer saernïaeth annhebyg.\n"
+
+#: ../urpmi:136
+#, c-format
+msgid "  --noscripts    - do not execute package scriptlet(s)\n"
+msgstr "  --noscripts    - peidio gweithredu sgripledi pecyn(au)\n"
+
+#: ../urpmi:137
+#, c-format
+msgid "  --replacefiles - ignore file conflicts\n"
+msgstr "  --replacefiles - anwybyddu gwrthdaro ffeiliau\n"
+
+#: ../urpmi:139
+#, c-format
+msgid "  --skip         - packages which installation should be skipped\n"
+msgstr "  --skip          - pecynnau dylid osgoi eu gosod.\n"
+
+#: ../urpmi:140
+#, c-format
+msgid "  --prefer       - packages which should be preferred\n"
+msgstr "  --prefer       - pecynnau angenrheidiol\n"
+
+#: ../urpmi:141
+#, c-format
+msgid ""
+"  --more-choices - when several packages are found, propose more choices\n"
+"                   than the default.\n"
+msgstr ""
+"  --more-choices - pan fydd nifer o becynnau wedi eu canfod, cynnig mwy o "
+"ddewis\n"
+"                   na'r rhagosodiad.\n"
+
+#: ../urpmi:143
+#, c-format
+msgid "  --nolock       - don't lock rpm db.\n"
+msgstr "  --nolock       - peidio cloi db rpm.\n"
+
+#: ../urpmi:144
+#, c-format
+msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
+msgstr ""
+"  --strict-arch  - uwchraddio dim ond pecynnau gyda'r un bensaernïaeth.\n"
+
+#: ../urpmi:145 ../urpmq:95
+#, c-format
+msgid "  -a             - select all matches on command line.\n"
+msgstr "  -a             - dewis pob cydweddiad ar y llinell gorchymyn.\n"
+
+#: ../urpmi:148
+#, c-format
+msgid "  --quiet, -q    - quiet mode.\n"
+msgstr "  --quiet, -q    - modd distaw.\n"
+
+#: ../urpmi:150
+#, c-format
+msgid "  --debug        - very verbose mode.\n"
+msgstr "  -  --debug       - modd llafar iawn.\n"
+
+#: ../urpmi:151
+#, c-format
+msgid "  names or rpm files given on command line will be installed.\n"
+msgstr ""
+" bydd enwau neu ffeiliau rpm sy'n cael eu rhoi ar y llinell orchymyn yn cael "
+"eu gosod.\n"
+
+#: ../urpmi:179
+#, c-format
+msgid "Error: can't use --auto-select along with package list.\n"
+msgstr "Gwall: methu defnyddio --auto-select ynghyd â'r rhestr pecynnau.\n"
+
+#: ../urpmi:186
+#, c-format
+msgid ""
+"Error: To generate a bug report, specify the usual command-line arguments\n"
+"along with --bug.\n"
+msgstr ""
+"Gwall: I gynhyrchu adroddiad gwall, nodwch yr ymresymiad llinell orchymyn "
+"arferol\n"
+"ynghyd a --bug.\n"
+
+#: ../urpmi:216
+#, c-format
+msgid "You can't install binary rpm files when using --install-src"
+msgstr "Methu gosod ffeiliau deuaidd rpm wrth ddefnyddio --install-src"
+
+#: ../urpmi:217
+#, c-format
+msgid "You can't install spec files"
+msgstr "Nid oes modd gosod ffeiliau spec"
+
+#: ../urpmi:224
+#, c-format
+msgid "defaulting to --buildrequires"
+msgstr "rhagosod --buildrequires"
+
+#: ../urpmi:229
+#, c-format
+msgid ""
+"please use --buildrequires or --install-src, defaulting to --buildrequires"
+msgstr ""
+"defnyddiwch --buildrequires neu --install-src, yn rhagosod i --buildrequires"
+
+#: ../urpmi:249
+#, c-format
+msgid ""
+"Directory [%s] already exists, please use another directory for bug report "
+"or delete it"
+msgstr ""
+"Mae cyfeiriadur (%s) yn bodoli eisoes, defnyddiwch gyfeiriadur arall am "
+"adroddiad gwall neu ei ddileu."
+
+#: ../urpmi:250
+#, c-format
+msgid "Unable to create directory [%s] for bug report"
+msgstr "Methu creu cyfeiriadur (%s) ar gyfer adroddiad gwall"
+
+#: ../urpmi:271
+#, c-format
+msgid ""
+"Error: %s appears to be mounted read-only.\n"
+"Use --allow-force to force operation."
+msgstr ""
+"Gwall: %s i weld wedi ei osod fel darllen yn unig.\n"
+"Defnydd --allow-force gorfodaeth i orfodi gweithred."
+
+#. -PO: here format is "<package_name>: <summary> (to upgrade)"
+#: ../urpmi:425
+#, c-format
+msgid "%s: %s (to upgrade)"
+msgstr "%s: %s (uwchraddio)"
+
+#. -PO: here format is "<package_name> (to upgrade)"
+#: ../urpmi:427
+#, c-format
+msgid "%s (to upgrade)"
+msgstr "%s (uwchraddio)"
+
+#. -PO: here format is "<package_name>: <summary> (to install)"
+#: ../urpmi:431
+#, c-format
+msgid "%s: %s (to install)"
+msgstr "%s: %s (gosod)"
+
+#. -PO: here format is "<package_name> (to install)"
+#: ../urpmi:433
+#, c-format
+msgid "%s (to install)"
+msgstr "%s (gosod)"
+
+#: ../urpmi:439
+#, c-format
+msgid ""
+"In order to satisfy the '%s' dependency, one of the following packages is "
+"needed:"
+msgstr "I fodloni '%s' dibyniaeth, bydd angen un o'r pecynnau canlynol:"
+
+#: ../urpmi:442
+#, c-format
+msgid "What is your choice? (1-%d) "
+msgstr "Beth yw eich dewis? (1-%d)"
+
+#: ../urpmi:484
+#, c-format
+msgid ""
+"The following package cannot be installed because it depends on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Nid oes modd gosod y pecyn canlynol am ei fod yn dibynnu ar becynnau\n"
+"sy'n hyn na'r rhai sydd wedi eu gosod:\n"
+"%s"
+
+#: ../urpmi:486
+#, c-format
+msgid ""
+"The following packages can't be installed because they depend on packages\n"
+"that are older than the installed ones:\n"
+"%s"
+msgstr ""
+"Nid oes modd gosod y pecynnau canlynol am eu bod yn dibynnu ar becynnau\n"
+"sy'n hyn na'r rhai sydd wedi eu gosod:\n"
+"%s"
+
+#: ../urpmi:492 ../urpmi:510
+#, c-format
+msgid ""
+"\n"
+"Continue installation anyway?"
+msgstr ""
+"\n"
+"Parhau i osod beth bynnag?"
+
+#: ../urpmi:493 ../urpmi:511 ../urpmi:626 ../urpmi.addmedia:136
+#, c-format
+msgid " (Y/n) "
+msgstr " (Y/n) "
+
+#: ../urpmi:504
+#, c-format
+msgid ""
+"A requested package cannot be installed:\n"
+"%s"
+msgstr ""
+"Nid oes modd gosod pecyn gofynnwyd amdani:\n"
+"%s"
+
+#: ../urpmi:525
+#, c-format
+msgid "removing package %s will break your system"
+msgstr "bydd tynnu pecynnau %s yn torri'r system"
+
+#: ../urpmi:533
+#, c-format
+msgid ""
+"The installation cannot continue because the following package\n"
+"has to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Nid oes modd i'r gosod parhau gan fo'n rhaid i'r pecyn canlynol\n"
+"gael ei dynnu i eraill gael eu diweddaru.\n"
+"%s\n"
+
+#: ../urpmi:535
+#, c-format
+msgid ""
+"The installation cannot continue because the following packages\n"
+"have to be removed for others to be upgraded:\n"
+"%s\n"
+msgstr ""
+"Nid oes modd i'r gosod parhau gan fo'n rhaid i'r pecynnau canlynol\n"
+"gael eu tynnu i eraill gael eu diweddaru.\n"
+"%s\n"
+
+#: ../urpmi:543
+#, c-format
+msgid "(test only, removal will not be actually done)"
+msgstr "(prawf yn unig, ni fydd yn cael ei ddadosod)"
+
+#: ../urpmi:562
+#, c-format
+msgid ""
+"You must first call urpmi with --buildrequires to install the following "
+"dependencies:\n"
+"%s\n"
+msgstr ""
+"Rhaid galw urpmi yn gyntaf gyda --buildrequires er mwyn gosod y dibyniaethau "
+"canlynol:\n"
+"%s\n"
+
+#: ../urpmi:572
+#, c-format
+msgid "The following orphan package will be removed."
+msgid_plural "The following orphan packages will be removed."
+msgstr[0] "Bydd y pecyn amddifad canlynol yn cael ei dynnu"
+msgstr[1] "Bydd y pecynnau amddifad canlynol yn cael eu tynnu"
+
+#: ../urpmi:596
+#, c-format
+msgid "WARNING: %s option is in use. Some strange problems may happen"
+msgstr ""
+
+#: ../urpmi:608
+#, c-format
+msgid "(test only, installation will not be actually done)"
+msgstr "(prawf yn unig, ni fydd yn cael ei osod)"
+
+#: ../urpmi:614
+#, c-format
+msgid "%s of additional disk space will be used."
+msgstr "Bydd %s o le ychwanegol ar ddisg yn cael ei ddefnyddio."
+
+#: ../urpmi:615
+#, c-format
+msgid "%s of disk space will be freed."
+msgstr "Bydd %s o le ar ddisg ar gael."
+
+#: ../urpmi:616
+#, c-format
+msgid "%s of packages will be retrieved."
+msgstr "bydd %s o becynnau yn cael eu hadfer."
+
+#: ../urpmi:617
+#, c-format
+msgid "Proceed with the installation of one package?"
+msgid_plural "Proceed with the installation of the %d packages?"
+msgstr[0] "Parhau gyda gosod %d pecyn?"
+msgstr[1] "Parhau gyda gosod %d pecyn?"
+
+#: ../urpmi:639
+#, c-format
+msgid "Press Enter when mounted..."
+msgstr "Pwyso Enter pan wedi ei arosod..."
+
+#. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
+#. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
+#: ../urpmi.addmedia:36
+#, fuzzy, c-format
+msgid ""
+"usage: urpmi.addmedia [options] <name> <url>\n"
+"where <url> is one of\n"
+"       [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"usage: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"usage: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"examples:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"  urpmi.addmedia --distrib --zeroconf\n"
+"\n"
+"\n"
+"and [options] are from\n"
+msgstr ""
+"defnydd: urpmi.addmedia [options] <name> <url>\n"
+"lle mae  <url> yn un o\n"
+"        [file:/]/<path>\n"
+"       ftp://<login>:<password>@<host>/<path>\n"
+"       ftp://<host>/<path>\n"
+"       http://<host>/<path>\n"
+"       cdrom://<path>\n"
+"\n"
+"defnydd: urpmi.addmedia [options] --distrib --mirrorlist <url>\n"
+"defnydd: urpmi.addmedia [options] --mirrorlist <url> <name> <relative path>\n"
+"\n"
+"esiamplau:\n"
+"\n"
+"  urpmi.addmedia --distrib --mirrorlist '$MIRRORLIST'\n"
+"  urpmi.addmedia --mirrorlist '$MIRRORLIST' backports media/main/backports\n"
+"\n"
+"\n"
+"a [options] o\n"
+
+#: ../urpmi.addmedia:56 ../urpmi.update:33 ../urpmq:71
+#, c-format
+msgid "  --wget         - use wget to retrieve distant files.\n"
+msgstr "  --wget         - defnyddio wget i estyn ffeiliau pell.\n"
+
+#: ../urpmi.addmedia:57 ../urpmi.update:34 ../urpmq:72
+#, c-format
+msgid "  --curl         - use curl to retrieve distant files.\n"
+msgstr "  --curl         - defnyddio curl i estyn ffeiliau pell.\n"
+
+#: ../urpmi.addmedia:58 ../urpmi.update:35 ../urpmq:73
+#, c-format
+msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
+msgstr "  --prozilla         - defnyddio prozilla i estyn ffeiliau pell.\n"
+
+#: ../urpmi.addmedia:59 ../urpmi.update:36
+#, c-format
+msgid "  --aria2        - use aria2 to retrieve distant files.\n"
+msgstr "  --aria2        - - defnyddio aria2 i estyn ffeiliau pell.\n"
+
+#: ../urpmi.addmedia:66
+#, c-format
+msgid ""
+"  --update       - create an update medium, \n"
+"                   or discard non-update media (when used with --distrib)\n"
+msgstr ""
+"  --update       - creu cyfrwng diweddaru, \n"
+"                   neu ddileu'r cyfrwng heb ei dddiweddaru (wrth gael ei "
+"ddefnyddio gyda --distrib)\n"
+
+#: ../urpmi.addmedia:68
+#, c-format
+msgid ""
+"  --xml-info     - use the specific policy for downloading xml info files\n"
+"                   one of: never, on-demand, update-only, always. cf urpmi."
+"cfg(5)\n"
+msgstr ""
+"  --xml-info     - defnyddio'r polisi penodol o lwytho ffeiliau gwybodaeth "
+"xml\n"
+"                   un o: byth, ar alw, diweddaru'n unig, bob tro. cf urpmi."
+"cfg(5)\n"
+
+#: ../urpmi.addmedia:70
+#, c-format
+msgid "  --probe-synthesis - use synthesis file.\n"
+msgstr "  --probe-synthesis - defnyddio ffeil synthesis.\n"
+
+#: ../urpmi.addmedia:71
+#, c-format
+msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
+msgstr "  --probe-rpms   -defnyddio ffeiliau rpm (yn lle synthesis).\n"
+
+#: ../urpmi.addmedia:72
+#, c-format
+msgid "  --no-probe     - do not try to find any synthesis file.\n"
+msgstr "  --no-probe     - peidio ceisio canfod unrhyw ffeil synthesis.\n"
+
+#: ../urpmi.addmedia:74
+#, c-format
+msgid ""
+"  --distrib      - automatically create all media from an installation\n"
+"                   medium.\n"
+msgstr ""
+"  --distrib      - creu yn awtomatig yr holl gyfrwng o gyfrwng\n"
+"                   gosod\n"
+
+#: ../urpmi.addmedia:76
+#, c-format
+msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
+msgstr ""
+"  --rhyngweithiol  - gyda --distrib, gofyn cadarnhad gyda phob cyfrwng\n"
+
+#: ../urpmi.addmedia:77
+#, c-format
+msgid "  --all-media    - with --distrib, add every listed media\n"
+msgstr "  --all-media   - gyda --distrib, rhestri'r holl gyfrwng ar gael.\n"
+
+#: ../urpmi.addmedia:78
+#, c-format
+msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
+msgstr "  --virtual      - creu cyfrwng rhithiol sydd wedi ei ddiweddaru,\n"
+
+#: ../urpmi.addmedia:79 ../urpmi.update:44
+#, c-format
+msgid "  --no-md5sum    - disable MD5SUM file checking.\n"
+msgstr "  --no-md5sum    - analluogi gwirio ffeil  MD5SUM.\n"
+
+#: ../urpmi.addmedia:80
+#, c-format
+msgid "  --nopubkey     - don't import pubkey of added media\n"
+msgstr "  --nopubkey     - peidio mewnforio pubkey y cyfrwng ychwanegwyd\n"
+
+#: ../urpmi.addmedia:81
+#, c-format
+msgid "  --raw          - add the media in config, but don't update it.\n"
+msgstr ""
+"  --raw          - ychwanegu cyfrwng yn config, ond nid yn ei ddiweddaru.\n"
+
+#: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:53
+#, c-format
+msgid "  -q             - quiet mode.\n"
+msgstr "  -q             - modd distaw.\n"
+
+#: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:54
+#, c-format
+msgid "  -v             - verbose mode.\n"
+msgstr "  --verbose      - modd llafar.\n"
+
+#: ../urpmi.addmedia:96
+#, c-format
+msgid "known xml-info policies are %s"
+msgstr "polisiau hysbys known xml-info yw %s"
+
+#: ../urpmi.addmedia:107
+#, c-format
+msgid "no argument needed for --distrib --mirrorlist <url>"
+msgstr "dim angen ymresymiad ar gyfer --distrib --mirrorlist <url>"
+
+#: ../urpmi.addmedia:112
+#, c-format
+msgid "bad <url> (for local directory, the path must be absolute)"
+msgstr ""
+"gwallus <url> (ar gyfer cyfeiriadur lleol, rhaid i'r llwybr fod yn absoliwt)"
+
+#: ../urpmi.addmedia:116
+#, c-format
+msgid "Only superuser is allowed to add media"
+msgstr "Dim ond uwch ddefnyddiwr sy'n cael ychwanegu cyfrwng"
+
+#: ../urpmi.addmedia:119
+#, c-format
+msgid "creating config file [%s]"
+msgstr "yn creu ffeil config (%s)"
+
+#: ../urpmi.addmedia:120
+#, c-format
+msgid "Can't create config file [%s]"
+msgstr "Methu creu ffeil Config (%s)"
+
+#: ../urpmi.addmedia:128
+#, c-format
+msgid "no need to give <relative path of synthesis> with --distrib"
+msgstr "dim angen rhoi <llwybr perthynnol synthesis> gyda --distrib"
+
+#: ../urpmi.addmedia:136
+#, c-format
+msgid ""
+"\n"
+"Do you want to add media '%s'?"
+msgstr ""
+"\n"
+"Hoffech chi ychwanegu cyfrwng '%s'?"
+
+#: ../urpmi.addmedia:156 ../urpmi.addmedia:181
+#, c-format
+msgid "unable to add medium"
+msgstr "methu ychwanegu cyfrwng"
+
+#: ../urpmi.addmedia:164
+#, c-format
+msgid "<relative path of synthesis> missing\n"
+msgstr "<llwybr perthynnol synthesis> ar goll\n"
+
+#: ../urpmi.addmedia:167
+#, c-format
+msgid "Can't use %s with remote medium"
+msgstr "Methu defnyddio %s gyda chyfrwng pell"
+
+#: ../urpmi.recover:30
+#, c-format
+msgid "  --checkpoint   - set repackaging start now\n"
+msgstr "  --checkpoint   - gosod cychwyn ailbacio nawr\n"
+
+#: ../urpmi.recover:31
+#, c-format
+msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
+msgstr "  --noclean      - peidio glanhau rpm ar checkpoint\n"
+
+#: ../urpmi.recover:33
+#, c-format
+msgid ""
+"  --list         - list transactions since provided date/duration argument\n"
+msgstr ""
+"  --list         - rhestri trafodion ers darparu ymresymiad dyddiad hyd\n"
+
+#: ../urpmi.recover:34
+#, c-format
+msgid "  --list-all     - list all transactions in rpmdb (long)\n"
+msgstr "  --list-all     - rhestri'r holl drafodion yn rpmdb (hir)\n"
+
+#: ../urpmi.recover:35
+#, c-format
+msgid "  --list-safe    - list transactions since checkpoint\n"
+msgstr "  --list-safe     - rhestri'r holl drafodion ers y pwynt gwirio\n"
+
+#: ../urpmi.recover:36
+#, c-format
+msgid ""
+"  --rollback     - rollback until specified date,\n"
+"                   or rollback the specified number of transactions\n"
+msgstr ""
+"  --rollback     - mynd yn ôl i'r dyddiad penodol,\n"
+"                   neu nôl y nifer o drafodion penodwyd\n"
+
+#: ../urpmi.recover:38
+#, c-format
+msgid "  --disable      - turn off repackaging\n"
+msgstr "  --disable      - diffodd ailbecynnu\n"
+
+#: ../urpmi.recover:53
+#, c-format
+msgid "Invalid date or duration [%s]\n"
+msgstr "Dyddiad neu hyd annilys [%s]\n"
+
+#: ../urpmi.recover:61
+#, c-format
+msgid "Repackage directory not defined\n"
+msgstr "Heb ddiffinio cyfeiriadur ailbecynnu\n"
+
+#: ../urpmi.recover:64
+#, c-format
+msgid "Can't write to repackage directory [%s]\n"
+msgstr "Methu ysgrifennu i gyfeiriadur ailbacio [%s]\n"
+
+#: ../urpmi.recover:66
+#, c-format
+msgid "Cleaning up repackage directory [%s]...\n"
+msgstr "Glanhau cyfeiriadur ailbacio [%s]...\n"
+
+#: ../urpmi.recover:68
+#, c-format
+msgid "%d file removed\n"
+msgid_plural "%d files removed\n"
+msgstr[0] "Tynnwyd %d pecyn\n"
+msgstr[1] "Tynnwyd %d pecyn\n"
+
+#: ../urpmi.recover:78
+#, c-format
+msgid "Spurious command-line arguments [%s]\n"
+msgstr "Ymresymiadau llinell orchymyn annilys [%s]\n"
+
+#: ../urpmi.recover:80
+#, c-format
+msgid "You can't specify --checkpoint and --rollback at the same time\n"
+msgstr "Methu pennu --checkpoint a --rollback ar yr un pryd\n"
+
+#: ../urpmi.recover:82
+#, c-format
+msgid "You can't specify --checkpoint and --list at the same time\n"
+msgstr "Methu pennu --checkpoint a --list ar yr un pryd\n"
+
+#: ../urpmi.recover:84
+#, c-format
+msgid "You can't specify --rollback and --list at the same time\n"
+msgstr "Methu pennu --rollback a --list ar yr un pryd\n"
+
+#: ../urpmi.recover:86
+#, c-format
+msgid "You can't specify --disable along with another option"
+msgstr "Methu pennu --disable gyda dewis arall"
+
+#: ../urpmi.recover:111
+#, c-format
+msgid "No transaction found since %s\n"
+msgstr "Dim trafodion ers %s\n"
+
+#: ../urpmi.recover:126
+#, c-format
+msgid "You must be superuser to do this"
+msgstr "Rhaid bod yn uwch-ddefnyddiwr i wneud hyn"
+
+#: ../urpmi.recover:139 ../urpmi.recover:205
+#, c-format
+msgid "Writing rpm macros file [%s]...\n"
+msgstr "Ysgrifennu ffeil macros rpm [%s]...\n"
+
+#: ../urpmi.recover:181
+#, c-format
+msgid "No rollback date found\n"
+msgstr "Heb ganfod dyddiad rholio nôl\n"
+
+#: ../urpmi.recover:184
+#, c-format
+msgid "Rollback until %s...\n"
+msgstr "Rholio nôl hyd %s...\n"
+
+#: ../urpmi.recover:191
+#, c-format
+msgid "Disabling repackaging\n"
+msgstr "Anablu ailbecynnu\n"
+
+#: ../urpmi.removemedia:38
+#, c-format
+msgid ""
+"usage: urpmi.removemedia (-a | <name> ...)\n"
+"where <name> is a medium name to remove.\n"
+msgstr ""
+"usage: urpmi.removemedia (-a | <name> ...)\n"
+"lle mai <name> yw'r enw cyfrwng i'w dynnu.\n"
+
+#: ../urpmi.removemedia:41
+#, c-format
+msgid "  -a             - select all media.\n"
+msgstr "  -a             - dewis pob cyfrwng.\n"
+
+#: ../urpmi.removemedia:42
+#, c-format
+msgid "  -y             - fuzzy match on media names.\n"
+msgstr "  -y             - cydweddiad bras enwau cyfryngau\n"
+
+#: ../urpmi.removemedia:59
+#, c-format
+msgid "Only superuser is allowed to remove media"
+msgstr "Dim ond uwch ddefnyddiwr sy'n cael tynnu cyfrwng"
+
+#: ../urpmi.removemedia:71
+#, c-format
+msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
+msgstr "dim i'w dynnu (defnyddio urpmi.addmedia i ychwanegu cyfrwng)\n"
+
+#: ../urpmi.removemedia:77
+#, c-format
+msgid ""
+"the entry to remove is missing\n"
+"(one of %s)\n"
+msgstr ""
+"mae'r cofnod i'w dynnu ar goll\n"
+"(un o %s)\n"
+
+#: ../urpmi.update:30
+#, c-format
+msgid ""
+"usage: urpmi.update [options] <name> ...\n"
+"where <name> is a medium name to update.\n"
+msgstr ""
+"usage: urpmi.update [dewisiadau] <name> ...\n"
+"lle mai <name> yw'r enw cyfrwng i'w dynnu.\n"
+
+#: ../urpmi.update:43
+#, c-format
+msgid "  --update       - update only update media.\n"
+msgstr "  --update          - defnyddio cyfrwng diweddaru'n unig.\n"
+
+#: ../urpmi.update:45
+#, c-format
+msgid "  --force-key    - force update of gpg key.\n"
+msgstr "  --force-key    - gorfodi diweddaru allwedd gpg.\n"
+
+#: ../urpmi.update:46
+#, c-format
+msgid "  --ignore       - don't update, mark the media as ignored.\n"
+msgstr ""
+"  --norebuild    - peidio diweddaru, marcio'r cyfrwng wedi ei anwybyddu.\n"
+
+#: ../urpmi.update:47
+#, c-format
+msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
+msgstr ""
+"  --no-ignore    - peidiwch diweddaru, marciwch y cyfrwng wedi ei alluogi.\n"
+
+#: ../urpmi.update:49
+#, c-format
+msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
+msgstr ""
+"  --probe-rpms     - peidio defnyddio synthesis, defnyddiwch ffeiliau rpm\n"
+
+#: ../urpmi.update:50
+#, fuzzy, c-format
+msgid "  -a             - select all enabled non-removable media.\n"
+msgstr "  -a             - dewis pob cyfrwng ansymudadwy.\n"
+
+#: ../urpmi.update:51
+#, c-format
+msgid "  -f             - force updating synthesis\n"
+msgstr "  -f             - gorfodi diweddaru ffeiliau synthesis\n"
+
+#: ../urpmi.update:52
+#, c-format
+msgid "  -ff            - really force updating synthesis\n"
+msgstr "  -f             - gorfodi diweddaru ffeiliau synthesis/\n"
+
+#: ../urpmi.update:69
+#, c-format
+msgid "Only superuser is allowed to update media"
+msgstr "Dim ond uwch ddefnyddiwr sy'n cael diweddaru cyfrwng"
+
+#: ../urpmi.update:86
+#, c-format
+msgid "nothing to update (use urpmi.addmedia to add a media)\n"
+msgstr "dim i'w ddiweddaru (defnyddio urpmi.addmedia i ychwanegu cyfrwng)\n"
+
+#: ../urpmi.update:87
+#, c-format
+msgid ""
+"the entry to update is missing\n"
+"(one of %s)\n"
+msgstr ""
+"mae'r cofnod i ddiweddaru ar goll\n"
+"(un o %s)\n"
+
+#: ../urpmi.update:98
+#, c-format
+msgid "\"%s\""
+msgstr "\"%s\""
+
+#: ../urpmi.update:99
+#, c-format
+msgid "ignoring media %s"
+msgstr "anwybyddu cyfrwng %s"
+
+#: ../urpmi.update:99
+#, c-format
+msgid "enabling media %s"
+msgstr "galluogi cyfrwng %s"
+
+#: ../urpmq:44
+#, c-format
+msgid ""
+"  --searchmedia  - use only the given media to search requested (or updated) "
+"packages.\n"
+msgstr ""
+"  --searchmedia  - defnyddio'r cyfrwng darparwyd i chwilio'r pecynnau "
+"gofynnwyd (neu diweddarwyd).\n"
+
+#: ../urpmq:49
+#, c-format
+msgid "  --auto-orphans - list orphans\n"
+msgstr "  --auto-orphans - rhestri'r amddifad\n"
+
+#: ../urpmq:50
+#, c-format
+msgid ""
+"  --not-available\n"
+"                 - list installed packages not available on any media.\n"
+msgstr ""
+
+#: ../urpmq:53
+#, c-format
+msgid "  --fuzzy        - impose fuzzy search (same as -y).\n"
+msgstr "  --fuzzy        - mynnu chwiliad fuzzy (fel -y).\n"
+
+#: ../urpmq:56
+#, c-format
+msgid "  --list         - list available packages.\n"
+msgstr "  --list        - rhestri'r holl gyfrwng ar gael.\n"
+
+#: ../urpmq:57
+#, c-format
+msgid "  --list-media   - list available media.\n"
+msgstr "  --list-media   - rhestri'r holl gyfrwng ar gael.\n"
+
+#: ../urpmq:58
+#, c-format
+msgid "  --list-url     - list available media and their url.\n"
+msgstr "  --list-url     - rhestri'r holl gyfrwng ar gael.\n"
+
+#: ../urpmq:59
+#, c-format
+msgid "  --list-nodes   - list available nodes when using --parallel.\n"
+msgstr ""
+"  --list-nodes   - rhestri'r nodau sydd ar gael wrth ddefnyddio --parallel.\n"
+
+#: ../urpmq:60
+#, c-format
+msgid "  --list-aliases - list available parallel aliases.\n"
+msgstr "  --list-aliases - rhestr ar gael ar gyfer enwau paralel.\n"
+
+#: ../urpmq:61
+#, c-format
+msgid ""
+"  --dump-config  - dump the config in form of urpmi.addmedia argument.\n"
+msgstr ""
+"  --dump-config  - dympio'r ffurfweddiad mewn ffurf ymresymiad urpmi."
+"addmedia.\n"
+
+#: ../urpmq:62
+#, c-format
+msgid "  --src          - next package is a source package (same as -s).\n"
+msgstr ""
+"  --src          - pecyn nesaf yn becyn ffynhonnell (yr un peth â -s).\n"
+
+#: ../urpmq:63
+#, fuzzy, c-format
+msgid "  --sources      - print source URLs of selected packages\n"
+msgstr "  --src, -s      - pecyn nesaf yn becyn ffynhonnell.\n"
+
+#: ../urpmq:65
+#, c-format
+msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
+msgstr ""
+"  --ignorearch   - caniatáu ymholi rpmau ar gyfer saernïaeth annhebyg.\n"
+
+#: ../urpmq:69
+#, c-format
+msgid ""
+"  --use-distrib  - configure urpmi on the fly from a distrib tree.\n"
+"                   This permit to querying a distro.\n"
+msgstr ""
+"  --use-distrib  - ffurfweddu urpmi wrth fynd o goeden distrib.\n"
+"                   Mae hyn yn caniatáu ymholi mewn dosbarthiad.\n"
+
+#: ../urpmq:79
+#, c-format
+msgid "  --changelog    - print changelog.\n"
+msgstr "  --changelog    - cofnod argraffu.\n"
+
+#: ../urpmq:80
+#, c-format
+msgid "  --conflicts    - print conflicts.\n"
+msgstr "  --conflicts    - gwrthdaro argraffu\n"
+
+#: ../urpmq:81
+#, c-format
+msgid "  --obsoletes    - print obsoletes.\n"
+msgstr "  --obsoletes     - argraffu'r hen.\n"
+
+#: ../urpmq:82
+#, c-format
+msgid "  --provides     - print provides.\n"
+msgstr "  --provides      - argraffu darparu\n"
+
+#: ../urpmq:83
+#, c-format
+msgid "  --requires     - print requires.\n"
+msgstr "  --requires     - angenrhaid argraffu.\n"
+
+#: ../urpmq:84
+#, c-format
+msgid "  --suggests     - print suggests.\n"
+msgstr "  --suggests     - argraffu'r awgrym.\n"
+
+#: ../urpmq:85
+#, c-format
+msgid "  --sourcerpm    - print sourcerpm.\n"
+msgstr "  --sourcerpm    - argraffu rpm ffynhonnell\n"
+
+#: ../urpmq:86
+#, c-format
+msgid "  --summary, -S  - print summary.\n"
+msgstr "  --summary, -S  - crynodeb argraffu.\n"
+
+#: ../urpmq:88
+#, c-format
+msgid ""
+"  --requires-recursive, -d\n"
+"                   - query package dependencies.\n"
+msgstr ""
+"  --requires-recursive, -d\n"
+"                   - ymestyn ymholiad i ddibyniaethau pecynnau.\n"
+".\n"
+
+#: ../urpmq:90
+#, c-format
+msgid "  --whatrequires - reverse search to what requires package.\n"
+msgstr "  --whatrequires - chwilio nôl  i'r hyn sydd angen ar becyn.\n"
+
+#: ../urpmq:91
+#, c-format
+msgid ""
+"  --whatrequires-recursive\n"
+"                   - extended reverse search (includes virtual packages).\n"
+msgstr ""
+"  --whatrequires-recursive\n"
+"                  - chwilio nôl  estyndig (yn cynnwys rhith becynnau) \n"
+
+#: ../urpmq:93
+#, c-format
+msgid ""
+"  --whatprovides, -p\n"
+"                   - search in provides to find package.\n"
+msgstr ""
+"  --whatprovides, -p\n"
+"                   - chwilio yn provides i ganfod pecyn.\n"
+
+#: ../urpmq:96
+#, c-format
+msgid "  -c             - complete output with package to be removed.\n"
+msgstr "  -c             - allbwn cyfan a phecyn i'w dynnu\n"
+
+#: ../urpmq:98
+#, c-format
+msgid "  -g             - print groups with name also.\n"
+msgstr "  -g            - argraffu grwpiau gydag enw hefyd.\n"
+
+#: ../urpmq:99
+#, c-format
+msgid "  -i             - print useful information in human readable form.\n"
+msgstr ""
+"  -i             - argraffu gwybodaeth ddefnyddiol mewn ffordd ddarllenadwy "
+"i bobl.\n"
+
+#: ../urpmq:100
+#, c-format
+msgid "  -l             - list files in package.\n"
+msgstr "  -l             - rhestri'r ffeiliau mewn pecyn.\n"
+
+#: ../urpmq:101
+#, c-format
+msgid "  -m             - equivalent to -du\n"
+msgstr "  -m             - yn cyfateb i -du.\n"
+
+#: ../urpmq:102
+#, c-format
+msgid "  -r             - print version and release with name also.\n"
+msgstr "  -r             - argraffu fersiwn a rhyddhad gydag enw hefyd.\n"
+
+#: ../urpmq:103
+#, c-format
+msgid "  -s             - next package is a source package (same as --src).\n"
+msgstr ""
+"  --s          - pecyn nesaf yn becyn ffynhonnell (yr un peth â --src).\n"
+
+#: ../urpmq:104
+#, c-format
+msgid ""
+"  -u             - remove package if a more recent version is already "
+"installed.\n"
+msgstr ""
+"  -u             - tynnu pecyn os oes yna fersiwn mwy diweddar wedi ei "
+"osod.\n"
+
+#: ../urpmq:105
+#, c-format
+msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
+msgstr "  -y             - gosod chwilio fuzzy (fel --fuzzy).\n"
+
+#: ../urpmq:106
+#, c-format
+msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
+msgstr ""
+"  -Y             - fel -y, ond yn gorfodi cydweddu diffyg cydweddiad maint "
+"llythrennau.\n"
+
+#: ../urpmq:107
+#, c-format
+msgid "  names or rpm files given on command line are queried.\n"
+msgstr ""
+" bydd enwau neu ffeiliau rpm sy'n cael eu rhoi ar y llinell orchymyn yn cael "
+"eu holi.\n"
+
+#: ../urpmq:154
+#, c-format
+msgid "usage: \"urpmq --auto-orphans\" with no argument"
+msgstr "defnydd: \"urpmq --auto-orphans\" heb ymresymiad"
+
+#: ../urpmq:207
+#, c-format
+msgid "--list-nodes can only be used with --parallel"
+msgstr "dim ond gyda --paralel mae modd defnyddio --list-nodes"
+
+#: ../urpmq:231
+#, c-format
+msgid "use -l to list files"
+msgstr "defnyddiwch -l i restru'r ffeiliau"
+
+#: ../urpmq:416
+#, c-format
+msgid "no xml info for medium \"%s\", only partial result for package %s"
+msgstr ""
+"dim xml info ar gyfer cyfrwng \"%s\", dim ond canlyniad rhannol ar gyfer "
+"pecyn %s"
+
+#: ../urpmq:417
+#, c-format
+msgid "no xml info for medium \"%s\", only partial result for packages %s"
+msgstr ""
+"dimxml info ar gyfer cyfrwng \"%s\", dim ond canlyniad rhannol ar gyfer "
+"pecynnau %s"
+
+#: ../urpmq:420
+#, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for package %s"
+msgstr ""
+"dim  xml info ar gyfer cyfrwng\"%s\", methu canfod unrhyw ganlyniad ar gyfer "
+"pecyn %s"
+
+#: ../urpmq:421
+#, c-format
+msgid ""
+"no xml info for medium \"%s\", unable to return any result for packages %s"
+msgstr ""
+"dim  xml info ar gyfer cyfrwng\"%s\", methu canfod unrhyw ganlyniad ar gyfer "
+"pecynnau %s"
+
+#: ../urpmq:488
+#, c-format
+msgid "No changelog found\n"
+msgstr "Heb ganfod changelog\n"
+
+#: ../gurpmi.desktop.in.h:1
+msgid "Software Installer"
+msgstr "Gosodwr Meddalwedd"
+
+#: ../gurpmi.desktop.in.h:2
+msgid "Graphical front end to install RPM files"
+msgstr "Blaen graffigol ar gyfer gosod ffeiliau RPM"
+
+#~ msgid ""
+#~ "urpme version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmf fersiwn %s\n"
+#~ "%s\n"
+#~ "Meddalwedd rhydd yw hwn a gall gael ei ddosbarthu o dan amodau'r GPL "
+#~ "GNU.\n"
+#~ "\n"
+#~ "defnydd:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmf version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage: urpmf [options] pattern-expression\n"
+#~ msgstr ""
+#~ "urpmf fersiwn %s\n"
+#~ "Hawlfraint © 2002 - 2006 Mandriva.\n"
+#~ "Meddalwedd rhydd yw hwn a gall gael ei ddosbarthu o dan amodau'r GPL "
+#~ "GNU..\n"
+#~ "\n"
+#~ "defnydd: urpmf [dewisiadau] pattern-expression\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmi.recover version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmi.recover fersiwn %s\n"
+#~ "Hawlfraint (C) 2006 Mandriva.\n"
+#~ "Meddalwedd rhydd yw hwn a gall gael ei ddosbarthu o dan amodau'r GPL "
+#~ "GNU.\n"
+#~ "\n"
+#~ "defnydd:\n"
+
+#, fuzzy
+#~ msgid ""
+#~ "urpmq version %s\n"
+#~ "%s\n"
+#~ "This is free software and may be redistributed under the terms of the GNU "
+#~ "GPL.\n"
+#~ "\n"
+#~ "usage:\n"
+#~ msgstr ""
+#~ "urpmq fersiwn %s\n"
+#~ "Hawlfraint (C) 2002-2006 Mandriva.\n"
+#~ "Meddalwedd rhydd yw hwn a gall gael ei ddosbarthu o dan amodau'r GPL "
+#~ "GNU.\n"
+#~ "\n"
+#~ "defnydd:\n"
+
+#~ msgid ""
+#~ "Installation failed, some files are missing:\n"
+#~ "%s\n"
+#~ "You may want to update your urpmi database"
+#~ msgstr ""
+#~ "Methodd y gosod, mae rhai ffeiliau ar goll:\n"
+#~ "%s\n"
+#~ "Hoffech chi ddiweddaru eich cronfa ddata urpmi?"
+
+#~ msgid "Cancel"
+#~ msgstr "Dileu"
+
+#, fuzzy
+#~ msgid ""
+#~ "# Here are logs of your DUDF uploads.\n"
+#~ "# Line format is : <date time of generation> <uid>\n"
+#~ "# You can use uids to see the content of your uploads at this url :\n"
+#~ "# %s"
+#~ msgstr ""
+#~ "# Dyma gofnod eich llwythi DUDF.\n"
+#~ "# Fformat llinell yw : <dyddiad amser cynhyrchu> <uid>\n"
+#~ "# Mae modd defnyddio You can use uids to see the content of your uploads "
+#~ "at this url :\n"
+#~ "# http://dudf.forge.mandriva.com/"
+
+#~ msgid "curl is missing, cannot upload DUDF file.\n"
+#~ msgstr "mae curl ar goll, methu llwytho ffeil DUDF.\n"
+
+#~ msgid "Compressing DUDF data... "
+#~ msgstr "Cywasgu data DUDF..."
+
+#~ msgid "NOT OK\n"
+#~ msgstr "NID YN IAWN\n"
+
+#~ msgid "OK\n"
+#~ msgstr "IAWN\n"
+
+#~ msgid "Uploading DUDF data:\n"
+#~ msgstr "Llwytho data DUDF:\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "You can see your DUDF report at the following URL :\n"
+#~ "\t"
+#~ msgstr ""
+#~ "\n"
+#~ "Mae eich adroddiad DUDF i’w weld yn yr URL canlynol :\n"
+#~ "\t"
+
+#, fuzzy
+#~ msgid ""
+#~ "You can access a log of your uploads in\n"
+#~ "\t"
+#~ msgstr ""
+#~ "Mae modd cael cofnod o'ch llwythi yn\n"
+#~ "\t"
+
+#~ msgid ""
+#~ "A problem has been encountered. You can help Mandriva to improve package\n"
+#~ "installation by uploading a DUDF report file.\n"
+#~ "This is a part of the Mancoosi european research project.\n"
+#~ "More at http://www.mancoosi.org\n"
+#~ msgstr ""
+#~ "Cafwyd anhawster. Mae modd cynorthwyo Mandriva i wella gosodiad\n"
+#~ "pecynnau drwy lwytho ffeil adrodd DUDF.\n"
+#~ "Mae hyn yn rhan o Mancoosi European Research Project.\n"
+#~ "Rhagor yn http://www.mancoosi.org\n"
+
+#, fuzzy
+#~ msgid "Do you want to upload a DUDF report to Mandriva?"
+#~ msgstr "Hoffech chi lwytho adroddiad DUDF i Mandriva ?"
+
+#~ msgid ""
+#~ "\n"
+#~ "Generating DUDF... "
+#~ msgstr ""
+#~ "\n"
+#~ "Cynhyrchu DUDF... "
+
+#, fuzzy
+#~ msgid "Cannot write DUDF file.\n"
+#~ msgstr "Methu ysgrifennu'r ffeil DUDF"
+
+#~ msgid ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+#~ msgstr ""
+#~ "  --sources      - give all source packages before downloading (root "
+#~ "only).\n"
+
+#~ msgid "due to already installed %s"
+#~ msgstr "oherwydd %s wedi ei osod eisoes"
+
+#~ msgid ""
+#~ "  --from         - use specified url for list of mirrors, the default is\n"
+#~ "                   %s\n"
+#~ msgstr ""
+#~ "  --from         - defnyddio url pennwyd ar gyfer rhestr drychau, y "
+#~ "rhagosodedig yw\n"
+#~ "                   %s\n"
+
+#~ msgid "Updating media...\n"
+#~ msgstr "Diweddaru cyfrwng...\n"
+
+#~ msgid "examining %s file"
+#~ msgstr "archwilio %s ffeil"
+
+#~ msgid "invalid MD5SUM file"
+#~ msgstr "ffeil MD SUM annilys"
+
+#~ msgid "found probed synthesis as %s"
+#~ msgstr "canfod synthesis holwyd fel %s"
+
+#~ msgid "  --update       - create an update medium.\n"
+#~ msgstr "  --update        - defnyddio cyfrwng diweddaru.\n"
+
+#~ msgid "malformed URL: [%s]"
+#~ msgstr "URL gwallus: [%s]"
+
+#~ msgid "sorry, you can't use --install-src to install remote .src.rpm files"
+#~ msgstr ""
+#~ "nid oes modd ei ddefnyddio --install-src i osod y ffeiliau pell .src.rpm "
+#~ "files"
+
+#~ msgid "Error"
+#~ msgstr "Gwall"
+
+#~ msgid "%d installation transaction failed"
+#~ msgid_plural "%d installation transactions failed"
+#~ msgstr[0] "methodd trosglwyddiad gosod %d"
+#~ msgstr[1] "methodd trosglwyddiad gosod %d"
+
+#~ msgid "Package %s can not be installed"
+#~ msgstr "Methu gosod pecyn %s"
+
+#~ msgid "Checking to remove the following packages"
+#~ msgstr "Ticio i ddileu'r pecynnau canlynol"
+
+#~ msgid "%s database locked"
+#~ msgstr "Cronfa ddata %s wedi cloi"
+
+#, fuzzy
+#~ msgid ""
+#~ "  --auto         - non-interactive mode, assume default answers to "
+#~ "questions.    --auto\n"
+#~ msgstr ""
+#~ "  --auto         - modd anrhyngweithiol, derbyn atebion rhagosodedig i "
+#~ "gwestiynau.\n"
+
+#~ msgid "Unknown option %s"
+#~ msgstr "Dewis anhysbys %s"
+
+#~ msgid "too many mount points for removable medium \"%s\""
+#~ msgstr "gormod o bwyntiau gosod ar gyfer cyfrwng symudol \"%s\""
+
+#~ msgid "Medium \"%s\" is an ISO image, will be mounted on-the-fly"
+#~ msgstr ""
+#~ "Delwedd ISO yw cyfrwng \"%s\" , a fydd yn cael ei osod wrth ei ddefnyddio."
+
+#~ msgid "using different removable device [%s] for \"%s\""
+#~ msgstr "defnyddio dyfais symudol gwahanol (%s) ar gyfer \"%s\""
+
+#~ msgid "unable to retrieve pathname for removable medium \"%s\""
+#~ msgstr "methu adfer enw llwybr ar gyfer cyfrwng symudadwy \"%s\""
+
+#~ msgid "unable to mount the distribution medium"
+#~ msgstr "methu mowntio cyfrwng y dosbarthiad"
+
+#~ msgid ""
+#~ "unable to access medium \"%s\",\n"
+#~ "this could happen if you mounted manually the directory when creating the "
+#~ "medium."
+#~ msgstr ""
+#~ "maethu cael mynediad i gyfrwng \"%s\",\n"
+#~ "gall hyn ddigwydd os ydych wedi gosod y cyfeiriadur wrth greu'r cyfrwng."
+
+#~ msgid "inconsistent medium \"%s\" marked removable but not really"
+#~ msgstr "cyfrwng annealladwy \"%s\" wedi ei nodi'n symudadwy ond nid yw"
+
+#~ msgid "  -c             - clean headers cache directory.\n"
+#~ msgstr "  -c             - glanhau penawdau yng nghyfeiriadur y storfa.\n"
+
+#~ msgid "virtual medium needs to be local"
+#~ msgstr "rhaid i'r rhith gyfrwng fod yn lleol"
+
+#~ msgid "Error generating names file: Can't write to file (%s)"
+#~ msgstr "Gwall wrth gynhyrchu ffeil enwau: Methu ysgrifennu ffeil (%s)"
+
+#, fuzzy
+#~ msgid "unable to parse synthesis file of \"%s\""
+#~ msgstr "methu didoli ffeil hdlist \"%s\""
+
+#~ msgid "found %d rpm headers in cache, removing %d obsolete headers"
+#~ msgstr "wedi canfod %d pennawd rpm yn yr ystorfa, tynnu %d hen bennawd"
+
+#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
+#~ msgstr "cyfrifo md5sum ffynhonnell presennol hdlist (neu synthesis) [%s]"
+
+#~ msgid ""
+#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
+#~ "ignored"
+#~ msgstr ""
+#~ "dylai cyfrwng rhithiol \"%s\" fod a rhestr ffeiliau hdlist, anwybyddwyd y "
+#~ "cyfrwng"
+
+#~ msgid "invalid hdlist name"
+#~ msgstr "enw hdlist annilys"
+
+#~ msgid "unable to find list file for \"%s\", medium ignored"
+#~ msgstr "methu canfod rhestr ffeil \"%s\", cyfrwng wedi ei anwybyddu"
+
+#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
+#~ msgstr "nid ddylai \"synthesis\" gael ei osod (canolig \"%s\")"
+
+#~ msgid "\"synthesis\" should be set (medium \"%s\")"
+#~ msgstr "\"synthesis\" i'w osod (canolig \"%s\")"
+
+#~ msgid "unable to access list file of \"%s\""
+#~ msgstr "methu cael mynediad  ffeil rhestr \"%s\""
+
+#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
+#~ msgstr ""
+#~ "cyfrwng \"%s\" yn ceisio defnyddio rhestr mewn defnydd, anwybyddu'r "
+#~ "cyfrwng"
+
+#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
+#~ msgstr ""
+#~ "cyfrwng \"%s\" yn ceisio defnyddio rhestr mewn defnydd, anwybyddu'r "
+#~ "cyfrwng"
+
+#~ msgid "wrote %s"
+#~ msgstr "ysgrifennodd %s"
+
+#~ msgid ""
+#~ "Note: no hdlist for medium \"%s\", unable to return any result for it"
+#~ msgstr ""
+#~ "Sylw: dim hdlist ar gyfer cyfrwng \"%s\", methu dychwelyd canlyniadau ar "
+#~ "ei gyfer"
+
+#~ msgid "performing second pass to compute dependencies\n"
+#~ msgstr "cyflawni ail ymgais i gyfrifo dibyniaethau\n"
+
+#~ msgid "building hdlist [%s]"
+#~ msgstr "adeiladu hdlist [%s]"
+
+#~ msgid ""
+#~ "Unable to build synthesis file for medium \"%s\". Your hdlist file may be "
+#~ "corrupted."
+#~ msgstr ""
+#~ "Methu adeiladu ffeil synthesis ar gyfer cyfrwng \"%s\". Efallai bod eich "
+#~ "ffeil hdlist yn llygredig."
+
+#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
+#~ msgstr "problem darllen hdlist neu ffeil synthesis y cyfrwng \"%s\""
+
+#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
+#~ msgstr "cyfrifo md5sum o ffynhonnell hdlist gopïwyd (neu synthesis)"
+
+#~ msgid "...retrieving failed: md5sum mismatch"
+#~ msgstr "... methodd ail-lwytho: anghysondeb md5sum"
+
+#~ msgid "no rpm files found from [%s]"
+#~ msgstr "heb ganfod ffeiliau rpm o [%s]"
+
+#~ msgid "unable to read rpm files from [%s]: %s"
+#~ msgstr "methu darllen ffeiliau rpm o (%s): %s"
+
+#~ msgid "no rpms read"
+#~ msgstr "heb ddarllen rpmau"
+
+#~ msgid "reading headers from medium \"%s\""
+#~ msgstr "darllen pennawd o'r cyfrwng \"%s\""
+
+#~ msgid "    --probe-synthesis - use synthesis file.\n"
+#~ msgstr "  --probe-synthesis - defnyddio ffeil synthesis.\n"
+
+#~ msgid "    --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - defnyddio ffeil hdlist.\n"
+
+#~ msgid ""
+#~ "Note: since no media searched uses hdlists, urpmf was unable to return "
+#~ "any result\n"
+#~ msgstr ""
+#~ "Sylw: gan nad oedd unrhyw gyfrwng chwiliwyd yn defnyddio hdlists, methodd "
+#~ "urpmf â chynnig canlyniad\n"
+
+#~ msgid "You may want to use --name to search for package names.\n"
+#~ msgstr "Efallai yr hoffech ddefnyddio --name i chwilio am enwau pecynnau.\n"
+
+#~ msgid "  --probe-hdlist - use hdlist file.\n"
+#~ msgstr "  --probe-hdlist - defnyddio ffeil hdlist.\n"
+
+#~ msgid "unable to update medium \"%s\"\n"
+#~ msgstr "methu diweddaru cyfrwng \"%s\"\n"
+
+#~ msgid "unable to create medium \"%s\"\n"
+#~ msgstr "methu creu cyfrwng \"%s\"\n"
+
+#~ msgid "there are multiple packages with the same rpm filename \"%s\""
+#~ msgstr "mae yna becynnau niferus gyda'r un enw ffeil rpm \"%s\""
+
+#~ msgid "unable to correctly parse [%s] on value \"%s\""
+#~ msgstr "methu didoli (%s) yn gywir ar werth \"%s\""
+
+#~ msgid "(retry as root?)"
+#~ msgstr "(ceisio eto fel root)"
+
+#~ msgid ""
+#~ "medium \"%s\" uses an invalid list file:\n"
+#~ "  mirror is probably not up-to-date, trying to use alternate method"
+#~ msgstr ""
+#~ "cyfrwng \"%s\" yn defnyddio rhestr ffeiliau annilys:\n"
+#~ "  nid yw'r drych yn un diweddar, ceisiwch ddull arall"
+
+#~ msgid "medium \"%s\" does not define any location for rpm files"
+#~ msgstr ""
+#~ "nid yw cyfrwng \"%s\" yn diffinio unrhyw leoliad ar gyfer ffeiliau rpm"
+
+#~ msgid "unrequested"
+#~ msgstr "diofyn"
+
+#~ msgid " (%d MB)"
+#~ msgstr " (%d MB)"
+
+#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
+#~ msgstr "ychwanegu pecyn %s (id=%d, eid=%d, update=%d, file=%s)"
+
+#~ msgid ""
+#~ "The following packages have bad signatures:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "Do you want to continue installation ?"
+#~ msgstr ""
+#~ "Mae gan y pecynnau canlynol lofnod gwallus:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "Hoffech chi barhau gyda'r gosod?"
+
+#~ msgid "You need to be root to use --use-distrib"
+#~ msgstr "Rhaid i chi fod yn wraidd i ddefnyddio --use-distrib"
+
+#~ msgid "unable to remove package %s"
+#~ msgstr "methu tynnu pecyn %s"
+
+#~ msgid "No filelist found\n"
+#~ msgstr "Heb ganfod filelist\n"
+
+#~ msgid ""
+#~ "To satisfy dependencies, the following %d packages will be removed (%d MB)"
+#~ msgstr ""
+#~ "I fodloni dibyniaethau, bydd y %d pecyn canlynol yn cael eu tynnu (%d MB)"
+
+#~ msgid "Proceed with the installation of the %d package? (%d MB)"
+#~ msgid_plural "Proceed with the installation of the %d packages? (%d MB)"
+#~ msgstr[0] "Parhau gyda gosod %d pecyn? (%d MB)"
+#~ msgstr[1] "Parhau gyda gosod %d pecyn? (%d MB)"
+
+#~ msgid "(%d packages, %d MB)"
+#~ msgstr "(%d pecyn, %d MB)"
+
+#~ msgid ""
+#~ "  -P             - do not search in provides to find package (default).\n"
+#~ msgstr ""
+#~ "  -P             - peidio chwilio yn provides i ganfod pecyn "
+#~ "(rhagosodedig).\n"
+
+#~ msgid "  -R             - reverse search to what requires package.\n"
+#~ msgstr "  -R             - chwilio nôl  i'r hyn sydd angen ar becyn.\n"

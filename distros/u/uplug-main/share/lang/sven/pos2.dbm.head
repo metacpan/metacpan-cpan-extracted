@@ -1,0 +1,2 @@
+# features (source): {'pos' => '^(([^N].).*\\Z|(N).*\\@(.).*\\Z)/$2$3$4'}
+# features (target): {'pos' => '^(..).*$/$1'}

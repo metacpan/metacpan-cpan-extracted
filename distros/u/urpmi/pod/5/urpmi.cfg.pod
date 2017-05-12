@@ -1,0 +1,275 @@
+=head1 NAME
+
+urpmi.cfg - urpmi option and media configuration file format
+
+=head1 DESCRIPTION
+
+The urpmi.cfg file is divided in multiple sections: one section to set
+global options, and one section per media.
+
+=head1 GLOBAL OPTIONS
+
+Some global options can be activated by default. The following sample
+shows how to disable signature checking and avoid transaction splits :
+
+    {
+	no-verify-rpm
+	split-length: 0
+    }
+
+The following options can be written in this section :
+
+=over
+
+=item B<allow-force>
+
+Same as specifying B<--allow-force> for urpmi. Disabled by default.
+
+=item B<allow-nodeps>
+
+Same as specifying B<--allow-nodeps> for urpmi. Disabled by default.
+
+=item B<xml-info>
+
+For remote media, specify when files.xml.lzma, changelog.xml.lzma and info.xml.lzma are downloaded:
+
+=over
+
+=item B<never>
+
+=item B<on-demand>
+
+(This is the default).
+
+The specific xml info file is downloaded when urpmq/urpmf/rpmdrake ask for it.
+urpmi.update will remove outdated xml info file.
+
+nb: if urpmq/urpmf/rpmdrake is not run by root, the xml info file is downloaded into /tmp/.urpmi-<uid>/
+
+=item B<update-only>
+
+urpmi.update will update xml info files already required at least once by urpmq/urpmf/rpmdrake.
+
+nb: with B<update-only>, urpmi.update will not update /tmp/.urpmi-<uid>/ xml info files
+
+=item B<always>
+
+all xml info files are downloaded when doing urpmi.addmedia and urpmi.update
+
+=back
+
+=item B<no-suggests>
+
+Same as specifying B<--no-suggests> for urpmi. Disabled by default.
+
+=item B<auto>
+
+Same as specifying B<--auto> for urpmi. Disabled by default.
+
+=item B<compress>
+
+Deprecated (use rsync-options)
+
+=item B<curl-options>
+
+Additional options to pass to B<curl>'s command line when downloading files.
+
+=item B<default-media>
+
+A comma-separated list of media names. By default, only those media will
+be taken into account (that is, when you don't specify an alternate list
+of media via the B<--media> command-line option.)
+
+=item B<disable-certificate-check>
+
+Disables checking of certificates when connecting to a https medium. By
+default the certificates are checked and the connection will fail if
+the certificate is invalid. This option shouldn't be used for maximum
+security.
+
+=item B<download-all> 
+
+Same as B<--download-all> option for urpmi: downloads all packages before
+installing into the specified directory.  If you want to use the default
+location, assign an empty string to it (WARNING! "yes" or "1" are NOT the
+options you really want to use here!)
+
+=item B<downloader>
+
+Specify which download program to use: B<wget> or B<curl>.
+
+=item B<excludedocs>
+
+Same as specifying B<--excludedocs> for urpmi. Disabled by default.
+
+=item B<excludepath>
+
+Same as B<--excludepath> for urpmi. This options allows to give a comma
+separated list of paths to be excluded on installation. There is no path
+exclusion by default.
+
+=item B<fuzzy>
+
+Same as B<--fuzzy> for urpmi or urpmq. Enable or disable fuzzy
+search. Disabled by default. Enabling it can be written in various ways :
+C<fuzzy> or C<fuzzy: yes> or C<fuzzy: on> or C<fuzzy: 1>.
+
+=item B<keep>
+
+Same as B<--keep> for urpmi or urpmq.
+
+=item B<key-ids>
+
+This option is not available on the command line. It allows to use a comma
+separated list of key ids to be globally accepted (keys still need to be
+authorized by B<rpm>) for any medium unless a specific B<key-ids> option
+for this medium is given. There is no default (even Mageia public key id
+70771ff3 is not included by default).
+
+=item B<ignoresize>
+
+Don't check file systems for sufficient disk space before installation.
+Same as specifying B<--ignoresize> for urpmi. Disabled by default.
+
+=item B<limit-rate>
+
+Same as B<--limit-rate> for all tools. This option allows to control
+download speed; there is no limitation by default. The number is given in
+bytes per second, unless a suffix C<K> or C<M> is added.
+
+=item B<max-round-robin-tries>
+
+For mirrorlist, the maximum number of mirrors to try before giving up. (since
+sometimes all mirrors have the same problem and it is useless to try more).
+
+=item B<days-between-mirrorlist-update>
+
+After a number of days, urpmi.update will update the list of mirrors (to get
+potential new mirrors).
+
+=item B<nopubkey>
+
+Don't import pubkeys when updating media.
+
+=item B<norebuild>
+
+Obsolete. Enabled by default.
+
+=item B<pre-clean, post-clean, clean>
+
+Control cache management for urpmi, default is only activated as
+B<post-clean>.
+
+=item B<priority-upgrade>
+
+A comma-separated list of package names that must be installed first,
+and that trigger an urpmi restart.
+
+=item B<prohibit-remove>
+
+A comma-separated list of package names that must never be removed (just
+like B<basesystem> dependencies).
+
+=item B<prozilla-options>
+
+Same as B<--prozilla-options> for urpmi, urpmq or urpmi.addmedia.
+Additional options to pass to B<prozilla> when downloading files.
+
+=item B<repackage>
+
+Same as specifying B<--repackage> for urpmi. Disabled by default.
+Ignored when it's set globally by urpmi.recover.
+
+=item B<resume>
+
+Same as specifying B<--resume> for urpmi. Resume transfer of partially-downloaded files.
+
+=item B<retry>
+
+Specify how many times the downloader should retry in case of non-permanent
+errors.
+
+=item B<rsync-options>
+
+Additional options to pass to B<rsync> when downloading files.
+Note that the rsync options will also be used for ssh media.
+
+=item B<split-length>
+
+Same as B<--split-length> for urpmi. This option allows to control the
+minimal length of splitted transactions. The default value is 8. 
+Setting this value to 0 disables the splitting of
+transactions.
+
+=item B<split-level>
+
+Same as B<--split-level> for urpmi. This option allows to control if
+transactions should be splitted depending of the number of packages to
+upgrade. The default value is 1.
+
+=item B<strict-arch>
+
+Same as B<--strict-arch> for urpmi. Boolean option, enabled by
+default, meaning that packages can not be upgraded with versions for another
+architecture.
+
+=item B<verify-rpm>
+
+Same as B<--verify-rpm> for urpmi. Enable or disable signature checking
+(it's enabled by default). Disabling it can be written in various ways (as
+for all the other boolean options) : C<no-verify-rpm> or C<verify-rpm: no>
+or C<verify-rpm: off> or C<verify-rpm: 0>.
+
+=item B<wget-options>
+
+Additional options to pass to B<wget>'s command line when downloading files.
+
+=back
+
+=head1 MEDIUM DESCRIPTION
+
+A medium is described as follows :
+
+    name url {
+	... list of options, one per line ...
+    }
+
+where B<name> is the medium name (space characters must be prefixed by a
+backslash) and where B<url> is the medium URL.
+
+Most other options like B<list>, B<media_info_dir>, 
+B<synthesis>, B<removable>, B<virtual> are for internal use and should be
+changed only by experienced users.
+
+Options like B<update>, B<ignore> or B<key-ids> can be modified by users
+to respectively mark mediums as update sources, to have them being
+ignored, or to specify the allowed GPG key ids for packages from the
+medium for verification (unless of course signature checking has been
+disabled globally). It's also possible to override B<verify-rpm> and
+B<downloader> in a medium description.
+
+The B<noreconfigure> flag can be added to specify that the media should
+not be reconfigured (by a reconfiguration file present on the mirror).
+
+Media can be marked as B<static>: this means that they will never get
+updated by urpmi.update or other means. This is useful for read-only media
+such as CDs.
+
+Please note that B<key-ids> is automatically set by urpmi.update or
+urpmi.addmedia if a remote pubkey file is available on the mirror. This
+file contains all the GPG armor keys that may be used.
+
+=head1 BUGS
+
+A C<{> should finish a line, as well as a C<}> should start it when used.
+This means the construction C<{ no-verify-rpm }> on a single line is
+invalid.
+
+=head1 AUTHOR
+
+Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+FranE<ccedil>ois Pons, Rafael Garcia-Suarez 
+
+=head1 SEE ALSO
+
+urpmi(8), urpmi.files(5).

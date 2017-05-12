@@ -1,0 +1,59 @@
+---
+abstract: 'turn on Unicode - all of it'
+author:
+  - 'Michael Schwern <mschwern@cpan.org>'
+  - 'Mike Doherty <doherty@cpan.org>'
+  - 'Hayo Baan <info@hayobaan.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  PerlIO: '0'
+  Test::Exception: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Test::Warn: '0'
+  autodie: '0'
+  blib: '1.01'
+  constant: '0'
+  perl: '5.010'
+  threads: '0'
+  threads::shared: '0'
+  version: '0.77'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: utf8-all
+no_index:
+  directory:
+    - corpus
+provides:
+  utf8::all:
+    file: lib/utf8/all.pm
+    version: '0.022'
+requires:
+  Carp: '0'
+  Encode: '0'
+  Import::Into: '0'
+  PerlIO::utf8_strict: '0'
+  Symbol: '0'
+  charnames: '0'
+  feature: '0'
+  open: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/utf8-all/issues
+  homepage: http://metacpan.org/release/utf8-all/
+  repository: git://github.com/doherty/utf8-all.git
+version: '0.022'
+x_serialization_backend: 'YAML::Tiny version 1.69'

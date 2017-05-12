@@ -1,0 +1,286 @@
+=head1 NAME
+
+urpmf - Finds the packages matching some conditions
+
+=head1 SYNOPSIS
+
+    urpmf [options] <pattern-expression>
+
+=head1 DESCRIPTION
+
+By default, urpmf outputs the list of the known packages that contain a
+file whose name or path was specified as an argument on the command-line.
+<I<pattern-expression>> is the name or part of the name of the file you
+want to locate. Perl-style regular expressions are allowed. urpmf will
+then print a list of matching files, with their corresponding packages. By
+using options, you may format output differently, and search through other
+rpm tags. The default behaviour corresponds to the B<--files> option;
+using other options makes urpmf search through other tags' contents.
+
+Note that urpmf searches through the urpmi media (B<not> in
+the system's rpm database -- for that you should use rpm(8) instead).
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+Prints a help message and exits.
+
+=item B<--version>
+
+Prints the version number and exits.
+
+=item B<--env> I<directory>
+
+Use a different environment directly out of a bug report tarball.
+
+=item B<--excludemedia> I<medium1,...,mediumN>
+
+Do not use the given media.
+
+=item B<--literal>
+
+Match literally instead of interpreting the argument as a regular
+expression.
+
+=item B<-l>
+
+Equivalent to B<--literal>.
+
+=item B<--media> I<medium1,...,mediumN>
+
+Select specific media to be used, instead of defaulting to all available
+media (or all update media if B<--update> is used).
+
+=item B<--sortmedia> I<medium1,...,mediumN>
+
+Sort the given media, substrings may be used to simplify grouping.
+This way, C<media1> will be taken into account first, then C<media2>, and
+so on. Media which aren't listed are taken into account after the others.
+
+=item B<--synthesis> I<file>
+
+Use the given synthesis file instead of urpmi db for searching packages.
+
+=item B<--use-distrib> I<directory>
+
+Use the given distribution tree instead of urpmi db for searching packages.
+
+=item B<--uniq>
+
+Do not print identical lines twice.
+
+=item B<--update>
+
+Use only update media. This means urpmf will only search through media
+marked as update.
+
+=item B<--urpmi-root> I<directory>
+
+Use the file system tree rooted for urpmi database and rpm install. Contrary
+to B<--root>, the urpmi configuration comes from the rooted tree.
+
+=item B<--verbose>
+
+Verbose mode. urpmf will emit various messages related to the parsing of
+media_info files for your media.
+
+=item B<--wait-lock>
+
+If the urpmi or rpm db is busy, wait until it is available
+
+=item B<-i>
+
+Ignore case distinctions in the patterns that follow.
+
+=item B<-I>
+
+Honor case distinctions in the patterns that follow. This is the default
+behaviour.
+
+=item B<-F> I<string>
+
+Change field separator to I<string> for the rest of the output line (it
+defaults to ':')
+
+=item B<--qf> I<format-string>
+
+Specify a printf-like output format.
+
+=item B<--arch>
+
+Prints the architecture tag.
+
+=item B<--buildhost>
+
+Prints the BuildHost tag.
+
+=item B<--buildtime>
+
+Prints the
+BuildTime tag.
+
+=item B<--conffiles>
+
+Prints the list of configuration files contained
+in the package. (Might be empty.)
+
+=item B<--conflicts>
+
+Prints the Conflicts tags.
+
+=item B<--description>
+
+Prints the Description tag.
+
+=item B<--distribution>
+
+Prints the Distribution tag.
+
+=item B<--epoch>
+
+Prints the Epoch tag.
+
+=item B<--filename>
+
+Prints package file names.
+
+=item B<--files>
+
+Prints the list of files contained in the rpm (this is the default if you
+specify no field).
+
+=item B<--group>
+
+Prints the Group tag.
+
+=item B<--license>
+
+Prints the License tag.
+
+=item B<--name>
+
+Prints package names.
+
+=item B<--obsoletes>
+
+Prints the Obsoletes tags.
+
+=item B<--packager>
+
+Prints the Packager tag.
+
+=item B<--provides>
+
+Prints the Provides tags.
+
+=item B<--requires>
+
+Prints the Requires tag.
+
+=item B<--size>
+
+Prints the Size tag.
+
+=item B<--sourcerpm>
+
+Prints the names of source rpms.
+
+=item B<--suggests>
+
+Prints the Suggests tag.
+
+=item B<--summary>
+
+Prints the Summary tag.
+
+=item B<--url>
+
+Prints the packages' URL.
+
+=item B<--vendor>
+
+Prints the Vendor tag.
+
+=item B<-m>
+
+Print the name of the media in which the
+package has been found.
+
+=item B<-f>
+
+Print version, release and arch along with name
+of package. This modifies the effect of the I<--name> option.
+
+=item B<-e>
+
+Include code directly
+in the perl search expression. Use it with B<--debug> to look at the generated
+perl code. In any cases, use it only if you know perl.
+
+=item B<-a>
+
+Binary AND operator, true if both expressions are true.
+
+=item B<-o>
+
+Binary OR operator, true if one expression is true.
+
+=item B<!>
+
+Unary NOT, true if expression is false.
+
+=item B<(>
+
+Left parenthesis to open a group expression.
+
+=item B<)>
+
+Right parenthesis to close a group expression.
+
+=item B<--debug>
+
+Includes debugging output.
+
+=back
+
+=head1 FORMAT
+
+The options to select tags (B<--arch>, B<--buildhost> and so on) control
+the output format of urpmf. If not explicitly specified somewhere else,
+the name of the rpm is printed first. Fields are separated by C<:> until
+specified otherwise.
+
+You can also use B<--qf> for that. It takes a format string, where tags to
+be replaced are specified as B<%>I<[-][number]>B<tagname>. The optional
+number indicates the length of the space-padding and the B<-> character
+its justification (like in printf(3)).
+
+=head1 EXPRESSIONS
+
+The boolean operator switches allow you to construct complex expressions
+from regexps. Those expressions are then matched against the whole output
+line.
+
+=head1 EXAMPLE
+
+This command will list all C<perl-Apache> modules, and list them along
+with the media in which they're been found, nicely indented :
+
+    urpmf --qf '%-30name is found in media %media' perl-Apache
+
+=head1 FILES
+
+See urpmi.files(5).
+
+=head1 SEE ALSO
+
+urpmi.addmedia(8), urpmi.update(8), urpmi.removemedia(8), urpmi(8),
+urpmq(8), urpmi.files(5).
+
+=head1 AUTHOR
+
+Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+FranE<ccedil>ois Pons, Rafael Garcia-Suarez 

@@ -1,0 +1,127 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package org.maltparser.parser.algorithm.stack;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import java.util.Stack;<a name="line.3"></a>
+<FONT color="green">004</FONT>    <a name="line.4"></a>
+<FONT color="green">005</FONT>    import org.maltparser.core.exception.MaltChainedException;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import org.maltparser.core.syntaxgraph.DependencyStructure;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import org.maltparser.core.syntaxgraph.node.DependencyNode;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import org.maltparser.parser.DependencyParserConfig;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import org.maltparser.parser.Oracle;<a name="line.9"></a>
+<FONT color="green">010</FONT>    import org.maltparser.parser.ParserConfiguration;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import org.maltparser.parser.history.GuideUserHistory;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import org.maltparser.parser.history.action.GuideUserAction;<a name="line.12"></a>
+<FONT color="green">013</FONT>    /**<a name="line.13"></a>
+<FONT color="green">014</FONT>     * @author Johan Hall<a name="line.14"></a>
+<FONT color="green">015</FONT>     *<a name="line.15"></a>
+<FONT color="green">016</FONT>     */<a name="line.16"></a>
+<FONT color="green">017</FONT>    public class ProjectiveOracle  extends Oracle {<a name="line.17"></a>
+<FONT color="green">018</FONT>            public ProjectiveOracle(DependencyParserConfig manager, GuideUserHistory history) throws MaltChainedException {<a name="line.18"></a>
+<FONT color="green">019</FONT>                    super(manager, history);<a name="line.19"></a>
+<FONT color="green">020</FONT>                    setGuideName("projective");<a name="line.20"></a>
+<FONT color="green">021</FONT>            }<a name="line.21"></a>
+<FONT color="green">022</FONT>            <a name="line.22"></a>
+<FONT color="green">023</FONT>            public GuideUserAction predict(DependencyStructure gold, ParserConfiguration configuration) throws MaltChainedException {<a name="line.23"></a>
+<FONT color="green">024</FONT>                    StackConfig config = (StackConfig)configuration;<a name="line.24"></a>
+<FONT color="green">025</FONT>                    Stack&lt;DependencyNode&gt; stack = config.getStack();<a name="line.25"></a>
+<FONT color="green">026</FONT>    <a name="line.26"></a>
+<FONT color="green">027</FONT>                    if (stack.size() &lt; 2) {<a name="line.27"></a>
+<FONT color="green">028</FONT>                            return updateActionContainers(Projective.SHIFT, null);<a name="line.28"></a>
+<FONT color="green">029</FONT>                    } else {<a name="line.29"></a>
+<FONT color="green">030</FONT>                            DependencyNode left = stack.get(stack.size()-2);<a name="line.30"></a>
+<FONT color="green">031</FONT>                            int leftIndex = left.getIndex();<a name="line.31"></a>
+<FONT color="green">032</FONT>                            int rightIndex = stack.get(stack.size()-1).getIndex();<a name="line.32"></a>
+<FONT color="green">033</FONT>                            if (!left.isRoot() &amp;&amp; gold.getTokenNode(leftIndex).getHead().getIndex() == rightIndex) {<a name="line.33"></a>
+<FONT color="green">034</FONT>                                    return updateActionContainers(Projective.LEFTARC, gold.getTokenNode(leftIndex).getHeadEdge().getLabelSet());<a name="line.34"></a>
+<FONT color="green">035</FONT>                            } else if (gold.getTokenNode(rightIndex).getHead().getIndex() == leftIndex &amp;&amp; checkRightDependent(gold, config.getDependencyGraph(), rightIndex)) {<a name="line.35"></a>
+<FONT color="green">036</FONT>                                    return updateActionContainers(Projective.RIGHTARC, gold.getTokenNode(rightIndex).getHeadEdge().getLabelSet());<a name="line.36"></a>
+<FONT color="green">037</FONT>                            } else {<a name="line.37"></a>
+<FONT color="green">038</FONT>                                    return updateActionContainers(Projective.SHIFT, null);<a name="line.38"></a>
+<FONT color="green">039</FONT>                            } // Solve the problem with non-projective input.<a name="line.39"></a>
+<FONT color="green">040</FONT>                    }<a name="line.40"></a>
+<FONT color="green">041</FONT>            }<a name="line.41"></a>
+<FONT color="green">042</FONT>            <a name="line.42"></a>
+<FONT color="green">043</FONT>            private boolean checkRightDependent(DependencyStructure gold, DependencyStructure parseDependencyGraph, int index) throws MaltChainedException {<a name="line.43"></a>
+<FONT color="green">044</FONT>                    if (gold.getTokenNode(index).getRightmostDependent() == null) {<a name="line.44"></a>
+<FONT color="green">045</FONT>                            return true;<a name="line.45"></a>
+<FONT color="green">046</FONT>                    } else if (parseDependencyGraph.getTokenNode(index).getRightmostDependent() != null) {<a name="line.46"></a>
+<FONT color="green">047</FONT>                            if (gold.getTokenNode(index).getRightmostDependent().getIndex() == parseDependencyGraph.getTokenNode(index).getRightmostDependent().getIndex()) {<a name="line.47"></a>
+<FONT color="green">048</FONT>                                    return true;<a name="line.48"></a>
+<FONT color="green">049</FONT>                            }<a name="line.49"></a>
+<FONT color="green">050</FONT>                    }<a name="line.50"></a>
+<FONT color="green">051</FONT>                    return false;<a name="line.51"></a>
+<FONT color="green">052</FONT>            }<a name="line.52"></a>
+<FONT color="green">053</FONT>            <a name="line.53"></a>
+<FONT color="green">054</FONT>            public void finalizeSentence(DependencyStructure dependencyGraph) throws MaltChainedException {<a name="line.54"></a>
+<FONT color="green">055</FONT>                    <a name="line.55"></a>
+<FONT color="green">056</FONT>            }<a name="line.56"></a>
+<FONT color="green">057</FONT>            <a name="line.57"></a>
+<FONT color="green">058</FONT>            public void terminate() throws MaltChainedException {<a name="line.58"></a>
+<FONT color="green">059</FONT>                    <a name="line.59"></a>
+<FONT color="green">060</FONT>            }<a name="line.60"></a>
+<FONT color="green">061</FONT>    }<a name="line.61"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

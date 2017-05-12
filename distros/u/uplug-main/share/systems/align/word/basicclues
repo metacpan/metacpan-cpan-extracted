@@ -1,0 +1,34 @@
+{
+  'module' => {
+    'name' => 'basic alignment clues',
+    'submodules' => [
+        'align/word/strsim',
+        'align/word/coocfreq',
+        'align/word/dice',
+#        'align/word/coocstat1 -s tscore', # t-score
+#        'align/word/coocstat2 -s pmi',    # pointwise  mutual I
+#        'align/word/coocstat3 -s ll',     # log-likelihood
+    ],
+    'submodule names' => [
+        'string similarity (LCSR)',
+        'co-occurrence frequencies',
+        'Dice coefficient',
+        'point-wise mutual information',
+        't-score',
+    ],
+  },
+  'description' => 'This module computes basic clues using association
+  measures such as the Dice coefficient and the longest common
+  sub-sequence ratio. The module "coocfreq" counts co-occurrence frequencies.',
+  'input' => {
+    'bitext' => {
+      'format' => 'xces align',
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:bitext:file',
+    }
+  },
+}
+

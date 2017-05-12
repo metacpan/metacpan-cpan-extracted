@@ -1,0 +1,19 @@
+#!/usr/bin/perl -T
+
+#- Copyright (C) 2005-2010 Mandriva SA
+
+use strict;
+use urpm::msg;
+use urpm::util qw(untaint);
+
+if ($< != 0) {
+    print STDERR N("Only superuser is allowed to uninstall packages"), "\n";
+    exit 1;
+}
+
+$ENV{PATH} = "/sbin:/usr/sbin:/bin:/usr/bin";
+delete @ENV{qw(ENV BASH_ENV HOME IFS CDPATH PERLLIB PERL5LIB PERL5OPT PERLIO PERLIO_DEBUG PERL5DB PERL_ENCODING PERL_HASH_SEED PERL_SIGNALS PERL_UNICODE RPM_CONFIGDIR)};
+
+print STDERR N("Running urpme in restricted mode..."), "\n";
+@ARGV or @ARGV = qw(--help);
+exec '/usr/bin/perl', '/usr/sbin/urpme', '--restricted', map { untaint $_ } @ARGV;

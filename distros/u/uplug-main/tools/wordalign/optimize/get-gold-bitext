@@ -1,0 +1,9 @@
+#!/bin/bash
+
+head -4 $1
+echo '<linkList>'
+grep '<link ' $1 | sed 's#>#/>#'
+grep '<sentLink ' $1 | sed 's#>#/>#'
+echo '</linkList>'
+tail -1 $1
+

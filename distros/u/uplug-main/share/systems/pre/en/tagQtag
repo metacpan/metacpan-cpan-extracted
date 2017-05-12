@@ -1,0 +1,69 @@
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#	'encoding' => 'iso-8859-1',
+	'status' => 'tagQtag',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+     'tagger' => {
+      'language' => 'english',
+      'startup base' => 'qtag',
+     },
+     'output' => {
+        'attribute' => 'pos',
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n<s>\_\.\n",
+        'tag delimiter' => '\_',
+	'encoding' => 'iso-8859-1',
+     },
+     'input' => {
+        'token delimiter' => ' ',
+        'sentence delimiter' => "\n<s>\n",
+     },
+  },
+  'module' => {
+    'program' => 'uplug-tag',
+    'location' => '$UplugBin',
+    'name' => 'Qtag tagger (English)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+      'lang' => 'parameter:tagger:language',
+       'attr' => 'parameter:output:attribute',
+       'char' => 'output:text:encoding',
+       'outchar' => 'output:text:encoding',
+       'inchar' => 'input:text:encoding',
+       'inroot' => 'input:text:root',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=(tok|tag|chunk),language=en)'
+	  },
+       },
+       'parameter' => {
+          'output' => {
+	     'attribute' => 'optionmenu (pos,qtag)',
+	  }
+       }
+  }
+}

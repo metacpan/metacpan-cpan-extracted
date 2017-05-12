@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+my $TNT=$Bin.'/../tnt/tnt';
+my $MODEL=$Bin.'/../tnt/models/helasucd-tnt';
+
+system ($TNT,$MODEL,@ARGV);
+

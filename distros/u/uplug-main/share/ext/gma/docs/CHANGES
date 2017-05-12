@@ -1,0 +1,104 @@
+Record of CHANGES in the GMA Package
+
+In 2.1:
+
+* Reorganization of the tools contained with the package.  Several 
+tools were moved to their respective packages (axis,train).
+
+* Removal of precision limitations that were imposed in past versions
+to ensure consistency with the older Perl based GMA codeset.
+
+
+In 2.0:
+
+* GMA has been ported to java!  The porting process revealed several
+bugs in the former Perl version, which have been fixed. Requires java
+version 1.4.x or higher.
+
+* GMA now has a webpage, and an online bugzilla-based bug reporting
+system. Resources such as tools, config files, stop lists, etc., are no
+longer distributed with GMA.  Instead they are separately downloadable
+from the website. 
+
+* All language file manipulation is now done at the byte level, rather
+than the character level, to avoid encoding issues.
+
+* GMA no longer performs any text normalization.  Processes such as
+lowercasing and diacritic stripping have been factored out into axis
+generators.
+
+* GMA no longer accepts axis files with POS tags.
+
+* Implemented traditional switch syntax using preceding 
+"-" or "+", primarily for use with the condor java universe.
+
+* Added capability to use a serialized tralex:  if the translation 
+lexicon file ends in .serial GMA will assume you are supplying it with
+a serialized file.  All other files are assumed to be plain text.  To
+put a translation lexicon into serial format use the Serialize.java 
+program available on the website utilities and in the tools section of 
+this package. 
+
+
+
+In 1.3:
+
+* Added auxiliaries to the English stoplist
+
+* Corrected the overflow errors in GCalign
+
+* fixed base case in string_lcs in SIMR.lib.pl
+
+* tweaked point disambiguation logic in bestchain.pl
+
+* added warning for invalid tralex entries in SIMR.ph
+
+
+In 1.2.1:
+
+Fixed some parameter names in older config files.
+
+
+In 1.2:
+
+* The "encumbered" part of GMA has been reimplemented, so the whole
+package is now open source.  A bunch of file and directory renaming
+resulted.
+
+* HOWTO slightly updated and clarified.
+
+* GMA no longer assumes that the user has write permissions in the GMA
+directory tree, so it uses another location for temporary files.
+
+* GMA no longer assumes that it is being run from the directory where
+it lives.  It uses environment variables to find its sub-scripts.
+
+
+In 1.1.2:
+
+* Minor correction in documentation.
+
+* Added default helper to standard package.
+
+* Set default GMApath in validation testsuite.
+
+In 1.1.1:
+
+* Small rearrangement in directory layout
+
+* Added code and data for validation test.
+
+
+In 1.1:
+
+* Added `crnl2nl` to util/
+
+* Added troubleshooting section to HOWTO.
+
+* Got rid of non-license; added simple T's & C's to README.
+
+* Minor documentation updates.
+
+* Moved mailing lists to NYU.
+
+* Made GMA.csh a bit more flexible, as per Resnik's suggestions.

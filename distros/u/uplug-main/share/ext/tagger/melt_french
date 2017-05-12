@@ -1,0 +1,6 @@
+#!/bin/sh
+
+`which MElt` < $1
+
+# my $MELT =  `which MElt`;
+# system "$MELT < $ARGV[0]";

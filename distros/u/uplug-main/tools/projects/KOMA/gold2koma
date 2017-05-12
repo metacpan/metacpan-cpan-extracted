@@ -1,0 +1,319 @@
+#!/usr/bin/perl
+#
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id$
+#----------------------------------------------------------------------------
+# usage: gold2koma [-io] [-o value] [-f format] align-xml old-gold
+#
+# required:
+#         align-xml: bitext-file in liu-xml
+#         old-gold: gold standard in the old UWA-style
+# optional:
+#         -o value: add <value> to each byte position
+#         -io: add offset = length(id)
+#         -f format: format of corpus file (default=liu xml)
+# 
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../..";
+
+use Uplug::Data::Align;
+use Uplug::Data::DOM;
+use Uplug::IO::Any;
+
+my $DefaultOffset=0;
+my $AddIdOffset=0;
+my $InputFormat='liu xml';
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift;
+    if ($opt eq '-o'){
+	my $val=shift(@ARGV);
+	$DefaultOffset=0-$val;
+    }
+    if ($opt eq '-io'){
+	$AddIdOffset=1;
+    }
+    if ($opt eq '-f'){
+	$InputFormat=shift(@ARGV);
+    }
+}
+
+my %InputStream=('format' => $InputFormat);
+$InputStream{file}=shift(@ARGV);
+my %OutputStream=('format' => 'liu xml');
+
+my $goldfile=shift(@ARGV);
+
+my $SrcOffset=$DefaultOffset;
+my $TrgOffset=$DefaultOffset;
+my $limit=-20;
+my $TokenLabel='w';
+
+my $data=Uplug::Data::Align->new();
+my $id=0;
+
+#---------------------------------------------------------------------------
+
+my $input=Uplug::IO::Any->new(\%InputStream);
+my $output=Uplug::IO::Any->new(\%OutputStream);
+$input->open('read',\%InputStream);
+$output->addheader($input->header());
+$output->open('write',\%OutputStream);
+
+open F,"<$goldfile";
+
+#---------------------------------------------------------------------------
+
+
+my $count=0;
+my %all=();
+
+
+if ($goldfile=~/(sven|ensv)tscan/){
+    &ReadUwaGold(*F,\%all,'sventscan');     # for sventscan:
+    &WriteKomaGold(\%all);                  #   1) read&convert ensvtscan-links
+    $input->close;                          #   2) close corpus
+    $input->open('read',\%InputStream);     #      re-open corpus
+    close F;                                #   3) close gold standard file
+    open F,"<$goldfile";                    #      and open it again
+    &ReadUwaGold(*F,\%all,'ensvtscan');     #   4) read&convert sventscan-links
+    &WriteKomaGold(\%all);
+}
+elsif ($goldfile=~/svenpeu/){
+    &ReadUwaGold(*F,\%all,'svenpeu');       # for svenpeu: read&convert
+}
+else{                                       # for all other gold-files:
+    &ReadUwaGold(*F,\%all);                 #   1) read uwa gold standard
+    &WriteKomaGold(\%all);                  #   2) print koma gold standard
+}
+
+$input->close;
+$output->close;
+
+#---------------------------------------------------------------------------
+
+sub WriteKomaGold{
+    my $all=shift;
+    foreach my $i (sort {$a <=> $b} keys %{$all}){
+	foreach (0..$#{$$all{$i}}){
+	    $SrcOffset=$DefaultOffset;
+	    $TrgOffset=$DefaultOffset;
+	    &ConvertLink($$all{$i}[$_]);
+	}
+    }
+    if ($id and $count){$output->write($data);}
+}
+
+
+sub ReadUwaGold{
+    my $file=shift;
+    my $all=shift;
+    my $match=shift;
+    my %link=();
+    my $nrLines=0;
+    my $nrGold=0;
+    while (<$file>){
+	$nrLines++;
+	if (/(.*?)\:\s*(\S.*|\Z)$/){
+	    my $k=$1;
+#	    if ($link{'align ID'}=~/^ensvtscan/){    # only for sventscan95!!
+#		if ($k eq 'target'){$k='source'}     # only for sventscan95!!
+#		elsif ($k eq 'source'){$k='target';} # only for sventscan95!!
+#	    }                                        # only for sventscan95!!
+	    if ($match eq 'svenpeu'){
+		if ($k eq 'target'){$k='source'}     # only for svenpeu-gold !!
+		elsif ($k eq 'source'){$k='target';} # only for svenpeu-gold !!
+	    }
+	    $link{$k}=$2;
+	    $link{$k}=~s/\r//;                        # dos2unix!
+	    if ($match eq 'svenpeu'){
+		$link{$k}=~s/^(.*)(\s\-\>\s)(.*)$/$3$2$1/; # only for svenpeu!
+	    }
+	    if ($k eq 'target text'){
+		if ($link{$k}=~/\#\#([a-z]+[0-9]+)\#\#/){
+		    $link{'align ID'}=$1 if ($link{'align ID'} ne $1);
+		}
+		if ($match eq 'svenpeu'){
+		    $SrcOffset=$DefaultOffset;       # only for svenpeu-gold !!
+		    $TrgOffset=$DefaultOffset;       # only for svenpeu-gold !!
+		    &ConvertLink(\%link);            # only for svenpeu-gold !!
+		    next;
+		}
+		my $i=$link{'align ID'};
+		if (defined $match){                 # skip all links with
+		    if ($i!~/$match/){next;}         # non-matching ID
+		}
+		if ($link{'align ID'}=~/[^0-9]([0-9]+)\:[0-9]+$/){
+		    $i=$1;
+		}
+		elsif ($link{'align ID'}=~/[^0-9]([0-9]+)$/){
+		    $i=$1;
+		}
+		if (ref($$all{$i}) ne 'ARRAY'){
+		    $$all{$i}=[];
+		}
+		my $nr=scalar @{$$all{$i}};
+		%{$$all{$i}[$nr]}=%link;
+		$nrGold++;
+	    }
+	}
+    }
+    print STDERR "read $nrLines lines and found $nrGold links!\n";
+}
+
+
+sub ConvertLink{
+    my $link=shift;
+
+    if ($$link{link}=~/^(.*)\s\-\>\s(.*)$/){
+	@{$$link{src}}=split(/\s/,$1);
+	@{$$link{trg}}=split(/\s/,$2);
+    }
+
+    @{$$link{srcspans}}=split(/\s+\&\s+/,$$link{source});
+    @{$$link{trgspans}}=split(/\s+\&\s+/,$$link{target});
+
+    @{$$link{srcspansold}}=@{$$link{srcspans}};
+    @{$$link{trgspansold}}=@{$$link{trgspans}};
+
+    &AddOffset($link,$SrcOffset,$TrgOffset);
+    if ($AddIdOffset){
+	my $offset=length($$link{'align ID'});
+	&AddOffset($link,$SrcOffset-$offset,$TrgOffset-$offset);
+    }
+
+    if (($$link{'align ID'}=~/^[0-9]+$/) and
+	($id=~/^([^0-9]+)[0-9]/)){
+	$$link{'align ID'}="$1$$link{'align ID'}";
+    }
+
+    my $nrSeg=0;
+    while ($id ne $$link{'align ID'}){
+#	print STDERR "$id\n";
+	if ($id and $count){
+	    print STDERR '.';
+	    $output->write($data);$count=0;
+	}
+	if (not $input->read($data)){return 0;}
+	$id=$data->{link}->attribute('id');
+#	print STDERR "-- $nrSeg -- $id -- $$link{'align ID'} --\n";
+	if (($$link{'align ID'}=~/^[0-9]+$/) and
+	    ($id=~/^([^0-9]+)[0-9]/)){
+	    $$link{'align ID'}="$1$$link{'align ID'}";
+	}
+	if (($$link{'align ID'}=~/^[a-z]{2}\-[a-z]{2}([0-9]+)\:[0-9]+$/) and
+	    $nrSeg==$1){
+	    $$link{'align ID'}=$id;
+	}
+	$nrSeg+=2;
+    }
+
+    my $SrcData=Uplug::Data::DOM->new();
+    my $TrgData=Uplug::Data::DOM->new();
+    $data->subTree($SrcData,'source');
+    $data->subTree($TrgData,'target');
+
+    my @SrcNodes=$SrcData->getNodes($TokenLabel);
+    my @SrcIds=$data->attribute(\@SrcNodes,'id');
+    my @SrcSpans=$data->attribute(\@SrcNodes,'span');
+    my @SrcTokens=$data->content(\@SrcNodes);
+
+    my @TrgNodes=$TrgData->getNodes($TokenLabel);
+    my @TrgIds=$data->attribute(\@TrgNodes,'id');
+    my @TrgSpans=$data->attribute(\@TrgNodes,'span');
+    my @TrgTokens=$data->content(\@TrgNodes);
+
+
+    my @src=();
+#    print STDERR $id;
+    foreach my $s (@{$$link{srcspans}}){
+	my ($idx)=grep($SrcSpans[$_] eq $s,(0..$#SrcSpans));
+	if (defined $idx){
+	    push (@src,$idx);
+	}
+	elsif ($SrcOffset>$limit){
+#	    print STDERR '*';
+	    $SrcOffset--;
+	    return &ConvertLink($link);
+	}
+	else{
+	    print STDERR "problems with $id!!\n";
+	    return 0;
+	}
+#	$SrcOffset=$DefaultOffset;
+    }
+    my @trg=();
+    foreach my $t (@{$$link{trgspans}}){
+	my ($idx)=grep($TrgSpans[$_] eq $t,(0..$#TrgSpans));
+	if (defined $idx){
+	    push (@trg,$idx);
+	}
+	elsif ($TrgOffset>$limit){
+#	    print STDERR '%';
+	    $TrgOffset--;
+	    return &ConvertLink($link);
+	}
+	else{
+	    print STDERR "problems with $id!!\n";
+	    return 0;
+	}
+#	$TrgOffset=$DefaultOffset;
+    }
+
+    my @srcTok=();
+    my @trgTok=();
+    my @srcId=();
+    my @trgId=();
+    my @srcSpan=();
+    my @trgSpan=();
+
+    foreach (@src){
+	push (@srcTok,$SrcTokens[$_]);
+	push (@srcId,$SrcIds[$_]);
+	push (@srcSpan,$SrcSpans[$_]);
+    }
+    foreach (@trg){
+	push (@trgTok,$TrgTokens[$_]);
+	push (@trgId,$TrgIds[$_]);
+	push (@trgSpan,$TrgSpans[$_]);
+    }
+
+    my %l=();
+    $l{link}=join ' ',@srcTok;
+    $l{link}.=';';
+    $l{link}.=join ' ',@trgTok;
+    $l{source}=join '+',@srcId;
+    $l{target}=join '+',@trgId;
+    $l{src}=join '&',@srcSpan;
+    $l{trg}=join '&',@trgSpan;
+    $l{score}=$$link{'link type'};
+    if (@srcId or @trgId){
+	$data->addWordLink(\%l);
+	$count++;
+    }
+    else{
+	print STDERR "problems with $id!!\n";
+	return 0;
+    }
+}
+
+sub AddOffset{
+    my ($link,$SrcOffset,$TrgOffset)=@_;
+    foreach (0..$#{$$link{srcspans}}){
+	if ($$link{srcspansold}[$_]=~/^([0-9]+)\|/){
+	    my $start=$SrcOffset+$1;
+	    $$link{srcspans}[$_]=~s/^.*[\|\:]/$start\:/;
+	}
+    }
+    foreach (0..$#{$$link{trgspans}}){
+	if ($$link{trgspansold}[$_]=~/^([0-9]+)\|/){
+	    my $start=$TrgOffset+$1;
+	    $$link{trgspans}[$_]=~s/^.*[\|\:]/$start\:/;
+	}
+    }
+}
+

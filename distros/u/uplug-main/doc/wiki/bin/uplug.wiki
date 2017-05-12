@@ -1,0 +1,353 @@
+
+== NAME ==
+
+uplug - the main startup script for the Uplug toolbox
+
+
+== SOURCES AND EXTENSIONS ==
+
+For the latest sources, language packs, additional modules and tools: Please, have a look at the project website at https://bitbucket.org/tiedemann/uplug
+
+
+== SYNOPSIS ==
+
+
+{{{
+  uplug [-ehHlp] [-f fallback] config-file [MODULE-ARGUMENTS]
+}}}
+**config-file** is a valid Uplug configuration file (describing a module that may consist of several sub-modules). Configuration files can be given with the absolute and relative paths. If they are not found as specified, then Uplug will look at **UplugSharedDir/systems/**
+
+
+== OPTIONS ==
+
+
+{{{
+ -e ............. returns the location of the given config-file
+ -f fallback .... fallback modules (config-files separated by ':')
+ -h ............. show a help text (also for specific config-files)
+ -H ............. show the man page
+ -l ............. list all modules (Uplug config files)
+ -p ............. print the configuration file
+}}}
+Other command-line options depend on the specifications in the configuration file. Each module may define its own arguments and options. For example, the basic pre-processing module accepts command-line arguments for input and output and for the input encoding:
+
+
+{{{
+ uplug pre/basic -in 1988en.txt -ci 'iso-8859-1' -out 1988en.xml
+}}}
+This will take the generic **basic** pre-processing module from found in **UplugShareDir/systems/pre** and it will process the text in **1988en.txt** (which is assumed to be in ISO-8859-1) and will produce 1988en.xml.
+
+
+== DESCRIPTION ==
+
+The basic use of this startup script is to load a Uplug module, to parse its configuration and to run it using the command-line arguments give. Uplug modules may consist of complex processing pipelines and loops and Uplug tries to build system calls accordingly.
+
+You can check whether a specific module exists using the flag **-e**. This will also return the location of the config-file if it can be found:
+
+
+{{{
+ uplug -e config-file
+}}}
+You can list all available modules (i.e. Uplug configuration files) by running
+
+
+{{{
+ uplug -l
+}}}
+You can also list only the modules within a specific sub-directory. For example, to list all configuration files for pre-processing English you can run
+
+
+{{{
+ uplug -l pre/en
+}}}
+
+=== Uplug modules ===
+
+The main modules are structured in categories like this:
+
+
+{{{
+ pre/ ........ pre-processing (generic and language-specific ones)
+ pre/xx ...... language-specific pre-processing modules (<xx> = langID)
+ align ....... modules for alignment of parallel texts
+ align/word .. modules for word alignment
+}}}
+The most common modules are the following
+
+
+{{{
+ pre/basic ... basic pre-processing (includes 'markup', 'sent', 'tok')
+ pre/markup .. basic markup (text to XML, paragraph boundaries)
+ pre/sent .... a generic sentence boundary detector
+ pre/tok ..... a generic tokenizer
+ pre/xx-all .. bundle pre-processing for language <xx>
+ pre/xx-tag .. tag untokenized XML text in language <xx>
+
+ align/sent .. length-based sentence alignment
+ align/hun ... wrapper around hunalign
+ align/gma ... geometric mapping and alignment
+
+ align/word/basic ..... basic word alignment (based on clues)
+ align/word/default ... default settings for word alignment
+ align/word/advanced .. advanced settings for word alignment
+}}}
+If you install **uplug-treetagger**, then you the following module is also quite useful:
+
+
+{{{
+ pre/xx/all-treetagger  run pre-processing pipeline including TreeTagger
+}}}
+To get more information about a specific module, run (for example for the module 'pre/basic')
+
+
+{{{
+ uplug -h pre/basic
+}}}
+To print the configuration file on screen, use
+
+
+{{{
+ uplug -p pre/basic
+}}}
+Sometimes it can be handy to define fallback modules in case you don't know exactly if a certain module exists. For example, you may want to use language-specific pre-processing pipelines but you like to fall back to the generic pre-processing steps when no language-specific configuration is found. Here is an example:
+
+
+{{{
+ uplug -f pre/basic pre/ar/basic -in inpout.txt -out output.txt
+}}}
+This command tries to call **pre/ar/basic** (Arabic pre-processing) but falls back to the generic **pre/basic** if this module cannot be found. You can also give a sequence of fallback modules with the same flag. Separate each fallback module by ':'.
+
+
+=== Uplug module scripts ===
+
+Uplug modules usually call external scripts distributed by this package. There is a number of scritps for specific tasks. Here is a list of scripts (to be found in **$Uplug::config::SHARED_BIN**):
+
+ * Pre-processing 
+{{{
+ uplug-markup        uplug-tok           uplug-sent
+ uplug-toktag        uplug-tokext        uplug-tag
+ uplug-split         uplug-chunk         uplug-malt
+}}}
+ * Sentence alignment 
+{{{
+ uplug-sentalign     uplug-hunalign      uplug-gma
+}}}
+ * Word alignment (and related tasks) 
+{{{
+ uplug-coocfreq      uplug-coocstat      uplug-strsim
+ uplug-ngramfreq     uplug-ngramstat     uplug-markphr
+ uplug-giza          uplug-linkclue      uplug-wordalign
+            
+}}}
+ * Other 
+{{{
+ uplug-convert
+}}}
+
+
+== Examples ==
+
+
+=== Prepare project directory ===
+
+Make a new project directory and go there:
+
+
+{{{
+ mkdir myproject
+ cd myproject
+}}}
+Copy example files into the project directory:
+
+
+{{{
+ cp /path/to/uplug/example/1988sv.txt .
+ cp /path/to/uplug/example/1988en.txt .
+}}}
+
+=== Basic pre-processing (text to xml) ===
+
+Convert texts in Swedish and English, encoded in ISO-8859-1 (latin1) and add some basic markup (paragraph boundaries, sentence boundaries and token boundaries).
+
+
+{{{
+ uplug pre/basic -ci 'iso-8859-1' -in 1988sv.txt > 1988sv.xml
+ uplug pre/basic -ci 'iso-8859-1' -in 1988en.txt > 1988en.xml
+}}}
+
+=== Sentence alignment ===
+
+Align the files from the previous step:
+
+
+{{{
+ uplug align/sent -src 1988sv.xml -trg 1988en.xml > 1988sven.xml
+}}}
+Sentence alignment pointers are stored in **1988sven.xml**. You can read the aligned bitext segments using the following command:
+
+
+{{{
+ uplug-readalign 1988sven.xml | less
+}}}
+
+=== Word alignment (default mode) ===
+
+
+{{{
+ uplug align/word/default -in 1988sven.xml -out 1988sven.links
+}}}
+This will take some time! Word alignment is slow even for this little bitext. The word aligner will
+
+
+{{{
+ * create basic clues (Dice and LCSR)
+ * run GIZA++ with standard settings (trained on plain text)
+ * learn clues from GIZA's Viterbi alignments
+ * "radical stemming" (take only the 3 inital characters 
+    of each token) and run GIZA++ again
+ * align words with existing clues
+ * learn clues from previous alignment
+ * align words again with all existing clues
+}}}
+Word alignment results are stored in 1988sven.links. You may look at word type links using the following script:
+
+
+{{{
+ /path/to/uplug/tools/xces2dic < 1988sven.links | less
+}}}
+
+=== Word alignment (tagged mode) ===
+
+Use the following command for aligning tagged corpora (at least POS tags):
+
+
+{{{
+ cp /path/to/uplug/example/svenprf* .
+ uplug align/word/tagged -in svenprf.xces -out svenprf.links
+}}}
+This is essentially the same as the default word alignment with additional clues for POS and chunk labels.
+
+
+=== Word alignment with Moses output format (using default mode) ===
+
+Use the following command if you like to get the word alignments in Moses format (links between word positions like in Moses after word alignment symmetrization)
+
+
+{{{
+ uplug align/word/default -in 1988sven.xml -out 1988sven.links -of moses
+}}}
+The Parameter '-of' is used to set the output format. The same parameter is available for other word alignment settings like 'basic' and 'advanced'
+
+Note that you can easily convert your parallel corpus into Moses format as well. There are actually three options:
+
+
+{{{
+ uplug/tools/xces2text 1988sven.xml output.sv output.en
+ uplug/tools/xces2moses -s sv -t en 1988sven.xml output
+ uplug/tools/opus2moses.pl -d . -e output.sv -f output.en < 1988sven.xml
+ uplug/tools/xces2plain 1988sven.xml output output sv en
+}}}
+The three tools use different ways of extracting the text from the aligned XML files. Look at the code and the usage information about how they differ. The first option os probably the safest one as this uses the same Uplug modules for extracting the text as they are used for word alignemnt. The last one requires XML::DT and works even when sentences are not aligned monotonically.
+
+
+=== Tagging (using external taggers) ===
+
+There are several taggers that can be called from the Uplug scripts. The following command can be used to tag the English example corpus:
+
+
+{{{
+ uplug pre/en/tagGrok -in 1988en.xml > 1988en.tag
+}}}
+
+=== Chunking (using external chunkers) ===
+
+There is a chunker for English that can be run on POS-tagged corpus files:
+
+
+{{{
+ uplug pre/en/chunk -in 1988en.tag > 1988en.chunk
+}}}
+
+=== Word alignment evaluation ===
+
+Word alignment can be evaluated using a gold standard (reference links stored in another file using the same format as for the links produced by Uplug). There is a small gold standard for the example bitext used in 3f). Alignments produced above can be evaluated using the following command:
+
+
+{{{
+ uplug-evalalign -gold svenprf.gold -in svenprf.links | less
+}}}
+Several measures will be computed by comparing reference links with links proposed by the system.
+
+
+=== Word alignment (using existing clues) ===
+
+3c) and 3f) explained how to run the aligner with all its sub-processes. However, existing clues do not have to be computed each time. Existing clues can be re-used for further alignent runs. The user can specify the set of clues that should be used for aligning words. The following command runs the word aligner with one clue type (GIZA++ translation probabilities):
+
+
+{{{
+ uplug align/word/test/link -gw -in svenprf.xces -out links.new
+}}}
+Weights can be set independently for each clue type. For example, in the example above we can specify a clue weight (e.g. 0.01) for GIZA++ clues using the following runtime parameter: '-gw_w 0.01'. Lots of different clues may be used depending on what has been computed before. The following table gives an overview of some available runtime clue-parameters.
+
+
+{{{
+    clue-flag  weight-flag  clue type
+    ---------------------------------------------------------------------
+    -sim       -sim_w       LCSR (string similarity)
+    -dice      -dice_w      Dice coefficient
+    -mi        -mi_w        point-wise Mututal Information
+    -tscore    -tscore_w    t-scores
+    -gw        -gw_w        GIZA++ trained on tokenised plain text
+    -gp        -gp_w        GIZA++ trained on POS tags
+    -gpw       -gpw_w       GIZA++ trained on words and POS tags
+    -gwp       -gwp_w       GIZA++ trained on word-prefixes (3 character)
+    -gws       -gws_w       GIZA++ trained on word-suffixes (3 character)
+    -gwi       -gwi_w       GIZA++ inverse (same as -gw)
+    -gpi       -gpi_w       GIZA++ inverse (same as -gp)
+    -gpwi      -gpwi_w      GIZA++ inverse (same as -gpw)
+    -gwpi      -gwpi_w      GIZA++ inverse (same as -gwp)
+    -gwsi      -gwsi_w      GIZA++ inverse (same as -gws)
+    -dl        -dl_q        dynamic clue (words)
+    -dlp       -dlp_w       dynamic clue (words+POS)
+    -dp3       -dp3_w       dynamic clue (POS-trigram)
+    -dcp3      -dcp3_w      dynamic clue (chunklabel+POS-trigram)
+    -dpx       -dpx_w       dynamic clue (POS+relative position)
+    -dp3x      -dp3x_w      dynamic clue (POS trigram+relative position)
+    -dc3       -dc3_w       dynamic clue (chunk label trigram)
+    -dc3p      -dc3p_w      dynamic clue (chunk label trigram+POS)
+    -dc3x      -dc3x_w      dynamic clue (chunk trigram+relative position)
+}}}
+
+=== Word alignment (basic mode) ===
+
+There is another standard setting for word alignment:
+
+
+{{{
+ uplug align/word/basic -in 1988sven.xml -out basic.links
+}}}
+The word aligner will * create basic clues (Dice and LCSR) * run GIZA++ with standard settings (trained on plain text) * align words with existing clues
+
+Word alignment results are stored in basic.links. You may look at word type links using the following script:
+
+
+{{{
+ /path/to/uplug/tools/xces2dic < basic.links | less
+}}}
+
+=== Word alignment (advanced mode) ===
+
+This settings is similar to the tagged word alignmen settings (3i) but the last two steps will be repeated 3 times (learning clues from precious alignments). This is the slowest standard setting for word alignment.
+
+
+{{{
+ uplug align/word/advanced -in svenprf.xces -out advanced.links
+ /path/to/uplug/tools/xces2dic < advanced.links | less
+}}}
+
+== See also ==
+
+More information on Uplug module configurations: Look at Uplug::Config
+
+More downloads: https://bitbucket.org/tiedemann/uplug
+

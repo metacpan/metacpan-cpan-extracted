@@ -1,0 +1,165 @@
+#!/usr/bin/perl
+#
+# -*-perl-*-
+#
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id $
+#----------------------------------------------------------------------------
+# usage: etap2koma etap-plug-xml old-gold > new-gold
+#
+# 
+
+use strict;
+
+my $xmlfile=shift(@ARGV);
+my $goldfile=shift(@ARGV);
+
+
+open X,"<$xmlfile";
+open G,"<$goldfile";
+
+#---------------------------------------------------------------------------
+
+
+my $count=0;
+my %all=();
+
+&ReadEtapGold(*G,\%all);
+&WriteUwaGold(*X,\%all);
+
+
+
+#---------------------------------------------------------------------------
+
+
+sub WriteUwaGold{
+    my $file=shift;
+    my $all=shift;
+    my $InputDel=$/;                          # save old input delimiter
+    $/='</align>';
+    foreach my $i (sort {$a <=> $b} keys %{$all}){
+
+	my $facitSrc=$$all{$i}[0]{'source text'};
+	my $facitTrg=$$all{$i}[0]{'target text'};
+	$facitSrc=~s/^\S*\#\s*(\S)/$1/;
+	$facitTrg=~s/^\S*\#\s*(\S)/$1/;
+	$facitSrc=~s/\§/ /sg;
+	$facitTrg=~s/\§/ /sg;         # remove additional sentence-end marker
+	$facitSrc=~s/\s*$//s;         # remove final \s
+	$facitTrg=~s/\s*$//s;
+	$facitSrc=~s/\s+\s*/ /sg;     # multiple \s (more than 1) -> ' '
+	$facitTrg=~s/\s+\s*/ /sg;
+
+	my $src='';
+	my $trg='';
+	my $restarted=0;
+
+	while (($src ne $facitSrc) and ($trg ne $facitTrg)){
+	    $_=<$file>;
+	    if ((not $_) and (not $restarted)){
+		seek $file,0,0;
+		$restarted=1;
+	    }
+	    elsif ((not $_) and ($restarted)){last;}
+	    if (/\<seg\s+lang\=[\'\"][^\"\']*[\'\"]\>(.*)\<\/seg\>.*\<seg\s+lang\=[\'\"][^\"\']*[\'\"]\>(.*)\<\/seg\>/s){     #"'
+		$src=$2;
+		$trg=$1;
+		$src=~s/^\s*//;
+		$trg=~s/^\s*//;      # remove initial \s
+		$src=~s/\s*$//s;     # remove final \s
+		$trg=~s/\s*$//s;
+		$src=~s/\n/ /gs;     # newline --> ' '
+		$trg=~s/\n/ /gs;
+		$src=~s/\s+\s*/ /sg; # multiple \s --> ' '
+		$trg=~s/\s+\s*/ /sg;
+	    }
+	}
+	if (not /\S/){
+	    print STDERR "problems with $$all{$i}[0]{'align ID'}!\n";
+	    next;
+	}
+	my $alignID=$$all{$i}[0]{'align ID'};
+	if (/\<align\s+[^\>]*id\=[\'\"]([^\"\']*)[\'\"]/s){   # '"
+	    $alignID=$1;
+	}
+
+	foreach my $j (0..$#{$$all{$i}}){
+	    $$all{$i}[$j]{'source text'}=~s/\#\#.*\#\#/\#\#$$all{$i}[0]{'align ID'}\#\#/;
+	    $$all{$i}[$j]{'target text'}=~s/\#\#.*\#\#/\#\#$$all{$i}[0]{'align ID'}\#\#/;
+	    my $offset=length($$all{$i}[$j]{'align ID'});
+	    &AddOffset($$all{$i}[$j],-5-$offset,-5-$offset);
+	    print "align ID:   $alignID\n";
+	    print "sample:     $$all{$i}[$j]{'sample'}\n";
+	    print "word:       $$all{$i}[$j]{'word'}\n";
+	    print "link:       $$all{$i}[$j]{'link'}\n";
+	    print "link type:  $$all{$i}[$j]{'link type'}\n";
+	    print "unit type:  $$all{$i}[$j]{'unit type'}\n";
+	    print "source:     $$all{$i}[$j]{'source'}\n";
+	    print "target:     $$all{$i}[$j]{'target'}\n";
+	    print "source text:$$all{$i}[$j]{'source text'}\n";
+	    print "target text:$$all{$i}[$j]{'target text'}\n";
+
+	}
+    }
+}
+
+
+sub ReadEtapGold{
+    my $file=shift;
+    my $all=shift;
+    my %link=();
+    my $nrLines=0;
+    my $nrGold=0;
+    while (<$file>){
+	$nrLines++;
+	if (/(.*?)\:\s*(\S.*|\Z)$/){
+	    my $k=$1;
+	    $link{$k}=$2;
+	    $link{$k}=~s/\r//;                        # dos2unix!
+	    if ($k eq 'target text'){
+		if ($link{$k}=~/\#\#([a-z]+[0-9]+)\#\#/){
+		    $link{'align ID'}=$1 if ($link{'align ID'} ne $1);
+		}
+		my $i=$link{'align ID'};
+		if ($link{'align ID'}=~/[^0-9]([0-9]+)\:[0-9]+$/){
+		    $i=$1;
+		}
+		elsif ($link{'align ID'}=~/[^0-9]([0-9]+)$/){
+		    $i=$1;
+		}
+		if (ref($$all{$i}) ne 'ARRAY'){
+		    $$all{$i}=[];
+		}
+		my $nr=scalar @{$$all{$i}};
+		%{$$all{$i}[$nr]}=%link;
+		$nrGold++;
+	    }
+	}
+    }
+    print STDERR "read $nrLines lines and found $nrGold links!\n";
+}
+
+sub AddOffset{
+    my ($link,$SrcOffset,$TrgOffset)=@_;
+
+    @{$$link{srcspans}}=split(/\s+\&\s+/,$$link{source});
+    @{$$link{trgspans}}=split(/\s+\&\s+/,$$link{target});
+
+    foreach (0..$#{$$link{srcspans}}){
+	if ($$link{srcspans}[$_]=~/^([0-9]+)\|/){
+	    my $start=$SrcOffset+$1;
+	    $$link{srcspans}[$_]=~s/^.*([\|\:])/$start$1/;
+	}
+    }
+    foreach (0..$#{$$link{trgspans}}){
+	if ($$link{trgspans}[$_]=~/^([0-9]+)\|/){
+	    my $start=$TrgOffset+$1;
+	    $$link{trgspans}[$_]=~s/^.*([\|\:])/$start$1/;
+	}
+    }
+
+    $$link{source}=join ' & ',@{$$link{srcspans}};
+    $$link{target}=join ' & ',@{$$link{trgspans}};
+}
+

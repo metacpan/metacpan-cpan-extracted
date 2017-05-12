@@ -1,0 +1,116 @@
+ * [[bin/uplug.wiki]]
+ * [[Uplug/Config.wiki]]
+ * [[Uplug/IO.wiki]]
+ * [[Uplug/IO/Any.wiki]]
+
+== Uplug - NLP tools for processing (parallel) corpora ==
+
+Uplug is a collection of tools and scripts for processing text-corpora. Its main focus is the creation of (annotated) parallel corpora. The toolbox is divided into several packages:
+
+The new project home page: https://bitbucket.org/tiedemann/uplug
+
+The old pages at SourceForge: http://sourceforge.net/projects/uplug/
+
+
+=== Packages ===
+
+**uplug-main**: main components and scripts
+
+**uplug-xx**: language-specific tools and models (**xx** = language ID)
+
+**uplug-treetagger**: integration of the TreeTagger
+
+**uplug-webalign**: webinterface for interactive alignment (ICA, ISA)
+
+**uplug-cwb**: tools for indexing parallel corpora for the CWB
+
+
+=== Reference ===
+
+Please cite the following dissertation if you use Uplug:
+
+
+{{{
+ @PhdThesis{Tiedemann:PhD03,
+  author = {J\"org Tiedemann},
+  title  = {Recycling Translations -- {E}xtraction of Lexical
+            Data from Parallel Corpora and their Application in
+            Natural Language Processing},
+  school = {Uppsala University},
+  year   =  2003,
+  address = {Uppsala, Sweden},
+  note   = {Anna S{\aa}gvall{ }Hein, {\AA}ke Viberg (eds): Studia
+            Linguistica Upsaliensia},
+  url = {http://uu.diva-portal.org/smash/record.jsf?pid=diva2:163715},
+ }
+}}}
+
+=== Installation ===
+
+Start by downloading the latest uplug-main tar-ball and install the main components. This is fully functional and includes already a lot of the main features and some annotation tools.
+
+
+{{{
+ tar xzf uplug-main*.tar.gz
+ cd uplug-main*
+ perl Makefile.PL
+ make all
+ sudo make install
+}}}
+You may then select the language packs that you'd like to include and install them one by one. Look at the documentation and readme's inside of those packages.
+
+You may also download the latest source from bitbucket and install all packages in one run:
+
+
+{{{
+ git clone https://bitbucket.org/tiedemann/uplug.git
+ cd uplug
+ make all
+ sudo make install
+}}}
+More about installation and usage: Read the documentation and look at the provided files: INSTALL, QUICKSTART & HOWTO
+
+See also:
+
+uplug, Uplug, Uplug::Config, Uplug::IO, Uplug::IO::Any
+
+
+=== Structure of the main package ===
+
+Uplug is a collection of tools and scripts for processing text-corpora
+
+
+{{{
+ uplug            script for running Uplug modules
+ bin/             executable scripts (Uplug modules)
+ share/systems/   configuration files of Uplug modules
+ share/ext/       external programs/tools integrated in Uplug
+ tools/           simple tools (converting, dumping, etc)
+ web/             experimental web interface (not maintained)
+
+ share/ini/       some configuration files
+ share/lang/      language specific data
+ example/         small example texts
+
+ lib/Uplug.pm     main library for running Uplug modules
+ lib/Uplug/       other Uplug modules
+}}}
+
+=== License ===
+
+Copyright (C) 2004-2012 Jörg Tiedemann
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+
+== More Information ==
+
+ * [[Uplug.wiki]]
+ * [[Uplug/Config.wiki]]
+ * [[Uplug/IO.wiki]]
+ * [[Uplug/IO/Any.wiki]]
+ * [[bin/uplug.wiki]]

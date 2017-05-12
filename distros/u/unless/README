@@ -1,0 +1,51 @@
+NAME
+    unless - use a Perl module unless a condition holds
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+      use unless CONDITION, MODULE => ARGUMENTS;
+
+DESCRIPTION
+    The construct
+
+      use unless CONDITION, MODULE => ARGUMENTS;
+
+    has no effect if "CONDITION" is true. In this case the effect is the
+    same as of
+
+      use MODULE ARGUMENTS;
+
+    Above "=>" provides necessary quoting of "MODULE". If not used (e.g., no
+    ARGUMENTS to give), you'd better quote "MODULE" yourselves.
+
+BUGS
+    The current implementation does not allow specification of the required
+    version of the module.
+
+SEE ALSO
+    if provides the same functionality as this module, without the negation.
+    It is also in core (since version 5.6.2).
+
+    Module::Requires can be used to conditionally load one or modules, with
+    constraints based on the version of the module.
+
+    Module::Load::Conditional provides a number of functions you can use to
+    query what modules are available, and then load one or more of them at
+    runtime.
+
+    provide can be used to select one of several possible modules to load,
+    based on what version of Perl is running.
+
+AUTHORS
+    *   Ilya Zakharevich <ilyaz@cpan.org>
+
+    *   Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Ilya Zakharevich.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

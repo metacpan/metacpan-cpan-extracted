@@ -1,0 +1,2 @@
+TYPEMAP
+udp_proxy	*	O_OBJECT

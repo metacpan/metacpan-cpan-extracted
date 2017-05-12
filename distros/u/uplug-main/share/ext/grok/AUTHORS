@@ -1,0 +1,10 @@
+Main Authors:
+     Jason Baldridge <jmb@cogsci.ed.ac.uk>
+     Gann Bierner <gbierner@cogsci.ed.ac.uk>
+
+Contributors:
+     Tom Morton - maximum entropy tokenizer
+     Eric Friedman - sentence detector improvements
+     Meghan Pike - windows compatibility, GUI
+     Mike Atkinson - multiword expression package
+     Joerg Tiedemann - NP chunker package

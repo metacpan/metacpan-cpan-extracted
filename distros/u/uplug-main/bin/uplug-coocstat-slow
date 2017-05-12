@@ -1,0 +1,320 @@
+#!/usr/bin/env perl
+#
+# coocstat.pl
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+#
+# $Id$
+#
+# usage: coocstat.pl [OPTIONS]
+#        
+#
+# default parameters are given in the &GetDefaultIni subfunction
+#    at the end of the script!
+#
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Uplug::Data;
+use Uplug::Data::Align;
+use Uplug::IO::Any;
+use Uplug::Config;
+use Uplug::CoocStat;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='coocstat.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+if (ref($IniData{input}) ne 'HASH'){die "# coocstat.pl: no input found!\n";}
+my $CoocStream=$IniData{input}{'cooc freq'};
+my $SrcStream=$IniData{input}{'source freq'};
+my $TrgStream=$IniData{input}{'target freq'};
+if (ref($IniData{output}) ne 'HASH'){die "# coocstat.pl: no output found!\n";}
+my ($StatStreamName,$StatStream)=each %{$IniData{output}};
+
+my $coocfreq=Uplug::IO::Any->new($CoocStream);
+my $srcfreq=Uplug::IO::Any->new($SrcStream);
+my $trgfreq=Uplug::IO::Any->new($TrgStream);
+my $coocstat=Uplug::IO::Any->new($StatStream);
+
+#---------------------------------------------------------------------------
+
+$coocfreq->open('read',$CoocStream);
+$srcfreq->open('read',$SrcStream);
+$trgfreq->open('read',$TrgStream);
+my $header=$coocfreq->header;
+$coocstat->addheader($header);
+$coocstat->open('write',$StatStream);
+$coocstat->writeheader;
+
+my $header=$srcfreq->header;
+my $SrcCount=$header->{'token count'};
+my $header=$trgfreq->header;
+my $TrgCount=$header->{'token count'};
+
+#---------------------------------------------------------------------------
+# set module parameters (from IniData)
+
+my ($measure,$precision,$MinScore);   # statistics
+my ($freq,$LenDiff,$ClassMatch);      # thresholds
+my %length;                           # token length thresholds (source+target)
+my %MinFreq;                          # minimal frequency (source+target)
+my %GrepTok;                          # restrict string types (source+target)
+my %lang;                             # language (source+target)
+my $PrintProgr;                       # verbose-mode
+
+if (ref($IniData{parameter}) eq 'HASH'){
+    if (ref($IniData{parameter}{'co-occurrence'}) eq 'HASH'){
+	$precision=$IniData{'parameter'}{'co-occurrence'}{'precision'};
+	$MinScore=$IniData{'parameter'}{'co-occurrence'}{'minimal score'};
+	$measure=$IniData{'parameter'}{'co-occurrence'}{'measure'};
+    }
+    if (ref($IniData{parameter}{'token pair'}) eq 'HASH'){
+	$freq=$IniData{'parameter'}{'token pair'}{'minimal frequency'};
+	$LenDiff=$IniData{'parameter'}{'token pair'}{'minimal length diff'};
+	$ClassMatch=$IniData{'parameter'}{'token pair'}{'matching word class'};
+    }
+    if (ref($IniData{parameter}{'source token'}) eq 'HASH'){
+	$length{source}=
+	    $IniData{'parameter'}{'source token'}{'minimal length'};
+	$MinFreq{source}=
+	    $IniData{'parameter'}{'source token'}{'minimal frequency'};
+	$lang{source}=$IniData{'parameter'}{'source token'}{'language'};
+	$GrepTok{source}=$IniData{'parameter'}{'source token'}{'grep token'};
+    }
+    if (ref($IniData{parameter}{'target token'}) eq 'HASH'){
+	$length{target}=
+	    $IniData{'parameter'}{'target token'}{'minimal length'};
+	$MinFreq{target}=
+	    $IniData{'parameter'}{'target token'}{'minimal frequency'};
+	$GrepTok{target}=$IniData{'parameter'}{'target token'}{'grep token'};
+	$lang{target}=$IniData{'parameter'}{'target token'}{'language'};
+    }
+    if (ref($IniData{parameter}{runtime}) eq 'HASH'){
+	$PrintProgr=$IniData{'parameter'}{runtime}{'print progress'};
+    }
+}
+
+my $stat=Uplug::CoocStat->new($measure);
+if (not ref($stat)){die "# coocstat.pl: cannot find '$measure'!\n";}
+
+
+#---------------------------------------------------------------------------
+
+my $header=$coocfreq->header;
+my $AlignCount=$header->{'align count'};
+my $PairCount=$header->{'token pair count'};
+
+#---------------------------------------------------------------------------
+# create instances of data objects
+
+my $TreeData=Uplug::Data::Align->new($lang{source},   # new alignment
+				     $lang{target});  # data object
+my $found=Uplug::Data->new;                           # search results
+my $OutData=Uplug::Data->new;                         # output data
+
+
+
+#---------------------------------------------------------------------------
+# main: read frequency files and compute scores
+
+my $count=0;
+my %CoocStats;
+if ($PrintProgr){print STDERR "read frequencies and calculate '$measure'\n";}
+
+while ($coocfreq->read($TreeData)){
+
+    my $data=$TreeData->attribute;
+
+    if ($freq and ($data->{freq}<$freq)){next;}
+    for ('source','target'){
+	if ($length{$_}){
+	    if (length($data->{$_})<$length{$_}){next;}
+	}
+	if ($GrepTok{$_}){
+	    if (not $TreeData->{$_}->isStringType($data->{$_},$GrepTok{$_})){
+		next;
+	    }
+	}
+    }
+
+    #------------------------------------------------------
+    # check length difference ratio if necessary
+
+    if ($LenDiff){
+	if ($TreeData->lengthQuotient($data->{source},
+				      $data->{target})<$LenDiff){next;}
+    }
+
+    #------------------------------------------------------
+    # check token classes if necessary
+
+    if ($ClassMatch){
+	if (not $TreeData->isSameType($lang{source},$lang{target},
+				      $data->{source},$data->{target},
+				      $ClassMatch)){next;}
+    }
+
+    #------------------------------------------------------
+    # look for source and target token frequencies
+    # (this makes it slow ...:)
+
+    my %search=('token' => $data->{source});     # source token
+    $found->init();
+    $srcfreq->select($found,\%search);
+    my $tokfreq=$found->attribute;
+    if ($MinFreq{source} and ($tokfreq->{freq}<$MinFreq{source})){next;}
+    $data->{'srcfreq'}=$tokfreq->{freq};
+
+    my %search=('token' => $data->{target});     # target token
+    $found->init();
+    $trgfreq->select($found,\%search);
+    my $tokfreq=$found->attribute;
+    if ($MinFreq{target} and ($tokfreq->{freq}<$MinFreq{target})){next;}
+    $data->{'trgfreq'}=$tokfreq->{freq};
+
+    #------------------------------------------------------
+    $count++;
+    if ($PrintProgr){
+	if (not ($count % 500)){
+	    $|=1;print STDERR '.';$|=0;
+	}
+	if (not ($count % 10000)){
+	    $|=1;print STDERR "$count pairs\n";$|=0;
+	}
+    }
+    #------------------------------------------------------
+
+    #------------------------------------------------------
+    # finally: compute the score!
+
+    my $score=$stat->compute($data->{freq},
+			     $data->{srcfreq},
+			     $data->{trgfreq},
+			     $PairCount);
+
+
+    if ($precision){
+	$score=int($score*10**$precision+0.5)/(10**$precision);
+    }
+    if ($MinScore){
+	if ($score<$MinScore){next;}
+    }
+
+    #------------------------------------------------------
+    # save score in output
+
+    $OutData->init();
+    $OutData->setAttribute('source',$data->{source});
+    $OutData->setAttribute('target',$data->{target});
+    $OutData->setAttribute('score',$score);
+
+    $coocstat->write($OutData);
+}
+$coocfreq->close;
+$srcfreq->close;
+$trgfreq->close;
+$coocstat->close;
+
+
+# end of main
+#---------------------------------------------------------------------------
+
+
+
+sub GetDefaultIni{
+
+    my $DefaultIni = 
+{
+  'module' => {
+    'program' => 'coocstat.pl',
+    'location' => '$UplugBin',
+    'name' => 'Dice coefficient',
+  },
+  'description' => 'This module calculates Dice scores from
+  co-occurrence counts.',
+  'input' => {
+    'cooc freq' => {
+      'stream name' => 'cooc freq',
+    },
+    'source freq' => {
+      'stream name' => 'source freq',
+    },
+    'target freq' => {
+      'stream name' => 'target freq',
+    },
+  },
+  'output' => {
+    'dice' => {
+      'stream name' => 'dice',
+    },
+  },
+  'parameter' => {
+    'token pair' => {
+      'minimal frequency' => 2,
+#      'minimal length diff' => 0.5,
+#      'matching word class' => 'same'
+    },
+    'source token' => {
+      'minimal frequency' => 2,
+#      'minimal length' => 4,
+#      'grep token' => 'contains alphabetic',
+#      'language' => 'default',
+#      'lower case' => 1,
+
+    },
+    'target token' => {
+      'minimal frequency' => 2,
+#      'minimal length' => 4,
+#      'grep token' => 'contains alphabetic',
+#      'language' => 'default',
+#      'lower case' => 1
+
+    },
+    'co-occurrence' => {
+      'minimal score' => 0.2,
+      'measure' => 'dice',
+#      'precision' => 4,
+    },
+    'runtime' => {
+      'print progress' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'src' => 'input:source freq:file',
+       'trg' => 'input:target freq:file',
+       'cooc' => 'input:cooc freq:file',
+       'stat' => 'output:cooc stat:file',
+       's' => 'parameter:co-occurrence:measure',
+       'm' => 'parameter:co-occurrence:minimal score',
+       'min' => 'parameter:co-occurrence:minimal score',
+    }
+  },
+  'widgets' => {
+  }
+};
+
+
+    return %{$DefaultIni};
+}

@@ -1,0 +1,21 @@
+---
+abstract: 'implements unix2dos and dos2unix in pure perl'
+author:
+  - 'Michael Fuersich <michael.fuersich@arcor.de>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: unix2dos
+provides:
+  unix2dos:
+    file: lib/unix2dos.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

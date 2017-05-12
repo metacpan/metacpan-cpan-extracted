@@ -1,0 +1,180 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package org.maltparser.core.options;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import java.util.Collection;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import java.util.HashMap;<a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.util.TreeSet;<a name="line.5"></a>
+<FONT color="green">006</FONT>    <a name="line.6"></a>
+<FONT color="green">007</FONT>    import org.maltparser.core.options.option.Option;<a name="line.7"></a>
+<FONT color="green">008</FONT>    <a name="line.8"></a>
+<FONT color="green">009</FONT>    <a name="line.9"></a>
+<FONT color="green">010</FONT>    /**<a name="line.10"></a>
+<FONT color="green">011</FONT>     * An option group categories a group of options.<a name="line.11"></a>
+<FONT color="green">012</FONT>     *<a name="line.12"></a>
+<FONT color="green">013</FONT>     * @author Johan Hall<a name="line.13"></a>
+<FONT color="green">014</FONT>     * @since 1.0<a name="line.14"></a>
+<FONT color="green">015</FONT>    **/<a name="line.15"></a>
+<FONT color="green">016</FONT>    public class OptionGroup {<a name="line.16"></a>
+<FONT color="green">017</FONT>            private String name;<a name="line.17"></a>
+<FONT color="green">018</FONT>            private HashMap&lt;String, Option&gt; options;<a name="line.18"></a>
+<FONT color="green">019</FONT>            <a name="line.19"></a>
+<FONT color="green">020</FONT>            public static int toStringSetting = 0;<a name="line.20"></a>
+<FONT color="green">021</FONT>            public final static int WITHGROUPNAME = 0; <a name="line.21"></a>
+<FONT color="green">022</FONT>            public final static int NOGROUPNAME = 1; <a name="line.22"></a>
+<FONT color="green">023</FONT>            <a name="line.23"></a>
+<FONT color="green">024</FONT>            /**<a name="line.24"></a>
+<FONT color="green">025</FONT>             * Creates an option group with an option group name.<a name="line.25"></a>
+<FONT color="green">026</FONT>             * <a name="line.26"></a>
+<FONT color="green">027</FONT>             * @param name  The name of the option group<a name="line.27"></a>
+<FONT color="green">028</FONT>             */<a name="line.28"></a>
+<FONT color="green">029</FONT>            public OptionGroup(String name) {<a name="line.29"></a>
+<FONT color="green">030</FONT>                    setName(name);<a name="line.30"></a>
+<FONT color="green">031</FONT>                    options = new HashMap&lt;String, Option&gt;();<a name="line.31"></a>
+<FONT color="green">032</FONT>            }<a name="line.32"></a>
+<FONT color="green">033</FONT>    <a name="line.33"></a>
+<FONT color="green">034</FONT>            /**<a name="line.34"></a>
+<FONT color="green">035</FONT>             * Returns the name of the option group<a name="line.35"></a>
+<FONT color="green">036</FONT>             * <a name="line.36"></a>
+<FONT color="green">037</FONT>             * @return      the name of the option group<a name="line.37"></a>
+<FONT color="green">038</FONT>             */<a name="line.38"></a>
+<FONT color="green">039</FONT>            public String getName() {<a name="line.39"></a>
+<FONT color="green">040</FONT>                    return name;<a name="line.40"></a>
+<FONT color="green">041</FONT>            }<a name="line.41"></a>
+<FONT color="green">042</FONT>    <a name="line.42"></a>
+<FONT color="green">043</FONT>            /**<a name="line.43"></a>
+<FONT color="green">044</FONT>             * Sets the name of the option group<a name="line.44"></a>
+<FONT color="green">045</FONT>             * <a name="line.45"></a>
+<FONT color="green">046</FONT>             * @param name  the name of the option group<a name="line.46"></a>
+<FONT color="green">047</FONT>             */<a name="line.47"></a>
+<FONT color="green">048</FONT>            public void setName(String name) {<a name="line.48"></a>
+<FONT color="green">049</FONT>                    this.name = name.toLowerCase();<a name="line.49"></a>
+<FONT color="green">050</FONT>            }<a name="line.50"></a>
+<FONT color="green">051</FONT>            <a name="line.51"></a>
+<FONT color="green">052</FONT>            /**<a name="line.52"></a>
+<FONT color="green">053</FONT>             * Adds an option to the option group.<a name="line.53"></a>
+<FONT color="green">054</FONT>             * <a name="line.54"></a>
+<FONT color="green">055</FONT>             * @param option        an option<a name="line.55"></a>
+<FONT color="green">056</FONT>             * @throws OptionException<a name="line.56"></a>
+<FONT color="green">057</FONT>             */<a name="line.57"></a>
+<FONT color="green">058</FONT>            public void addOption(Option option) throws OptionException {<a name="line.58"></a>
+<FONT color="green">059</FONT>                    if (option.getName() == null || option.getName().equals("")) {<a name="line.59"></a>
+<FONT color="green">060</FONT>                            throw new OptionException("The option name is null or contains the empty string. ");<a name="line.60"></a>
+<FONT color="green">061</FONT>                    } else if (options.containsKey(option.getName().toLowerCase())) {<a name="line.61"></a>
+<FONT color="green">062</FONT>                            throw new OptionException("The option name already exists for that option group. ");<a name="line.62"></a>
+<FONT color="green">063</FONT>                    } else {<a name="line.63"></a>
+<FONT color="green">064</FONT>                            options.put(option.getName().toLowerCase(), option);<a name="line.64"></a>
+<FONT color="green">065</FONT>                    }<a name="line.65"></a>
+<FONT color="green">066</FONT>            }<a name="line.66"></a>
+<FONT color="green">067</FONT>            <a name="line.67"></a>
+<FONT color="green">068</FONT>            /**<a name="line.68"></a>
+<FONT color="green">069</FONT>             * Returns the option according to the option name.<a name="line.69"></a>
+<FONT color="green">070</FONT>             * <a name="line.70"></a>
+<FONT color="green">071</FONT>             * @param optionname    an option name<a name="line.71"></a>
+<FONT color="green">072</FONT>             * @return      an option, &lt;i&gt;null&lt;/i&gt; if the option name can't be found<a name="line.72"></a>
+<FONT color="green">073</FONT>             */<a name="line.73"></a>
+<FONT color="green">074</FONT>            public Option getOption(String optionname) {<a name="line.74"></a>
+<FONT color="green">075</FONT>                    return options.get(optionname);<a name="line.75"></a>
+<FONT color="green">076</FONT>            }<a name="line.76"></a>
+<FONT color="green">077</FONT>            <a name="line.77"></a>
+<FONT color="green">078</FONT>            /**<a name="line.78"></a>
+<FONT color="green">079</FONT>             * Returns all options for this option group.<a name="line.79"></a>
+<FONT color="green">080</FONT>             * <a name="line.80"></a>
+<FONT color="green">081</FONT>             * @return      a list of options<a name="line.81"></a>
+<FONT color="green">082</FONT>             */<a name="line.82"></a>
+<FONT color="green">083</FONT>            public Collection&lt;Option&gt; getOptionList() {<a name="line.83"></a>
+<FONT color="green">084</FONT>                    return options.values();<a name="line.84"></a>
+<FONT color="green">085</FONT>            }<a name="line.85"></a>
+<FONT color="green">086</FONT>            <a name="line.86"></a>
+<FONT color="green">087</FONT>            /* (non-Javadoc)<a name="line.87"></a>
+<FONT color="green">088</FONT>             * @see java.lang.Object#toString()<a name="line.88"></a>
+<FONT color="green">089</FONT>             */<a name="line.89"></a>
+<FONT color="green">090</FONT>            public String toString() {<a name="line.90"></a>
+<FONT color="green">091</FONT>                    final StringBuilder sb = new StringBuilder();<a name="line.91"></a>
+<FONT color="green">092</FONT>    //              for (String value : new TreeSet&lt;String&gt;(options.keySet())) {<a name="line.92"></a>
+<FONT color="green">093</FONT>    //                      sb.append("super.put(\""); <a name="line.93"></a>
+<FONT color="green">094</FONT>    //                      sb.append("--");<a name="line.94"></a>
+<FONT color="green">095</FONT>    //                      sb.append(name);<a name="line.95"></a>
+<FONT color="green">096</FONT>    //                      sb.append("-");<a name="line.96"></a>
+<FONT color="green">097</FONT>    //                      sb.append(options.get(value).getName());<a name="line.97"></a>
+<FONT color="green">098</FONT>    //                      sb.append("\", \"");<a name="line.98"></a>
+<FONT color="green">099</FONT>    //                      sb.append(options.get(value).getDefaultValueString());<a name="line.99"></a>
+<FONT color="green">100</FONT>    //                      sb.append("\");\n");<a name="line.100"></a>
+<FONT color="green">101</FONT>    //              }<a name="line.101"></a>
+<FONT color="green">102</FONT>    <a name="line.102"></a>
+<FONT color="green">103</FONT>                    if (OptionGroup.toStringSetting == OptionGroup.WITHGROUPNAME) {<a name="line.103"></a>
+<FONT color="green">104</FONT>                            sb.append("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");<a name="line.104"></a>
+<FONT color="green">105</FONT>                            sb.append("+ " + name+"\n");<a name="line.105"></a>
+<FONT color="green">106</FONT>                            sb.append("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");<a name="line.106"></a>
+<FONT color="green">107</FONT>                    }<a name="line.107"></a>
+<FONT color="green">108</FONT>                    <a name="line.108"></a>
+<FONT color="green">109</FONT>                    for (String value : new TreeSet&lt;String&gt;(options.keySet())) {<a name="line.109"></a>
+<FONT color="green">110</FONT>                            sb.append(options.get(value).toString());<a name="line.110"></a>
+<FONT color="green">111</FONT>                    }<a name="line.111"></a>
+<FONT color="green">112</FONT>                    return sb.toString();<a name="line.112"></a>
+<FONT color="green">113</FONT>            }<a name="line.113"></a>
+<FONT color="green">114</FONT>    }<a name="line.114"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

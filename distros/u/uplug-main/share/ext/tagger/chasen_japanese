@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+BIN=${UPLUGHOME}/ext/tagger/japanese
+RCFILE=${UPLUGHOME}/ext/tagger/japanese/chasenrc
+
+INCHAR='utf8'
+OUTCHAR='EUC-JP'
+
+CHASEN="${BIN}/chasen -r ${RCFILE}"
+ENCODE="${BIN}/recode ${INCHAR}..${OUTCHAR}"
+DECODE="${BIN}/recode ${OUTCHAR}..${INCHAR}"
+
+${ENCODE} <$1 | ${CHASEN} | ${DECODE}
+
+

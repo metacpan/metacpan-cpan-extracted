@@ -1,0 +1,34 @@
+=head1 NAME
+
+rurpme - restricted urpme
+
+=head1 SYNOPSIS
+
+    rurpme [options] [package_name...]
+
+=head1 DESCRIPTION
+
+rurpme is similar to urpme, but has a stripped-down set of features. It's
+intended to be used by users without root privileges but with sudo rights
+on it, preventing any abuse of this tool to compromise the system.
+
+With rurpme, the following options are forbidden: B<--root>,
+B<--use-distrib>, B<--noscripts> and B<--parallel>.
+
+=head1 CAVEAT
+
+This software is still experimental. While some operations are forbidden,
+there is no guarantee it is actually secure.
+
+=head1 OPTIONS
+
+The options are the same than urpme ones.
+
+=head1 AUTHOR
+
+Maintained by Rafael Garcia-Suarez,
+
+
+=head1 SEE ALSO
+
+urpme(8).

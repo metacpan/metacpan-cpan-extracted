@@ -1,0 +1,18 @@
+# features (source): { 'c.*:type' => undef }
+# features (target): { 'pos' => '^(..).*$/$1' }
+NP	NN	0.9
+NPMAX	NN AP NN	0.9
+NPMAX	NN AP NE	0.9
+NPMAX	NE AP NN	0.9
+NPMAX	NE AP NE	0.9
+NPMAX	NN	0.9
+APMIN	AD	0.9
+PP	AP	0.9
+PP	AP NN	0.9
+VC	VV	0.9
+VC	VA	0.9
+VC	VM	0.9
+ADVP	AD	0.9
+INFP	VV	0.9
+INFP	VA	0.9
+INFP	VM	0.9

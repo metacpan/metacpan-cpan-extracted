@@ -1,0 +1,7 @@
+#!/bin/bash
+
+BIN=/local/ling/taggare/MBT-0.7
+MBT=${BIN}/tagdemo7
+CONFIG=${BIN}/settings.swedish.suc
+
+${MBT} -s ${CONFIG} <$1

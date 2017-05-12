@@ -1,0 +1,5 @@
+[env]
+
+[uml]
+ubda=/tmp/disk
+eth0=daemon,

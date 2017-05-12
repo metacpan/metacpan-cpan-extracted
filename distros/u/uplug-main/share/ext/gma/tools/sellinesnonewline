@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl5
+
+# selects given range of lines
+
+#check for correct usage
+if ($#ARGV < 0) {
+        print "usage:  sellines <from> [<to>]\n";
+	print "Line count starts at 1.\n";
+        exit;
+};
+
+$from = shift(@ARGV);
+if (@ARGV) {
+	$to = shift(@ARGV);
+} else {
+	$to = $from;
+};
+
+if ($to < $from) { die "<FROM> MUST BE LESS THAN <TO>!\n"; };
+
+
+while (<>) {
+    chop;
+	$ln++;
+	if ($ln > $to) {
+		exit;
+	};
+	if ($ln >= $from ) {
+		print;
+	};
+};
+

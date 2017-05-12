@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Umlmgr;
+
+my ($machine, $console) = @ARGV;
+
+$console ||= 'con1';
+    
+my $umlmgr = Umlmgr->new;
+
+my $ma = $umlmgr->get_machine($machine) or die "can't find machine $machine";
+
+$ma->get_console($console);

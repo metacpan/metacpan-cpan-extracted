@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE liuAlign SYSTEM "liu-align.dtd">
+
+<liuAlign fromDoc="svenprf.ces.src.gz" toDoc="svenprf.ces.trg.gz" version="1.0"><liuHeader></liuHeader>
+
+ <linkList>
+<sentLink id="svenprf2" xtargets="2;2">
+ <wordLink span="18:5+24:8+33:8;16:4+21:5+27:10" certainty="regular" xtargets="w2.4+w2.5+w2.6;w2.4+w2.5+w2.6" lexPair="Eders Kungliga Högheter;Your Royal Highnesses" />
+</sentLink>
+<sentLink id="svenprf3" xtargets="3;3">
+ <wordLink span="9:19;9:6+16:2+19:10" certainty="regular" xtargets="w3.2;w3.4+w3.5+w3.6" lexPair="neutralitetspolitik;policy of neutrality" />
+</sentLink>
+<sentLink id="svenprf4" xtargets="4;4">
+ <wordLink span="33:3;33:3" certainty="regular" xtargets="w4.6;w4.6" lexPair="och;and" />
+</sentLink>
+<sentLink id="svenprf11" xtargets="11;12">
+ <wordLink span="49:7+57:8;46:3+50:6+57:6" certainty="regular" xtargets="w11.6+w11.7;w12.7+w12.8+w12.9" lexPair="Förenta staterna;the United States" />
+</sentLink>
+<sentLink id="svenprf15" xtargets="15;16">
+ <wordLink span="0:5;0:2" certainty="regular" xtargets="w15.1;w16.1" lexPair="Genom;By" />
+ <wordLink span="79:5+85:4;92:10+103:2" certainty="regular" xtargets="w15.11+w15.12;w16.14+w16.15" lexPair="bidra till;contribute to" />
+</sentLink>
+<sentLink id="svenprf16" xtargets="16;17">
+ <wordLink span="16:6;29:11" certainty="regular" xtargets="w16.3;w17.4" lexPair="vidare;furthermore" />
+ <wordLink span="54:3;67:2" certainty="regular" xtargets="w16.8;w17.9" lexPair="med;of" />
+</sentLink>
+<sentLink id="svenprf17" xtargets="17;18">
+ <wordLink span="46:12;71:6+78:7+86:10" certainty="regular" xtargets="w17.9;w18.13+w18.14+w18.15" lexPair="FN-konferens;United Nations conference" />
+</sentLink>
+<sentLink id="svenprf22" xtargets="22;23">
+ <wordLink span="8:9;7:2+10:13" certainty="regular" xtargets="w22.2;w23.2+w23.3" lexPair="medverkar;is participating" />
+</sentLink>
+<sentLink id="svenprf23" xtargets="23;24">
+ <wordLink span="21:8+30:8;16:2+19:5" certainty="fuzzy" xtargets="w23.6+w23.7;w24.4+w24.5" lexPair="mottagit beskedet;to learn" />
+ <wordLink span="94:7;115:6" certainty="regular" xtargets="w23.17;w24.21" lexPair="styrkor;forces" />
+</sentLink>
+<sentLink id="svenprf29" xtargets="29;30">
+ <wordLink span="0:10;0:3+4:10" certainty="regular" xtargets="w29.1;w30.1+w30.2" lexPair="Regeringen;The Government" />
+</sentLink>
+<sentLink id="svenprf36" xtargets="36;37">
+ <wordLink span="17:3;23:2" certainty="regular" xtargets="w36.3;w37.4" lexPair="att;to" />
+</sentLink>
+<sentLink id="svenprf43" xtargets="43;44">
+ <wordLink span="16:13;17:3+21:4+26:2+29:6" certainty="regular" xtargets="w43.3;w44.5+w44.6+w44.7+w44.8" lexPair="fängelsetiden;the term in prison" />
+</sentLink>
+<sentLink id="svenprf44" xtargets="44;45">
+ <wordLink span="80:4+85:6;78:3+82:5+88:6" certainty="regular" xtargets="w44.13+w44.14;w45.14+w45.15+w45.16" lexPair="hela folket;the whole nation" />
+</sentLink>
+<sentLink id="svenprf49" xtargets="49;50">
+ <wordLink span="19:6+33:3;17:4" certainty="regular" xtargets="w49.3+w49.5;w50.3" lexPair="kommer att;will" />
+</sentLink>
+<sentLink id="svenprf62" xtargets="62;63">
+ <wordLink span="0:11;0:7+8:4" certainty="regular" xtargets="w62.1;w63.1+w63.2" lexPair="Arbetslivet;Working life" />
+</sentLink>
+<sentLink id="svenprf63" xtargets="63;64">
+ <wordLink span="11:6+18:3;15:4" certainty="regular" xtargets="w63.2+w63.3;w64.3" lexPair="kommer att;will" />
+</sentLink>
+<sentLink id="svenprf64" xtargets="64;65">
+ <wordLink span="96:7;118:6" certainty="regular" xtargets="w64.15;w65.20" lexPair="minskar;reduce" />
+</sentLink>
+<sentLink id="svenprf67" xtargets="67;68">
+ <wordLink span="17:3+21:9;121:2+124:9" certainty="regular" xtargets="w67.4+w67.5;w68.23+w68.24" lexPair="att fortsätta;be continued" />
+</sentLink>
+<sentLink id="svenprf69" xtargets="69;70">
+ <wordLink span="19:6+26:3;17:4" certainty="regular" xtargets="w69.3+w69.4;w70.3" lexPair="kommer att;will" />
+</sentLink>
+<sentLink id="svenprf71" xtargets="71;72">
+ <wordLink span="3:3;0:5" certainty="regular" xtargets="w71.2;w72.1" lexPair="små;Small" />
+ <wordLink span="52:10;61:7" certainty="regular" xtargets="w71.10;w72.11" lexPair="förnyelsen;renewal" />
+</sentLink>
+<sentLink id="svenprf77" xtargets="77;78">
+ <wordLink span="13:1;49:4" certainty="null" xtargets="w77.2;" lexPair="i;" />
+</sentLink>
+<sentLink id="svenprf89" xtargets="89;90">
+ <wordLink span="37:3;63:3" certainty="regular" xtargets="w89.6;w90.10" lexPair="och;and" />
+</sentLink>
+<sentLink id="svenprf92" xtargets="92;93">
+ <wordLink span="0:9;0:7" certainty="regular" xtargets="w92.1;w93.1" lexPair="Särskilda;Special" />
+ <wordLink span="19:5+25:2+28:1;22:2+25:7+33:2" certainty="regular" xtargets="w92.3+w92.4+w92.5;w93.4+w93.5+w93.6" lexPair="sätts in i;be applied in" />
+</sentLink>
+<sentLink id="svenprf96" xtargets="96;97">
+ <wordLink span="80:8;98:7" certainty="regular" xtargets="w96.10;w97.16" lexPair="påverkan;effects" />
+</sentLink>
+<sentLink id="svenprf103" xtargets="103;104">
+ <wordLink span="52:5;46:7" certainty="regular" xtargets="w103.9;w104.10" lexPair="tjäna;provide" />
+</sentLink>
+<sentLink id="svenprf105" xtargets="105;106">
+ <wordLink span="30:5+36:5;34:5+40:5+46:6" certainty="regular" xtargets="w105.5+w105.6;w106.9+w106.10+w106.11" lexPair="bland annat;among other things" />
+</sentLink>
+<sentLink id="svenprf106" xtargets="106;107">
+ <wordLink span="30:4;41:4" certainty="regular" xtargets="w106.4;w107.7" lexPair="från;nine" />
+ <wordLink span="56:3;65:4" certainty="regular" xtargets="w106.10;w107.11" lexPair="med;with" />
+</sentLink>
+<sentLink id="svenprf109" xtargets="109;110">
+ <wordLink span="50:3;65:4" certainty="regular" xtargets="w109.7;w110.11" lexPair="med;with" />
+</sentLink>
+<sentLink id="svenprf110" xtargets="110;111">
+ <wordLink span="91:4;92:4" certainty="regular" xtargets="w110.16;w111.18" lexPair="full;full" />
+ <wordLink span="109:3;114:3" certainty="regular" xtargets="w110.18;w111.21" lexPair="för;the" />
+</sentLink>
+<sentLink id="svenprf112" xtargets="112;113">
+ <wordLink span="22:4;18:6" certainty="regular" xtargets="w112.2;w113.3" lexPair="inom;within" />
+</sentLink>
+<sentLink id="svenprf123" xtargets="123;124">
+ <wordLink span="20:10;14:12" certainty="regular" xtargets="w123.3;w124.2" lexPair="samarbetet;co-operation" />
+ <wordLink span="66:4;71:12" certainty="regular" xtargets="w123.9;w124.9" lexPair="allt;increasingly" />
+</sentLink>
+<sentLink id="svenprf124" xtargets="124;125">
+ <wordLink span="44:3;41:2" certainty="regular" xtargets="w124.7;w125.7" lexPair="att;to" />
+ <wordLink span="135:15;133:13" certainty="regular" xtargets="w124.21;w125.20" lexPair="internationella;international" />
+</sentLink>
+<sentLink id="svenprf125" xtargets="125;126">
+ <wordLink span="6:3+19:11;7:3+18:9+28:6" certainty="regular" xtargets="w125.2+w125.4;w126.2+w126.4+w126.5" lexPair="den valperioden;the electoral period" />
+</sentLink>
+<sentLink id="svenprf129" xtargets="129;130">
+ <wordLink span="21:5;27:5" certainty="regular" xtargets="w129.4;w130.6" lexPair="minst;least" />
+ <wordLink span="110:7;113:2+116:9" certainty="regular" xtargets="w129.15;w130.20+w130.21" lexPair="stödjas;be supported" />
+</sentLink>
+<sentLink id="svenprf130" xtargets="130;131">
+ <wordLink span="26:2+29:5+35:10;0:1+2:10+13:6+20:2" certainty="fuzzy" xtargets="w130.4+w130.5+w130.6;w131.1+w131.2+w131.3+w131.4" lexPair="en sådan omfattning;A sufficient number of" />
+</sentLink>
+<sentLink id="svenprf135" xtargets="135;136">
+ <wordLink span="64:5;84:4" certainty="regular" xtargets="w135.12;w136.17" lexPair="nästa;next" />
+</sentLink>
+<sentLink id="svenprf136" xtargets="136;137">
+ <wordLink span="131:8;111:6" certainty="regular" xtargets="w136.24;w137.23" lexPair="framtida;future" />
+ <wordLink span="164:16;154:10" certainty="regular" xtargets="w136.29;w137.31" lexPair="sysselsättningen;employment" />
+</sentLink>
+<sentLink id="svenprf138" xtargets="138;139">
+ <wordLink span="16:3+20:2+23:5;18:3+22:4" certainty="regular" xtargets="w138.2+w138.3+w138.4;w139.3+w139.4" lexPair="för en sådan;for this" />
+ <wordLink span="53:2;63:3" certainty="regular" xtargets="w138.8;w139.12" lexPair="är;are" />
+</sentLink>
+<sentLink id="svenprf147" xtargets="147;148">
+ <wordLink span="116:6;83:14" certainty="regular" xtargets="w147.21;w148.19" lexPair="ansvar;responsibility" />
+</sentLink>
+<sentLink id="svenprf170" xtargets="172;173">
+ <wordLink span="24:3;25:3" certainty="regular" xtargets="w172.6;w173.6" lexPair="för;for" />
+</sentLink>
+<sentLink id="svenprf171" xtargets="173;174">
+ <wordLink span="48:15;43:7+51:3+55:11" certainty="regular" xtargets="w173.9;w174.9+w174.10+w174.11" lexPair="samarbetsklimat;climate for cooperation" />
+</sentLink>
+<sentLink id="svenprf172" xtargets="174;175">
+ <wordLink span="22:11;20:7" certainty="regular" xtargets="w174.4;w175.4" lexPair="ytterligare;further" />
+</sentLink>
+<sentLink id="svenprf177" xtargets="179;180">
+ <wordLink span="41:7;34:2+37:10" certainty="regular" xtargets="w179.6;w180.5+w180.6" lexPair="stärkas;be reinforced" />
+</sentLink>
+<sentLink id="svenprf178" xtargets="180;181">
+ <wordLink span="0:11;12:3+16:5+22:11" certainty="regular" xtargets="w180.1;w181.4+w181.5+w181.6" lexPair="Kommunernas;the local authorities" />
+</sentLink>
+<sentLink id="svenprf184" xtargets="186;187">
+ <wordLink span="33:9;35:14" certainty="regular" xtargets="w186.6;w187.7" lexPair="kompetens;qualifications" />
+</sentLink>
+<sentLink id="svenprf185" xtargets="187;188">
+ <wordLink span="31:5;34:4" certainty="regular" xtargets="w187.6;w188.6" lexPair="skall;will" />
+</sentLink>
+<sentLink id="svenprf186" xtargets="188;189">
+ <wordLink span="56:3+60:3;66:2+69:5+75:2" certainty="regular" xtargets="w188.8+w188.9;w189.11+w189.12+w189.13" lexPair="för att;in order to" />
+</sentLink>
+<sentLink id="svenprf188" xtargets="190;191">
+ <wordLink span="74:5;88:2+91:5" certainty="regular" xtargets="w190.11;w191.15+w191.16" lexPair="varav;of these" />
+</sentLink>
+<sentLink id="svenprf191" xtargets="193;194">
+ <wordLink span="0:3+4:7+12:5+18:12;0:7+8:6+15:9" certainty="regular" xtargets="w193.1+w193.2+w193.3+w193.4;w194.1+w194.2+w194.3" lexPair="Den svenska högre utbildningen;Swedish higher education" />
+</sentLink>
+<sentLink id="svenprf193" xtargets="195;196">
+ <wordLink span="74:8;0:8" certainty="regular" xtargets="w195.14;w196.1" lexPair="regional;Regional" />
+</sentLink>
+<sentLink id="svenprf194" xtargets="196;197">
+ <wordLink span="54:3;71:3" certainty="regular" xtargets="w196.9;w197.13" lexPair="det;and" />
+</sentLink>
+<sentLink id="svenprf196" xtargets="198;199">
+ <wordLink span="32:3;33:3" certainty="regular" xtargets="w198.6;w199.7" lexPair="den;the" />
+ <wordLink span="32:3+36:10;33:3+37:9" certainty="regular" xtargets="w198.6+w198.7;w199.7+w199.8" lexPair="den stabilitet;the stability" />
+</sentLink>
+<sentLink id="svenprf197" xtargets="199;200">
+ <wordLink span="30:3;36:3" certainty="regular" xtargets="w199.6;w200.8" lexPair="för;for" />
+</sentLink>
+<sentLink id="svenprf204" xtargets="206;207">
+ <wordLink span="41:6;41:10" certainty="regular" xtargets="w206.7;w207.9" lexPair="ökande;increasing" />
+</sentLink>
+<sentLink id="svenprf206" xtargets="208;209">
+ <wordLink span="7:2;8:1" certainty="regular" xtargets="w208.3;w209.3" lexPair="en;a" />
+</sentLink>
+<sentLink id="svenprf209" xtargets="211;212">
+ <wordLink span="108:3;125:2" certainty="regular" xtargets="w211.17;w212.24" lexPair="att;to" />
+</sentLink>
+<sentLink id="svenprf219" xtargets="221;223">
+ <wordLink span="30:5;8:10" certainty="regular" xtargets="w221.6;w223.2" lexPair="tyngd;importance" />
+</sentLink>
+<sentLink id="svenprf220" xtargets="222;224">
+ <wordLink span="59:5;63:4" certainty="regular" xtargets="w222.10;w224.11" lexPair="dagar;days" />
+</sentLink>
+<sentLink id="svenprf225" xtargets="227;229">
+ <wordLink span="54:14;50:13" certainty="regular" xtargets="w227.8;w229.10" lexPair="internationell;international" />
+</sentLink>
+<sentLink id="svenprf226" xtargets="228;230">
+ <wordLink span="0:6;20:9" certainty="regular" xtargets="w228.1;w230.4" lexPair="Därför;therefore" />
+ <wordLink span="7:9+17:3;30:3" certainty="fuzzy" xtargets="w228.2+w228.3;w230.5" lexPair="engagerar sig;act" />
+</sentLink>
+<sentLink id="svenprf227" xtargets="229;231">
+ <wordLink span="100:15;114:13" certainty="regular" xtargets="w229.16;w231.22" lexPair="internationellt;international" />
+</sentLink>
+<sentLink id="svenprf229" xtargets="231;233">
+ <wordLink span="3:5;2:5" certainty="regular" xtargets="w231.2;w233.2" lexPair="värld;world" />
+ <wordLink span="40:7;29:6" certainty="regular" xtargets="w231.9;w233.7" lexPair="socialt;social" />
+</sentLink>
+<sentLink id="svenprf234" xtargets="236;238">
+ <wordLink span="24:12;33:13+47:5+53:5" certainty="regular" xtargets="w236.5;w238.6+w238.7+w238.8" lexPair="fredsstyrkan;International peace force" />
+ <wordLink span="42:3;73:2+76:6" certainty="fuzzy" xtargets="w236.7;w238.13+w238.14" lexPair="ger;is making" />
+ <wordLink span="164:2;73:2+76:6" certainty="null" xtargets="w236.25;" lexPair="en;" />
+ <wordLink span="176:4;197:5" certainty="regular" xtargets="w236.27;w238.32" lexPair="fred;peace" />
+</sentLink>
+<sentLink id="svenprf237" xtargets="239;241">
+ <wordLink span="19:5+25:3;26:2" certainty="regular" xtargets="w239.4+w239.5;w241.5" lexPair="genom att;by" />
+</sentLink>
+<sentLink id="svenprf250" xtargets="252;254">
+ <wordLink span="82:11;86:10+97:2+100:7" certainty="regular" xtargets="w252.11;w254.18+w254.19+w254.20" lexPair="remissvaren;statements of opinion" />
+</sentLink>
+<sentLink id="svenprf253" xtargets="255;257">
+ <wordLink span="4:7+12:9;0:7+8:7" certainty="regular" xtargets="w255.2+w255.3;w257.1+w257.2" lexPair="svenska välfärden;Swedish welfare" />
+</sentLink>
+<sentLink id="svenprf254" xtargets="256;258">
+ <wordLink span="59:7;51:8" certainty="regular" xtargets="w256.10;w258.9" lexPair="förmåga;capacity" />
+</sentLink>
+<sentLink id="svenprf256" xtargets="258+259;260">
+ <wordLink span="64:11;75:8" certainty="regular" xtargets="w258.9;w260.13" lexPair="föränderlig;changing" />
+</sentLink>
+<sentLink id="svenprf262" xtargets="265;266">
+ <wordLink span="34:4;38:7" certainty="regular" xtargets="w265.6;w266.7" lexPair="till;towards" />
+</sentLink>
+<sentLink id="svenprf270" xtargets="273;274">
+ <wordLink span="35:10;65:4+70:8" certainty="regular" xtargets="w273.6;w274.12+w274.13" lexPair="fortsätter;will continue" />
+</sentLink>
+<sentLink id="svenprf272" xtargets="275;276">
+ <wordLink span="45:2;44:3" certainty="regular" xtargets="w275.8;w276.7" lexPair="är;the" />
+ <wordLink span="60:3+64:7+72:9;58:7+66:7" certainty="regular" xtargets="w275.11+w275.12+w275.13;w276.10+w276.11" lexPair="den svenska välfärden;Swedish welfare" />
+ <wordLink span="72:9;66:7" certainty="regular" xtargets="w275.13;w276.11" lexPair="välfärden;welfare" />
+ <wordLink span="87:9+97:3;78:7+86:3" certainty="regular" xtargets="w275.16+w275.17;w276.13+w276.14" lexPair="avgörande för;crucial for" />
+</sentLink>
+<sentLink id="svenprf275" xtargets="278;279">
+ <wordLink span="30:10;8:2+37:9" certainty="regular" xtargets="w278.7;w279.3+w279.8" lexPair="utvärderas;be evaluated" />
+</sentLink>
+<sentLink id="svenprf276" xtargets="279;280">
+ <wordLink span="145:3;192:3" certainty="regular" xtargets="w279.19;w280.28" lexPair="för;the" />
+</sentLink>
+<sentLink id="svenprf277" xtargets="280;281">
+ <wordLink span="15:7;36:6" certainty="regular" xtargets="w280.3;w281.7" lexPair="stabila;stable" />
+</sentLink>
+<sentLink id="svenprf279" xtargets="282;283+284">
+ <wordLink span="33:3+37:7;14:2+17:8" certainty="regular" xtargets="w282.4+w282.5;w283.2+w283.3" lexPair="att bekämpa;of fighting" />
+</sentLink>
+<sentLink id="svenprf281" xtargets="284;286">
+ <wordLink span="10:3;10:4" certainty="regular" xtargets="w284.4;w286.4" lexPair="god;good" />
+ <wordLink span="45:9;56:8" certainty="fuzzy" xtargets="w284.12;w286.13" lexPair="utpräglad;advanced" />
+</sentLink>
+<sentLink id="svenprf284" xtargets="287;289">
+ <wordLink span="92:3;105:3" certainty="regular" xtargets="w287.16;w289.20" lexPair="och;and" />
+</sentLink></linkList>
+</liuAlign>

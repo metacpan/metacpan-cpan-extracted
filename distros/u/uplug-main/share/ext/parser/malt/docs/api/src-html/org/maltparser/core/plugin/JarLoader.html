@@ -1,0 +1,282 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    package org.maltparser.core.plugin;<a name="line.1"></a>
+<FONT color="green">002</FONT>    <a name="line.2"></a>
+<FONT color="green">003</FONT>    import java.io.BufferedInputStream;<a name="line.3"></a>
+<FONT color="green">004</FONT>    import java.io.ByteArrayOutputStream;<a name="line.4"></a>
+<FONT color="green">005</FONT>    import java.io.File;<a name="line.5"></a>
+<FONT color="green">006</FONT>    import java.io.IOException;<a name="line.6"></a>
+<FONT color="green">007</FONT>    import java.lang.reflect.InvocationTargetException;<a name="line.7"></a>
+<FONT color="green">008</FONT>    import java.lang.reflect.Method;<a name="line.8"></a>
+<FONT color="green">009</FONT>    import java.net.MalformedURLException;<a name="line.9"></a>
+<FONT color="green">010</FONT>    import java.net.URL;<a name="line.10"></a>
+<FONT color="green">011</FONT>    import java.net.URLClassLoader;<a name="line.11"></a>
+<FONT color="green">012</FONT>    import java.security.SecureClassLoader;<a name="line.12"></a>
+<FONT color="green">013</FONT>    import java.util.HashMap;<a name="line.13"></a>
+<FONT color="green">014</FONT>    import java.util.HashSet;<a name="line.14"></a>
+<FONT color="green">015</FONT>    import java.util.TreeSet;<a name="line.15"></a>
+<FONT color="green">016</FONT>    import java.util.jar.Attributes;<a name="line.16"></a>
+<FONT color="green">017</FONT>    import java.util.jar.JarEntry;<a name="line.17"></a>
+<FONT color="green">018</FONT>    import java.util.jar.JarFile;<a name="line.18"></a>
+<FONT color="green">019</FONT>    import java.util.jar.JarInputStream;<a name="line.19"></a>
+<FONT color="green">020</FONT>    import java.util.jar.Manifest;<a name="line.20"></a>
+<FONT color="green">021</FONT>    import java.util.regex.PatternSyntaxException;<a name="line.21"></a>
+<FONT color="green">022</FONT>    <a name="line.22"></a>
+<FONT color="green">023</FONT>    import org.maltparser.core.exception.MaltChainedException;<a name="line.23"></a>
+<FONT color="green">024</FONT>    import org.maltparser.core.options.OptionManager;<a name="line.24"></a>
+<FONT color="green">025</FONT>    <a name="line.25"></a>
+<FONT color="green">026</FONT>    <a name="line.26"></a>
+<FONT color="green">027</FONT>    /**<a name="line.27"></a>
+<FONT color="green">028</FONT>    The jar class loader loads the content of a jar file that complies with a MaltParser Plugin.<a name="line.28"></a>
+<FONT color="green">029</FONT>    <a name="line.29"></a>
+<FONT color="green">030</FONT>    @author Johan Hall<a name="line.30"></a>
+<FONT color="green">031</FONT>     */<a name="line.31"></a>
+<FONT color="green">032</FONT>    public class JarLoader extends SecureClassLoader {<a name="line.32"></a>
+<FONT color="green">033</FONT>            private HashMap&lt;String, byte[]&gt; classByteArrays;<a name="line.33"></a>
+<FONT color="green">034</FONT>            private HashMap&lt;String, Class&lt;?&gt;&gt; classes;<a name="line.34"></a>
+<FONT color="green">035</FONT>            <a name="line.35"></a>
+<FONT color="green">036</FONT>            /**<a name="line.36"></a>
+<FONT color="green">037</FONT>             * Creates a new class loader that is specialized for loading jar files.<a name="line.37"></a>
+<FONT color="green">038</FONT>             * <a name="line.38"></a>
+<FONT color="green">039</FONT>             * @param parent The parent class loader<a name="line.39"></a>
+<FONT color="green">040</FONT>             */<a name="line.40"></a>
+<FONT color="green">041</FONT>            public JarLoader(ClassLoader parent) {<a name="line.41"></a>
+<FONT color="green">042</FONT>                    super(parent);<a name="line.42"></a>
+<FONT color="green">043</FONT>                    classByteArrays = new HashMap&lt;String, byte[]&gt;();<a name="line.43"></a>
+<FONT color="green">044</FONT>                    classes = new HashMap&lt;String, Class&lt;?&gt;&gt;();<a name="line.44"></a>
+<FONT color="green">045</FONT>            }<a name="line.45"></a>
+<FONT color="green">046</FONT>            <a name="line.46"></a>
+<FONT color="green">047</FONT>            /* (non-Javadoc)<a name="line.47"></a>
+<FONT color="green">048</FONT>             * @see java.lang.ClassLoader#findClass(java.lang.String)<a name="line.48"></a>
+<FONT color="green">049</FONT>             */<a name="line.49"></a>
+<FONT color="green">050</FONT>            protected Class&lt;?&gt; findClass(String name) {<a name="line.50"></a>
+<FONT color="green">051</FONT>                    String urlName = name.replace('.', '/');<a name="line.51"></a>
+<FONT color="green">052</FONT>                    byte buf[];<a name="line.52"></a>
+<FONT color="green">053</FONT>    <a name="line.53"></a>
+<FONT color="green">054</FONT>                    SecurityManager sm = System.getSecurityManager();<a name="line.54"></a>
+<FONT color="green">055</FONT>                    if (sm != null) {<a name="line.55"></a>
+<FONT color="green">056</FONT>                            int i = name.lastIndexOf('.');<a name="line.56"></a>
+<FONT color="green">057</FONT>                            if (i &gt;= 0) {<a name="line.57"></a>
+<FONT color="green">058</FONT>                                    sm.checkPackageDefinition(name.substring(0, i));<a name="line.58"></a>
+<FONT color="green">059</FONT>                            }<a name="line.59"></a>
+<FONT color="green">060</FONT>                    } <a name="line.60"></a>
+<FONT color="green">061</FONT>    <a name="line.61"></a>
+<FONT color="green">062</FONT>                    buf = (byte[]) classByteArrays.get(urlName);<a name="line.62"></a>
+<FONT color="green">063</FONT>                    if (buf != null) {<a name="line.63"></a>
+<FONT color="green">064</FONT>                            return defineClass(null, buf, 0, buf.length);<a name="line.64"></a>
+<FONT color="green">065</FONT>                    }<a name="line.65"></a>
+<FONT color="green">066</FONT>                    return null;<a name="line.66"></a>
+<FONT color="green">067</FONT>            }<a name="line.67"></a>
+<FONT color="green">068</FONT>    <a name="line.68"></a>
+<FONT color="green">069</FONT>            /**<a name="line.69"></a>
+<FONT color="green">070</FONT>             * Loads the content of a jar file that comply with a MaltParser Plugin  <a name="line.70"></a>
+<FONT color="green">071</FONT>             * <a name="line.71"></a>
+<FONT color="green">072</FONT>             * @param jarUrl The URL to the jar file<a name="line.72"></a>
+<FONT color="green">073</FONT>             * @throws PluginException<a name="line.73"></a>
+<FONT color="green">074</FONT>             */<a name="line.74"></a>
+<FONT color="green">075</FONT>            public boolean readJarFile(URL jarUrl) throws MaltChainedException {<a name="line.75"></a>
+<FONT color="green">076</FONT>                    JarInputStream jis;<a name="line.76"></a>
+<FONT color="green">077</FONT>                    JarEntry je;<a name="line.77"></a>
+<FONT color="green">078</FONT>                    HashSet&lt;URL&gt; pluginXMLs = new HashSet&lt;URL&gt;();<a name="line.78"></a>
+<FONT color="green">079</FONT>                    <a name="line.79"></a>
+<FONT color="green">080</FONT>                    /*if (logger.isDebugEnabled()) {<a name="line.80"></a>
+<FONT color="green">081</FONT>                            logger.debug("Loading jar " + jarUrl+"\n");<a name="line.81"></a>
+<FONT color="green">082</FONT>                    }*/<a name="line.82"></a>
+<FONT color="green">083</FONT>                    JarFile jarFile;<a name="line.83"></a>
+<FONT color="green">084</FONT>                    try {<a name="line.84"></a>
+<FONT color="green">085</FONT>                            jarFile = new JarFile(jarUrl.getFile());<a name="line.85"></a>
+<FONT color="green">086</FONT>                    } catch (IOException e) {<a name="line.86"></a>
+<FONT color="green">087</FONT>                            throw new PluginException("Could not open jar file " + jarUrl+". ", e);<a name="line.87"></a>
+<FONT color="green">088</FONT>                    }<a name="line.88"></a>
+<FONT color="green">089</FONT>                    try {<a name="line.89"></a>
+<FONT color="green">090</FONT>                    Manifest manifest = jarFile.getManifest();<a name="line.90"></a>
+<FONT color="green">091</FONT>                    if (manifest != null) {<a name="line.91"></a>
+<FONT color="green">092</FONT>                            Attributes manifestAttributes = manifest.getMainAttributes();<a name="line.92"></a>
+<FONT color="green">093</FONT>                            if (!(manifestAttributes.getValue("MaltParser-Plugin") != null &amp;&amp; manifestAttributes.getValue("MaltParser-Plugin").equals("true"))) {<a name="line.93"></a>
+<FONT color="green">094</FONT>                                    return false;<a name="line.94"></a>
+<FONT color="green">095</FONT>                            }<a name="line.95"></a>
+<FONT color="green">096</FONT>                            if (manifestAttributes.getValue("Class-Path") != null) {<a name="line.96"></a>
+<FONT color="green">097</FONT>                                    String[] classPathItems = manifestAttributes.getValue("Class-Path").split(" ");<a name="line.97"></a>
+<FONT color="green">098</FONT>                                    for (int i=0; i &lt; classPathItems.length; i++) {<a name="line.98"></a>
+<FONT color="green">099</FONT>                                            URL u;<a name="line.99"></a>
+<FONT color="green">100</FONT>                                            try {<a name="line.100"></a>
+<FONT color="green">101</FONT>                                                    u = new URL(jarUrl.getProtocol()+":"+new File(jarFile.getName()).getParentFile().getPath()+"/"+classPathItems[i]);<a name="line.101"></a>
+<FONT color="green">102</FONT>                                            } catch (MalformedURLException e) {<a name="line.102"></a>
+<FONT color="green">103</FONT>                                                    throw new PluginException("The URL to the plugin jar-class-path '"+jarUrl.getProtocol()+":"+new File(jarFile.getName()).getParentFile().getPath()+"/"+classPathItems[i]+"' is wrong. ", e);<a name="line.103"></a>
+<FONT color="green">104</FONT>                                            }<a name="line.104"></a>
+<FONT color="green">105</FONT>                                            URLClassLoader sysloader = (URLClassLoader)ClassLoader.getSystemClassLoader();<a name="line.105"></a>
+<FONT color="green">106</FONT>                                            Class&lt;?&gt; sysclass = URLClassLoader.class;<a name="line.106"></a>
+<FONT color="green">107</FONT>                                            Method method = sysclass.getDeclaredMethod("addURL",new Class[]{URL.class});<a name="line.107"></a>
+<FONT color="green">108</FONT>                                            method.setAccessible(true);<a name="line.108"></a>
+<FONT color="green">109</FONT>                                            method.invoke(sysloader,new Object[]{u });<a name="line.109"></a>
+<FONT color="green">110</FONT>                                    }<a name="line.110"></a>
+<FONT color="green">111</FONT>                            }<a name="line.111"></a>
+<FONT color="green">112</FONT>                    }<a name="line.112"></a>
+<FONT color="green">113</FONT>                    } catch (PatternSyntaxException e) {<a name="line.113"></a>
+<FONT color="green">114</FONT>                            throw new PluginException("Could not split jar-class-path entries in the jar-file '"+jarFile.getName()+"'. ", e);<a name="line.114"></a>
+<FONT color="green">115</FONT>                    } catch (IOException e) {<a name="line.115"></a>
+<FONT color="green">116</FONT>                            throw new PluginException("Could not read the manifest file in the jar-file '"+jarFile.getName()+"'. ", e);<a name="line.116"></a>
+<FONT color="green">117</FONT>                    } catch (NoSuchMethodException e) {<a name="line.117"></a>
+<FONT color="green">118</FONT>                            throw new PluginException("", e);<a name="line.118"></a>
+<FONT color="green">119</FONT>                    } catch (IllegalAccessException e) {<a name="line.119"></a>
+<FONT color="green">120</FONT>                            throw new PluginException("", e);<a name="line.120"></a>
+<FONT color="green">121</FONT>                    } catch (InvocationTargetException e) {<a name="line.121"></a>
+<FONT color="green">122</FONT>                            throw new PluginException("", e);<a name="line.122"></a>
+<FONT color="green">123</FONT>                    }<a name="line.123"></a>
+<FONT color="green">124</FONT>                    <a name="line.124"></a>
+<FONT color="green">125</FONT>            try {<a name="line.125"></a>
+<FONT color="green">126</FONT>                            jis = new JarInputStream(jarUrl.openConnection().getInputStream());<a name="line.126"></a>
+<FONT color="green">127</FONT>    <a name="line.127"></a>
+<FONT color="green">128</FONT>                            while ((je = jis.getNextJarEntry()) != null) {<a name="line.128"></a>
+<FONT color="green">129</FONT>                                    String jarName = je.getName();<a name="line.129"></a>
+<FONT color="green">130</FONT>                                    if (jarName.endsWith(".class")) {<a name="line.130"></a>
+<FONT color="green">131</FONT>                                            /* if (logger.isDebugEnabled()) {<a name="line.131"></a>
+<FONT color="green">132</FONT>                                                    logger.debug("  Loading class: " + jarName+"\n");<a name="line.132"></a>
+<FONT color="green">133</FONT>                                            }*/<a name="line.133"></a>
+<FONT color="green">134</FONT>                                            loadClassBytes(jis, jarName);<a name="line.134"></a>
+<FONT color="green">135</FONT>                                            Class&lt;?&gt; clazz = findClass(jarName.substring(0, jarName.length() - 6));<a name="line.135"></a>
+<FONT color="green">136</FONT>                                            classes.put(jarName.substring(0, jarName.length() - 6).replace('/','.'), clazz);<a name="line.136"></a>
+<FONT color="green">137</FONT>                                            loadClass(jarName.substring(0, jarName.length() - 6).replace('/', '.'));<a name="line.137"></a>
+<FONT color="green">138</FONT>                                    }<a name="line.138"></a>
+<FONT color="green">139</FONT>                                    if (jarName.endsWith("plugin.xml")) {<a name="line.139"></a>
+<FONT color="green">140</FONT>                                            pluginXMLs.add(new URL("jar:"+jarUrl.getProtocol()+":"+jarUrl.getPath()+"!/"+jarName));<a name="line.140"></a>
+<FONT color="green">141</FONT>                                    }<a name="line.141"></a>
+<FONT color="green">142</FONT>                                    jis.closeEntry();<a name="line.142"></a>
+<FONT color="green">143</FONT>                            }<a name="line.143"></a>
+<FONT color="green">144</FONT>                            for (URL url : pluginXMLs) {<a name="line.144"></a>
+<FONT color="green">145</FONT>                                    /* if (logger.isDebugEnabled()) {<a name="line.145"></a>
+<FONT color="green">146</FONT>                                            logger.debug("  Loading "+url+"\n");<a name="line.146"></a>
+<FONT color="green">147</FONT>                                    }*/<a name="line.147"></a>
+<FONT color="green">148</FONT>                                    OptionManager.instance().loadOptionDescriptionFile(url);<a name="line.148"></a>
+<FONT color="green">149</FONT>                            }<a name="line.149"></a>
+<FONT color="green">150</FONT>                    } catch (MalformedURLException e) {<a name="line.150"></a>
+<FONT color="green">151</FONT>                            throw new PluginException("The URL to the plugin.xml is wrong. ", e);<a name="line.151"></a>
+<FONT color="green">152</FONT>                    } catch (IOException e) {<a name="line.152"></a>
+<FONT color="green">153</FONT>                            throw new PluginException("cannot open jar file " + jarUrl+". ", e);<a name="line.153"></a>
+<FONT color="green">154</FONT>                    } catch (ClassNotFoundException e) {<a name="line.154"></a>
+<FONT color="green">155</FONT>                            throw new PluginException("The class "+e.getMessage() +" can't be found. ", e);<a name="line.155"></a>
+<FONT color="green">156</FONT>                    }<a name="line.156"></a>
+<FONT color="green">157</FONT>                    return true;<a name="line.157"></a>
+<FONT color="green">158</FONT>            }<a name="line.158"></a>
+<FONT color="green">159</FONT>    <a name="line.159"></a>
+<FONT color="green">160</FONT>            /**<a name="line.160"></a>
+<FONT color="green">161</FONT>             * Returns the Class object for the class with the specified name.<a name="line.161"></a>
+<FONT color="green">162</FONT>             * <a name="line.162"></a>
+<FONT color="green">163</FONT>             * @param classname the fully qualified name of the desired class<a name="line.163"></a>
+<FONT color="green">164</FONT>             * @return the Class object for the class with the specified name.<a name="line.164"></a>
+<FONT color="green">165</FONT>             */<a name="line.165"></a>
+<FONT color="green">166</FONT>            public Class&lt;?&gt; getClass(String classname) {<a name="line.166"></a>
+<FONT color="green">167</FONT>                    return (Class&lt;?&gt;)classes.get(classname);<a name="line.167"></a>
+<FONT color="green">168</FONT>            }<a name="line.168"></a>
+<FONT color="green">169</FONT>            <a name="line.169"></a>
+<FONT color="green">170</FONT>            /**<a name="line.170"></a>
+<FONT color="green">171</FONT>             * Reads a jar file entry into a byte array.<a name="line.171"></a>
+<FONT color="green">172</FONT>             * <a name="line.172"></a>
+<FONT color="green">173</FONT>             * @param jis The jar input stream<a name="line.173"></a>
+<FONT color="green">174</FONT>             * @param jarName The name of a jar file entry<a name="line.174"></a>
+<FONT color="green">175</FONT>             * @throws PluginException<a name="line.175"></a>
+<FONT color="green">176</FONT>             */<a name="line.176"></a>
+<FONT color="green">177</FONT>            private void loadClassBytes(JarInputStream jis, String jarName) throws MaltChainedException {<a name="line.177"></a>
+<FONT color="green">178</FONT>                    BufferedInputStream jarBuf = new BufferedInputStream(jis);<a name="line.178"></a>
+<FONT color="green">179</FONT>                    ByteArrayOutputStream jarOut = new ByteArrayOutputStream();<a name="line.179"></a>
+<FONT color="green">180</FONT>                    int b;<a name="line.180"></a>
+<FONT color="green">181</FONT>                    try {<a name="line.181"></a>
+<FONT color="green">182</FONT>                            while ((b = jarBuf.read()) != -1) {<a name="line.182"></a>
+<FONT color="green">183</FONT>                                    jarOut.write(b);<a name="line.183"></a>
+<FONT color="green">184</FONT>                            }<a name="line.184"></a>
+<FONT color="green">185</FONT>                            classByteArrays.put(jarName.substring(0, jarName.length() - 6), jarOut.toByteArray());<a name="line.185"></a>
+<FONT color="green">186</FONT>                    } catch (IOException e) {<a name="line.186"></a>
+<FONT color="green">187</FONT>                            throw new PluginException("Error reading entry " + jarName+". ", e);<a name="line.187"></a>
+<FONT color="green">188</FONT>                    }<a name="line.188"></a>
+<FONT color="green">189</FONT>            }<a name="line.189"></a>
+<FONT color="green">190</FONT>    <a name="line.190"></a>
+<FONT color="green">191</FONT>            /**<a name="line.191"></a>
+<FONT color="green">192</FONT>             * Checks package access<a name="line.192"></a>
+<FONT color="green">193</FONT>             * <a name="line.193"></a>
+<FONT color="green">194</FONT>             * @param name  the package name<a name="line.194"></a>
+<FONT color="green">195</FONT>             */<a name="line.195"></a>
+<FONT color="green">196</FONT>            protected void checkPackageAccess(String name) {<a name="line.196"></a>
+<FONT color="green">197</FONT>                    SecurityManager sm = System.getSecurityManager();<a name="line.197"></a>
+<FONT color="green">198</FONT>                    if (sm != null) {<a name="line.198"></a>
+<FONT color="green">199</FONT>                            sm.checkPackageAccess(name);<a name="line.199"></a>
+<FONT color="green">200</FONT>                    }<a name="line.200"></a>
+<FONT color="green">201</FONT>            }<a name="line.201"></a>
+<FONT color="green">202</FONT>            <a name="line.202"></a>
+<FONT color="green">203</FONT>            /* (non-Javadoc)<a name="line.203"></a>
+<FONT color="green">204</FONT>             * @see java.lang.Object#toString()<a name="line.204"></a>
+<FONT color="green">205</FONT>             */<a name="line.205"></a>
+<FONT color="green">206</FONT>            public String toString() {<a name="line.206"></a>
+<FONT color="green">207</FONT>                    StringBuilder sb = new StringBuilder();<a name="line.207"></a>
+<FONT color="green">208</FONT>                    <a name="line.208"></a>
+<FONT color="green">209</FONT>                    sb.append("The MaltParser Plugin Loader (JarLoader)\n");<a name="line.209"></a>
+<FONT color="green">210</FONT>                    sb.append("---------------------------------------------------------------------\n");<a name="line.210"></a>
+<FONT color="green">211</FONT>                    for (String entry : new TreeSet&lt;String&gt;(classes.keySet())) {<a name="line.211"></a>
+<FONT color="green">212</FONT>                            sb.append("   "+entry+"\n");<a name="line.212"></a>
+<FONT color="green">213</FONT>                    }<a name="line.213"></a>
+<FONT color="green">214</FONT>                    return sb.toString();<a name="line.214"></a>
+<FONT color="green">215</FONT>            }<a name="line.215"></a>
+<FONT color="green">216</FONT>    }<a name="line.216"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

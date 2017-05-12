@@ -1,0 +1,45 @@
+{
+  'module' => {
+    'name' => 'Spanish pre-processing',
+    'submodules' => [
+#        'pre/es/toktag',
+        'pre/tok -l es',
+        'pre/es/annotate',
+    ],
+    'submodule names' => [
+	'tokenizer',
+        'linguistic annotation',
+    ],
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'chunk'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+	'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=sv)'
+	  },
+       },
+  }
+}

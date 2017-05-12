@@ -1,0 +1,1066 @@
+#!/usr/bin/perl
+# -*-perl-*-
+#---------------------------------------------------------------------------
+# uplug - uplug-cgi-script
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+
+require 5.002;
+use strict;
+use lib '/home/staff/joerg/user_perl/lib/perl5/site_perl/5.6.1/';
+use Mail::Mailer;
+use FindBin qw($Bin);
+use vars qw($UPLUGADMIN $UPLUGLOG $UPLUGHOME $UPLUGDATA 
+	    $UPLUGHTML $UPLUGCWB $CSS $HTPASSWD $MAXPOST $ALARM);
+
+BEGIN {
+    use CGI qw/:standard escapeHTML escape/;
+
+    binmode(STDOUT, ":utf8");                   # set UTF8 for STDOUT
+    $MAXPOST=100;                               # post max X kB of data
+    $CGI::POST_MAX = $MAXPOST * 1024;           # to the CGI-script
+    $ALARM=10;                                  # stop cgi-script after X sec.
+
+    $UPLUGADMIN = 'joerg@stp.ling.uu.se';                # administrator e-mail
+    $UPLUGLOG  = '/tmp/uplug.log';                       # CGI log-file
+    $UPLUGHOME = '/home/joerg/cvs/sourceforge/uplug';    # path to Uplug
+    $UPLUGDATA = '/corpora/uplug';                       # corpus home-dir
+    $UPLUGCWB  = $UPLUGDATA.'/cwb';                      # CWB index home
+    $UPLUGHTML = 'http://stp.ling.uu.se/~joerg/uplugII'; # HTML home-URL
+    $CSS       = $UPLUGHTML.'/menu.css';                 # ... with css-file
+    $HTPASSWD  = '/usr/sbin/htpasswd2';                  # apache-password-tool
+
+    $ENV{UPLUGHOME} =$UPLUGHOME;   # store important values
+    $ENV{UPLUGDATA} =$UPLUGDATA;   # in global environment variables
+    $ENV{UPLUGCWB}  =$UPLUGCWB;
+    $ENV{UPLUGADMIN}=$UPLUGADMIN;
+    use CGI::Carp qw(carpout);
+    open L, ">>$UPLUGLOG" || die ("could not open log\n");
+    carpout(*L);
+}
+
+
+
+use lib "$UPLUGHOME/lib";
+use Uplug::Web;
+
+$SIG{ALRM}=\&timeout;               # catch SIGALRM
+alarm($ALARM);                      # set alarm timer
+
+my $user   = &remote_user;
+my $action = &my_param('a');
+my $corpus = &my_param('c');        # corpus name
+my $url    = url();
+my $query  = url(-query=>1);
+
+my $ADMIN=0;
+if ($user eq $UPLUGADMIN){$ADMIN=1;}
+
+
+my @char=split(//,$UPLUGADMIN);
+map($_='&#'.ord($_).';',@char);
+my $SAVEMAIL=join('',@char);
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+print &HtmlHeader();
+
+my $menu=&UplugMenu();
+my $main;
+if ($action eq 'corpus'){
+    $main=&CorpusManager();
+}
+elsif ($action eq 'user'){
+    $main=&UserManager();
+}
+elsif ($action eq 'process'){
+    $main=&TaskManager();
+}
+elsif ($action eq 'regform'){
+    $main=&RegisterForm();
+}
+elsif ($action eq 'register'){
+    $main=&Register();
+}
+elsif ($action eq 'sendpassword'){
+    my $email = &my_param('e');
+    $main=&Uplug::Web::LostPassword($email);
+}
+else{
+    $main=&UplugHome($user);
+}
+
+print &table({-width => '100%',-border=>'0',
+	      -cellpadding=> '0'},
+	     caption(''),
+	     &Tr([&td({-valign=>'top',-width=>'150'},[$menu]).
+		  &td({-width=>'6'},['&nbsp;']).
+		  &td({-valign=>'top'},[$main]).
+		  &td({-width=>'6'},['&nbsp;'])]));
+
+
+print &end_html;
+
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+sub timeout{
+    print &h3("Got timeout signal (waited $ALARM seconds)!");
+    print &end_html();
+    exit;
+}
+
+
+sub HtmlHeader{
+    my $html=&header(-charset => 'utf-8');
+    $html.=&start_html(-title => 'Uplug home page',
+		       -author => 'Joerg Tiedemann',
+		       -base=>'true',
+		       -dtd=>1,
+		       -leftmargin=>'0',
+		       -topmargin=>'0',
+		       -marginwidth=>'0',
+		       -marginheight=>'0',
+		       -style=>{'src'=>$CSS},
+		       -encoding => 'utf-8',
+		       -head=>meta({-http_equiv=>'Content-Type',
+				    -content=>'text/html;charset=utf-8'}));
+    return $html;
+}
+
+
+
+
+
+
+
+
+
+
+sub UplugMenu{
+
+    my @stat=stat($Bin.'/uplug');
+    my $mtime=scalar(localtime($stat[9]));
+    my @menu = 
+	('General', 
+	 ['Home' , $url,
+	  'SourceForge', 'http://uplug.sourceforge.net',
+	  # 'Publications' , $UPLUGHTML.'/home.html#publications',
+          # 'System architecture' , $UPLUGHTML.'/uplug.gif'
+	  ],
+	 );
+
+#    if ($user eq $UPLUGADMIN){
+#	push (@menu,('Uplug administration',
+#		     [
+#		      'User manager' , "$url?a=user",
+#		      'Corpus manager' , "$url?a=corpus",
+#		      'Task manager' , "$url?a=process",
+#		      ]));
+#    }
+    if (not defined $user){
+	push (@menu,('User management' , 
+		     [
+		      'Login' , "user/login",
+		      'Lost Password' , "$url?a=sendpassword",
+		      '<blink>Register now!</blink>' , "$url?a=regform",
+		      ],
+		     'Corpus management',
+		     [
+		      'Public corpora' , "$url?a=corpus;o=pub",
+		      'CWB Query' , "$url?a=corpus;t=query",
+		      ],
+		     'Task Management'
+		     ));
+    }
+    else{
+	push (@menu,('User management' , 
+		     [
+		      'Uplug users','?a=user',
+		      'Create a new User','?a=regform',
+		      'Change password' , undef
+		      ],
+		     'Corpus management',
+		     [
+		      'Create new corpus' , "$url?a=corpus;t=create",
+		      'My corpora' , "$url?a=corpus",
+		      'Public corpora' , "$url?a=corpus;o=pub",
+#		      'Add document' , "$url?a=corpus;t=add",
+#		      'Create CWB index' , "$url?a=corpus;t=index",
+		      'CWB Query' , "$url?a=corpus;t=query",
+		      'Restore documents', "$url?a=corpus;t=restore",
+		      ],
+		     'Task Management'
+		     ));
+    }
+
+    my @apps;
+    if (defined $corpus){@apps=('Main',"$url?a=process;c=".&escape($corpus));}
+    else{@apps=('Main',"$url?a=process");}
+    my %main=();
+    my @main=&Uplug::Web::Process::GetSubmodules($user,'main');
+    while (@main){
+	my $mod=shift(@main);
+	my $name=shift(@main);
+	my $link;
+	if (defined $user){                          # add links only for
+	    $link="$url?a=process;m=".&escape($mod); # registered users!
+	    if (defined $corpus){
+		$link.=";c=".&escape($corpus);
+	    }
+	}
+	push (@apps,('- '.$name,$link));
+#	push (@apps,('- '.$name,"$url?a=process;m=".escape($mod)));
+    }
+    push (@menu,[@apps]);
+    push (@menu,('Documentation/Links' , 
+		 [
+          # 'UplugWeb' , $UPLUGHTML.'../uplug/UplugWeb/',
+          # "PWA User's Guide" , '/plug/pwa/pwa_manual.html',
+		  'F.A.Q.',$UPLUGHTML.'/uplugweb-faq.html',
+#		  'F.A.Q.' => 'http://stp.ling.uu.se/cgi-bin/joerg/faq/uplug',
+#		  'PLUG' , 'http://stp.ling.uu.se/plug/',
+#		  'PWA' , 'http://stp.ling.uu.se/plug/pwa/'
+		  ],
+		 'Status' , 
+		 [
+		  $mtime , undef,
+		  &i($SAVEMAIL) , 'mailto:'.$SAVEMAIL
+		  ],
+		 ));
+
+    my $html=&img({-src => "$UPLUGHTML/uplug.gif"});
+    $html.=&p();
+    my @rows=();
+
+    while (@menu){
+	my $header=shift(@menu);
+	my $submenu=shift(@menu);
+	push (@rows,th([$header]));
+	while (@{$submenu}){
+	    my $name=shift(@{$submenu});
+	    my $link=shift(@{$submenu});
+	    if (defined $link){
+		push (@rows,td([&a({-href => $link},$name)]));
+	    }
+	    else{
+		push (@rows,td([$name]));
+	    }
+	}
+    }
+    $html.=&table({-width => '100%'},caption(''),Tr(\@rows));
+    return $html;
+}
+
+
+
+
+
+
+
+
+
+
+
+sub my_param{
+    my $p=shift;
+    my $v=&param($p);
+    if (not defined $v){
+	$v=&url_param($p);
+	if (defined $v){&param($p,$v);}
+    }
+    return $v;
+}
+
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+
+sub CorpusManager{
+
+    my $task   = &my_param('t');        # task
+    my $docbase= &my_param('b');        # document base name
+    my $doc    = &my_param('d');        # document
+    my $owner  = &my_param('o');        # corpus owner
+    my $pos    = &my_param('x');        # current position in corpus
+    my $style  = &my_param('s');        # display style
+
+#    $query  = url(-query=>1);
+    $query=&Uplug::Web::AddUrlParam('','a','corpus');
+    $query=&Uplug::Web::AddUrlParam($query,'c',$corpus);
+    if ($task){$query=&Uplug::Web::AddUrlParam($query,'t',$task);}
+    if ($owner){$query=&Uplug::Web::AddUrlParam($query,'d',$owner);}
+    if ($doc){$query=&Uplug::Web::AddUrlParam($query,'d',$doc);}
+    if ($docbase){$query=&Uplug::Web::AddUrlParam($query,'b',$docbase);}
+    if ($pos){$query=&Uplug::Web::AddUrlParam($query,'x',$pos);}
+    if ($style){$query=&Uplug::Web::AddUrlParam($query,'s',$style);}
+
+    if (not defined $owner){$owner=$user;}
+    if (not defined $owner){$owner='pub';}
+    my $priv='all';
+    if ($user eq $owner){$priv='user';}
+    if ($user eq $UPLUGADMIN){$priv='admin';}
+
+    my $html=&h2("UplugWeb - Corpus Manager");
+    $html.=&hr;
+
+    my %CorpusData=();
+    my %params;                               # other query parameters
+    if (&param()) {%params=&CGI::Vars();}      # (stored in a hash)
+
+
+    #-------------------------------------------------------------------------
+    # view a corpus
+    #-------------------------------------------------------------------------
+
+    if (($task eq 'view') and 
+	(defined $corpus) and
+	(defined $doc)){
+
+	$html.=&Uplug::Web::ViewCorpus($owner,            # corpus-owner
+				       $corpus,$doc,      # corpus + document
+				       $query,            # URL for this query
+				       $pos,              # corpus position
+				       $style,            # display-style
+				       \%params);         # other parameters
+    }
+
+    #-------------------------------------------------------------------------
+    # query a corpus using CWB
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'query'){
+	$html.=&Uplug::Web::CorpusQueryForm($owner,$corpus);
+    }
+
+    #-------------------------------------------------------------------------
+    # create a corpus index using CWB
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'index'){
+	if ($priv ne 'all'){
+	    &Uplug::Web::Corpus::IndexCorpus($owner,$corpus);
+	    $html.=&b("Corpus '$corpus' will be indexed!").&br();
+	    $html.="(Indexing process is in the queue!)".&p();
+	}
+	$task='view';
+	&param('t',$task);
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,$corpus,$docbase,$doc,$priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # remove a document from a corpus
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'remove'){
+	$html.=&CorpusManagerInfo();
+	if ($priv ne 'all'){
+	    if (defined $doc){
+		&Uplug::Web::Corpus::RemoveDocument($owner,$corpus,$doc);
+	    }
+	    else{
+		$html.=&Uplug::Web::RemoveCorpus($owner,$corpus,\%params);
+	    }
+	}
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,$corpus,$docbase,$doc,$priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # restore removed corpus documents
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'restore'){
+	$html.=&h3('Restore removed corpus documents');
+	if (defined $doc){
+	    &Uplug::Web::Corpus::RestoreDocument($owner,$corpus,$doc);
+	}
+	$html.=&Uplug::Web::ShowRemovedCorpusInfo($task,
+						  $owner,
+						  $corpus,
+						  $docbase,
+						  $doc,
+						  $priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # align all bitexts in a corpus
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'align'){
+	$html.=&CorpusManagerInfo();
+	$html.=&Uplug::Web::AlignAllDocuments($owner,$corpus);
+	$task='view';
+	&param('t',$task);
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,$corpus,$docbase,$doc,$priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # pre-process all bitexts in a corpus
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'preprocess'){
+	$html.=&CorpusManagerInfo();
+	$html.=&Uplug::Web::PreprocessAllDocuments($owner,$corpus);
+	$task='view';
+	&param('t',$task);
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,$corpus,$docbase,$doc,$priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # send a document of a corpus by mail
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'send'){
+	$html.=&CorpusManagerInfo();
+	if (not defined $user){
+	    $html.=&h3("You have to register first!");
+	}
+	elsif (defined $doc){
+	    if (&Uplug::Web::Corpus::SendCorpus($user,$owner,$corpus,$doc)){
+		$html.=&h3("'$doc' from '$corpus' has been sent to $user!");
+	    }
+	}
+	else{
+	    $html.=&h3("Click on any document and I will send it to you!");
+	}
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,
+					   $corpus,
+					   $docbase,
+					   $doc,
+					   $priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # add a corpus to the repository
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'create'){
+	if ($priv ne 'all'){
+	    $html.=&Uplug::Web::AddCorpus($user,\%params);
+	}
+	$task='view';
+	&param('t',$task);
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,$corpus,$docbase,$doc,$priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # add a document to a corpus
+    #-------------------------------------------------------------------------
+
+    elsif ($task eq 'add'){
+	if ($priv ne 'all'){
+	    my $file=param('file');
+	    if (!$file && &cgi_error()) {
+		$html.=&h3('Upload failed!');
+		$html.="Uploads are limited to $MAXPOST kB of data!".&br();
+		$html.='('.&header(-status=>cgi_error()).')'.&hr();
+	    }
+	    else{
+		$html.=&Uplug::Web::AddDocument($user,$corpus,$file,\%params);
+	    }
+	}
+	$task='view';
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,$corpus,$docbase,$doc,$priv);
+    }
+
+    #-------------------------------------------------------------------------
+    # show info about a corpus/documents
+    #-------------------------------------------------------------------------
+
+    else{
+	$html.=&CorpusManagerInfo();
+	$html.=&Uplug::Web::ShowCorpusInfo($task,
+					   $owner,$corpus,$docbase,$doc,$priv);
+    }
+    return $html;
+}
+
+
+sub CorpusManagerInfo{
+    my $html.='<table width="100%"><tr>';
+    $html.='<td valign="top">Corpus manager <b>modes</b><ul>';
+    $html.='<li><b>add</b>: add documents to the corpus</li>';
+    $html.='<li><b>view</b>: view existing corpus documents</li>';
+    $html.='<li><b>info</b>: show some information about documents</li>';
+    $html.='<li><b>send</b>: send documents via e-mail</li>';
+    $html.='<li><b>remove</b>: remove documents from the corpus</li>';
+    $html.='</ul></td>';
+    $html.='<td valign="top">Corpus manager <b>tasks</b><ul>';
+    $html.='<li><b>preprocess</b>: pre-process <b>ALL</b> (raw) documents</li>';
+    $html.='<li><b>align</b>: sentence-align <b>ALL</b> bitexts in the corpus</li>';
+    $html.='<li><b>index</b>: create a CWB index for the <b>entire</b> corpus</li>';
+    $html.='<li><b>query</b>: query the corpus with CQP/CWB</li>';
+    $html.='</ul></td>';
+    $html.='</tr></table><hr />';
+    return $html;
+}
+
+sub CorpusManagerInfoOld{
+    my $html.='<table width="100%"><tr>';
+    $html.='<td valign="top">For each corpus you may<ul>';
+#    $html.='<li>list all documents included in the corpus (<b>documents</b>)</li>';
+#    $html.='<li>remove the entire corpus (<b>remove</b>)</li>';
+    $html.='<li>look at status information of each document(<b>info</b>)</li>';
+    $html.='<li>view corpus documents (<b>view</b>)</li>';
+    $html.='<li>send documents via mail (<b>send</b>)</li>';
+    $html.='<li>add documents to the corpus (<b>add</b>)</li>';
+    $html.='<li>create a corpus index using CWB (<b>index</b>)</li>';
+    $html.='<li>run corpus queries using CWB (<b>query</b>)</li>';
+    $html.='<li>remove documents and the entire corpus (<b>remove</b>)</li>';
+#	$html.='<li>display a link matrix (<b>links</b>)</li>';
+    $html.='</ul></td>';
+    $html.='<td valign="top">Use the links for each corpus!<ul>';
+    $html.='<li>Select a corpus by clicking on its name</li>';
+    $html.='<li>Show aligned bitexts by clicking on document names</li>';
+    $html.='<li>Select one of the tasks to the right of each corpus</li>';
+    $html.='<li>Run one of the tasks by selecting a corpus/document</li>';
+    $html.='</ul>';
+    $html.='Note that corpus documents have to be tokenized '.&br();
+    $html.='before you can index them using CWB!';
+    $html.='</td>';
+    $html.='</tr></table><hr />';
+    return $html;
+}
+
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+sub TaskManager{
+
+##    if (defined &url_param('c')){&param('c',&url_param('c'));}
+#    if (defined &url_param('m')){&param('m',&url_param('m'));}
+#    if (defined &url_param('p')){&param('p',&url_param('p'));}
+#    if (defined &url_param('y')){&param('y',&url_param('y'));}
+
+#    my $corpus = &my_param('c');        # corpus
+    my $module   = &my_param('m');      # Uplug module
+    my $task   = &my_param('t');        # task
+    my $process= &my_param('p');        # process
+    my $type   = &my_param('y');        # type
+
+    my $corpora=&Uplug::Web::Corpus::Corpora($user); # get all corpora names
+    if (not $corpus){                                # if no corpus selected:
+	($corpus)=each %{$corpora};                  #   take just one
+	&param('c',$corpus);                         #   and set the form-param
+    }
+#    $query  = url(-query=>1);
+    $query=&Uplug::Web::AddUrlParam('','a','process');
+    $query=&Uplug::Web::AddUrlParam($query,'c',$corpus);
+    if (defined $module){$query=&Uplug::Web::AddUrlParam($query,'m',$module);}
+
+    my $html=&h2("UplugWeb - Task Manager");
+    $html.="selected corpus: [<b>$corpus</b>] ";
+    delete $$corpora{$corpus};
+    $html.="other corpora: ".&Uplug::Web::TaskLinks($query,'c',
+						    keys %{$corpora}).&br();
+
+#    # my @actions=('add','info','remove all');
+#    my @actions=('add','view');
+#    $html.="   jobs: ".&Uplug::Web::ActionLinks($query,@actions).&br();
+
+    $html.=&hr;
+    if (not defined $user){
+	$html.=&h3("You have to register first!");
+	return $html;
+    }
+
+    &Uplug::Web::Process::ClearStack('done',$user,5);
+
+    if ($task eq 'view'){
+	$html.=&Uplug::Web::ShowProcessInfo($query,$user,$process,$ADMIN);
+    }
+    elsif ($task eq 'clear'){
+	&Uplug::Web::Process::ClearStack($type,$user);
+	$html.=&Uplug::Web::ShowProcessInfo($query,$user,$ADMIN);
+    }
+    elsif ($process){
+	if ($task eq 'remove'){
+	    &Uplug::Web::Process::RemoveProcess($type,$user,$process);
+	    $html.=&Uplug::Web::ShowProcessInfo($query,$user,undef,$ADMIN);
+	}
+	elsif ($task eq 'restart'){
+	    &Uplug::Web::Process::RestartProcess($type,$user,$process);
+	    $html.=&Uplug::Web::ShowProcessInfo($query,$user,undef,$ADMIN);
+	}
+	elsif ($task eq 'logfile'){
+	    $html.=&pre(&Uplug::Web::Process::ViewLogfile($user,$process));
+	}
+	else{
+	    $html.=&Uplug::Web::ShowProcessInfo($query,$user,$process,$ADMIN);
+	}
+    }
+    else{
+	my %params;
+	if (&param()) {%params=&CGI::Vars();}
+	$html.=&Uplug::Web::Process($query,
+				    $user,$corpus,
+				    $module,\%params);
+	$html.=&hr;
+	$html.=&h3('Jobs');
+	$html.=&Uplug::Web::ShowProcessInfo($query,$user,$process,$ADMIN);
+    }
+    return $html;
+}
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+
+sub UserManager{
+
+    my $name   = &my_param('n');        # user name
+    my $task   = &my_param('t');        # task
+
+    my $html=&h2("UplugWeb user management").&hr();
+#    $html.=&a({-href => 'admin.pl'},'Main admin menu');
+#    $html.=&p();
+
+    my %UserData;
+    if ($name){
+	if ($task eq 'remove'){
+	    &Uplug::Web::User::RemoveUser($name);
+	    &Uplug::Web::User::ReadUserInfo(\%UserData,$name);
+	    $html.=&Uplug::Web::ShowUserInfo($query,$user,
+					     \%UserData,$name,$ADMIN);
+	}
+	elsif ($task eq 'edit'){
+	    $html.=&Uplug::Web::User::EditUser($user).&p();
+	    &Uplug::Web::User::ReadUserInfo(\%UserData,$user);
+	    $html.=&Uplug::Web::ShowUserInfo($query,$user,
+					     \%UserData,$name,$ADMIN);
+	}
+	else{
+	    &Uplug::Web::User::ReadUserInfo(\%UserData,$name);
+	    $html.=&Uplug::Web::ShowUserInfo($query,$user,
+					     \%UserData,$name,$ADMIN);
+	}
+    }
+    else{
+	&Uplug::Web::User::ReadUserInfo(\%UserData);
+	$html.=&Uplug::Web::ShowUserInfo($query,$user,
+					 \%UserData,$name,$ADMIN);
+    }
+    return $html;
+}
+
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+
+
+
+sub UplugHome{
+    my $user=shift;
+    my $html='<center><h1>The Uplug home page</h1>';
+    if ($user){$html.='<i>user: '.$user.'</i>';}
+    $html.='</center><hr>
+
+Uplug is a collection of tools for linguistic corpus processing, word
+alignment and term extraction from parallel corpora. It includes two main 
+components:
+<p>
+
+<ul>
+<li><a href="?a=corpus">Corpus 
+Manager</a> - Monolingual and bilingual corpora can be
+added to your personal repository. The corpus manager includes tools
+for updating the repository and inspecting corpus data in your collection.
+<li><a href="?a=process">Task 
+Manager</a> - The task manager allows to run
+applications on registered corpora. Several tools are integrated which
+can be used to process monolingual and bilingual corpora. Jobs are
+queued on the local system and results will be send by mail and added
+to the personal data collection.
+</ul>
+
+
+Several tools have been integrated in Uplug. Pre-processing tools
+include a sentence splitter, tokenizer and external part-of-speech
+tagger and shallow parsers. 
+The following external tools are used: 
+The <a href="http://www.ims.uni-stuttgart.de/projekte/corplex/TreeTagger/DecisionTreeTagger.html">TreeTagger</a>
+  for English, French, Italian, and German,
+  the <a href="http://www.coli.uni-sb.de/~thorsten/tnt/">TnT
+  tagger</a> for English, German and Swedish,
+  The <a href="http://grok.sourceforge.net/">Grok system</a> for
+  English (tagging and chunking), and
+  the morphological analyzer 
+  <a href="http://chasen.aist-nara.ac.jp/">ChaSen</a> for Japanese.
+Translated documents can be sentence
+aligned using the length-based approach by 
+<a href="http://citeseer.nj.nec.com/gale91program.html">Gale&amp;Church</a>.
+Words and phrases can be aligned using the 
+<a href="http://stp.ling.uu.se/~joerg/paper/eacl03.pdf">clue
+alignment</a> approach and the toolbox for statistical machine translation 
+<a href="http://www-i6.informatik.rwth-aachen.de/web/Software/GIZA++.html">GIZA++</a>.
+
+<HR>
+<h3>Publications</h3>
+<P>
+
+<DL>
+<dt>Tiedemann, J. 2003,</dt>
+<dd><i>Recycling Translations - Extraction of Lexical Data from Parallel
+Corpora and their Application in Natural Language Processing</i>,<br/>
+Doctoral Thesis, Studia Linguistica Upsaliensia 1, ISSN 1652-1366,
+ISBN 91-554-5815-7<br>
+[<a href="http://publications.uu.se/uu/fulltext/nbn_se_uu_diva-3791.pdf">pdf, 1.3MB</a>]
+[<a href="http://stp.ling.uu.se/~joerg/phd/html/">html</a>]
+[<a href="http://stp.ling.uu.se/~joerg/phd/errata.pdf">errata, pdf</a>]</dd>
+
+<dt>Tiedemann,J. 2003,</dt>
+<dd>Combining Clues for Word Alignment.
+In <cite>Proceedings of the 10th Conference
+of the European Chapter of the ACL (EACL03)</cite>
+Budapest, Hungary, April 12-17, 2003<br>
+<a href="http://stp.ling.uu.se/~joerg/paper/eacl03.pdf">[pdf, 90 kB]</a>
+<a href="http://stp.ling.uu.se/~joerg/paper/eacl03.ps"> [ps, 93 kB]</a></dd>
+
+<DT>Ahrenberg, Lars, Merkel, Magnus, Sågvall Hein, A., Tiedemann, J.,
+2000.</DT>
+<DD>Evaluation of Word Alignment Systems. In <i>Proceedings of LREC 2000,
+Athens/Greece.</i>
+<BR>
+<A HREF="http://stp.ling.uu.se/~corpora/plug/paper/lrec2000.pdf">[pdf, 406kB]</A>
+<A HREF="http://stp.ling.uu.se/~corpora/plug/paper/lrec2000.ps">[ps, 757kB]</A>
+<A HREF="http://stp.ling.uu.se/~corpora/plug/paper/lrec2000.ps.gz">[gzipped ps, 236kB]</A></DD>
+</DL>
+<HR>';
+return $html;
+}
+
+
+#########################################################################
+#########################################################################
+#########################################################################
+
+sub RegisterForm{
+    my $html='<CENTER>
+<H2 ALIGN=CENTER>UplugWeb Registration</H2>
+</CENTER>
+
+<HR>
+
+<P>
+<FORM METHOD="POST" ACTION="?a=register" 
+      NAME="UPLUGUSER" ENCTYPE="multipart/form-data">
+
+<table border=0>
+<tr><td>User*:</td><td><INPUT SIZE=20 NAME="User"> (your e-mail
+address)</td></tr>
+<tr><td>Name*:</td><td><INPUT SIZE=30 NAME="Name"> (your name
+including titles etc.) </td></tr>
+<tr><td>Address:</td><td><INPUT SIZE=30 NAME="Address"> (e.g. street etc.)</td></tr>
+<tr><td>ZIP code:</td><td><INPUT SIZE=10 NAME="ZIP"> (postal code)</td></tr>
+<tr><td>City:</td><td><INPUT SIZE=20 NAME="City"></td></tr>
+<tr><td>Country:</td><td><INPUT SIZE=20 NAME="Country"></td></tr>
+<tr><td>Telephone:</td><td><INPUT SIZE=20 NAME="Telephone"></td></tr>
+<tr><td>Password*:</td><td><INPUT type=password SIZE=15 NAME="Password"></td></tr>
+<tr><td>Re-type the password*:</td><td><INPUT type=password SIZE=15 NAME="re-typed"></td></tr>
+</table>
+
+<p>
+<h3>License Agreement</h3>
+
+<div class="license">
+
+UplugWeb referes to all interfaces, scripts, and documentation that are
+provided from the Uplug homepage  (including
+linked pages and documents in all subdirectories)
+<!-- at the following URL: 
+<a href="/~joerg/uplug2/">http://stp.ling.uu.se/~joerg/uplug2/</a> -->
+<p>
+UplugWeb is supplied "as is", without any
+accompanying services or improvements from the Proprietors.
+<p>
+The Proprietors make no warranty, express, or implied, as to the
+   accuracy, capability, efficiency, merchantability, or functioning
+   of UplugWeb and its documentation. In no event will the Proprietors be
+   liable for any general, consequential, indirect, incidental,
+   exemplary or special damages, even if the Proprietors have been
+   advised of the possibility of such damages. The Proprietors make no
+   representations or warranties of merchantability or fitness for
+   any particular purpose or that the use of the licensed software
+   components or documentation will not infringe any patents,
+   copyrights, trademarks or other rights.
+<p>
+Title to copyright of UplugWeb and to any associated documentation
+   shall at all times remain with the Proprietors, and the Licensee
+   agrees to preserve same.
+<p>
+If the Licensee, or any authorized user at the Licensees site,
+   publishes any work to which UplugWeb has contributed directly or
+   indirectly, The Licensee shall acknowledge UplugWeb by name in the
+   publication.
+<p>
+The Proprietors do not guarantee the maintenance of UplugWeb. The
+Proprietors have the right to remove or modify any part of UplugWeb at any time
+and the Licensee agrees with that.
+<p>
+The Proprietors have the right to store any data that has been
+submitted to the UplugWeb server. The Licensee may contact the
+Proprietors in order to remove data from the Proprietors site. 
+All communication to the Proprietors shall be sent to:
+
+<a href="mailto:';
+    $html.=$SAVEMAIL.'">'.$SAVEMAIL.'</a>';
+    $html.='</div>
+
+</font>
+<p>
+<INPUT TYPE="checkbox" checked NAME="license" VALUE="1"> 
+I have read the complete
+license agreement as specified above and agree with all its parts.
+
+<P>
+<INPUT TYPE="SUBMIT" VALUE="send">
+<INPUT TYPE="RESET">
+</FORM>
+(* - required parameters)
+<HR>
+';
+return $html;
+}
+
+
+
+sub Register{
+
+    my %ParamValue=();
+    my @ParamName = (
+		     'User',
+		     'Name',
+		     'Address',
+		     'ZIP',
+		     'City',
+		     'Country',
+		     'Telephone',
+		     'Password',
+		     're-typed',
+		     'license'
+		     );
+    &GetParameter(\@ParamName,\%ParamValue);
+    my %ParamSpec=(
+		   'User'     => '^\S+\@\S+\.\w{2,3}$',
+		   'Name'     => '\S',
+		   'Address'  => '.*',
+		   'ZIP'      => '.*',
+		   'City'     => '.*',
+		   'Country'  => '.*',
+		   'Telephone'=> '.*',
+		   'Password' => '.+',
+		   'license' => '1',
+		   're-typed' => "\^$ParamValue{'Password'}\$"
+		   );
+
+    my $UserDataFile=$UPLUGDATA.'/.user';
+    my $PasswordFile=$UPLUGDATA.'/.htpasswd';
+
+
+    if (not &CheckParameter(\%ParamValue,\@ParamName,\%ParamSpec)){
+	return 0;
+    }
+
+    if (&MakeNewUser(\%ParamValue)){
+	my $body=&MakeEmailBody(\%ParamValue);
+	my $subject='UplugWeb registration';
+	&SendUserInfo($UPLUGADMIN,$ParamValue{'User'},$subject,$body);
+	&SendUserInfo($UPLUGADMIN,$UPLUGADMIN,$subject,$body);
+    }
+
+    my $html='<table border=0>';
+    $html.= "<tr><th>Name</th><td>$ParamValue{'Name'}</td></tr>\n";
+    $html.= "<tr><th>Address</th><td>$ParamValue{'Address'}</td></tr>\n";
+    $html.= "<tr><th></th><td>$ParamValue{'ZIP'} $ParamValue{'City'}</td></tr>\n";
+    $html.= "<tr><th></th><td>$ParamValue{'Country'}</td></tr>\n";
+    $html.= "<tr><th>Telphone</th><td>$ParamValue{'Telephone'}</td></tr>\n";
+    $html.= "<tr><th>e-mail</th><td>$ParamValue{'User'}</td></tr>\n";
+    $html.= '</table>';
+    $html.= '<p>Your e-mail address will be used as your private user name. 
+              Please, use it exactely as specified
+              above to enter the Uplug user pages.
+              The password, you have specified, will be sent to you by e-mail.
+              You do not have to wait for the mail. Your account has been
+              created already.
+           <br>Click ';
+    $html.= "<a target=\"_top\" href=\"user/login\">here</a> to login!";
+    $html.= '
+           <p>Send e-mail to 
+           <A HREF="mailto:';
+    $html.=$SAVEMAIL.'">'.$SAVEMAIL.'</a> ';
+    $html.='in case of any trouble. Any kind of feedback is very welcome!
+           <p>Enjoy using UplugWeb and good luck!';
+    return $html;
+}
+
+
+sub MakeEmailBody{
+    my $ParamValue=shift;
+    my $MailText="Name        $$ParamValue{'Name'}\n";
+    $MailText.="Address     $$ParamValue{'Address'}\n";
+    $MailText.="            $$ParamValue{'ZIP'} $$ParamValue{'City'}\n";
+    $MailText.="            $$ParamValue{'Country'}\n";
+    $MailText.="Tel         $$ParamValue{'Telephone'}\n";
+    $MailText.="e-mail      $$ParamValue{'User'}\n";
+    $MailText.="Password    $$ParamValue{'Password'}\n\n";
+    $MailText.='
+Your e-mail address will be used as your private user name. 
+Please, use your complete e-mail address exactely as specified
+above to enter the Uplug user pages.
+
+Send e-mail to joerg@stp.ling.uu.se in case of any trouble.
+Any kind of feedback is very welcome!
+
+Enjoy using UplugWeb and good luck!
+
+
+Jörg Tiedemann
+
+***********/\/\/\/\/\/\/\/\/\/\/\************************************
+**  Joerg Tiedemann                 joerg@stp.ling.uu.se           **
+**  Department of Linguistics    http://stp.ling.uu.se/~joerg/     **
+**  Uppsala University               tel: (018) 471 7007           **
+**  S-751 20 Uppsala/SWEDEN          fax: (018) 471 1416           **
+*************************************/\/\/\/\/\/\/\/\/\/\/\**********
+';
+    return $MailText;
+}
+
+
+sub SendUserInfo{
+
+    my ($from,$to,$subject,$message)=@_;
+
+    my $mailer=Mail::Mailer->new("sendmail");
+    $mailer->open({From    => $from,
+		   To      => $to,
+		   Subject => $subject});
+    print $mailer $message;
+    $mailer->close();
+}
+
+sub GetParameter{
+    my ($ParamName,$ParamValue)=@_;
+    foreach (@{$ParamName}){
+	$$ParamValue{$_} = &my_param($_);
+    }
+}
+
+sub CheckParameter{
+    my ($ParamValue,$ParamName,$ParamSpec)=@_;
+    my $ParamOK=1;
+    foreach (@{$ParamName}){
+	if ($$ParamValue{$_}!~/$$ParamSpec{$_}/){
+	    if ($ParamOK){
+		print '<strong>Oops!</strong> ';
+		print "The following data have not been specified correctly:";
+		print '<strong><ul>';
+	    }
+	    print "<li>$_\n";
+	    $ParamOK=0;
+	}
+    }
+    if (not $ParamOK){
+	print '</ul></strong>';
+	print '<p><hr>Please, fill out the form correctly and try again<br>';
+    }
+    return $ParamOK;
+}
+
+
+sub MakeNewUser{
+
+    my $UserData=shift;
+    my $User=$UserData->{User};
+    my $Password=$UserData->{Password};
+
+    my $UserDataFile=$UPLUGDATA.'/.user';
+    my $PasswordFile=$UPLUGDATA.'/.htpasswd';
+
+    if (not -e $UPLUGDATA){
+	system "mkdir $UPLUGDATA";
+    }
+    if (not -e "$UPLUGDATA/$User"){
+	system "mkdir $UPLUGDATA/$User";
+	system "touch $UPLUGDATA/$User/.corpora";
+	system "touch $UPLUGDATA$User/.user";
+
+#	if (system "$HTPASSWD -nb '$User' '$Password' >>$PasswordFile"){
+#	    print "problems: $!<br>";
+#	}
+#	elsif (system "$HTPASSWD -nb '$User' '$Password' >>$PasswordFile";){
+#	    print "problems: $? --- $! -- $@<br>";
+#	}
+
+	if (not -e $PasswordFile){
+	    if (system "$HTPASSWD -c -b $PasswordFile '$User' '$Password'"){
+		print "problems: $? --- $! -- $@\n";
+	    }
+	    system "chmod g+w $PasswordFile";
+	}
+	else{
+	    if (system "$HTPASSWD -b $PasswordFile '$User' '$Password'"){
+		print "problems: $? --- $! -- $@<br>";
+	    }
+	}
+	
+	&SaveUserData("$UPLUGDATA/$User/.user",$UserData);
+	system "echo '$UserData->{User}:$UPLUGDATA/$User/.user'>>$UserDataFile";
+    }
+    else{
+	print "User $User exists already!".&p();
+	return 0;
+    }
+    return 1;
+}
+
+
+
+
+sub SaveUserData{
+    my ($file,$UserData)=@_;
+    if (not -e $UPLUGDATA){
+	system "mkdir $UPLUGDATA";
+    }
+    open F,">$file";
+    foreach (keys %{$UserData}){
+	if ($_ eq 'license'){next;}
+	if ($_ eq 're-typed'){next;}
+	print F "$_:$UserData->{$_}\n";
+    }
+    close F;
+}

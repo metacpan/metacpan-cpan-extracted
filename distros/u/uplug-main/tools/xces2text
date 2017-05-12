@@ -1,0 +1,131 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+# -*-perl-*-
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# $Id: xces2text,v 1.1.1.1 2004/05/03 15:39:55 joerg72 Exp $
+#----------------------------------------------------------------------------
+# usage: koma2text [OPTIONS] koma-align-file src-output trg-output
+#
+# OPTIONS:
+#
+#   -s attr .... source attribute (e.g. 'pos')        optional
+#   -t attr .... target attribute (e.g. 'pos')        optional
+#   -twente .... add '$' as SOFTDELIMITER for twente-alignment
+#   -latin1 .... output in iso-8859-1, default: unicode (utf8)
+#
+# 
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/..";
+
+use Uplug::Data::Align;
+use Uplug::IO::Any;
+
+my $srcattr;
+my $trgattr;
+my $twente=0;
+my $utf8=0;
+
+my %InputStream=('format' => 'xces align');
+my %SrcStream=('format' => 'text','encoding' => 'utf-8');
+my %TrgStream=('format' => 'text','encoding' => 'utf-8');
+
+while ($ARGV[0]=~/^\-/){
+    my $opt=shift(@ARGV);
+    if ($opt eq '-s'){
+	$srcattr=shift(@ARGV);
+    }
+    if ($opt eq '-t'){
+	$trgattr=shift(@ARGV);
+    }
+    if ($opt eq '-twente'){
+	$twente=1;
+    }
+    if ($opt eq '-latin1'){
+	$SrcStream{encoding}='iso-8859-1';
+	$TrgStream{encoding}='iso-8859-1';
+    }
+}
+
+$InputStream{file}=shift(@ARGV);
+$SrcStream{file}=shift(@ARGV);
+$TrgStream{file}=shift(@ARGV);
+
+#---------------------------------------------------------------------------
+
+my $input=Uplug::IO::Any->new(\%InputStream);
+my $source=Uplug::IO::Any->new(\%SrcStream);
+my $target=Uplug::IO::Any->new(\%TrgStream);
+$input->open('read',\%InputStream);
+$source->open('write',\%SrcStream);
+$target->open('write',\%TrgStream);
+
+my %SrcParam=();
+my %TrgParam=();
+
+if (defined $srcattr){$SrcParam{'use attribute'} = $srcattr;}
+if (defined $trgattr){$TrgParam{'use attribute'} = $trgattr;}
+
+#---------------------------------------------------------------------------
+
+my $data=Uplug::Data::Align->new();
+
+my $count=0;
+while ($input->read($data)){
+    $count++;
+    if (not ($count % 100)){
+	$|=1;print STDERR '.';$|=0;
+    }
+    if (not ($count % 1000)){
+	$|=1;print STDERR "$count\n";$|=0;
+    }
+
+#    if (keys %SrcParam){$srctxt=join ' ',$data->getSrcTokens(\%SrcParam);}
+#    else{$srctxt=$data->content('source');}
+#    if (keys %TrgParam){$trgtxt=join ' ',$data->getTrgTokens(\%TrgParam);}
+#    else{$trgtxt=$data->content('target');}
+
+    my @srctok=$data->getSrcTokens(\%SrcParam);
+    my @trgtok=$data->getTrgTokens(\%TrgParam);
+    map($_=~s/\n/ /sg,@srctok);
+    map($_=~s/\n/ /sg,@trgtok);
+    map($_=~s/\s/\_/sg,@srctok);
+    map($_=~s/\s/\_/sg,@trgtok);
+
+    my $srctxt=join(' ',@srctok);
+    my $trgtxt=join(' ',@trgtok);
+
+    $srctxt=~tr/\n/ /;
+    $trgtxt=~tr/\n/ /;
+
+    if (($srctxt=~/\S/) and ($trgtxt=~/\S/)){
+
+	if ($twente){
+	    $srctxt=~s/\$/DOLLAR/g;
+	    $trgtxt=~s/\$/DOLLAR/g;
+	    $srctxt=~s/\@/AT/g;
+	    $trgtxt=~s/\@/AT/g;
+	}
+
+	$source->write($srctxt);
+	$target->write($trgtxt);
+	if ($twente){
+	    $source->write('$');
+	    $target->write('$');
+	}
+    }
+}
+
+if ($twente){
+    $source->write('@');
+    $target->write('@');
+}
+
+$input->close;
+$source->close;
+$target->close;
+
+

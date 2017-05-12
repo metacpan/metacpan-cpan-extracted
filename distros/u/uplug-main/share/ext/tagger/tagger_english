@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+
+use FindBin qw($Bin);
+
+my $JAVA=`which java`;
+chomp $JAVA;
+
+my $GROK_HOME = "$Bin/../grok";
+my $GROK_LIB  = "$GROK_HOME/lib";
+my @JARS;
+opendir(LIB, $GROK_LIB) or die "Can't open $dir: $!";
+while( defined ($file = readdir LIB) ) {
+    push (@JARS,"$GROK_LIB/$file") if $file=~/.jar$/;
+}
+closedir(LIB);
+$ENV{CLASSPATH}=join(':',@JARS).':'.$Bin;
+
+my $file=$ARGV[0];                                  # file to be tagged
+system "$JAVA GrokTaggerEN $file";                  # call the tagger
+exit;

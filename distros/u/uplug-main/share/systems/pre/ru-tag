@@ -1,0 +1,44 @@
+{
+  'module' => {
+    'name' => 'Italian pre-processing',
+    'submodules' => [
+        'pre/tok -l ru',
+        'pre/ru/annotate',
+    ],
+    'submodule names' => [
+        'standard tokenizer',
+        'linguistic annotation',
+    ],
+    'stdin' => 'text',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+      'status' => 'tag'
+    }
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+	'out' => 'output:text:file',
+       'ci' => 'input:text:encoding',
+       'co' => 'output:text:encoding',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=text,language=it)'
+	  },
+       },
+  }
+}

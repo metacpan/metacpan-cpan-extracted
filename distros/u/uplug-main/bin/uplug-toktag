@@ -1,0 +1,431 @@
+#!/usr/bin/env perl
+#-*-perl-*-
+#
+# toktag.pl: a simple UPLUG wrapper for a tokenizer + (POS) tagger
+#
+# usage: toktag.pl <infile >outfile
+#        toktag.pl [-i config] [-in in] [-out out] [-l language] [-s syst]
+#
+# config      : configuration file
+# in          : input file (source language)
+# out         : output file
+# l           : language (requires a startup script in './tagger/')
+# syst        : Uplug system (subdirectory of UPLUGSYSTEM)
+#
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#----------------------------------------------------------------------------
+#
+#            * requires a startup script for an external POS tagger
+#              in the directory 'tagger/' (relative to UPLUG home directory)
+#            * default startup-script: tagger_$language
+#            * default language: swedish
+#            * default input format for the tagger:
+#                   1 sentence per line, each token separated by <SPACE>
+#            * default tagger output:
+#                   1 sentence per line, tags are appended to each token
+#                   (token1/tag1 token2/tag2 token3/tag3 ...)
+#            * default attribute name: pos
+#
+# 
+use strict;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+my $UplugHome="$Bin/../";
+$ENV{UPLUGHOME}  = $UplugHome;
+$ENV{UPLUGSHARE} = &shared_home;
+
+use Uplug::Data;
+use Uplug::IO::Any;
+use Uplug::Config;
+use Uplug::Encoding;
+use Encode;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='toktag.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+my ($InputStreamName,$InputStream)=
+    each %{$IniData{'input'}};               # the first input stream;
+my ($OutputStreamName,$OutputStream)=         # take only
+    each %{$IniData{'output'}};               # the first output stream
+
+my $input=Uplug::IO::Any->new($InputStream);
+my $output=Uplug::IO::Any->new($OutputStream);
+
+#---------------------------------------------------------------------------
+# general options (for the external program)
+
+my $lang=$IniData{parameter}{tagger}{language};
+my $startup=$IniData{parameter}{tagger}{'startup base'};
+
+# ... or a specific program and a language specific model
+my $tagger=$IniData{parameter}{tagger}{program};
+
+# additional tagger arguments
+my $TaggerArgs=$IniData{parameter}{tagger}{parameter};
+# tagging model (will be appended as additional argument)
+my $TaggerModel=$IniData{parameter}{tagger}{model};
+
+# set to stdin if the tagger needs piped data
+my $TaggerInput=$IniData{parameter}{tagger}{input} || 'last argument';
+
+#---------------------------------------------------------------------------
+# tokenizer options:
+
+my $SegTag=$IniData{parameter}{segments}{tag};
+my $AddId=$IniData{parameter}{segments}{'add IDs'};
+my $AddSpans=$IniData{parameter}{segments}{'add spans'};
+my $KeepSpaces=$IniData{parameter}{segments}{'keep spaces'};
+my $AddParId=$IniData{parameter}{segments}{'add parent id'};
+
+#---------------------------------------------------------------------------
+# tagging options
+
+my $attr=$IniData{parameter}{output}{attribute};
+my $OutAttr=$IniData{parameter}{output}{attributes};
+my $OutPattern=$IniData{parameter}{output}{pattern};
+my $OutTokDel=$IniData{parameter}{output}{'token delimiter'};
+my $InSentDel=$IniData{parameter}{input}{'sentence delimiter'};
+my $OutSentDel=$IniData{parameter}{output}{'sentence delimiter'};
+my $TagDel=$IniData{parameter}{output}{'tag delimiter'};
+my %InputReplace=();
+if (ref($IniData{parameter}{'input replacements'}) eq 'HASH'){
+    %InputReplace=%{$IniData{parameter}{'input replacements'}};
+}
+my %OutputReplace=();
+if (ref($IniData{parameter}{'output replacements'}) eq 'HASH'){
+    %OutputReplace=%{$IniData{parameter}{'output replacements'}};
+}
+my @Attr=split(/:/,$OutAttr);
+
+#---------------------------------------------------------------------------
+
+my $TaggerPrg;
+if (defined $startup){
+    $TaggerPrg = &shared_home.'/ext/tagger/'.$startup;
+    if (not -e $TaggerPrg){
+	$TaggerPrg.=$lang;  # if necessary
+    }	
+}
+elsif (defined $tagger){
+    $TaggerPrg = &find_executable($tagger);
+}
+$TaggerPrg .= ' '.$TaggerArgs;
+$TaggerPrg .= ' '.$TaggerModel;
+
+my $TmpUntagged=Uplug::IO::Any::GetTempFileName;
+my $TmpTagged=Uplug::IO::Any::GetTempFileName;
+
+#---------------------------------------------------------------------------
+
+my $data=Uplug::Data->new;
+
+print STDERR "Tagger.pl: create temporary text file!\n";
+
+$input->open('read',$InputStream);
+my $UplugEncoding=$input->getInternalEncoding();
+
+my $InEncoding=$IniData{parameter}{input}{encoding};
+my $OutEncoding=$IniData{parameter}{output}{encoding};
+my $ModelEncoding=$IniData{parameter}{tagger}{encoding};
+
+if (not defined $ModelEncoding){$ModelEncoding=$UplugEncoding;}
+if (not defined $InEncoding){$InEncoding=$ModelEncoding;}
+if (not defined $OutEncoding){$OutEncoding=$InEncoding;}
+
+my $untagged=Uplug::IO::Any->new('text');
+$untagged->open('write',{file=>$TmpUntagged,encoding=>$InEncoding});
+
+while ($input->read($data)){
+
+    my $txt=$data->content;
+    if ($txt){
+	$txt=&FixTaggerData($txt,\%InputReplace);
+
+	## handle malformed data by converting to octets and back
+	## the sub in encode ensures that malformed characters are ignored!
+	## (see http://perldoc.perl.org/Encode.html#Handling-Malformed-Data)
+	if ($InEncoding ne $UplugEncoding){
+	    my $octets = encode($InEncoding, $txt,sub{ return ' ' });
+	    $txt = decode($InEncoding, $octets );
+	}
+	$untagged->write($txt.$InSentDel);
+    }
+}
+
+$untagged->close;
+$input->close;
+
+
+#---------------------------------------------------------------------------
+print STDERR "Tagger.pl: call external tagger!\n";
+print STDERR "   $TaggerPrg $TmpUntagged >$TmpTagged\n";
+
+`$TaggerPrg $TmpUntagged >$TmpTagged`;
+
+#---------------------------------------------------------------------------
+
+my $InputSeperator=$/;
+
+print STDERR "Tagger.pl: read tagged file and create output data!\n";
+
+$input->open('read',$InputStream);
+$output->open('write',$OutputStream);
+open F,"<$TmpTagged";
+binmode(F,':encoding('.$OutEncoding.')');
+
+my $TextAttr;
+foreach my $j (0..$#Attr){
+    if (($Attr[$j] eq 'text') or 
+	($Attr[$j] eq 'word')){
+	$TextAttr=$j;          # this is the column with the segment string
+	last;
+    }
+}
+
+my $ret;
+my $id=0;
+my $parId=0;
+my $idhead='';
+my $data=Uplug::Data->new;    # use a new data-object (new XML parser!)
+while ($ret=$input->read($data)){
+    my $txt=$data->content;
+    if (not $txt){
+	$output->write($data);
+	next;
+    }
+    $/=$OutSentDel;
+    my $tagged=undef;
+    my @tok=();
+    $tagged=<F>;
+    $tagged=&FixTaggerData($tagged,\%OutputReplace);
+    chomp $tagged;
+    @tok=split(/$OutTokDel/,$tagged);
+
+    my @SegAttr=();
+    my @SegString=();
+    foreach my $i (0..$#tok){
+	$tok[$i]=~/$OutPattern/s;
+	my @Val=($1,$2,$3,$4,$5,$6,$7,$8,$9);
+	$SegString[$i]=$Val[$TextAttr];
+	%{$SegAttr[$i]}=();
+	foreach my $j (0..$#Attr){
+	    if ($j == $TextAttr){next;}
+	    if ($Val[$j]=~/^\s*$/){next;}
+	    $SegAttr[$i]{$Attr[$j]}=$Val[$j];
+	}
+    }
+
+    #-------------------------------------------------------
+    if ($AddParId){                        # add parent id's
+	$idhead=$data->attribute('id');
+	if ($idhead=~/^[^0-9]([0-9].*)$/){
+	    $idhead=$1;
+	}
+	if (not defined $idhead){
+	    $parId++;
+	    $idhead=$parId;
+	    $data->setAttribute('id',$parId);
+	}
+	$idhead.='.';
+	$id=0;
+    }
+    #-------------------------------------------------------
+    my $root=$data->getRootNode();
+
+
+    ##---------------------------------------------------------------
+    ## if w exists already --> keep tokenization and add attributes
+
+    my @children=$data->findNodes($SegTag);
+    if (@children){
+
+	## if there are more tags than tokens:
+	## - check if there were problems with character encoding conversion
+	## - if not: skip this sentence (write data without adding annotations)
+
+	if (@children != @SegAttr){
+	    if ($InEncoding ne $UplugEncoding){
+		@children = $data->contentNodesEncoded($InEncoding);
+	    }
+	    if (@children != @SegAttr){
+		print STDERR "# toktag.pl - warning: ";
+		print STDERR scalar @children," tokens but ",
+		scalar @SegAttr," tags!! (try to match them anyway)\n";
+	    }
+	}
+
+	my @ChildString=();
+	foreach my $c (@children){
+	    push(@ChildString,$c->content);
+	}
+
+	## find tokens that match
+	my %matching=();
+	my ($x,$y)=(0,0);
+	while ($x<=$#children){
+	    if ($ChildString[$x] eq $SegString[$y]){
+		$matching{$x} = $y;
+		$x++;$y++;
+	    }
+	    elsif ($ChildString[$x] eq $SegString[$y+1]){$y++;}
+	    elsif ($ChildString[$x+1] eq $SegString[$y]){$x++;}
+	    else{$x++;$y++;}
+	}
+
+	## set attributes for matching tokens
+	foreach my $x (keys %matching){
+	    foreach my $j (keys %{$SegAttr[$matching{$x}]}){
+		if ($SegAttr[$matching{$x}]{$j}=~/\S/){
+		    $data->setAttribute($children[$x],$j,
+					$SegAttr[$matching{$x}]{$j});;
+		}
+	    }
+	}
+	$output->write($data);
+	$/=$InputSeperator;
+	next;
+    }
+
+    ##---------------------------------------------------------------
+    ## no segmentation exists --> split and create new content nodes
+
+    my @children=$data->splitContent($root,$SegTag,\@SegString);
+    foreach (0..$#children){
+	if (ref($SegAttr[$_]) ne 'HASH'){next;}
+	foreach my $j (keys %{$SegAttr[$_]}){
+	    if ($SegAttr[$_]{$j}=~/\S/){
+		$data->setAttribute($children[$_],$j,$SegAttr[$_]{$j});;
+	    }
+	}
+#	$data->setAttributes($children[$_],$SegAttr[$_]);
+	if ($AddId){
+	    $id++;
+	    $data->setAttribute($children[$_],
+				'id',"$SegTag$idhead$id");
+	}
+    }
+
+    $output->write($data);
+    $/=$InputSeperator;
+}
+close F;
+$input->close;
+$output->close;
+
+$/=$InputSeperator;
+
+END {
+    unlink $TmpUntagged;
+    unlink $TmpTagged;
+}
+
+############################################################################
+
+sub FixTaggerData{
+    my ($string,$subst)=@_;
+    foreach (keys %{$subst}){
+	$string=~s/$_/$subst->{$_}/sg;
+    }
+    return $string;
+}
+
+sub GetDefaultIni{
+
+    my $DefaultIni = 
+{
+  'input' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+    }
+  },
+  'output' => {
+    'text' => {
+      'format' => 'xml',
+      'root' => 's',
+      'write_mode' => 'overwrite',
+#	'encoding' => 'iso-8859-1',
+	'status' => 'tagTree',
+    }
+  },
+  'required' => {
+    'text' => {
+      'words' => undef,
+    }
+  },
+  'parameter' => {
+     'segments' => {
+	  'add IDs' => 1,
+	  'add parent id' => 1,
+	'tag' => 'w',
+     },
+     'tagger' => {
+      'language' => 'english',
+      'startup base' => 'tree_',
+     },
+     'output' => {
+#        'attribute' => 'pos',
+        'attributes' => 'text:tree:lem',
+        'pattern' => '^(.*)\t+(.*)\t+(.*)$',
+        'token delimiter' => "\n",
+        'sentence delimiter' => "\n<s>\n",
+        'tag delimiter' => '\s+',
+	'encoding' => 'iso-8859-1',
+     },
+     'input' => {
+        'token delimiter' => " ",
+        'sentence delimiter' => "\n<s>\n",
+     },
+     'output replacements' => {
+        '<unknown>' => '',
+     },
+  },
+  'module' => {
+    'program' => 'toktag.pl',
+    'location' => '$UplugBin',
+    'name' => 'tree tagger (english)',
+    'stdout' => 'text'
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:text:file',
+       'out' => 'output:text:file',
+      'lang' => 'parameter:tagger:language',
+       'attr' => 'parameter:output:attribute',
+       'char' => 'output:text:encoding',
+       'co' => 'output:text:encoding',
+       'ci' => 'input:text:encoding',
+       'r' => 'input:text:root',
+    }
+  },
+  'widgets' => {
+       'input' => {
+	  'text' => {
+	    'stream name' => 'stream(format=xml,status=sent,language=en)'
+	  },
+       },
+  }
+};
+    return %{$DefaultIni};
+}

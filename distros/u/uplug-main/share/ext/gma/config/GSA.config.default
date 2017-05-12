@@ -1,0 +1,22 @@
+# configuration file for map2lm part of GMA package
+# Copyright (C) 2000 by I. Dan Melamed
+
+# All parameters are mandatory unless otherwise indicated.
+# Lines starting with '#' like this one are comments and will be ignored.
+# Other lines should have the parameter name and value(s) separated by whitespace.
+
+# This is a master configuration file for GSA parameters, but can include other
+# configuration files like this: #INCLUDE	another_config_file_name
+# This is useful if you want to, e.g., separate out the numeric
+# parameters for optimization. 
+##############################################################################
+
+## ----- alignment parameters -----
+
+####################
+##
+## agressiveness of alignment backing off
+##
+####################
+
+backOff = 0.2

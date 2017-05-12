@@ -1,0 +1,296 @@
+#!/usr/bin/env perl
+#
+# ngramstat.pl: n-gram statistics
+#
+#---------------------------------------------------------------------------
+# Copyright (C) 2004 Jörg Tiedemann  <joerg@stp.ling.uu.se>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#---------------------------------------------------------------------------
+#
+# $Id$
+#
+# usage: 
+#
+#
+
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+
+use Uplug::IO::Any;
+use Uplug::Data;
+use Uplug::Config;
+use Uplug::CoocStat;
+
+my %IniData=&GetDefaultIni;
+my $IniFile='NgramStat.ini';
+&CheckParameter(\%IniData,\@ARGV,$IniFile);
+
+#---------------------------------------------------------------------------
+
+my ($InputStreamName,$InputStream)=             # input stream
+    each %{$IniData{'input'}};
+my ($OutputStreamName,$OutputStream)=             # output stream
+    each %{$IniData{'output'}};
+
+my $input=Uplug::IO::Any->new($InputStream);
+my $output=Uplug::IO::Any->new($OutputStream);
+
+#---------------------------------------------------------------------------
+
+$input->open('read',$InputStream);
+$output->open('write',$OutputStream) || exit;
+
+#---------------------------------------------------------------------------
+
+my $Param={};
+$Param=$IniData{parameter};
+my $FreqHeader=$input->header();
+
+my $MinFreq=$IniData{parameter}{token}{'minimal frequency'};
+my $measure=$IniData{parameter}{statistics}{measure};
+my $MinScore=$IniData{parameter}{statistics}{'minimal score'};
+my $precision=$IniData{parameter}{statistics}{precision};
+my $PrintProgr=$IniData{parameter}{runtime}{'print progress'};
+
+if (ref($FreqHeader) eq 'HASH'){
+    if ((not defined $MinFreq) and 
+	(defined $FreqHeader->{'minimal frequency'})){
+	$MinFreq=$FreqHeader->{'minimal frequency'};
+    }
+    $FreqHeader->{measure}=$measure;
+    $FreqHeader->{threshold}=$MinScore;
+    $output->addheader($FreqHeader);
+}
+
+my $stat=Uplug::CoocStat->new($measure);
+if (not ref($stat)){die "# ngramstat.pl: cannot find '$measure'!\n";}
+
+#---------------------------------------------------------------------------
+
+if ($PrintProgr){
+    print STDERR "read frequencies\n";
+}
+
+my $data=Uplug::Data->new();
+my $time=time();
+my $count=0;
+my $accepted=0;
+
+while ($input->read($data)){
+
+    if ($PrintProgr){
+	$count++;
+	if (not ($count % 500)){
+	    $|=1;print STDERR '.';$|=0;
+	}
+	if (not ($count % 10000)){
+	    $|=1;
+	    print STDERR "$accepted ($count) ngrams (";
+	    print STDERR time()-$time;
+	    print STDERR " sec)\n";
+	    $|=0;
+	}
+    }
+
+    my $tok=$data->data();
+    my @words=split(/\s+/,$tok->{token});
+    my $len=@words;
+    if ($len<2){next;}
+
+    my ($left,$right);
+    my ($first,$second);
+    if ($measure=~/left/i){
+	$second=shift(@words);                # take the initial word
+    }
+    else{
+	$second=pop(@words);                  # take the final word
+    }
+    $first=join (' ',@words);
+    $left=&GetTokFreq($input,$first);
+    $right=&GetTokFreq($input,$second);
+
+    my $NgramLength=$#words+2;
+    my $NrNgrams=$FreqHeader->{"$NgramLength-gram freq"};
+    my $score=$stat->compute($tok->{freq},$left,$right,$NrNgrams);
+
+
+########### old: use built-in sub's
+#
+#       my $score;
+#	my $LenLeft=scalar @words;
+#	my $LenRight=1;
+#	if ($measure=~/dice/i){
+#	    $score=&Dice($tok->{freq},$left,$right);
+#	}
+#	if ($measure=~/mutual/i){
+#	    $score=&Mutual($tok->{freq},
+#			   $left,$right,
+#			   $LenLeft,$LenRight,
+#			   $FreqHeader);
+#	}
+#	if ($measure=~/t-?score/i){
+#	    $score=&Tscore($tok->{freq},
+#			   $left,$right,
+#			   $LenLeft,$LenRight,
+#			   $FreqHeader);
+#	}
+#######################
+
+    if (defined $precision){
+	$score=int($score*10**$precision+0.5)/(10**$precision);
+    }
+    if ($MinScore){
+	if ($score<$MinScore){next;}
+    }
+
+    $accepted++;
+    my $OutData=Uplug::Data->new;
+    $OutData->setAttribute('ngram',$tok->{token});
+    $OutData->setAttribute('score',$score);
+
+    $output->write($OutData);
+}
+
+
+$input->close;
+$output->close;
+
+
+
+#---------------------------------------------------------------------------
+#---------------------------------------------------------------------------
+
+sub Dice{
+    my ($freq,$left,$right)=@_;
+    my $score=0;
+    if ($freq and $left and $right){
+	$score=$freq*2/($left+$right);
+    }
+    return $score;
+}
+
+sub Mutual{
+    my ($freq,$left,$right,$LenLeft,$LenRight,$counts)=@_;
+    my $LenAll=$LenLeft+$LenRight;
+
+    my $CountLeft=$counts->{"$LenLeft-gram freq"};
+    my $CountRight=$counts->{"$LenRight-gram freq"};
+    my $CountAll=$counts->{"$LenAll-gram freq"};
+
+    my $score=0;
+    if ($CountLeft and $CountRight and $CountAll){
+	my $probleft=$left/$CountLeft;
+	my $probright=$right/$CountRight;
+	my $probpair=$freq/$CountAll;
+	if ($probleft and $probright and $probpair){
+	    $score=log(($probpair)/
+		       (($probleft)*($probright)))/
+			   log(2);
+	}
+    }
+    return $score;
+}
+
+sub Tscore{
+    my ($freq,$left,$right,$LenLeft,$LenRight,$counts)=@_;
+    my $LenAll=$LenLeft+$LenRight;
+
+    my $CountLeft=$counts->{"$LenLeft-gram freq"};
+    my $CountRight=$counts->{"$LenRight-gram freq"};
+    my $CountAll=$counts->{"$LenAll-gram freq"};
+
+    my $score=0;
+    if ($CountLeft and $CountRight and $CountAll){
+	my $probleft=$left/$CountLeft;
+	my $probright=$right/$CountRight;
+	my $probpair=$freq/$CountAll;
+	if ($probleft and $probright and $probpair){
+	    $score=($probpair-$probleft*$probright)/
+		sqrt($probpair/$CountAll);
+	}
+    }
+    return $score;
+}
+
+
+#---------------------------------------------------------------------------
+
+sub GetTokFreq{
+    my ($freq,$token)=@_;
+    my %search=('token' => $token);
+    my $found=Uplug::Data->new;
+    if ($freq->select($found,\%search)){
+	return $found->attribute('freq');
+    }
+    return 0;
+}
+
+
+#---------------------------------------------------------------------------
+
+sub GetDefaultIni{
+
+    my $DefaultIni = {
+  'module' => {
+    'name' => 'N-gram statistics',
+    'program' => 'ngramstat.pl',
+    'location' => '$UplugBin',
+    'stin' => 'text',
+    'stdout' => 'text',
+  },
+  'input' => {
+    'ngram freq' => {
+      'format' => 'DBM',
+      'key' => ['token']
+    },
+  },
+  'output' => {
+    'ngram stat' => {
+       'format' => 'uwa tab',
+       'columns' => ['ngram'],
+       'write_mode' => 'overwrite',
+    },
+  },
+  'parameter' => {
+    'token' => {
+      'minimal frequency' => 2,
+#      'delimiter' => '\s+',
+    },
+    'statistics' => {
+       'minimal score' => 0.3,
+       'measure' => 'dice',
+    },
+    'runtime' => {
+      'print progress' => 1,
+    },
+  },
+  'arguments' => {
+    'shortcuts' => {
+       'in' => 'input:ngram freq:file',
+       'infile' => 'input:ngram freq:file',
+       'informat' => 'input:ngram freq:format',
+       'out' => 'output:ngram stat:file',
+       'stat' => 'parameter:statistics:measure',
+       'min' => 'parameter:statistics:minimal score',
+       'prec' => 'parameter:statistics:precision',
+       'lang' => 'parameter:token:language (target)',
+    }
+  },
+};
+    return %{$DefaultIni};
+}

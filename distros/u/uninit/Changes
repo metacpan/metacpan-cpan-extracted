@@ -1,0 +1,6 @@
+Revision history for Perl extension uninit.
+
+0.01  Tue Oct 30 13:31:11 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n uninit
+
